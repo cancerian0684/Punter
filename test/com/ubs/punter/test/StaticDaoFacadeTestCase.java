@@ -53,14 +53,14 @@ public class StaticDaoFacadeTestCase {
 	@Test
 	public void testCreateProcessHistory() throws Exception {
 		Process proc=new Process();
-		proc.setId(1L);
+		proc.setId(1603L);
 		ProcessHistory ph=new ProcessHistory();
 		ph.setName("Test-1");
 		ph.setStartTime(new Date());
 		ph.setProcess(proc);
 		StaticDaoFacade.createProcessHistory(ph);
 		Task task=new Task();
-		task.setId(2L);
+		task.setId(1602L);
 		for(int i=0;i<=10;i++){
 		TaskHistory th=new TaskHistory();
 		th.setProcessHistory(ph);
@@ -75,7 +75,14 @@ public class StaticDaoFacadeTestCase {
 
 	@Test
 	public void testGetProcessHistoryForProcessId() throws Exception{
-		List<ProcessHistory> phl = StaticDaoFacade.getProcessHistoryListForProcessId(1L);
+		List<ProcessHistory> phl = StaticDaoFacade.getProcessHistoryListForProcessId(1603L);
+		for (ProcessHistory processHistory : phl) {
+			System.out.println(processHistory.getId());
+		}
+	}
+	@Test
+	public void testGetProcessTaskHistoryForProcessHistoryId() throws Exception{
+		List<ProcessHistory> phl = StaticDaoFacade.getProcessHistoryListForProcessId(1603L);
 		for (ProcessHistory processHistory : phl) {
 			System.out.println(processHistory.getId());
 		}

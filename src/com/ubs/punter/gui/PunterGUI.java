@@ -43,6 +43,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -71,18 +72,20 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import com.sun.jmx.snmp.tasks.TaskServer;
 import com.ubs.punter.Tasks;
 import com.ubs.punter.jpa.Process;
 import com.ubs.punter.jpa.ProcessHistory;
 import com.ubs.punter.jpa.StaticDaoFacade;
 import com.ubs.punter.jpa.Task;
+import com.ubs.punter.jpa.TaskHistory;
 
 /** 
  * TableRenderDemo is just like TableDemo, except that it
  * explicitly initializes column sizes and it uses a combo box
  * as an editor for the Sport column.
  */
-public class PunterGUI extends JPanel {
+public class PunterGUI extends JPanel implements TaskObserver{
     private boolean DEBUG = false;
     private static JFrame frame;
     private final JTable taskTable;
@@ -95,14 +98,6 @@ public class PunterGUI extends JPanel {
     public PunterGUI() throws Exception {
         super(new GridLayout(1,0));
         processTable=new JTable(new ProcessTableModel());
-        ProcessTableModel model=(ProcessTableModel) processTable.getModel();
-        List<Process> pl = StaticDaoFacade.getProcessList();
-        for (Process p : pl) {
-        	final ArrayList<Object> newRequest = new ArrayList<Object>();
-        	newRequest.add(p.getName());
-        	newRequest.add(p);
-        	model.insertRow(newRequest);
-		}
         processTable.setShowGrid(true);
         processTable.setPreferredScrollableViewportSize(new Dimension(100, 400));
         processTable.setFillsViewportHeight(true);
@@ -261,7 +256,7 @@ public class PunterGUI extends JPanel {
 		runProcessMenu = new JMenuItem("Run Process");
 		runProcessMenu.addActionListener(new ActionListener() {
 	          public void actionPerformed(ActionEvent e) {
-	        	  System.out.println("Adding new Process");
+	        	  System.out.println("Running Process");
 	        	  try{
 	        		  if(processTable.getSelectedRow()!=-1){
 	        		  ProcessTableModel model=(ProcessTableModel) processTable.getModel();
@@ -269,13 +264,30 @@ public class PunterGUI extends JPanel {
 	        		  Process p=(Process) currRow.get(1);
 	        		  System.out.println(p.getId()+" == "+p.getName());
 	        		  List<Task> ptl = StaticDaoFacade.getProcessTasksById(p.getId());
-	        		  com.ubs.punter.Process process=new com.ubs.punter.Process();
+	        		  final com.ubs.punter.Process process=new com.ubs.punter.Process();
 	        		  for (Task task : ptl) {
 						System.out.println(task.getId());
 						Tasks t=Tasks.getTask(task.getName(), task.getInputParams(), task.getOutputParams());
-						process.addTask(t);
+						process.addTask(t,task);
 	        		  	}
-	        		  process.execute();
+	        		  ProcessHistory ph=new ProcessHistory();
+	        		  ph.setName("Test-1");
+	        		  ph.setStartTime(new Date());
+	        		  ph.setProcess(p);
+	        		  ph=StaticDaoFacade.createProcessHistory(ph);
+	        		  final ArrayList<Object> newRequest = new ArrayList<Object>();
+	      	          newRequest.add(ph.getId());
+	      	          newRequest.add(ph);
+	        		  ((ProcessHistoryTableModel)processHistoryTable.getModel()).insertRow(newRequest);
+	        		  process.setTaskObservable(PunterGUI.this,ph);
+	        		  Thread t=new Thread(){
+	        			@Override
+	        			public void run() {
+	        				process.execute();
+	        				super.run();
+	        			}  
+	        		  };
+	        		  t.start();
 	        		  }
 	        	  }catch(Exception ee){
 	        		  ee.printStackTrace();
@@ -355,23 +367,28 @@ public class PunterGUI extends JPanel {
                     int selectedRow = lsm.getMinSelectionIndex();
                     System.out.println("Row " + selectedRow + " is now selected.");
                     try{
-//                    	long l=(Long) jList.getModel().getElementAt(selectedRow);
-                    ArrayList ar = ((ProcessTableModel)processTable.getModel()).getRow(processTable.getSelectedRow());
-      	        	long l=(Long)((Process)ar.get(1)).getId();
-      	        	System.out.println("PID= "+l);
-      	        	//populate processHistory
-      	        	ProcessHistoryTableModel phtmodel=(ProcessHistoryTableModel) processHistoryTable.getModel();
-      	            List<ProcessHistory> phl = StaticDaoFacade.getProcessHistoryListForProcessId(l);
-      	            phtmodel.clearTable();
-	      	          for (ProcessHistory ph : phl) {
-	      	          	final ArrayList<Object> newRequest = new ArrayList<Object>();
-	      	          	newRequest.add(""+ph.getId()+" [ "+ph.getName()!=null?ph.getName():""+" ]");
-	      	          	newRequest.add(ph);
-	      	          	phtmodel.insertRow(newRequest);
+                    	ProcessTaskHistoryTableModel pthtmodel=(ProcessTaskHistoryTableModel) processTaskHistoryTable.getModel();
+	                    pthtmodel.clearTable();
+	                    ArrayList ar = ((ProcessTableModel)processTable.getModel()).getRow(processTable.getSelectedRow());
+	      	        	long l=(Long)((Process)ar.get(1)).getId();
+	      	        	System.out.println("PID= "+l);
+	      	        	//populate processHistory
+	      	        	ProcessHistoryTableModel phtmodel=(ProcessHistoryTableModel) processHistoryTable.getModel();
+	      	            List<ProcessHistory> phl = StaticDaoFacade.getProcessHistoryListForProcessId(l);
+	      	            phtmodel.clearTable();
+		      	        for (ProcessHistory ph : phl) {
+		      	          	final ArrayList<Object> newRequest = new ArrayList<Object>();
+		      	          	newRequest.add(ph.getId());
+		      	          	newRequest.add(ph);
+		      	          	phtmodel.insertRow(newRequest);
+		      	        List<TaskHistory> thl = ph.getTaskHistoryList();
+		      	        for(TaskHistory th:thl){
+		      	        	System.out.println(th.getId());
+		      	        }
 	      	  		}
 	      	        if(phtmodel.getRowCount()>0){
 	      	        	processHistoryTable.setRowSelectionInterval(0, 0);
-	      	          }
+	      	        }
       	        	//populate task table
                     List<Task> taskList=StaticDaoFacade.getProcessTasksById(l);
                     Process process = StaticDaoFacade.getProcess(l);
@@ -408,7 +425,7 @@ public class PunterGUI extends JPanel {
         processHistoryTable.setShowGrid(true);
         processHistoryTable.setPreferredScrollableViewportSize(new Dimension(200, 400));
         processHistoryTable.setFillsViewportHeight(true);
-        processTaskHistoryTable=new JTable();
+        processTaskHistoryTable=new JTable(new ProcessTaskHistoryTableModel());
         processTaskHistoryTable.setShowGrid(true);
         processTaskHistoryTable.setPreferredScrollableViewportSize(new Dimension(300, 400));
         processTaskHistoryTable.setFillsViewportHeight(true);
@@ -421,10 +438,95 @@ public class PunterGUI extends JPanel {
         JSplitPane jsp3=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,listPane,tabbedPane);
         jsp3.setDividerSize(1);
         add(jsp3);
+        
+        ListSelectionModel PHTSelectionModel = processHistoryTable.getSelectionModel();
+        PHTSelectionModel.addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+                ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+                if (lsm.isSelectionEmpty()) {
+                	System.out.println("PTHL Empty --No Row is now selected.");
+                } else {
+                    int selectedRow = lsm.getMinSelectionIndex();
+                    System.out.println("PTHL -- Row " + selectedRow + " is now selected.");
+                    try{
+                    ArrayList ar = ((ProcessHistoryTableModel)processHistoryTable.getModel()).getRow(processHistoryTable.getSelectedRow());
+      	        	long l=(Long)((ProcessHistory)ar.get(1)).getId();
+      	        	System.out.println("PHID= "+l);
+      	        	ProcessHistory ph = StaticDaoFacade.getProcessHistoryById(l);
+      	        	//populate ProcessTaskHistory
+      	        	ProcessTaskHistoryTableModel pthtmodel=(ProcessTaskHistoryTableModel) processTaskHistoryTable.getModel();
+      	            List<TaskHistory> pthl = ph.getTaskHistoryList();
+      	            pthtmodel.clearTable();
+	      	          for (TaskHistory th : pthl) {
+	      	          	final ArrayList<Object> newRequest = new ArrayList<Object>();
+	      	          	newRequest.add(th.getTask().getName());
+	      	          	newRequest.add(th.isStatus());
+	      	          	newRequest.add(th.getLogs());
+	      	          	pthtmodel.insertRow(newRequest);
+	      	  		}
+	      	        if(pthtmodel.getRowCount()>0){
+	      	        	processTaskHistoryTable.setRowSelectionInterval(0, 0);
+	      	          }
+                    }catch (Exception ee) {
+                    	ee.printStackTrace();
+					}
+                }
+            }});
+        ProcessTableModel model=(ProcessTableModel) processTable.getModel();
+        List<Process> pl = StaticDaoFacade.getProcessList();
+        for (Process p : pl) {
+        	final ArrayList<Object> newRequest = new ArrayList<Object>();
+        	newRequest.add(p.getName());
+        	newRequest.add(p);
+        	model.insertRow(newRequest);
+		}
         if(processTable.getModel().getRowCount()>0)
-        processTable.setRowSelectionInterval(0, 0);
+            processTable.setRowSelectionInterval(0, 0);
+            
     }
-
+    
+    
+    @Override
+	public void updateTaskHistory(final TaskHistory taskHistory) {
+    	try {
+    		System.err.println("Creating task history");
+			StaticDaoFacade.createTaskHistory(taskHistory);
+			 javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		            public void run() {
+		            	try{
+		            	ArrayList ar = ((ProcessHistoryTableModel)processHistoryTable.getModel()).getRow(processHistoryTable.getSelectedRow());
+		            	long pidTable=(Long)((ProcessHistory)ar.get(1)).getId();
+		            	long pid=taskHistory.getProcessHistory().getId();
+		            	System.out.println(""+pid+" == "+pidTable);
+		            	if(pid==pidTable){
+		            		ProcessHistory ph = StaticDaoFacade.getProcessHistoryById(pid);
+		      	        	//populate ProcessTaskHistory
+		      	        	ProcessTaskHistoryTableModel pthtmodel=(ProcessTaskHistoryTableModel) processTaskHistoryTable.getModel();
+		      	            List<TaskHistory> pthl = ph.getTaskHistoryList();
+		      	            pthtmodel.clearTable();
+			      	          for (TaskHistory th : pthl) {
+			      	          	final ArrayList<Object> newRequest = new ArrayList<Object>();
+			      	          	newRequest.add(th.getTask().getName());
+			      	          	newRequest.add(th.isStatus());
+			      	          	newRequest.add(th.getLogs());
+			      	          	pthtmodel.insertRow(newRequest);
+			      	  		}
+			      	        if(pthtmodel.getRowCount()>0){
+			      	        	processTaskHistoryTable.setRowSelectionInterval(0, 0);
+			      	          }
+		            	}
+		            	}
+		            catch (Exception e) {
+		            	e.printStackTrace();
+					}
+		            }
+		        });
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
     /*
      * This method picks good column sizes.
      * If all column heads are wider than the column's cells'
@@ -591,4 +693,5 @@ public class PunterGUI extends JPanel {
             }
         });
     }
+
 }

@@ -22,7 +22,7 @@ public class ProcessHistory {
 	private Date startTime;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date finishTime;
-	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy="processHistory")
+	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy="processHistory")
 	private List<TaskHistory> taskHistoryList;
 	@ManyToOne
 	private Process process;

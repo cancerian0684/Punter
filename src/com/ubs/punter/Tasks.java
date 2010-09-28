@@ -120,14 +120,15 @@ public abstract class Tasks {
 	 */
 	public abstract boolean run();
 	
-	public void execute(){
+	public boolean execute(){
 		System.out.println("started executing task..");
 		substituteParams();
-		run();
+		boolean status= run();
 		afterTaskRun();
-		if(next!=null){
+		/*if(next!=null){
 			next.run();
-		}
+		}*/
+		return status;
 	}
 	public void setOutputParams(Map outputParams) {
 		this.outputParams = outputParams;

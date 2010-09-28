@@ -7,7 +7,7 @@ import javax.swing.table.AbstractTableModel;
 import com.ubs.punter.jpa.Process;
 import com.ubs.punter.jpa.StaticDaoFacade;
  
-public class ProcessHistoryTableModel extends AbstractTableModel {
+public class ProcessTaskHistoryTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflsdfl"};
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
@@ -15,9 +15,9 @@ public class ProcessHistoryTableModel extends AbstractTableModel {
 
 	/** Holds the column names */         
 	private String [] columnNames = new String [] 
-                                  {"<html><b>Run ID"};
+                                  {"<html><b>Task","<html><b>Status","<html><b>Logs"};
 	private Class [] columnClasses = new Class[] 
-                                   {String.class};
+                                   {String.class,String.class,String.class};
   
   /**
    * Constructor: Initializes the table structure, including number of columns
@@ -30,7 +30,7 @@ public class ProcessHistoryTableModel extends AbstractTableModel {
 	  ArrayList<Object>  newdata=new ArrayList<Object>(data); 
 	  return newdata;
   }
-  public ProcessHistoryTableModel() {
+  public ProcessTaskHistoryTableModel() {
 	  
   }
 
@@ -91,7 +91,7 @@ public class ProcessHistoryTableModel extends AbstractTableModel {
   public void setValueAt( Object obj, int row, int col ) {
     ArrayList colArrayList = (ArrayList)data.get(row);
     colArrayList.set( col, obj);
-    /*try{
+   /* try{
     	Process p=(Process) colArrayList.get(1);
     	p.setName((String)obj);
     	StaticDaoFacade.saveProcess(p);

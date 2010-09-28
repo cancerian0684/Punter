@@ -288,6 +288,16 @@ public class StaticDaoFacade {
     		em.close();
     	}
     }
+    public static ProcessHistory getProcessHistoryById(long id) throws Exception{
+    	EntityManager em = emf.createEntityManager();
+    	try{
+    		ProcessHistory proc= em.find(ProcessHistory.class, id);
+    		em.refresh(proc);
+    		return proc;
+    	}finally{
+    		em.close();
+    	}
+    }
     public static List<Task> getProcessTasksById(long pid) throws UnknownHostException, Exception{
     	EntityManager em = emf.createEntityManager();
     	try{

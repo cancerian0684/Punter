@@ -23,7 +23,7 @@ public class Process {
 //	@Basic(fetch=FetchType.EAGER)
 	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "process")
 	private List<Task> taskList;
-	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "process")
+	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy = "process")
 	private List<ProcessHistory> processHistoryList;
 	
 	public long getId() {
