@@ -42,9 +42,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.print.PrinterException;
-import java.net.UnknownHostException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -56,7 +53,6 @@ import javax.swing.InputMap;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -373,6 +369,9 @@ public class PunterGUI extends JPanel {
 	      	          	newRequest.add(ph);
 	      	          	phtmodel.insertRow(newRequest);
 	      	  		}
+	      	        if(phtmodel.getRowCount()>0){
+	      	        	processHistoryTable.setRowSelectionInterval(0, 0);
+	      	          }
       	        	//populate task table
                     List<Task> taskList=StaticDaoFacade.getProcessTasksById(l);
                     Process process = StaticDaoFacade.getProcess(l);
