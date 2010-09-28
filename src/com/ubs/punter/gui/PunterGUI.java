@@ -63,6 +63,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -76,6 +77,7 @@ import javax.swing.table.TableColumn;
 
 import com.ubs.punter.Tasks;
 import com.ubs.punter.jpa.Process;
+import com.ubs.punter.jpa.ProcessHistory;
 import com.ubs.punter.jpa.StaticDaoFacade;
 import com.ubs.punter.jpa.Task;
 
@@ -88,7 +90,12 @@ public class PunterGUI extends JPanel {
     private boolean DEBUG = false;
     private static JFrame frame;
     private final JTable taskTable;
+//    private final JTable processHistoryTable;
     private final JTable processTable;
+    private final JTable inputParamTable;
+    private final JTable outputParamTable;
+    private final JTable processHistoryTable;
+    private final JTable processTaskHistoryTable;
     public PunterGUI() throws Exception {
         super(new GridLayout(1,0));
         processTable=new JTable(new ProcessTableModel());
@@ -101,7 +108,7 @@ public class PunterGUI extends JPanel {
         	model.insertRow(newRequest);
 		}
         processTable.setShowGrid(true);
-        processTable.setPreferredScrollableViewportSize(new Dimension(100, 270));
+        processTable.setPreferredScrollableViewportSize(new Dimension(100, 400));
         processTable.setFillsViewportHeight(true);
         processTable.setRowHeight(20);
         InputMap imap = processTable.getInputMap(JComponent.WHEN_FOCUSED);
@@ -136,7 +143,7 @@ public class PunterGUI extends JPanel {
         taskTable = new JTable(new TaskTableModel());
         taskTable.setShowGrid(true);
         taskTable.setShowVerticalLines(false);
-        taskTable.setPreferredScrollableViewportSize(new Dimension(400, 270));
+        taskTable.setPreferredScrollableViewportSize(new Dimension(500, 270));
         taskTable.setFillsViewportHeight(true);
         imap = taskTable.getInputMap(JComponent.WHEN_FOCUSED);
 	    imap.put(KeyStroke.getKeyStroke("DELETE"), "table.delete");
@@ -290,14 +297,14 @@ public class PunterGUI extends JPanel {
       		 }
 	          }
 	      });
-        final JTable inputParamTable = new JTable(new ParamTableModel());
+        inputParamTable = new JTable(new ParamTableModel());
         inputParamTable.setShowGrid(true);
-        inputParamTable.setPreferredScrollableViewportSize(new Dimension(300, 150));
+        inputParamTable.setPreferredScrollableViewportSize(new Dimension(250, 200));
         inputParamTable.setFillsViewportHeight(true);
         
-        final JTable outputParamTable = new JTable(new ParamTableModel());
+        outputParamTable = new JTable(new ParamTableModel());
         outputParamTable.setShowGrid(true);
-        outputParamTable.setPreferredScrollableViewportSize(new Dimension(300, 120));
+        outputParamTable.setPreferredScrollableViewportSize(new Dimension(250, 200));
         outputParamTable.setFillsViewportHeight(true);
         initColumnSizes1(outputParamTable);
         ListSelectionModel rowSM = taskTable.getSelectionModel();
@@ -308,11 +315,6 @@ public class PunterGUI extends JPanel {
         		} else {
         			int selectedRow = lsm.getMinSelectionIndex();
         			System.out.println("Row " + selectedRow + " is now selected.");
-        			Object[][] data = {
-        				    {"name", "Munish Chandel"},
-        				    {"name", "Rohit Banyal"},
-        				    {"Sue", "Black"},
-        			        };
         			Task t=(Task) taskTable.getModel().getValueAt(selectedRow, 5);
         			if(t.getInputParams()!=null){
         			inputParamTable.setModel(new ParamTableModel(t,true));
@@ -333,7 +335,7 @@ public class PunterGUI extends JPanel {
         });
         //Create the scroll pane and add the table to it.
         JScrollPane scrollPane = new JScrollPane(taskTable);
-
+        JTabbedPane tabbedPane = new JTabbedPane();
         //Set up column sizes.
         initColumnSizes(taskTable);
         initColumnSizes1(inputParamTable);
@@ -342,6 +344,7 @@ public class PunterGUI extends JPanel {
 //        setUpSportColumn(taskTable, taskTable.getColumnModel().getColumn(2));
         JSplitPane jsp2=new JSplitPane(JSplitPane.VERTICAL_SPLIT,new JScrollPane(inputParamTable),new JScrollPane(outputParamTable));
         JSplitPane jsp=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane,jsp2);
+        
         jsp.setDividerLocation(0.4);
         //Add the scroll pane to this panel.
         processTable.setAutoscrolls(true);
@@ -357,8 +360,20 @@ public class PunterGUI extends JPanel {
                     System.out.println("Row " + selectedRow + " is now selected.");
                     try{
 //                    	long l=(Long) jList.getModel().getElementAt(selectedRow);
-                    	ArrayList ar = ((ProcessTableModel)processTable.getModel()).getRow(processTable.getSelectedRow());
-      	        	  long l=(Long)((Process)ar.get(1)).getId();
+                    ArrayList ar = ((ProcessTableModel)processTable.getModel()).getRow(processTable.getSelectedRow());
+      	        	long l=(Long)((Process)ar.get(1)).getId();
+      	        	System.out.println("PID= "+l);
+      	        	//populate processHistory
+      	        	ProcessHistoryTableModel phtmodel=(ProcessHistoryTableModel) processHistoryTable.getModel();
+      	            List<ProcessHistory> phl = StaticDaoFacade.getProcessHistoryListForProcessId(l);
+      	            phtmodel.clearTable();
+	      	          for (ProcessHistory ph : phl) {
+	      	          	final ArrayList<Object> newRequest = new ArrayList<Object>();
+	      	          	newRequest.add(""+ph.getId()+" [ "+ph.getName()!=null?ph.getName():""+" ]");
+	      	          	newRequest.add(ph);
+	      	          	phtmodel.insertRow(newRequest);
+	      	  		}
+      	        	//populate task table
                     List<Task> taskList=StaticDaoFacade.getProcessTasksById(l);
                     Process process = StaticDaoFacade.getProcess(l);
                     TaskTableModel model=(TaskTableModel) taskTable.getModel();
@@ -374,8 +389,14 @@ public class PunterGUI extends JPanel {
                     	newRequest.add(process);
                     	model.insertRow(newRequest);
                     }
-                    if(taskTable.getModel().getRowCount()>0)
+                    if(taskTable.getModel().getRowCount()>0){
                     taskTable.setRowSelectionInterval(0, 0);
+                    }else{
+                    	inputParamTable.setModel(new ParamTableModel());
+                    	outputParamTable.setModel(new ParamTableModel());
+                    	initColumnSizes1(inputParamTable);
+                    	initColumnSizes1(outputParamTable);
+                    }
                     }catch (Exception ee) {
                     	ee.printStackTrace();
 					}
@@ -383,10 +404,26 @@ public class PunterGUI extends JPanel {
             }});
         JScrollPane listPane = new JScrollPane(processTable);
         jsp.setDividerSize(1);
-        JSplitPane jsp3=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,listPane,jsp);
+        tabbedPane.addTab("Process Tasks", null, (jsp),"Tasks List for selected Process");
+        processHistoryTable=new JTable(new ProcessHistoryTableModel());
+        processHistoryTable.setShowGrid(true);
+        processHistoryTable.setPreferredScrollableViewportSize(new Dimension(200, 400));
+        processHistoryTable.setFillsViewportHeight(true);
+        processTaskHistoryTable=new JTable();
+        processTaskHistoryTable.setShowGrid(true);
+        processTaskHistoryTable.setPreferredScrollableViewportSize(new Dimension(300, 400));
+        processTaskHistoryTable.setFillsViewportHeight(true);
+        JScrollPane processHistoryPane = new JScrollPane(processHistoryTable);
+        JScrollPane processTaskHistoryPane = new JScrollPane(processTaskHistoryTable);
+        JSplitPane jsp4=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,processHistoryPane,processTaskHistoryPane);
+        jsp4.setDividerSize(0);
+        tabbedPane.addTab("Process History", null, jsp4,"Tasks Run History for selected Process");
+        
+        JSplitPane jsp3=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,listPane,tabbedPane);
         jsp3.setDividerSize(1);
-//        jsp3.setDividerLocation(01);
         add(jsp3);
+        if(processTable.getModel().getRowCount()>0)
+        processTable.setRowSelectionInterval(0, 0);
     }
 
     /*

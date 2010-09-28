@@ -4,6 +4,8 @@
     <provider>oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider</provider>
     <class>com.ubs.punter.jpa.Task</class>
     <class>com.ubs.punter.jpa.Process</class>
+    <class>com.ubs.punter.jpa.ProcessHistory</class>
+    <class>com.ubs.punter.jpa.TaskHistory</class>
     <properties>
       <property name="toplink.jdbc.user" value="punter"/>
       <property name="toplink.jdbc.password" value="punter"/>

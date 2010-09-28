@@ -23,6 +23,9 @@ public class Process {
 //	@Basic(fetch=FetchType.EAGER)
 	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "process")
 	private List<Task> taskList;
+	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "process")
+	private List<ProcessHistory> processHistoryList;
+	
 	public long getId() {
 		return id;
 	}
@@ -52,6 +55,12 @@ public class Process {
 	}
 	public void setTaskList(List<Task> taskList) {
 		this.taskList = taskList;
+	}
+	public List<ProcessHistory> getProcessHistoryList() {
+		return processHistoryList;
+	}
+	public void setProcessHistoryList(List<ProcessHistory> processHistoryList) {
+		this.processHistoryList = processHistoryList;
 	}
 	
 }

@@ -67,9 +67,11 @@ public abstract class Tasks {
 				try {
 					field.setAccessible(true);
 					String fieldValue=getInputParams().getProperty(field.getName(),"");
-					if(fieldValue.length()>=1&&fieldValue.startsWith("$")){
-						fieldValue=fieldValue.substring(1);
-						fieldValue=(String) getSessionObject(fieldValue);
+					if(fieldValue.length()>=1){
+						if(fieldValue.startsWith("$")){
+							fieldValue=fieldValue.substring(1);
+							fieldValue=(String) getSessionObject(fieldValue);
+						}
 						if(field.getType().getSimpleName().equals("String")){
 							field.set(this, fieldValue);
 						}else if(field.getType().getSimpleName().equals("int")){
@@ -113,7 +115,10 @@ public abstract class Tasks {
 			}
 		}
 	}
-	public abstract void run();
+	/*
+	 * @return returns the status of the task. true means success and false is failure
+	 */
+	public abstract boolean run();
 	
 	public void execute(){
 		System.out.println("started executing task..");

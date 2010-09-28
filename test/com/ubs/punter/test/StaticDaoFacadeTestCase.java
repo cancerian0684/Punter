@@ -2,6 +2,7 @@ package com.ubs.punter.test;
 
 import static org.junit.Assert.*;
 
+import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
@@ -11,8 +12,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.ubs.punter.jpa.Process;
+import com.ubs.punter.jpa.ProcessHistory;
 import com.ubs.punter.jpa.StaticDaoFacade;
 import com.ubs.punter.jpa.Task;
+import com.ubs.punter.jpa.TaskHistory;
 
 public class StaticDaoFacadeTestCase {
 
@@ -48,14 +51,34 @@ public class StaticDaoFacadeTestCase {
 	}
 
 	@Test
-	public void testCreateProcess() {
-//		StaticDaoFacade.getProcess(id);
-		fail("Not yet implemented"); // TODO
+	public void testCreateProcessHistory() throws Exception {
+		Process proc=new Process();
+		proc.setId(1L);
+		ProcessHistory ph=new ProcessHistory();
+		ph.setName("Test-1");
+		ph.setStartTime(new Date());
+		ph.setProcess(proc);
+		StaticDaoFacade.createProcessHistory(ph);
+		Task task=new Task();
+		task.setId(2L);
+		for(int i=0;i<=10;i++){
+		TaskHistory th=new TaskHistory();
+		th.setProcessHistory(ph);
+		th.setTask(task);
+		th.setSequence(1);
+		th.setStatus(true);
+		th.setLogs("dummy logs");
+		StaticDaoFacade.createTaskHistory(th);
+		
+		}
 	}
 
 	@Test
-	public void testSaveTask() {
-		fail("Not yet implemented"); // TODO
+	public void testGetProcessHistoryForProcessId() throws Exception{
+		List<ProcessHistory> phl = StaticDaoFacade.getProcessHistoryListForProcessId(1L);
+		for (ProcessHistory processHistory : phl) {
+			System.out.println(processHistory.getId());
+		}
 	}
 
 	@Test

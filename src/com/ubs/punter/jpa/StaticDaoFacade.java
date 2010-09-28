@@ -179,6 +179,7 @@ public class StaticDaoFacade {
 			em.close();
 		}
     }
+    
     public static Task createTask(Task task)throws Exception{
     	EntityManager em = emf.createEntityManager();
     	try{
@@ -199,6 +200,30 @@ public class StaticDaoFacade {
         em.flush();
         em.getTransaction().commit();
         return proc;
+    	}finally{
+    		em.close();
+    	}
+    }
+    public static ProcessHistory createProcessHistory(ProcessHistory ph)throws Exception{
+    	EntityManager em = emf.createEntityManager();
+    	try{
+        em.getTransaction().begin();
+        em.persist(ph);
+        em.flush();
+        em.getTransaction().commit();
+        return ph;
+    	}finally{
+    		em.close();
+    	}
+    }
+    public static TaskHistory createTaskHistory(TaskHistory th)throws Exception{
+    	EntityManager em = emf.createEntityManager();
+    	try{
+	        em.getTransaction().begin();
+	        em.persist(th);
+	        em.flush();
+	        em.getTransaction().commit();
+	        return th;
     	}finally{
     		em.close();
     	}
@@ -252,13 +277,24 @@ public class StaticDaoFacade {
     		em.close();
     	}
     }
+    public static List<ProcessHistory> getProcessHistoryListForProcessId(long id) throws Exception{
+    	EntityManager em = emf.createEntityManager();
+    	try{
+    		Process proc= em.find(Process.class, id);
+    		em.refresh(proc);
+    		List<ProcessHistory> phl = proc.getProcessHistoryList();
+    		return phl;
+    	}finally{
+    		em.close();
+    	}
+    }
     public static List<Task> getProcessTasksById(long pid) throws UnknownHostException, Exception{
     	EntityManager em = emf.createEntityManager();
     	try{
         Process np = em.find(Process.class,pid);
         em.refresh(np);
     	List<Task> tl = np.getTaskList();
-    	System.err.println("Listing Tasks for process.");
+//    	System.err.println("Listing Tasks for process.");
     	for (Task task : tl) {
     		System.out.println(task.getName());
     	}
