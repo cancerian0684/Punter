@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
+  <persistence-unit name="punter" transaction-type="RESOURCE_LOCAL">
+    <provider>oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider</provider>
+    <class>com.sapient.punter.jpa.TaskDao</class>
+    <class>com.sapient.punter.jpa.ProcessDao</class>
+    <class>com.sapient.punter.jpa.ProcessHistory</class>
+    <class>com.sapient.punter.jpa.TaskHistory</class>
+    <properties>
+      <property name="toplink.jdbc.user" value="punter"/>
+      <property name="toplink.jdbc.password" value="punter"/>
+      <property name="toplink.jdbc.url" value="jdbc:derby://localhost:1527/punterDB;create=true"/>
+      <property name="toplink.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver"/>
+      <property name="toplink.ddl-generation" value="create-tables"/>
+      <property name="com.acme.persistence.sql-logging" value="on"/>
+      <property name="toplink.jdbc.read-connections.max" value="3"/>
+      <property name="toplink.jdbc.read-connections.min" value="1"/>
+      <property name="toplink.jdbc.read-connections.shared" value="true"/>
+      <property name="toplink.jdbc.write-connections.max" value="5"/>
+      <property name="toplink.jdbc.bind-parameters" value="true"/>
+    </properties>
+  </persistence-unit>
+</persistence>
