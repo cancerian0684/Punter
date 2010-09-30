@@ -39,12 +39,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import com.sapient.punter.Tasks;
 import com.sapient.punter.jpa.ProcessDao;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskDao;
 import com.sapient.punter.jpa.TaskHistory;
+import com.sapient.punter.tasks.Tasks;
 
 /** 
  * TableRenderDemo is just like TableDemo, except that it
@@ -253,7 +253,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        	  try{
 	        		  ProcessDao proc=new ProcessDao();
 	        		  proc.setName("new Process");
-	        		  List<String> inputParams = com.sapient.punter.Process.listInputParams();
+	        		  List<String> inputParams = com.sapient.punter.tasks.Process.listInputParams();
 	        		  Properties inProp=new Properties();
     	        	  for (String key : inputParams) {
     					System.err.println(key);
@@ -279,32 +279,46 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        		  if(processTable.getSelectedRow()!=-1){
 	        		  ProcessTableModel model=(ProcessTableModel) processTable.getModel();
 	        		  ArrayList<Object> currRow=model.getRow(processTable.getSelectedRow());
-	        		  ProcessDao p=(ProcessDao) currRow.get(1);
+	        		  final ProcessDao p=(ProcessDao) currRow.get(1);
 	        		  System.out.println(p.getId()+" == "+p.getName());
 	        		  List<TaskDao> ptl = StaticDaoFacade.getSortedTasksByProcessId(p.getId());
-	        		  final com.sapient.punter.Process process=com.sapient.punter.Process.getProcess(p.getInputParams());
+	        		  final com.sapient.punter.tasks.Process process=com.sapient.punter.tasks.Process.getProcess(p.getInputParams());
 	        		  for (TaskDao taskDao : ptl) {
 						System.out.println("Task -"+taskDao.getId());
 						Tasks task=Tasks.getTask(taskDao.getClassName(), taskDao.getInputParams(), taskDao.getOutputParams());
 						task.setTaskDao(taskDao);
 						process.addTask(task);
 	        		  	}
-	        		  ProcessHistory ph=new ProcessHistory();
-	        		  ph.setName("Test-1");
-	        		  ph.setStartTime(new Date());
-	        		  ph.setProcess(p);
-	        		  ph=StaticDaoFacade.createProcessHistory(ph);
-	        		  final ArrayList<Object> newRequest = new ArrayList<Object>();
-	      	          newRequest.add(""+ph.getId()+"  [ "+sdf.format(ph.getStartTime())+" ]");
-	      	          newRequest.add(ph);
-	        		  ((ProcessHistoryTableModel)processHistoryTable.getModel()).insertRowAtBeginning(newRequest);
-	        		  processHistoryTable.setRowSelectionInterval(0, 0);
-	        		  process.setTaskObservable(PunterGUI.this,ph);
+	        		  
 	        		  Thread t=new Thread(){
 	        			@Override
 	        			public void run() {
+	        				try{
+	        			  ProcessHistory ph=new ProcessHistory();
+	  	        		  ph.setName("Test-1");
+	  	        		  ph.setStartTime(new Date());
+	  	        		  ph.setProcess(p);
+	  	        		  final ProcessHistory ph1 = StaticDaoFacade.createProcessHistory(ph);
+	  	        		  final ArrayList<Object> newRequest = new ArrayList<Object>();
+	  	      	          newRequest.add(""+ph1.getId()+"  [ "+sdf.format(ph1.getStartTime())+" ]");
+	  	      	          newRequest.add(ph1);
+	  	        		  final ArrayList row = ((ProcessHistoryTableModel)processHistoryTable.getModel()).insertRowAtBeginning(newRequest);
+	  	        		  processHistoryTable.setRowSelectionInterval(0, 0);
+	  	        		  process.setTaskObservable(PunterGUI.this,ph1);
+	        			  process.addObserver(new ProcessObserver() {
+								 
+								@Override
+								public void update(com.sapient.punter.tasks.Process proc) {
+									System.err.println("updating table model");
+									row.set(0, ""+ph1.getId()+"  [ "+sdf.format(ph1.getStartTime())+" ]");
+									((ProcessHistoryTableModel)processHistoryTable.getModel()).refreshTable();
+								}
+							});
 	        				process.execute();
 	        				super.run();
+	        				}catch (Exception e) {
+	        					e.printStackTrace();
+							}
 	        			}  
 	        		  };
 	        		  t.start();
@@ -351,6 +365,9 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		        			  popupProcess.show(e.getComponent(), 
 		                              e.getX(), e.getY());
 		        		 }
+		        	  }else {
+		        		  popupProcess.show(e.getComponent(), 
+	                              e.getX(), e.getY());
 		        	  }
 		        	  }
 			}

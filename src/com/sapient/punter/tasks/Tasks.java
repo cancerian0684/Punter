@@ -1,4 +1,4 @@
-package com.sapient.punter;
+package com.sapient.punter.tasks;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
@@ -29,7 +29,7 @@ public abstract class Tasks {
 	private MemoryHandler mHandler = null;
 	private Level loggingLevel=Level.INFO;
 	private StringBuilder strLogger;
-	public static final ThreadLocal<Logger> uniqueLogger = new ThreadLocal<Logger>() {
+	public static final ThreadLocal<Logger> LOGGER = new ThreadLocal<Logger>() {
 		@Override
 		protected Logger initialValue() {
 		    Logger logger = Logger.getLogger("Logger for "
@@ -67,9 +67,9 @@ public abstract class Tasks {
         }
         
       }, 2, loggingLevel);
-	    uniqueLogger.get().addHandler(mHandler);
-	    uniqueLogger.get().addHandler(handler);
-	    uniqueLogger.get().setUseParentHandlers(false);
+	    LOGGER.get().addHandler(mHandler);
+	    LOGGER.get().addHandler(handler);
+	    LOGGER.get().setUseParentHandlers(false);
 	}
 	public void setLoggingLevel(Level loggingLevel) {
 		this.loggingLevel = loggingLevel;
@@ -180,8 +180,8 @@ public abstract class Tasks {
 		}
 	}
 	public void afterTaskFinish(){
-		uniqueLogger.get().removeHandler(mHandler);
-		uniqueLogger.get().removeHandler(handler);
+		LOGGER.get().removeHandler(mHandler);
+		LOGGER.get().removeHandler(handler);
 	}
 	/*
 	 * @return returns the status of the task. true means success and false is failure
@@ -224,3 +224,4 @@ public abstract class Tasks {
 		sessionMap.put(key, obj);
 	}
 }
+

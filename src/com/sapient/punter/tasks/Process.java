@@ -1,4 +1,4 @@
-package com.sapient.punter;
+package com.sapient.punter.tasks;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import com.sapient.punter.annotations.InputParam;
+import com.sapient.punter.gui.ProcessObserver;
 import com.sapient.punter.gui.TaskObserver;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.TaskDao;
@@ -29,8 +30,12 @@ private String comments;
 private String loggingLevel;
 @InputParam
 private String emailsToNotify;
+protected ProcessObserver po;
 public Process() {
 	// TODO Auto-generated constructor stub
+}
+public void addObserver(ProcessObserver po){
+	this.po=po;
 }
 public void addTask(Tasks task){
 	task.setSessionMap(sessionMap);
@@ -38,6 +43,15 @@ public void addTask(Tasks task){
 }
 public void beforeProcessStart(){
 	System.err.println("Emails to notify : "+emailsToNotify);
+	
+	try {
+		for (int i = 0; i < 8; i++) {			
+			TimeUnit.SECONDS.sleep(1);
+			po.update(this);
+		}
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
 }
 public void afterProcessFinish(){
 	
