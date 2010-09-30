@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -26,6 +28,11 @@ public class ProcessHistory {
 	private List<TaskHistory> taskHistoryList;
 	@ManyToOne
 	private ProcessDao process;
+//	@Basic(optional = false)
+	@Enumerated(EnumType.STRING)
+//	@Column(nullable = false, columnDefinition = "char(1) default 'A'")
+	private RunState runState = RunState.NEW;
+
 	public long getId() {
 		return id;
 	}
@@ -63,5 +70,10 @@ public class ProcessHistory {
 	public void setProcess(ProcessDao process) {
 		this.process = process;
 	}
-	
+	public RunState getRunState() {
+		return runState;
+	}
+	public void setRunState(RunState runState) {
+		this.runState = runState;
+	}
 }

@@ -14,6 +14,7 @@ import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.gui.ProcessObserver;
 import com.sapient.punter.gui.TaskObserver;
 import com.sapient.punter.jpa.ProcessHistory;
+import com.sapient.punter.jpa.RunState;
 import com.sapient.punter.jpa.TaskDao;
 import com.sapient.punter.jpa.TaskHistory;
 import com.sun.jmx.snmp.tasks.TaskServer;
@@ -30,6 +31,10 @@ private String comments;
 private String loggingLevel;
 @InputParam
 private String emailsToNotify;
+@InputParam
+private boolean emailsOnFailureOnly;
+@InputParam
+private String scheduleString;
 protected ProcessObserver po;
 public Process() {
 	// TODO Auto-generated constructor stub
@@ -46,15 +51,17 @@ public void beforeProcessStart(){
 	
 	try {
 		for (int i = 0; i < 8; i++) {			
-			TimeUnit.SECONDS.sleep(1);
-			po.update(this);
+			TimeUnit.MILLISECONDS.sleep(100);
+			po.update(ph);
 		}
 	} catch (InterruptedException e) {
 		e.printStackTrace();
 	}
 }
 public void afterProcessFinish(){
-	
+	ph.setRunState(RunState.SUCCESS);
+	po.update(ph);
+	po.processCompleted();
 }
 public void execute(){
 	substituteParams();
@@ -68,6 +75,10 @@ public void execute(){
 		th.setTask(task.getTaskDao());
 		th.setSequence(task.getTaskDao().getSequence());
 		th.setStatus(status);
+		if(status)
+			th.setRunState(RunState.SUCCESS);
+		else
+			th.setRunState(RunState.FAILURE);
 		th.setLogs(task.getMemoryLogs());
 		ts.createTaskHistory(th);
 		try {

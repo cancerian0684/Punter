@@ -5,6 +5,8 @@ import java.util.Properties;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -27,7 +29,6 @@ public class ProcessDao {
 	private List<TaskDao> taskList;
 	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy = "process")
 	private List<ProcessHistory> processHistoryList;
-	
 	public long getId() {
 		return id;
 	}
@@ -70,4 +71,5 @@ public class ProcessDao {
 	public void setInputParams(Properties inputParams) {
 		this.inputParams = inputParams;
 	}
+	
 }

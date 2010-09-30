@@ -1,6 +1,8 @@
 package com.sapient.punter.jpa;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
@@ -19,6 +21,11 @@ public class TaskHistory {
 	private TaskDao task;
 	@ManyToOne
 	private ProcessHistory processHistory;
+//	@Basic(optional = false)
+	@Enumerated(EnumType.STRING)
+//	@Column(nullable = false, columnDefinition = "char(1) default 'A'")
+	private RunState runState = RunState.NEW;
+
 	public long getId() {
 		return id;
 	}
@@ -55,6 +62,11 @@ public class TaskHistory {
 	public void setProcessHistory(ProcessHistory processHistory) {
 		this.processHistory = processHistory;
 	}
-	
+	public RunState getRunState() {
+		return runState;
+	}
+	public void setRunState(RunState runState) {
+		this.runState = runState;
+	}
 	
 }
