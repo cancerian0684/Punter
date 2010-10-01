@@ -48,10 +48,10 @@ public void addTask(Tasks task){
 }
 public void beforeProcessStart(){
 	System.err.println("Emails to notify : "+emailsToNotify);
-	
+	ph.setRunState(RunState.RUNNING);
 	try {
 		for (int i = 0; i < 8; i++) {			
-			TimeUnit.MILLISECONDS.sleep(100);
+			TimeUnit.MILLISECONDS.sleep(20);
 			po.update(ph);
 		}
 	} catch (InterruptedException e) {
@@ -70,10 +70,11 @@ public void execute(){
 	for (Tasks task : taskList) {
 		boolean status=task.execute();
 		i++;
-		TaskHistory th=new TaskHistory();
-		th.setProcessHistory(ph);
-		th.setTask(task.getTaskDao());
-		th.setSequence(task.getTaskDao().getSequence());
+		TaskHistory th=ph.getTaskHistoryList().get(i-1);
+//		TaskHistory th=new TaskHistory();
+//		th.setProcessHistory(ph);
+//		th.setTask(task.getTaskDao());
+//		th.setSequence(task.getTaskDao().getSequence());
 		th.setStatus(status);
 		if(status)
 			th.setRunState(RunState.SUCCESS);

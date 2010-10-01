@@ -228,6 +228,18 @@ public class StaticDaoFacade {
     		em.close();
     	}
     }
+    public static void saveTaskHistory(TaskHistory t)throws Exception{
+    	EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        TaskHistory task=em.find(TaskHistory.class, t.getId());
+        task.setRunState(t.getRunState());
+        task.setSequence(t.getSequence());
+        task.setLogs(t.getLogs());
+        em.merge(task);
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
+    }
     public static void saveTask(TaskDao t)throws Exception{
         em.getTransaction().begin();
         TaskDao task=em.find(TaskDao.class, t.getId());
@@ -274,6 +286,16 @@ public class StaticDaoFacade {
     	EntityManager em = emf.createEntityManager();
     	try{
     		ProcessDao proc= em.find(ProcessDao.class, id);
+    		em.refresh(proc);
+    		return proc;
+    	}finally{
+    		em.close();
+    	}
+    }
+    public static TaskHistory getTaskDao(TaskHistory td) throws Exception{
+    	EntityManager em = emf.createEntityManager();
+    	try{
+    		TaskHistory proc= em.find(TaskHistory.class, td.getId());
     		em.refresh(proc);
     		return proc;
     	}finally{

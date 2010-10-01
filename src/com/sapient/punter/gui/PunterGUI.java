@@ -21,6 +21,7 @@ import javax.swing.InputMap;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -32,11 +33,13 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
@@ -65,6 +68,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private final JTable runningProcessTable;
     private final JTable runningTaskTable;
     private int selectedRow=-1;
+    private final Timer timer;
     private static SimpleDateFormat sdf=new SimpleDateFormat("dd, MMM hh:mm:ss");
     public PunterGUI() throws Exception {
         super(new GridLayout(1,0));
@@ -72,6 +76,34 @@ public class PunterGUI extends JPanel implements TaskObserver{
         runningProcessTable.setShowGrid(true);
         runningProcessTable.setPreferredScrollableViewportSize(new Dimension(330, 160));
         runningProcessTable.setFillsViewportHeight(true);
+        ListSelectionModel runningProcessTableSM = runningProcessTable.getSelectionModel();
+        runningProcessTableSM.addListSelectionListener(new ListSelectionListener() {
+        	public void valueChanged(ListSelectionEvent e) {
+        		ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+        		if (lsm.isSelectionEmpty()) {
+        		} else {
+        			int selectedRow = lsm.getMinSelectionIndex();
+        			System.out.println("Row " + selectedRow + " is now selected.");
+        			ProcessHistory ph=(ProcessHistory) ((RunningProcessTableModel) runningProcessTable.getModel()).getRow(selectedRow).get(4);
+        			try {
+//						ph=StaticDaoFacade.getProcessHistoryById(ph.getId());
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+        			List<TaskHistory> thList = ph.getTaskHistoryList();
+        			((RunningTaskTableModel)runningTaskTable.getModel()).clearTable();
+        			for (TaskHistory taskHistory : thList) {
+        				final ArrayList<Object> newRequest = new ArrayList<Object>();
+	      	          	newRequest.add(taskHistory.getSequence());
+	      	          	newRequest.add(taskHistory.getTask().getName());
+	      	          	newRequest.add(taskHistory.getRunState());
+	      	          	newRequest.add(taskHistory.getLogs());
+	      	          	newRequest.add(taskHistory);
+	      	           ((RunningTaskTableModel)runningTaskTable.getModel()).insertRow(newRequest);
+					}
+        		}
+        	}
+        });
         
         runningTaskTable=new JTable(new RunningTaskTableModel());
         runningTaskTable.setShowGrid(true);
@@ -163,6 +195,15 @@ public class PunterGUI extends JPanel implements TaskObserver{
         taskTable.setShowVerticalLines(false);
         taskTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
         taskTable.setFillsViewportHeight(true);
+        taskTable.setAutoCreateRowSorter(true);
+        taskTable.setRowHeight(26);
+        taskTable.setIntercellSpacing(new Dimension(0, 0));
+        JTableHeader header = taskTable.getTableHeader();
+        TableCellRenderer headerRenderer = header.getDefaultRenderer();
+        if(headerRenderer instanceof JLabel){
+        	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
+        }
+        header.setPreferredSize(new Dimension(30, 26));
         imap = taskTable.getInputMap(JComponent.WHEN_FOCUSED);
 	    imap.put(KeyStroke.getKeyStroke("DELETE"), "table.delete");
 	    amap = taskTable.getActionMap();
@@ -288,6 +329,33 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        	  }
 	          }
 	    });
+		timer=new Timer(1000,new ActionListener(){
+			private int i=0;
+			public void actionPerformed(ActionEvent e) {
+				i++;
+				int row=runningProcessTable.getSelectedRow();
+				if(row!=-1){
+//					ArrayList rowArray = ((RunningProcessTableModel)runningProcessTable.getModel()).getRow(row);
+//					ProcessHistory ph1 = (ProcessHistory) rowArray.get(4);
+//					ProcessHistory ph = StaticDaoFacade.getProcessHistoryById(ph1.getId());
+					System.out.println("Timer running");
+					int rows=runningTaskTable.getRowCount();
+					for(int r=0;r<rows;r++){
+						final ArrayList<Object> newRequest = ((RunningTaskTableModel)runningTaskTable.getModel()).getRow(r);
+						TaskHistory cr=(TaskHistory)newRequest.get(4);
+						try {
+//							cr=StaticDaoFacade.getTaskDao(cr);
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+						newRequest.set(0,""+ cr.getSequence());
+						newRequest.set(2,""+ cr.getRunState());
+						newRequest.set(3,""+ cr.getLogs());
+					}
+					((RunningTaskTableModel)runningTaskTable.getModel()).refreshTable();
+				}
+			}});
+		timer.start();
 		runProcessMenu = new JMenuItem("Run Process");
 		runProcessMenu.addActionListener(new ActionListener() {
 	          public void actionPerformed(ActionEvent e) {
@@ -296,25 +364,34 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        		  if(processTable.getSelectedRow()!=-1){
 	        		  ProcessTableModel model=(ProcessTableModel) processTable.getModel();
 	        		  ArrayList<Object> currRow=model.getRow(processTable.getSelectedRow());
-	        		  final ProcessDao p=(ProcessDao) currRow.get(1);
-	        		  System.out.println(p.getId()+" == "+p.getName());
-	        		  List<TaskDao> ptl = StaticDaoFacade.getSortedTasksByProcessId(p.getId());
-	        		  final com.sapient.punter.tasks.Process process=com.sapient.punter.tasks.Process.getProcess(p.getInputParams());
+	        		  final ProcessDao procDao=(ProcessDao) currRow.get(1);
+	        		  System.out.println(procDao.getId()+" == "+procDao.getName());
+	        		  List<TaskDao> ptl = StaticDaoFacade.getSortedTasksByProcessId(procDao.getId());
+	        		  final com.sapient.punter.tasks.Process process=com.sapient.punter.tasks.Process.getProcess(procDao.getInputParams());
+	        		  final List<TaskHistory> thList=new ArrayList<TaskHistory>(10);
+	        		  final ProcessHistory ph=new ProcessHistory();
+  	        		  ph.setName("Test-1");
+  	        		  ph.setStartTime(new Date());
+  	        		  ph.setProcess(procDao);
+  	        		  ph.setTaskHistoryList(thList);
 	        		  for (TaskDao taskDao : ptl) {
 						System.out.println("Task -"+taskDao.getId());
 						Tasks task=Tasks.getTask(taskDao.getClassName(), taskDao.getInputParams(), taskDao.getOutputParams());
 						task.setTaskDao(taskDao);
 						process.addTask(task);
+						TaskHistory th = new TaskHistory();
+						th.setTask(taskDao);
+						th.setProcessHistory(ph);
+						th.setSequence(task.getTaskDao().getSequence());
+						
+						thList.add(th);
 	        		  	}
 	        		  
 	        		  Thread t=new Thread(){
 	        			@Override
 	        			public void run() {
-	        				try{
-	        			  ProcessHistory ph=new ProcessHistory();
-	  	        		  ph.setName("Test-1");
-	  	        		  ph.setStartTime(new Date());
-	  	        		  ph.setProcess(p);
+	        			try{
+	        			 
 	  	        		  final ProcessHistory ph1 = StaticDaoFacade.createProcessHistory(ph);
 	  	        		  final ArrayList<Object> newRequest = new ArrayList<Object>();
 	  	      	          newRequest.add(""+ph1.getId()+"  [ "+sdf.format(ph1.getStartTime())+" ]");
@@ -333,10 +410,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	  	        		  // Adding row to running process table model
 	  	        		  final RunningProcessTableModel rptm=(RunningProcessTableModel) runningProcessTable.getModel();
 	  	        		  ArrayList<Object> newRequest1 = new ArrayList<Object>();
-	  	      	          newRequest1.add(p.getName());
+	  	      	          newRequest1.add(procDao.getName());
 	  	      	          newRequest1.add("");
+	  	      	          newRequest1.add(ph1.getRunState());
 	  	      	          newRequest1.add(ph1.getStartTime());
-	  	      	          newRequest1.add(p.getId());
 	  	      	          newRequest1.add(ph1);
 	  	      	          final ArrayList rptmRow = rptm.insertRow(newRequest1);
 	        			  process.addObserver(new ProcessObserver() {
@@ -347,13 +424,14 @@ public class PunterGUI extends JPanel implements TaskObserver{
 									newRequest.set(0, ""+ph.getId()+"  [ "+sdf.format(ph.getStartTime())+" ]");
 									((ProcessHistoryTableModel)processHistoryTable.getModel()).refreshTable();
 									rptmRow.set(1, ph.getId());
+									rptmRow.set(2, ph.getRunState());
 									rptm.refreshTable();
 								}
 
 								@Override
 								public void processCompleted() {
-									rptm.deleteRow(rptmRow);
-									rptm.refreshTable();
+//									rptm.deleteRow(rptmRow);
+//									rptm.refreshTable();
 								}
 							});
 	        				process.execute();
@@ -633,7 +711,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	public void createTaskHistory(final TaskHistory taskHistory) {
     	try {
     		System.err.println("Creating task history");
-			StaticDaoFacade.createTaskHistory(taskHistory);
+			StaticDaoFacade.saveTaskHistory(taskHistory);
 			if(processHistoryTable.getSelectedRow()!=-1){
 			 javax.swing.SwingUtilities.invokeLater(new Runnable() {
 		            public void run() {
@@ -654,7 +732,9 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			      	          	newRequest.add(th.getTask().getName());
 			      	          	newRequest.add(th.getRunState());
 			      	          	newRequest.add(th.getLogs());
+			      	          	newRequest.add(th);
 			      	          	pthtmodel.insertRow(newRequest);
+//			      	          ((RunningTaskTableModel)runningTaskTable.getModel()).insertRow(newRequest);
 			      	  		}
 			      	        if(pthtmodel.getRowCount()>0){
 			      	        	processTaskHistoryTable.setRowSelectionInterval(0, 0);
