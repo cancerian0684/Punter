@@ -66,22 +66,19 @@ public void afterProcessFinish(){
 public void execute(){
 	substituteParams();
 	beforeProcessStart();
-	int i=0;
-	for (Tasks task : taskList) {
+	for (TaskHistory th : ph.getTaskHistoryList()) {
+		Tasks task=Tasks.getTask(th.getTask().getClassName(), th.getTask().getInputParams(), th.getTask().getOutputParams());
+		task.setTaskDao(th.getTask());
+		task.setSessionMap(sessionMap);
+		th.setRunState(RunState.RUNNING);
 		boolean status=task.execute();
-		i++;
-		TaskHistory th=ph.getTaskHistoryList().get(i-1);
-//		TaskHistory th=new TaskHistory();
-//		th.setProcessHistory(ph);
-//		th.setTask(task.getTaskDao());
-//		th.setSequence(task.getTaskDao().getSequence());
 		th.setStatus(status);
 		if(status)
 			th.setRunState(RunState.SUCCESS);
 		else
 			th.setRunState(RunState.FAILURE);
 		th.setLogs(task.getMemoryLogs());
-		ts.createTaskHistory(th);
+		ts.saveTaskHistory(th);
 		try {
 			TimeUnit.SECONDS.sleep(1);
 		} catch (InterruptedException e) {

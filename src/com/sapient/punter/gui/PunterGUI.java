@@ -210,7 +210,6 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	    amap.put("table.delete", new AbstractAction(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				 if(taskTable.getSelectedRow() != -1){
 	                	System.out.println("Delete Key Pressed.");
 	                	TaskTableModel tableModel=(TaskTableModel) taskTable.getModel();
@@ -330,29 +329,22 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	          }
 	    });
 		timer=new Timer(1000,new ActionListener(){
-			private int i=0;
 			public void actionPerformed(ActionEvent e) {
-				i++;
 				int row=runningProcessTable.getSelectedRow();
 				if(row!=-1){
-//					ArrayList rowArray = ((RunningProcessTableModel)runningProcessTable.getModel()).getRow(row);
-//					ProcessHistory ph1 = (ProcessHistory) rowArray.get(4);
-//					ProcessHistory ph = StaticDaoFacade.getProcessHistoryById(ph1.getId());
 					System.out.println("Timer running");
 					int rows=runningTaskTable.getRowCount();
 					for(int r=0;r<rows;r++){
 						final ArrayList<Object> newRequest = ((RunningTaskTableModel)runningTaskTable.getModel()).getRow(r);
 						TaskHistory cr=(TaskHistory)newRequest.get(4);
-						try {
-//							cr=StaticDaoFacade.getTaskDao(cr);
-						} catch (Exception e1) {
-							e1.printStackTrace();
-						}
 						newRequest.set(0,""+ cr.getSequence());
 						newRequest.set(2,""+ cr.getRunState());
-						newRequest.set(3,""+ cr.getLogs());
+						newRequest.set(3, cr.getLogs()!=null?cr.getLogs():"");
 					}
 					((RunningTaskTableModel)runningTaskTable.getModel()).refreshTable();
+				}else{
+					if(((RunningTaskTableModel)runningTaskTable.getModel()).getRowCount()>0)
+					((RunningTaskTableModel)runningTaskTable.getModel()).clearTable();
 				}
 			}});
 		timer.start();
@@ -376,14 +368,12 @@ public class PunterGUI extends JPanel implements TaskObserver{
   	        		  ph.setTaskHistoryList(thList);
 	        		  for (TaskDao taskDao : ptl) {
 						System.out.println("Task -"+taskDao.getId());
-						Tasks task=Tasks.getTask(taskDao.getClassName(), taskDao.getInputParams(), taskDao.getOutputParams());
-						task.setTaskDao(taskDao);
-						process.addTask(task);
+						
+//						process.addTask(task);
 						TaskHistory th = new TaskHistory();
 						th.setTask(taskDao);
 						th.setProcessHistory(ph);
-						th.setSequence(task.getTaskDao().getSequence());
-						
+						th.setSequence(taskDao.getSequence());
 						thList.add(th);
 	        		  	}
 	        		  
@@ -391,7 +381,6 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        			@Override
 	        			public void run() {
 	        			try{
-	        			 
 	  	        		  final ProcessHistory ph1 = StaticDaoFacade.createProcessHistory(ph);
 	  	        		  final ArrayList<Object> newRequest = new ArrayList<Object>();
 	  	      	          newRequest.add(""+ph1.getId()+"  [ "+sdf.format(ph1.getStartTime())+" ]");
@@ -430,8 +419,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
 
 								@Override
 								public void processCompleted() {
-//									rptm.deleteRow(rptmRow);
-//									rptm.refreshTable();
+									rptm.deleteRow(rptmRow);
+									rptm.refreshTable();
 								}
 							});
 	        				process.execute();
@@ -493,7 +482,6 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			}
 	      });
         inputParamTable = new JTable(new ParamTableModel());
-//        inputParamTable.setBorder(new TitledBorder("Input Parameters"));
         inputParamTable.setShowGrid(true);
         inputParamTable.setPreferredScrollableViewportSize(new Dimension(250, 150));
         inputParamTable.setFillsViewportHeight(true);
@@ -708,7 +696,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     
     
     @Override
-	public void createTaskHistory(final TaskHistory taskHistory) {
+	public void saveTaskHistory(final TaskHistory taskHistory) {
     	try {
     		System.err.println("Creating task history");
 			StaticDaoFacade.saveTaskHistory(taskHistory);
@@ -734,7 +722,6 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			      	          	newRequest.add(th.getLogs());
 			      	          	newRequest.add(th);
 			      	          	pthtmodel.insertRow(newRequest);
-//			      	          ((RunningTaskTableModel)runningTaskTable.getModel()).insertRow(newRequest);
 			      	  		}
 			      	        if(pthtmodel.getRowCount()>0){
 			      	        	processTaskHistoryTable.setRowSelectionInterval(0, 0);
