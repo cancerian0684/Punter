@@ -6,9 +6,9 @@ import java.util.logging.Level;
 
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
-import com.sapient.punter.annotations.Task;
+import com.sapient.punter.annotations.PunterTask;
 
-@Task(author="munishc",name="EchoTask",description="Echo's the input data to SOP")
+@PunterTask(author="munishc",name="EchoTask",description="Echo's the input data to SOP")
 public class EchoTask extends Tasks {
 	@InputParam(required = true)
 	private String name;

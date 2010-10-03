@@ -10,9 +10,9 @@ import java.util.logging.Logger;
 
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
-import com.sapient.punter.annotations.Task;
+import com.sapient.punter.annotations.PunterTask;
 
-@Task(author="munishc",name="DBExportTask",description="Export DB into specified file.")
+@PunterTask(author="munishc",name="DBExportTask",description="Export DB into specified file.")
 public class DBExportTask extends Tasks {
 	@InputParam(required = true)
 	private String targetFile;

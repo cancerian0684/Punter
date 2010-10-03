@@ -87,9 +87,8 @@ public void execute(){
 	}
 	afterProcessFinish();
 }
-public void setTaskObservable(TaskObserver ts,ProcessHistory ph){
+public void setTaskObservable(TaskObserver ts){
 	this.ts=ts;
-	this.ph=ph;
 }
 
 public static List<String> listInputParams(){
@@ -136,9 +135,10 @@ private void substituteParams() {
 		}
 	}
 }
-public static Process getProcess(Properties props){
+public static Process getProcess(Properties props,ProcessHistory ph){
 	Process proc=new Process();
 	proc.inputParams=props;
+	proc.ph=ph;
 	return proc;
 }
 public static void main(String[] args) {

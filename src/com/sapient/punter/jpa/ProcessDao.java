@@ -1,12 +1,16 @@
 package com.sapient.punter.jpa;
 
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -14,7 +18,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="PROCESS")
-public class ProcessDao {
+public class ProcessDao implements Serializable{
 //	@SequenceGenerator(name="Emp_Gen", sequenceName="Emp_Seq", allocationSize=5)
 //	@GeneratedValue(generator="Emp_Gen")
 	@Id
@@ -24,10 +28,9 @@ public class ProcessDao {
 	private String description;
 	private String comments;
 	private Properties inputParams;
-//	@Basic(fetch=FetchType.EAGER)
-	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "process")
+	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.LAZY)
 	private List<TaskDao> taskList;
-	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy = "process")
+	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy = "process",fetch=FetchType.LAZY)
 	private List<ProcessHistory> processHistoryList;
 	public long getId() {
 		return id;

@@ -1,5 +1,8 @@
 package com.sapient.punter.jpa;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -7,6 +10,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -15,7 +19,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-public class ProcessHistory {
+public class ProcessHistory implements Serializable{
 	@Id
 	@GeneratedValue
 	private long id;
@@ -24,13 +28,13 @@ public class ProcessHistory {
 	private Date startTime;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date finishTime;
-	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy="processHistory")
+	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy="processHistory",fetch=FetchType.LAZY)
 	private List<TaskHistory> taskHistoryList;
 	@ManyToOne
 	private ProcessDao process;
 //	@Basic(optional = false)
-	@Enumerated(EnumType.STRING)
 //	@Column(nullable = false, columnDefinition = "char(1) default 'A'")
+	@Enumerated(EnumType.STRING)
 	private RunState runState = RunState.NEW;
 
 	public long getId() {

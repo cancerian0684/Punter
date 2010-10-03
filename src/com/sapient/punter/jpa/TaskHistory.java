@@ -1,5 +1,7 @@
 package com.sapient.punter.jpa;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -9,7 +11,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class TaskHistory {
+public class TaskHistory implements Serializable{
 	@Id
 	@GeneratedValue
 	private long id;

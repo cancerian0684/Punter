@@ -1,5 +1,6 @@
 package com.sapient.punter.jpa;
 
+import java.io.Serializable;
 import java.util.Properties;
 
 import javax.persistence.Entity;
@@ -10,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="TASK")
-public class TaskDao {
+public class TaskDao implements Serializable{
 	@Id
 	@GeneratedValue
 	private long id;

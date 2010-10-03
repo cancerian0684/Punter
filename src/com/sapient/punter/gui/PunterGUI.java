@@ -35,7 +35,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -43,6 +42,8 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import com.sapient.punter.executors.ProcessExecutor;
+import com.sapient.punter.executors.ScheduledJobPicker;
 import com.sapient.punter.jpa.ProcessDao;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.StaticDaoFacade;
@@ -354,83 +355,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        	  System.out.println("Running Process");
 	        	  try{
 	        		  if(processTable.getSelectedRow()!=-1){
-	        		  ProcessTableModel model=(ProcessTableModel) processTable.getModel();
-	        		  ArrayList<Object> currRow=model.getRow(processTable.getSelectedRow());
-	        		  final ProcessDao procDao=(ProcessDao) currRow.get(1);
-	        		  System.out.println(procDao.getId()+" == "+procDao.getName());
-	        		  List<TaskDao> ptl = StaticDaoFacade.getSortedTasksByProcessId(procDao.getId());
-	        		  final com.sapient.punter.tasks.Process process=com.sapient.punter.tasks.Process.getProcess(procDao.getInputParams());
-	        		  final List<TaskHistory> thList=new ArrayList<TaskHistory>(10);
-	        		  final ProcessHistory ph=new ProcessHistory();
-  	        		  ph.setName("Test-1");
-  	        		  ph.setStartTime(new Date());
-  	        		  ph.setProcess(procDao);
-  	        		  ph.setTaskHistoryList(thList);
-	        		  for (TaskDao taskDao : ptl) {
-						System.out.println("Task -"+taskDao.getId());
-						
-//						process.addTask(task);
-						TaskHistory th = new TaskHistory();
-						th.setTask(taskDao);
-						th.setProcessHistory(ph);
-						th.setSequence(taskDao.getSequence());
-						thList.add(th);
-	        		  	}
-	        		  
-	        		  Thread t=new Thread(){
-	        			@Override
-	        			public void run() {
-	        			try{
-	  	        		  final ProcessHistory ph1 = StaticDaoFacade.createProcessHistory(ph);
-	  	        		  final ArrayList<Object> newRequest = new ArrayList<Object>();
-	  	      	          newRequest.add(""+ph1.getId()+"  [ "+sdf.format(ph1.getStartTime())+" ]");
-	  	      	          newRequest.add(ph1);
-	  	      	          javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	  	      	        	  public void run() {
-	  	                	try{
-	  	                		((ProcessHistoryTableModel)processHistoryTable.getModel()).insertRowAtBeginning(newRequest);
-	  	                		processHistoryTable.setRowSelectionInterval(0, 0);
-	  	                        }catch (Exception e) {
-	  	                        	e.printStackTrace();
-	  	                		}
-	  	                	}
-	  	      	      	  });
-	  	        		  process.setTaskObservable(PunterGUI.this,ph1);
-	  	        		  // Adding row to running process table model
-	  	        		  final RunningProcessTableModel rptm=(RunningProcessTableModel) runningProcessTable.getModel();
-	  	        		  ArrayList<Object> newRequest1 = new ArrayList<Object>();
-	  	      	          newRequest1.add(procDao.getName());
-	  	      	          newRequest1.add("");
-	  	      	          newRequest1.add(ph1.getRunState());
-	  	      	          newRequest1.add(ph1.getStartTime());
-	  	      	          newRequest1.add(ph1);
-	  	      	          final ArrayList rptmRow = rptm.insertRow(newRequest1);
-	        			  process.addObserver(new ProcessObserver() {
-								 
-								@Override
-								public void update(ProcessHistory ph) {
-									System.err.println("updating table model");
-									newRequest.set(0, ""+ph.getId()+"  [ "+sdf.format(ph.getStartTime())+" ]");
-									((ProcessHistoryTableModel)processHistoryTable.getModel()).refreshTable();
-									rptmRow.set(1, ph.getId());
-									rptmRow.set(2, ph.getRunState());
-									rptm.refreshTable();
-								}
-
-								@Override
-								public void processCompleted() {
-									rptm.deleteRow(rptmRow);
-									rptm.refreshTable();
-								}
-							});
-	        				process.execute();
-	        				super.run();
-	        				}catch (Exception e) {
-	        					e.printStackTrace();
-							}
-	        			}  
-	        		  };
-	        		  t.start();
+	        			  final ProcessDao procDao=(ProcessDao) ((ProcessTableModel) processTable.getModel()).getRow(processTable.getSelectedRow()).get(1);
+	        			  createProcess(procDao);
 	        		  }
 	        	  }catch(Exception ee){
 	        		  ee.printStackTrace();
@@ -538,7 +464,9 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
                 ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-                if (lsm.isSelectionEmpty()) {
+                if(e.getValueIsAdjusting()){
+                	System.err.println("Mouse is adjusting..");
+                }else if (lsm.isSelectionEmpty()) {
                 } else {
                     int selectedRow = lsm.getMinSelectionIndex();
                     System.out.println("Row " + selectedRow + " is now selected.");
@@ -557,10 +485,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		      	          	newRequest.add(""+ph.getId()+"  [ "+sdf.format(ph.getStartTime())+" ]");
 		      	          	newRequest.add(ph);
 		      	          	phtmodel.insertRow(newRequest);
-		      	        List<TaskHistory> thl = ph.getTaskHistoryList();
+		      	        /*List<TaskHistory> thl = ph.getTaskHistoryList();
 		      	        for(TaskHistory th:thl){
 		      	        	System.out.println(th.getId());
-		      	        }
+		      	        }*/
 	      	  		}
 	      	        if(phtmodel.getRowCount()>0){
 	      	        	processHistoryTable.setRowSelectionInterval(0, 0);
@@ -651,6 +579,9 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
                 ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+                if(e.getValueIsAdjusting()){
+                	System.err.println("Mouse is adjusting..");
+                }
                 if (lsm.isSelectionEmpty()) {
                 	System.out.println("PTHL Empty --No Row is now selected.");
                 } else {
@@ -691,9 +622,96 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		}
         if(processTable.getModel().getRowCount()>0)
             processTable.setRowSelectionInterval(0, 0);
-            
+         
+        //create scheduled job picker
+        ScheduledJobPicker sjp= new ScheduledJobPicker();
+        sjp.setGuiReference(this);
     }
-    
+    public void createProcess(final ProcessDao procDao) throws Exception{
+		  System.out.println(procDao.getId()+" == "+procDao.getName());
+		  List<TaskDao> ptl = StaticDaoFacade.getSortedTasksByProcessId(procDao.getId());
+		  
+		  final List<TaskHistory> thList=new ArrayList<TaskHistory>(10);
+		  final ProcessHistory ph=new ProcessHistory();
+		  ph.setName("Test-1");
+		  ph.setStartTime(new Date());
+		  ph.setProcess(procDao);
+		  ph.setTaskHistoryList(thList);
+		  for (TaskDao taskDao : ptl) {
+			System.out.println("Task -"+taskDao.getId());
+			TaskHistory th = new TaskHistory();
+			th.setTask(taskDao);
+			th.setProcessHistory(ph);
+			th.setSequence(taskDao.getSequence());
+			thList.add(th);
+		  	}
+		  
+		  Thread t=new Thread(){
+			@Override
+			public void run() {
+			try{
+    		  final ProcessHistory ph1 = StaticDaoFacade.createProcessHistory(ph);
+    		  final ArrayList<Object> newRequest = new ArrayList<Object>();
+  	          newRequest.add(""+ph1.getId()+"  [ "+sdf.format(ph1.getStartTime())+" ]");
+  	          newRequest.add(ph1);
+  	          javax.swing.SwingUtilities.invokeLater(new Runnable() {
+  	        	public void run() {
+            	try{
+            		if(processTable.getSelectedRow()!=-1){
+            		ProcessDao pd=(ProcessDao) ((ProcessTableModel)processTable.getModel()).getRow(processTable.getSelectedRow()).get(1);
+            		if(pd.getId()==procDao.getId()){
+            			((ProcessHistoryTableModel)processHistoryTable.getModel()).insertRowAtBeginning(newRequest);
+            			processHistoryTable.setRowSelectionInterval(0, 0);
+            		}
+            		}
+                    }catch (Exception e) {
+                    	e.printStackTrace();
+            		}
+            	}
+  	      	  });
+  	          final com.sapient.punter.tasks.Process process=com.sapient.punter.tasks.Process.getProcess(procDao.getInputParams(),ph1);
+    		  process.setTaskObservable(PunterGUI.this);
+    		  // Adding row to running process table model
+    		  final RunningProcessTableModel rptm=(RunningProcessTableModel) runningProcessTable.getModel();
+    		  ArrayList<Object> newRequest1 = new ArrayList<Object>();
+  	          newRequest1.add(procDao.getName());
+  	          newRequest1.add("");
+  	          newRequest1.add(ph1.getRunState());
+  	          newRequest1.add(ph1.getStartTime());
+  	          newRequest1.add(ph1);
+  	          final ArrayList rptmRow = rptm.insertRow(newRequest1);
+			  process.addObserver(new ProcessObserver() {
+					 
+					@Override
+					public void update(ProcessHistory ph) {
+//						System.err.println("updating table model");
+						newRequest.set(0, ""+ph.getId()+"  [ "+sdf.format(ph.getStartTime())+" ]");
+						((ProcessHistoryTableModel)processHistoryTable.getModel()).refreshTable();
+						rptmRow.set(1, ph.getId());
+						rptmRow.set(2, ph.getRunState());
+						rptm.refreshTable();
+					}
+
+					@Override
+					public void processCompleted() {
+						rptm.deleteRow(rptmRow);
+						if(rptm.getRowCount()>0&&runningProcessTable.getSelectedRow()==-1){
+							runningProcessTable.setRowSelectionInterval(0, 0);
+						}
+//						rptm.refreshTable();
+					}
+				});
+				runProcess(process);
+				}catch (Exception e) {
+					e.printStackTrace();
+				}
+			}  
+		  };
+		  t.start();
+    }
+    public void runProcess(com.sapient.punter.tasks.Process process){
+    	ProcessExecutor.getInstance().submitProcess(process);
+    }
     
     @Override
 	public void saveTaskHistory(final TaskHistory taskHistory) {

@@ -276,6 +276,19 @@ public class StaticDaoFacade {
         	
         }
     }
+ 	public static List<ProcessDao> getScheduledProcessList() throws Exception{
+	     Query q = em.createQuery("select p from ProcessDao p");
+	     q.setHint("toplink.refresh", "true");
+	     List<ProcessDao> dbProcList = q.getResultList();
+	     List<ProcessDao> processList =new ArrayList<ProcessDao>();
+	     for (ProcessDao processDao :dbProcList  ) {
+	    	 String ss=processDao.getInputParams().getProperty("scheduleString").trim();
+	    	 System.out.println(ss);
+	    	 if(!ss.isEmpty())
+	    	 processList.add(processDao);
+		}
+	     return processList;
+ 	}
     public static List<ProcessDao> getProcessList() throws Exception{
         Query q = em.createQuery("select p from ProcessDao p");
         q.setHint("toplink.refresh", "true");
