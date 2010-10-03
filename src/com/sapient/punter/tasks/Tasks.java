@@ -78,7 +78,9 @@ public abstract class Tasks {
 		this.loggingLevel = loggingLevel;
 	}
 	public String getMemoryLogs(){
+		if(strLogger!=null)
 		return strLogger.toString();
+		return "";
 	}
 	public void setTaskDao(TaskData taskDao) {
 		this.taskDao = taskDao;

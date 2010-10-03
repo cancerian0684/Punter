@@ -17,6 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 @Entity
 public class ProcessHistory implements Serializable{
@@ -32,10 +33,14 @@ public class ProcessHistory implements Serializable{
 	private List<TaskHistory> taskHistoryList;
 	@ManyToOne
 	private ProcessData process;
+	@Transient
+	private int progress;
 //	@Basic(optional = false)
 //	@Column(nullable = false, columnDefinition = "char(1) default 'A'")
 	@Enumerated(EnumType.STRING)
 	private RunState runState = RunState.NEW;
+	@Enumerated(EnumType.STRING)
+	private RunStatus runStatus = RunStatus.NOT_RUN;
 
 	public long getId() {
 		return id;
@@ -80,4 +85,37 @@ public class ProcessHistory implements Serializable{
 	public void setRunState(RunState runState) {
 		this.runState = runState;
 	}
+	public RunStatus getRunStatus() {
+		return runStatus;
+	}
+	public void setRunStatus(RunStatus runStatus) {
+		this.runStatus = runStatus;
+	}
+	public int getProgress() {
+		return progress;
+	}
+	public void setProgress(int progress) {
+		this.progress = progress;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof ProcessHistory))
+			return false;
+		ProcessHistory other = (ProcessHistory) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+	
 }

@@ -154,9 +154,22 @@ public class StaticDaoFacade {
         em.getTransaction().begin();
         TaskHistory task=em.find(TaskHistory.class, t.getId());
         task.setRunState(t.getRunState());
+        task.setRunStatus(t.getRunStatus());
         task.setSequence(t.getSequence());
         task.setLogs(t.getLogs());
         em.merge(task);
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
+    }
+    public static void saveProcessHistory(ProcessHistory procHistory)throws Exception{
+    	EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        ProcessHistory ph=em.find(ProcessHistory.class, procHistory.getId());
+        ph.setRunState(procHistory.getRunState());
+        ph.setRunStatus(procHistory.getRunStatus());
+        ph.setFinishTime(procHistory.getFinishTime());
+        em.merge(ph);
         em.flush();
         em.getTransaction().commit();
         em.close();
@@ -326,28 +339,6 @@ public class StaticDaoFacade {
         	}
 		}
     }
-    private static Player[] dodgersPlayers = new Player[] {
-        
-        new Player("Lowe", "Derek", 23, "You just can't touch that sinker."),
-        new Player("Kent", "Jeff", 12, "I'm getting too old for this."),
-        new Player("Garciaparra", "Nomar", 5,
-                "No, I'm not superstitious at all.")
-                
-    };
-    
-    private static Player[] giantsPlayers = new Player[] {
-        new Player("Pettitte", "Andy", 46, null),
-        new Player("Jeter", "Derek", 2, null),
-        new Player("Rodriguez", "Alex", 13, null)
-        
-    };
-    
-    public static Team[] teams = new Team[] {
-        new Team("Los Angeles Dodgers", "National"),
-        new Team("San Francisco Giants", "National"),
-        new Team("Anaheim Angels", "American"),
-        new Team("Boston Red Sox", "American")
-    };
     
     public void deleteTeam(){
         String aTeamName = "Anaheim Angels";
@@ -367,107 +358,5 @@ public class StaticDaoFacade {
         em.close();
         emf.close();
     }
-    public void findPlayer(){
-
-        // Create the EntityManager
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("league");
-        EntityManager em = emf.createEntityManager();
-        
-        
-        for(long primaryKey = 1; primaryKey < 10; primaryKey++) {
-            Player player = em.find(Player.class, primaryKey);
-            if (player != null) {
-                System.out.println(player.toString());
-            }
-            
-        }
-        
-        em.close();
-        emf.close();
-        // TODO code application logic here
-    
-    }
-    public void mergePlayer(){
-
-        
-        // Create the EntityManager
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("league");
-        EntityManager em = emf.createEntityManager();
-        
-        Player p = em.find(Player.class, 1L);
-        em.clear();
-        // p is now detached
-        Team t = new Team("Ventura Surfers", "National");
-        p.setTeam(t);
-        em.getTransaction().begin();
-        Player managedPlayer = em.merge(p);
-        em.getTransaction().commit();
-        System.out.println(p.toString());
-        
-        
-        em.close();
-        emf.close();
-        
-    }
-    public void removePlayer(){
-
-        // Create the EntityManager
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("league");
-        EntityManager em = emf.createEntityManager();
-        
-        em.getTransaction().begin();
-        Player player = em.find(Player.class, 5L);
-        if (player != null) {
-            System.out.println(player.toString());
-            em.remove(player);
-        }
-        
-        em.getTransaction().commit();
-        
-        em.close();
-        emf.close();
-    
-    }
-    public void retrievePlayer(){
-
-        String aTeamName = "Los Angeles Dodgers";
-        
-        // Create the EntityManager
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("league");
-        EntityManager em = emf.createEntityManager();
-        
-        Query q = em.createQuery("select c from Player c where c.team.teamName = :name");
-        q.setParameter("name", aTeamName);
-        List<Player> playerList = q.getResultList();
-
-        for(Player p : playerList) {
-            System.out.println(p.toString());
-        }
-        
-        em.close();
-        emf.close();
-         
-    
-    }
-    public void updatePlayer(){
-
-        String aTeamName = "Los Angeles Dodgers";
-
-		// Create the EntityManager
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("league");
-		EntityManager em = emf.createEntityManager();
-		
-		Query q = em.createQuery("update Player p " +
-		        "set p.jerseyNumber = (p.jerseyNumber + 1) " +
-		        "where p.team.teamName = :name");
-		q.setParameter("name", aTeamName);
-		
-		em.getTransaction().begin();
-		q.executeUpdate();
-		em.getTransaction().commit();
-		
-		em.close();
-		emf.close();
-
-    }
+   
 }

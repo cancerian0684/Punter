@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
 import com.sapient.punter.jpa.ProcessData;
+import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.StaticDaoFacade;
 
 public class RunningProcessTableModel extends AbstractTableModel {
@@ -15,9 +16,9 @@ public class RunningProcessTableModel extends AbstractTableModel {
 
 	/** Holds the column names */         
 	private String [] columnNames = new String [] 
-                                  {"<html><b>Process","<html><b>Run ID","<html><b>Status","<html><b>Start Time"};
+                                  {"<html><b>Process","<html><b>Run ID","<html><b>Status","<html><b>Completed"};
 	private Class [] columnClasses = new Class[] 
-                                   {String.class,String.class,String.class,String.class};
+                                   {String.class,String.class,String.class,Integer.class};
   
   /**
    * Constructor: Initializes the table structure, including number of columns
@@ -67,6 +68,17 @@ public class RunningProcessTableModel extends AbstractTableModel {
    */
   public Object getValueAt(int row, int col) {
     ArrayList colArrayList = (ArrayList) data.get(row);
+    ProcessHistory ph=(ProcessHistory) colArrayList.get(0);
+    switch(col){
+    case 0:
+    	return ph.getName();
+    case 1:
+    	return ph.getId();
+    case 2:
+    	return ph.getRunState();
+    case 3:
+    	return ph.getProgress();
+    }
     return colArrayList.get(col);
   }
 
@@ -90,14 +102,7 @@ public class RunningProcessTableModel extends AbstractTableModel {
    */
   public void setValueAt( Object obj, int row, int col ) {
     ArrayList colArrayList = (ArrayList)data.get(row);
-    colArrayList.set( col, obj);
-    try{
-    	ProcessData p=(ProcessData) colArrayList.get(1);
-    	p.setName((String)obj);
-    	StaticDaoFacade.saveProcess(p);
-    }catch (Exception e) {
-    	e.printStackTrace();
-	}
+//    colArrayList.set( col, obj);
   /*  int totalFieldsSelected=0;
     for(int i=0;i<data.size();i++){
     	boolean select=Boolean.parseBoolean(((ArrayList)data.get(i)).get(5).toString());
@@ -111,11 +116,11 @@ public class RunningProcessTableModel extends AbstractTableModel {
    * Adds a new row to the table.
    * @param <b>ArrayList </b> new row data
    */
- /* public synchronized ArrayList insertRow( ArrayList newrow ) {
+  public synchronized ArrayList insertRowAtBeginning( ArrayList newrow ) {
     data.add(0,newrow);
     super.fireTableRowsInserted(0,0);
     return (ArrayList) data.get(0);
-  }*/
+  }
   
   public synchronized ArrayList insertRow( ArrayList newrow ) {
 	    data.add(newrow);
@@ -195,8 +200,8 @@ public class RunningProcessTableModel extends AbstractTableModel {
     super.fireTableDataChanged();
   }
   public boolean isCellEditable(int row, int col) {  
-      return true;
-      }
+      return false;
+  }
   private void printDebugData() {
       int numRows = getRowCount();
       int numCols = getColumnCount();

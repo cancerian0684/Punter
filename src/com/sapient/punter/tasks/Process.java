@@ -9,14 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.gui.ProcessObserver;
 import com.sapient.punter.gui.TaskObserver;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.RunState;
+import com.sapient.punter.jpa.RunStatus;
+import com.sapient.punter.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
+import com.sapient.punter.utils.StringUtils;
 import com.sun.jmx.snmp.tasks.TaskServer;
 
 public class Process {
@@ -55,32 +59,65 @@ public void beforeProcessStart(){
 	}
 }
 public void afterProcessFinish(){
-	ph.setRunState(RunState.SUCCESS);
+	try{
+	StaticDaoFacade.saveProcessHistory(ph);
+	}catch (Exception e) {
+		e.printStackTrace();
+	}
 	po.update(ph);
 	po.processCompleted();
 }
 public void execute(){
 	substituteParams();
 	beforeProcessStart();
+	boolean keepRunning=true;
+	int progressCounter=0;
+	ph.setRunStatus(RunStatus.RUNNING);
 	for (TaskHistory th : ph.getTaskHistoryList()) {
 		Tasks task=Tasks.getTask(th.getTask().getClassName(), th.getTask().getInputParams(), th.getTask().getOutputParams());
 		task.setTaskDao(th.getTask());
 		task.setSessionMap(sessionMap);
 		th.setRunState(RunState.RUNNING);
-		boolean status=task.execute();
+		boolean status=false;
+		if(keepRunning){
+		try{
+		status=task.execute();
+		keepRunning=status;
+		}catch (Throwable e) {
+			keepRunning=false;
+			task.LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+		}
+		progressCounter++;
+		ph.setProgress(100*progressCounter/ph.getTaskHistoryList().size());
+		po.update(ph);
 		th.setStatus(status);
 		if(status)
-			th.setRunState(RunState.SUCCESS);
+			th.setRunStatus(RunStatus.SUCCESS);
 		else
-			th.setRunState(RunState.FAILURE);
-		th.setLogs(task.getMemoryLogs());
-		ts.saveTaskHistory(th);
+			th.setRunStatus(RunStatus.FAILURE);
+		
+			th.setRunState(RunState.COMPLETED);
+			th.setLogs(task.getMemoryLogs());
+			ts.saveTaskHistory(th);
+		}else{
+			th.setRunState(RunState.NOT_RUN);
+			th.setRunStatus(RunStatus.NOT_RUN);
+			th.setLogs("");
+			ts.saveTaskHistory(th);
+		}
+		
 		try {
 			TimeUnit.SECONDS.sleep(1);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
+	ph.setRunState(RunState.COMPLETED);
+	if(keepRunning)
+		ph.setRunStatus(RunStatus.SUCCESS);
+	else
+		ph.setRunStatus(RunStatus.FAILURE);
+		
 	afterProcessFinish();
 }
 public void setTaskObservable(TaskObserver ts){

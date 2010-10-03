@@ -17,7 +17,7 @@ package com.sapient.punter.utils;
  */
 import java.io.*;
 
-class StringUtils {
+public class StringUtils {
     public static InputStream reverse(InputStream source) {
         PipedOutputStream ps = null;
         PipedInputStream is = null;
@@ -109,5 +109,11 @@ class StringUtils {
 	}
 	quicksort(a, lo0, lo);
 	quicksort(a, lo == lo0 ? lo+1 : lo, hi0);
+    }
+    public static String getExceptionStackTrace(Throwable t){
+    	StringWriter sw = new StringWriter(); 
+    	PrintWriter pw = new PrintWriter(sw); 
+    	t.printStackTrace(pw);
+    	return sw.toString();
     }
 }

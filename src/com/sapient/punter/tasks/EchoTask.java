@@ -30,6 +30,7 @@ public class EchoTask extends Tasks {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		dob.getDate();
 		LOGGER.get().log(Level.WARNING, taskDao.getDescription()+name);
 		status=true;
 		return status;

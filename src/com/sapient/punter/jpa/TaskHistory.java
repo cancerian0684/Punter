@@ -24,10 +24,11 @@ public class TaskHistory implements Serializable{
 	@ManyToOne
 	private ProcessHistory processHistory;
 //	@Basic(optional = false)
-	@Enumerated(EnumType.STRING)
 //	@Column(nullable = false, columnDefinition = "char(1) default 'A'")
+	@Enumerated(EnumType.STRING)
 	private RunState runState = RunState.NEW;
-
+	@Enumerated(EnumType.STRING)
+	private RunStatus runStatus = RunStatus.NOT_RUN;
 	public long getId() {
 		return id;
 	}
@@ -70,5 +71,34 @@ public class TaskHistory implements Serializable{
 	public void setRunState(RunState runState) {
 		this.runState = runState;
 	}
-	
+	public RunStatus getRunStatus() {
+		return runStatus;
+	}
+	public void setRunStatus(RunStatus runStatus) {
+		this.runStatus = runStatus;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof TaskHistory))
+			return false;
+		TaskHistory other = (TaskHistory) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+	@Override
+    public String toString() {
+        return "com.sapient.punter.jpa.TaskHistory[id=" + id + "]";
+    }
 }

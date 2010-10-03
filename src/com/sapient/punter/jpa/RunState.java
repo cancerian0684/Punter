@@ -2,8 +2,8 @@ package com.sapient.punter.jpa;
 
 public enum RunState {
 NEW,
+PENDING,
 RUNNING,
-CANCELLED,
-SUCCESS,
-FAILURE
+COMPLETED,
+NOT_RUN
 }

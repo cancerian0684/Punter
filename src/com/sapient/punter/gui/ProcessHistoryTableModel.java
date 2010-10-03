@@ -71,7 +71,7 @@ public class ProcessHistoryTableModel extends AbstractTableModel {
   public Object getValueAt(int row, int col) {
     ArrayList colArrayList = (ArrayList) data.get(row);
     ProcessHistory ph=(ProcessHistory) colArrayList.get(0);
-    return ""+ph.getId()+"  [ "+sdf.format(ph.getStartTime())+" ]";
+    return ""+ph.getId()+"  [ "+sdf.format(ph.getStartTime())+" ]"+" "+ph.getRunStatus().toString().charAt(0);
   }
 
   /**
@@ -182,7 +182,7 @@ public class ProcessHistoryTableModel extends AbstractTableModel {
     super.fireTableDataChanged();
   }
   public boolean isCellEditable(int row, int col) {  
-      return true;
+      return false;
       }
   private void printDebugData() {
       int numRows = getRowCount();

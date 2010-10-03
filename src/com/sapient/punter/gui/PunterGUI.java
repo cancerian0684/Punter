@@ -1,11 +1,13 @@
 package com.sapient.punter.gui;
 
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
@@ -28,6 +30,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -48,6 +51,8 @@ import com.sapient.punter.executors.ProcessExecutor;
 import com.sapient.punter.executors.ScheduledJobPicker;
 import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
+import com.sapient.punter.jpa.RunState;
+import com.sapient.punter.jpa.RunStatus;
 import com.sapient.punter.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
@@ -79,8 +84,17 @@ public class PunterGUI extends JPanel implements TaskObserver{
         super(new GridLayout(1,0));
         runningProcessTable=new JTable(new RunningProcessTableModel());
         runningProcessTable.setShowGrid(true);
-        runningProcessTable.setPreferredScrollableViewportSize(new Dimension(330, 160));
+        runningProcessTable.setPreferredScrollableViewportSize(new Dimension(370, 160));
         runningProcessTable.setFillsViewportHeight(true);
+        runningProcessTable.getColumn("<html><b>Completed").setCellRenderer(new ProgressRenderer(runningProcessTable));
+        runningProcessTable.addKeyListener(new java.awt.event.KeyAdapter()
+        {
+         public void keyTyped(KeyEvent e){}
+          public void keyPressed(KeyEvent e)        
+          {
+            doKeyPressed(e);
+          }
+        });
         ListSelectionModel runningProcessTableSM = runningProcessTable.getSelectionModel();
         runningProcessTableSM.addListSelectionListener(new ListSelectionListener() {
         	public void valueChanged(ListSelectionEvent e) {
@@ -89,15 +103,11 @@ public class PunterGUI extends JPanel implements TaskObserver{
         		} else {
         			int selectedRow = lsm.getMinSelectionIndex();
         			System.out.println("Row " + selectedRow + " is now selected.");
-        			ProcessHistory ph=(ProcessHistory) ((RunningProcessTableModel) runningProcessTable.getModel()).getRow(selectedRow).get(4);
+        			ProcessHistory ph=(ProcessHistory) ((RunningProcessTableModel) runningProcessTable.getModel()).getRow(selectedRow).get(0);
         			List<TaskHistory> thList = ph.getTaskHistoryList();
         			((RunningTaskTableModel)runningTaskTable.getModel()).clearTable();
         			for (TaskHistory taskHistory : thList) {
         				final ArrayList<Object> newRequest = new ArrayList<Object>();
-	      	          	newRequest.add(taskHistory.getSequence());
-	      	          	newRequest.add(taskHistory.getTask().getName());
-	      	          	newRequest.add(taskHistory.getRunState());
-	      	          	newRequest.add(taskHistory.getLogs());
 	      	          	newRequest.add(taskHistory);
 	      	           ((RunningTaskTableModel)runningTaskTable.getModel()).insertRow(newRequest);
 					}
@@ -316,14 +326,14 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			public void actionPerformed(ActionEvent e) {
 				int row=runningProcessTable.getSelectedRow();
 				if(row!=-1){
-					System.out.println("Timer running");
+//					System.out.println("Timer running");
 					int rows=runningTaskTable.getRowCount();
 					for(int r=0;r<rows;r++){
 						final ArrayList<Object> newRequest = ((RunningTaskTableModel)runningTaskTable.getModel()).getRow(r);
-						TaskHistory cr=(TaskHistory)newRequest.get(4);
+						/*TaskHistory cr=(TaskHistory)newRequest.get(0);
 						newRequest.set(0,""+ cr.getSequence());
 						newRequest.set(2,""+ cr.getRunState());
-						newRequest.set(3, cr.getLogs()!=null?cr.getLogs():"");
+						newRequest.set(3, cr.getLogs()!=null?cr.getLogs():"");*/
 					}
 					((RunningTaskTableModel)runningTaskTable.getModel()).refreshTable();
 				}else{
@@ -519,6 +529,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
         processHistoryTable.setPreferredScrollableViewportSize(new Dimension(200, 300));
         processHistoryTable.setFillsViewportHeight(true);
         processHistoryTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        processHistoryTable.getColumn("<html><b>Run ID").setCellRenderer(new ProcessHistoryTableRenderer());
+        
         processTaskHistoryTable=new JTable(new ProcessTaskHistoryTableModel());
         processTaskHistoryTable.setShowGrid(true);
         processTaskHistoryTable.setPreferredScrollableViewportSize(new Dimension(300, 300));
@@ -604,7 +616,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		  
 		  final List<TaskHistory> thList=new ArrayList<TaskHistory>(10);
 		  final ProcessHistory ph=new ProcessHistory();
-		  ph.setName("Test-1");
+		  ph.setName(procDao.getName());
 		  ph.setStartTime(new Date());
 		  ph.setProcess(procDao);
 		  ph.setTaskHistoryList(thList);
@@ -644,24 +656,18 @@ public class PunterGUI extends JPanel implements TaskObserver{
     		  // Adding row to running process table model
     		  final RunningProcessTableModel rptm=(RunningProcessTableModel) runningProcessTable.getModel();
     		  ArrayList<Object> newRequest1 = new ArrayList<Object>();
-  	          newRequest1.add(procDao.getName());
-  	          newRequest1.add("");
-  	          newRequest1.add(ph1.getRunState());
-  	          newRequest1.add(ph1.getStartTime());
   	          newRequest1.add(ph1);
-  	          final ArrayList rptmRow = rptm.insertRow(newRequest1);
+  	          final ArrayList rptmRow = rptm.insertRowAtBeginning(newRequest1);
 			  process.addObserver(new ProcessObserver() {
 					@Override
 					public void update(ProcessHistory ph) {
 						((ProcessHistoryTableModel)processHistoryTable.getModel()).refreshTable();
-						rptmRow.set(1, ph.getId());
-						rptmRow.set(2, ph.getRunState());
 						rptm.refreshTable();
 					}
 
 					@Override
 					public void processCompleted() {
-						rptm.deleteRow(rptmRow);
+//						rptm.deleteRow(rptmRow);
 						if(rptm.getRowCount()>0&&runningProcessTable.getSelectedRow()==-1){
 							runningProcessTable.setRowSelectionInterval(0, 0);
 						}
@@ -719,6 +725,21 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			e.printStackTrace();
 		}
 	}
+    
+    private void doKeyPressed(KeyEvent e) {
+        switch(e.getKeyCode()){
+            case KeyEvent.VK_DELETE:
+                if(runningProcessTable.getSelectedRow() != -1){
+                	System.err.println("Delete Key Pressed.");
+                		ArrayList<Object> row=((RunningProcessTableModel)runningProcessTable.getModel()).getRow(runningProcessTable.getSelectedRow());
+                		if(((ProcessHistory)row.get(0)).getRunState().equals(RunState.COMPLETED))
+                		((RunningProcessTableModel)runningProcessTable.getModel()).deleteRow(runningProcessTable.getSelectedRow());
+                    break;
+                }
+            default:
+                break;
+        }
+    }
     /*
      * This method picks good column sizes.
      * If all column heads are wider than the column's cells'
@@ -1011,5 +1032,70 @@ public class PunterGUI extends JPanel implements TaskObserver{
     	    setText((value.toString().isEmpty()) ? "---" : value.toString());
 //    	    setToolTipText();
     	}
+        }
+    	static class ProcessHistoryTableRenderer extends DefaultTableCellRenderer {
+    	
+    	public ProcessHistoryTableRenderer() { super(); }
+    	@Override
+    	public Component getTableCellRendererComponent(JTable table,
+    			Object value, boolean isSelected, boolean hasFocus, int row,
+    			int column) {
+    		ProcessHistory ph = (ProcessHistory) ((ProcessHistoryTableModel)table.getModel()).getRow(row).get(0);
+    		if(ph.getRunStatus().equals(RunStatus.FAILURE)){
+    			setBackground(new Color(153, 51, 0));
+    			setForeground(Color.WHITE);
+    		}else if(ph.getRunStatus().equals(RunStatus.SUCCESS)){
+    			setBackground(new Color(51, 102, 0));
+    			setForeground(Color.WHITE);
+    		}else if(ph.getRunStatus().equals(RunStatus.NOT_RUN)){
+    			setBackground(Color.GRAY);
+    			setForeground(Color.BLACK);
+    		}else{
+    			setBackground(Color.WHITE);
+    			setForeground(Color.BLACK);
+    		}
+    		
+    		return super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+    				row, column);
+    	}
+    	public void setValue(Object value) {
+    	    setText((value.toString().isEmpty()) ? "---" : value.toString());
+    	}
+        }
+    	static class ProgressRenderer extends JProgressBar implements TableCellRenderer {
+			private JTable theTable;
+            public ProgressRenderer(JTable theTable) {
+                super();
+                this.theTable=theTable;
+                this.setStringPainted(true);
+                //  this.setIndeterminate(true);
+            }
+
+            public Component getTableCellRendererComponent(JTable table, 
+                                                           Object value, 
+                                                           boolean isSelected, 
+                                                           boolean hasFocus, 
+                                                           int row, 
+                                                           int column) {
+                int val=Integer.parseInt(value.toString());
+                this.setValue(val);
+                return this;
+            }
+
+            public boolean isDisplayable() {
+                // This does the trick. It makes sure animation is always performed 
+                return true;
+            }
+
+            public void repaint() {
+                // If you have access to the table you can force repaint like this. 
+                //Otherwize, you could trigger repaint in a timer at some interval 
+               try{
+             //   theTable.repaint();
+               }catch(Exception e){
+                   System.out.println("1111");
+               }
+            }
+
         }
 }

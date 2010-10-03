@@ -6,6 +6,7 @@ import javax.swing.table.AbstractTableModel;
 
 import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.StaticDaoFacade;
+import com.sapient.punter.jpa.TaskHistory;
 
 public class RunningTaskTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflksdflksdfl"};
@@ -67,6 +68,17 @@ public class RunningTaskTableModel extends AbstractTableModel {
    */
   public Object getValueAt(int row, int col) {
     ArrayList colArrayList = (ArrayList) data.get(row);
+    TaskHistory th=(TaskHistory) colArrayList.get(0);
+    switch(col){
+    case 0:
+    	return th.getSequence();
+    case 1:
+    	return th.getTask().getName();
+    case 2:
+    	return th.getRunState();
+    case 3:
+    	return th.getLogs();
+    }
     return colArrayList.get(col);
   }
 
@@ -90,20 +102,8 @@ public class RunningTaskTableModel extends AbstractTableModel {
    */
   public void setValueAt( Object obj, int row, int col ) {
     ArrayList colArrayList = (ArrayList)data.get(row);
-    colArrayList.set( col, obj);
-    try{
-    	ProcessData p=(ProcessData) colArrayList.get(1);
-    	p.setName((String)obj);
-    	StaticDaoFacade.saveProcess(p);
-    }catch (Exception e) {
-    	e.printStackTrace();
-	}
-  /*  int totalFieldsSelected=0;
-    for(int i=0;i<data.size();i++){
-    	boolean select=Boolean.parseBoolean(((ArrayList)data.get(i)).get(5).toString());
-    	if( select==true )
-    		totalFieldsSelected++;
-     } */             	
+    /*colArrayList.set( col, obj);
+    */
      super.fireTableDataChanged();
   }
 
@@ -190,7 +190,7 @@ public class RunningTaskTableModel extends AbstractTableModel {
     super.fireTableDataChanged();
   }
   public boolean isCellEditable(int row, int col) {  
-      return true;
+      return false;
       }
   private void printDebugData() {
       int numRows = getRowCount();

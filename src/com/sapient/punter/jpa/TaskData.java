@@ -92,5 +92,25 @@ public class TaskData implements Serializable{
 	public void setActive(boolean active) {
 		this.active = active;
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof TaskData))
+			return false;
+		TaskData other = (TaskData) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
 	
 }
