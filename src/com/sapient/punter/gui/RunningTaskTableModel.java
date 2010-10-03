@@ -5,11 +5,12 @@ import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
 import com.sapient.punter.jpa.ProcessData;
+import com.sapient.punter.jpa.RunState;
 import com.sapient.punter.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskHistory;
 
 public class RunningTaskTableModel extends AbstractTableModel {
-	public final Object[] longValues = {"Kathy123sdljflksdflksdfl"};
+	public final Object[] longValues = {new Integer(3),"Kaflksdfl","12345678","123456546865354343543543543584435"};
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
@@ -18,7 +19,7 @@ public class RunningTaskTableModel extends AbstractTableModel {
 	private String [] columnNames = new String [] 
                                   {"<html><b>Serial","<html><b>Task","<html><b>Status","<html><b>Logs"};
 	private Class [] columnClasses = new Class[] 
-                                   {Integer.class,String.class,String.class,String.class};
+                                   {Integer.class,String.class,RunState.class,String.class};
   
   /**
    * Constructor: Initializes the table structure, including number of columns

@@ -6,19 +6,20 @@ import javax.swing.table.AbstractTableModel;
 
 import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
+import com.sapient.punter.jpa.RunState;
 import com.sapient.punter.jpa.StaticDaoFacade;
 
 public class RunningProcessTableModel extends AbstractTableModel {
-	public final Object[] longValues = {"Kathy123sdljflksdflksdfl"};
+	public final Object[] longValues = {new Integer(4),"Kaflksdfl","123456789",new Integer(2000000000)};
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
 
 	/** Holds the column names */         
 	private String [] columnNames = new String [] 
-                                  {"<html><b>Process","<html><b>Run ID","<html><b>Status","<html><b>Completed"};
+                                  {"<html><b>Run ID","<html><b>Process","<html><b>Status","<html><b>Completed"};
 	private Class [] columnClasses = new Class[] 
-                                   {String.class,String.class,String.class,Integer.class};
+                                   {Integer.class,String.class,RunState.class,Integer.class};
   
   /**
    * Constructor: Initializes the table structure, including number of columns
@@ -71,9 +72,9 @@ public class RunningProcessTableModel extends AbstractTableModel {
     ProcessHistory ph=(ProcessHistory) colArrayList.get(0);
     switch(col){
     case 0:
-    	return ph.getName();
-    case 1:
     	return ph.getId();
+    case 1:
+    	return ph.getName();
     case 2:
     	return ph.getRunState();
     case 3:

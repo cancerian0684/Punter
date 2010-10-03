@@ -4,6 +4,7 @@ package com.sapient.punter.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -83,12 +84,23 @@ public class PunterGUI extends JPanel implements TaskObserver{
     public PunterGUI() throws Exception {
         super(new GridLayout(1,0));
         runningProcessTable=new JTable(new RunningProcessTableModel());
-        runningProcessTable.setShowGrid(true);
+        runningProcessTable.setShowGrid(false);
         runningProcessTable.setPreferredScrollableViewportSize(new Dimension(370, 160));
         runningProcessTable.setFillsViewportHeight(true);
+        runningProcessTable.setAutoCreateRowSorter(true);
+        runningProcessTable.setRowHeight(20);
+        runningProcessTable.setIntercellSpacing(new Dimension(0, 0));
+        runningProcessTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        runningProcessTable.setFont(new Font("Courier New",Font.TRUETYPE_FONT,12));
+        JTableHeader header = runningProcessTable.getTableHeader();
+        TableCellRenderer headerRenderer = header.getDefaultRenderer();
+        if(headerRenderer instanceof JLabel){
+        	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
+        }
+        header.setPreferredSize(new Dimension(30, 20));
+        initColumnSizesRunningProcessTable(runningProcessTable);
         runningProcessTable.getColumn("<html><b>Completed").setCellRenderer(new ProgressRenderer(runningProcessTable));
-        runningProcessTable.addKeyListener(new java.awt.event.KeyAdapter()
-        {
+        runningProcessTable.addKeyListener(new java.awt.event.KeyAdapter(){
          public void keyTyped(KeyEvent e){}
           public void keyPressed(KeyEvent e)        
           {
@@ -102,7 +114,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         		if (lsm.isSelectionEmpty()) {
         		} else {
         			int selectedRow = lsm.getMinSelectionIndex();
-        			System.out.println("Row " + selectedRow + " is now selected.");
+//        			System.out.println("Row " + selectedRow + " is now selected.");
         			ProcessHistory ph=(ProcessHistory) ((RunningProcessTableModel) runningProcessTable.getModel()).getRow(selectedRow).get(0);
         			List<TaskHistory> thList = ph.getTaskHistoryList();
         			((RunningTaskTableModel)runningTaskTable.getModel()).clearTable();
@@ -116,10 +128,20 @@ public class PunterGUI extends JPanel implements TaskObserver{
         });
         
         runningTaskTable=new JTable(new RunningTaskTableModel());
-        runningTaskTable.setShowGrid(true);
+        runningTaskTable.setShowGrid(false);
         runningTaskTable.setPreferredScrollableViewportSize(new Dimension(300, 160));
         runningTaskTable.setFillsViewportHeight(true);
-        
+        runningTaskTable.setFont(new Font("Courier New",Font.TRUETYPE_FONT,12));
+        runningTaskTable.setAutoCreateRowSorter(true);
+        runningTaskTable.setRowHeight(20);
+        runningTaskTable.setIntercellSpacing(new Dimension(0, 0));
+        initColumnSizesRunningTaskTable(runningTaskTable);
+        header = runningTaskTable.getTableHeader();
+        headerRenderer = header.getDefaultRenderer();
+        if(headerRenderer instanceof JLabel){
+        	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
+        }
+        header.setPreferredSize(new Dimension(30, 20));
         JSplitPane splitRunningProcessPane=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(runningProcessTable), new JScrollPane(runningTaskTable));
         splitRunningProcessPane.setDividerSize(0);
 //        splitRunningProcessPane.setBorder(new TitledBorder("Process Explorer"));
@@ -208,8 +230,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
         taskTable.setAutoCreateRowSorter(true);
         taskTable.setRowHeight(26);
         taskTable.setIntercellSpacing(new Dimension(0, 0));
-        JTableHeader header = taskTable.getTableHeader();
-        TableCellRenderer headerRenderer = header.getDefaultRenderer();
+        header = taskTable.getTableHeader();
+        headerRenderer = header.getDefaultRenderer();
         if(headerRenderer instanceof JLabel){
         	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
         }
@@ -418,7 +440,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         		if (lsm.isSelectionEmpty()) {
         		} else {
         			int selectedRow = lsm.getMinSelectionIndex();
-        			System.out.println("Row " + selectedRow + " is now selected.");
+//        			System.out.println("Row " + selectedRow + " is now selected.");
         			TaskData t=(TaskData)((TaskTableModel) taskTable.getModel()).getRow(selectedRow).get(0);
         			if(t.getInputParams()!=null){
         			inputParamTable.setModel(new InputParamTableModel(t));
@@ -465,7 +487,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
                 } else if (lsm.isSelectionEmpty()) {
                 } else {
                     int selectedRow = lsm.getMinSelectionIndex();
-                    System.out.println("Row " + selectedRow + " is now selected.");
+//                    System.out.println("Row " + selectedRow + " is now selected.");
                     try{
                     	ProcessTaskHistoryTableModel pthtmodel=(ProcessTaskHistoryTableModel) processTaskHistoryTable.getModel();
 	                    pthtmodel.clearTable();
@@ -529,6 +551,14 @@ public class PunterGUI extends JPanel implements TaskObserver{
         processHistoryTable.setPreferredScrollableViewportSize(new Dimension(200, 300));
         processHistoryTable.setFillsViewportHeight(true);
         processHistoryTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        processHistoryTable.setRowHeight(22);
+        processHistoryTable.setIntercellSpacing(new Dimension(0, 0));
+        header = processHistoryTable.getTableHeader();
+        headerRenderer = header.getDefaultRenderer();
+        if(headerRenderer instanceof JLabel){
+        	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
+        }
+        header.setPreferredSize(new Dimension(30, 20));
         processHistoryTable.getColumn("<html><b>Run ID").setCellRenderer(new ProcessHistoryTableRenderer());
         
         processTaskHistoryTable=new JTable(new ProcessTaskHistoryTableModel());
@@ -657,7 +687,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     		  final RunningProcessTableModel rptm=(RunningProcessTableModel) runningProcessTable.getModel();
     		  ArrayList<Object> newRequest1 = new ArrayList<Object>();
   	          newRequest1.add(ph1);
-  	          final ArrayList rptmRow = rptm.insertRowAtBeginning(newRequest1);
+  	          rptm.insertRowAtBeginning(newRequest1);
 			  process.addObserver(new ProcessObserver() {
 					@Override
 					public void update(ProcessHistory ph) {
@@ -740,11 +770,74 @@ public class PunterGUI extends JPanel implements TaskObserver{
                 break;
         }
     }
-    /*
-     * This method picks good column sizes.
-     * If all column heads are wider than the column's cells'
-     * contents, then you can just use column.sizeWidthToFit().
-     */
+    private void initColumnSizesRunningProcessTable(JTable table) {
+    	RunningProcessTableModel model = (RunningProcessTableModel)table.getModel();
+        TableColumn column = null;
+        Component comp = null;
+        int headerWidth = 0;
+        int cellWidth = 0;
+        Object[] longValues = model.longValues;
+        TableCellRenderer headerRenderer =
+            table.getTableHeader().getDefaultRenderer();
+
+        for (int i = 0; i < 4; i++) {
+            column = table.getColumnModel().getColumn(i);
+
+            comp = headerRenderer.getTableCellRendererComponent(
+                                 null, column.getHeaderValue(),
+                                 false, false, 0, 0);
+            headerWidth = comp.getPreferredSize().width;
+
+            comp = table.getDefaultRenderer(model.getColumnClass(i)).
+                             getTableCellRendererComponent(
+                                 table, longValues[i],
+                                 false, false, 0, i);
+            cellWidth = comp.getPreferredSize().width;
+
+            if (DEBUG) {
+                System.out.println("Initializing width of column "
+                                   + i + ". "
+                                   + "headerWidth = " + headerWidth
+                                   + "; cellWidth = " + cellWidth);
+            }
+
+            column.setPreferredWidth(Math.max(headerWidth, cellWidth));
+        }
+    }
+    private void initColumnSizesRunningTaskTable(JTable table) {
+    	RunningTaskTableModel model = (RunningTaskTableModel)table.getModel();
+        TableColumn column = null;
+        Component comp = null;
+        int headerWidth = 0;
+        int cellWidth = 0;
+        Object[] longValues = model.longValues;
+        TableCellRenderer headerRenderer =
+            table.getTableHeader().getDefaultRenderer();
+
+        for (int i = 0; i < 4; i++) {
+            column = table.getColumnModel().getColumn(i);
+
+            comp = headerRenderer.getTableCellRendererComponent(
+                                 null, column.getHeaderValue(),
+                                 false, false, 0, 0);
+            headerWidth = comp.getPreferredSize().width;
+
+            comp = table.getDefaultRenderer(model.getColumnClass(i)).
+                             getTableCellRendererComponent(
+                                 table, longValues[i],
+                                 false, false, 0, i);
+            cellWidth = comp.getPreferredSize().width;
+
+            if (DEBUG) {
+                System.out.println("Initializing width of column "
+                                   + i + ". "
+                                   + "headerWidth = " + headerWidth
+                                   + "; cellWidth = " + cellWidth);
+            }
+
+            column.setPreferredWidth(Math.max(headerWidth, cellWidth));
+        }
+    }
     private void initColumnSizes(JTable table) {
     	TaskTableModel model = (TaskTableModel)table.getModel();
         TableColumn column = null;
@@ -1030,72 +1123,73 @@ public class PunterGUI extends JPanel implements TaskObserver{
     	}
     	public void setValue(Object value) {
     	    setText((value.toString().isEmpty()) ? "---" : value.toString());
-//    	    setToolTipText();
     	}
+    }
+	static class ProcessHistoryTableRenderer extends DefaultTableCellRenderer {
+		private static final Color successColor = new Color(51, 153, 51);
+		private static final Color failureColor = new Color(153, 51, 0);
+	
+	public ProcessHistoryTableRenderer() { super(); }
+	@Override
+	public Component getTableCellRendererComponent(JTable table,
+			Object value, boolean isSelected, boolean hasFocus, int row,
+			int column) {
+		ProcessHistory ph = (ProcessHistory) ((ProcessHistoryTableModel)table.getModel()).getRow(row).get(0);
+		if(ph.getRunStatus().equals(RunStatus.FAILURE)){
+			setBackground(failureColor);
+			setForeground(Color.WHITE);
+		}else if(ph.getRunStatus().equals(RunStatus.SUCCESS)){
+			setBackground(successColor);
+			setForeground(Color.WHITE);
+		}else if(ph.getRunStatus().equals(RunStatus.NOT_RUN)){
+			setBackground(Color.GRAY);
+			setForeground(Color.BLACK);
+		}else{
+			setBackground(Color.WHITE);
+			setForeground(Color.BLACK);
+		}
+		
+		return super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+				row, column);
+	}
+	public void setValue(Object value) {
+	    setText((value.toString().isEmpty()) ? "---" : value.toString());
+	}
+    }
+	static class ProgressRenderer extends JProgressBar implements TableCellRenderer {
+		private JTable theTable;
+        public ProgressRenderer(JTable theTable) {
+            super();
+            this.theTable=theTable;
+            this.setStringPainted(true);
+            //  this.setIndeterminate(true);
         }
-    	static class ProcessHistoryTableRenderer extends DefaultTableCellRenderer {
-    	
-    	public ProcessHistoryTableRenderer() { super(); }
-    	@Override
-    	public Component getTableCellRendererComponent(JTable table,
-    			Object value, boolean isSelected, boolean hasFocus, int row,
-    			int column) {
-    		ProcessHistory ph = (ProcessHistory) ((ProcessHistoryTableModel)table.getModel()).getRow(row).get(0);
-    		if(ph.getRunStatus().equals(RunStatus.FAILURE)){
-    			setBackground(new Color(153, 51, 0));
-    			setForeground(Color.WHITE);
-    		}else if(ph.getRunStatus().equals(RunStatus.SUCCESS)){
-    			setBackground(new Color(51, 102, 0));
-    			setForeground(Color.WHITE);
-    		}else if(ph.getRunStatus().equals(RunStatus.NOT_RUN)){
-    			setBackground(Color.GRAY);
-    			setForeground(Color.BLACK);
-    		}else{
-    			setBackground(Color.WHITE);
-    			setForeground(Color.BLACK);
-    		}
-    		
-    		return super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
-    				row, column);
-    	}
-    	public void setValue(Object value) {
-    	    setText((value.toString().isEmpty()) ? "---" : value.toString());
-    	}
+
+        public Component getTableCellRendererComponent(JTable table, 
+                                                       Object value, 
+                                                       boolean isSelected, 
+                                                       boolean hasFocus, 
+                                                       int row, 
+                                                       int column) {
+            int val=Integer.parseInt(value.toString());
+            this.setValue(val);
+            return this;
         }
-    	static class ProgressRenderer extends JProgressBar implements TableCellRenderer {
-			private JTable theTable;
-            public ProgressRenderer(JTable theTable) {
-                super();
-                this.theTable=theTable;
-                this.setStringPainted(true);
-                //  this.setIndeterminate(true);
-            }
 
-            public Component getTableCellRendererComponent(JTable table, 
-                                                           Object value, 
-                                                           boolean isSelected, 
-                                                           boolean hasFocus, 
-                                                           int row, 
-                                                           int column) {
-                int val=Integer.parseInt(value.toString());
-                this.setValue(val);
-                return this;
-            }
-
-            public boolean isDisplayable() {
-                // This does the trick. It makes sure animation is always performed 
-                return true;
-            }
-
-            public void repaint() {
-                // If you have access to the table you can force repaint like this. 
-                //Otherwize, you could trigger repaint in a timer at some interval 
-               try{
-             //   theTable.repaint();
-               }catch(Exception e){
-                   System.out.println("1111");
-               }
-            }
-
+        public boolean isDisplayable() {
+            // This does the trick. It makes sure animation is always performed 
+            return true;
         }
+
+        public void repaint() {
+            // If you have access to the table you can force repaint like this. 
+            //Otherwize, you could trigger repaint in a timer at some interval 
+           try{
+         //   theTable.repaint();
+           }catch(Exception e){
+               System.out.println("1111");
+           }
+        }
+
+    }
 }
