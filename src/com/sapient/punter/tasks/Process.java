@@ -15,7 +15,7 @@ import com.sapient.punter.gui.ProcessObserver;
 import com.sapient.punter.gui.TaskObserver;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.RunState;
-import com.sapient.punter.jpa.TaskDao;
+import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
 import com.sun.jmx.snmp.tasks.TaskServer;
 

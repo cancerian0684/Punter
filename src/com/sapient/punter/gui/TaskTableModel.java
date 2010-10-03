@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
 import com.sapient.punter.jpa.StaticDaoFacade;
-import com.sapient.punter.jpa.TaskDao;
+import com.sapient.punter.jpa.TaskData;
  
 public class TaskTableModel extends AbstractTableModel {
 	public final Object[] longValues = {new Integer(5), "Kathy123",new Integer(5), "None of the above a,jbskjkjas jsahfk",new Boolean(true)};
@@ -93,7 +93,7 @@ public class TaskTableModel extends AbstractTableModel {
     colArrayList.set( col, obj);
     if(obj!=null){
     try{
-    TaskDao task=(TaskDao) colArrayList.get(6);
+    TaskData task=(TaskData) colArrayList.get(6);
     switch(col){
     case 2:
     	task.setSequence(Integer.parseInt(obj.toString()));

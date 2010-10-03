@@ -6,7 +6,7 @@ import java.util.Properties;
 import javax.swing.table.AbstractTableModel;
 
 import com.sapient.punter.jpa.StaticDaoFacade;
-import com.sapient.punter.jpa.TaskDao;
+import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.utils.InputParamValue;
  class InputParamTableModel extends AbstractTableModel {
         private String[] columnNames = {"<html><b>Property",
@@ -19,7 +19,7 @@ import com.sapient.punter.utils.InputParamValue;
 			// TODO Auto-generated constructor stub
         	this.data=data;
 		}
-        public InputParamTableModel(TaskDao t) {
+        public InputParamTableModel(TaskData t) {
         	HashMap<String,InputParamValue> prop;
         	prop=t.getInputParams();
         	int size=prop.size();
@@ -92,7 +92,7 @@ import com.sapient.punter.utils.InputParamValue;
 
             data[row][col] = value;
             fireTableCellUpdated(row, col);
-            TaskDao t=(TaskDao) data[row][2];
+            TaskData t=(TaskData) data[row][2];
             InputParamValue ipv=(InputParamValue) t.getInputParams().get((String)data[row][0]);
             ipv.setValue((String) value);
             try {

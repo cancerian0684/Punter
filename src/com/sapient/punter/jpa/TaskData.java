@@ -16,7 +16,7 @@ import com.sapient.punter.utils.OutputParamValue;
 
 @Entity
 @Table(name="TASK")
-public class TaskDao implements Serializable{
+public class TaskData implements Serializable{
 	@Id
 	@GeneratedValue
 	private long id;
@@ -29,7 +29,7 @@ public class TaskDao implements Serializable{
 	private HashMap<String, InputParamValue> inputParams;
 	private HashMap<String,OutputParamValue> outputParams;
 	@ManyToOne
-	private ProcessDao process;
+	private ProcessData process;
 	public long getId() {
 		return id;
 	}
@@ -80,10 +80,10 @@ public class TaskDao implements Serializable{
 	public void setOutputParams(HashMap<String,OutputParamValue> outputParams) {
 		this.outputParams = outputParams;
 	}
-	public ProcessDao getProcess() {
+	public ProcessData getProcess() {
 		return process;
 	}
-	public void setProcess(ProcessDao process) {
+	public void setProcess(ProcessData process) {
 		this.process = process;
 	}
 	public boolean isActive() {

@@ -18,7 +18,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="PROCESS")
-public class ProcessDao implements Serializable{
+public class ProcessData implements Serializable{
 //	@SequenceGenerator(name="Emp_Gen", sequenceName="Emp_Seq", allocationSize=5)
 //	@GeneratedValue(generator="Emp_Gen")
 	@Id
@@ -29,7 +29,7 @@ public class ProcessDao implements Serializable{
 	private String comments;
 	private Properties inputParams;
 	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.LAZY)
-	private List<TaskDao> taskList;
+	private List<TaskData> taskList;
 	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy = "process",fetch=FetchType.LAZY)
 	private List<ProcessHistory> processHistoryList;
 	public long getId() {
@@ -56,10 +56,10 @@ public class ProcessDao implements Serializable{
 	public void setComments(String comments) {
 		this.comments = comments;
 	}
-	public List<TaskDao> getTaskList() {
+	public List<TaskData> getTaskList() {
 		return taskList;
 	}
-	public void setTaskList(List<TaskDao> taskList) {
+	public void setTaskList(List<TaskData> taskList) {
 		this.taskList = taskList;
 	}
 	public List<ProcessHistory> getProcessHistoryList() {

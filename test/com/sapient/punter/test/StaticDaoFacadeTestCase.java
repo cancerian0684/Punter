@@ -11,10 +11,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.sapient.punter.jpa.ProcessDao;
+import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.StaticDaoFacade;
-import com.sapient.punter.jpa.TaskDao;
+import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
 
 public class StaticDaoFacadeTestCase {
@@ -37,10 +37,10 @@ public class StaticDaoFacadeTestCase {
 
 	@Test
 	public void testRemoveTask() throws Exception{
-		com.sapient.punter.jpa.ProcessDao process=new com.sapient.punter.jpa.ProcessDao();
+		com.sapient.punter.jpa.ProcessData process=new com.sapient.punter.jpa.ProcessData();
 		process.setId(1L);
 		for(int i=0;i<=10;i++){
-		TaskDao task=new TaskDao();
+		TaskData task=new TaskData();
 		task.setProcess(process);
 		task.setName("Test Task");
 		task=StaticDaoFacade.createTask(task);
@@ -52,14 +52,14 @@ public class StaticDaoFacadeTestCase {
 
 	@Test
 	public void testCreateProcessHistory() throws Exception {
-		ProcessDao proc=new ProcessDao();
+		ProcessData proc=new ProcessData();
 		proc.setId(1603L);
 		ProcessHistory ph=new ProcessHistory();
 		ph.setName("Test-1");
 		ph.setStartTime(new Date());
 		ph.setProcess(proc);
 		StaticDaoFacade.createProcessHistory(ph);
-		TaskDao task=new TaskDao();
+		TaskData task=new TaskData();
 		task.setId(1602L);
 		for(int i=0;i<=10;i++){
 		TaskHistory th=new TaskHistory();
@@ -90,31 +90,31 @@ public class StaticDaoFacadeTestCase {
 
 	@Test
 	public void testListTask() throws Exception{
-		com.sapient.punter.jpa.ProcessDao process=new com.sapient.punter.jpa.ProcessDao();
+		com.sapient.punter.jpa.ProcessData process=new com.sapient.punter.jpa.ProcessData();
 		process.setId(712L);
-		List<TaskDao> t1 = StaticDaoFacade.getProcessTasks(712L);
-		TaskDao task=new TaskDao();
+		List<TaskData> t1 = StaticDaoFacade.getProcessTasks(712L);
+		TaskData task=new TaskData();
 		task.setProcess(process);
 		task.setName("Test Task");
 		task=StaticDaoFacade.createTask(task);
-		List<TaskDao> t2 = StaticDaoFacade.getProcessTasks(712L);
+		List<TaskData> t2 = StaticDaoFacade.getProcessTasks(712L);
 		assertEquals(1, (t2.size()-t1.size()));
 	}
 
 	@Test
 	public void testGetProcessList() throws Exception{
-		com.sapient.punter.jpa.ProcessDao process=new com.sapient.punter.jpa.ProcessDao();
+		com.sapient.punter.jpa.ProcessData process=new com.sapient.punter.jpa.ProcessData();
 		process.setName("UBS-101");
-		List<ProcessDao> pl1 = StaticDaoFacade.getProcessList();
+		List<ProcessData> pl1 = StaticDaoFacade.getProcessList();
 		StaticDaoFacade.createProcess(process);
-		List<ProcessDao> pl2 = StaticDaoFacade.getProcessList();
+		List<ProcessData> pl2 = StaticDaoFacade.getProcessList();
 		assertEquals(1, (pl2.size()-pl1.size()));
 	}
 
 	@Test
 	public void testGetProcess() throws Exception{
-		List<ProcessDao> pl1 = StaticDaoFacade.getProcessList();
-		for (ProcessDao process : pl1) {
+		List<ProcessData> pl1 = StaticDaoFacade.getProcessList();
+		for (ProcessData process : pl1) {
 			System.out.println(process.getId()+" -- "+process.getName());
 		}
 	}

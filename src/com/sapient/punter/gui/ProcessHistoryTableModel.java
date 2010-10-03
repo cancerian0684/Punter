@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.punter.jpa.ProcessDao;
+import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.StaticDaoFacade;
  
 public class ProcessHistoryTableModel extends AbstractTableModel {

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.punter.jpa.ProcessDao;
+import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.StaticDaoFacade;
  
 public class ProcessTableModel extends AbstractTableModel {
@@ -67,7 +67,14 @@ public class ProcessTableModel extends AbstractTableModel {
    */
   public Object getValueAt(int row, int col) {
     ArrayList colArrayList = (ArrayList) data.get(row);
-    return colArrayList.get(col);
+    ProcessData pDao=(ProcessData) colArrayList.get(0);
+    switch(col){
+    case 0:
+    	return pDao.getName();
+    	
+    	default :
+    		return pDao;
+    }
   }
 
   /**
@@ -92,7 +99,7 @@ public class ProcessTableModel extends AbstractTableModel {
     ArrayList colArrayList = (ArrayList)data.get(row);
     colArrayList.set( col, obj);
     try{
-    	ProcessDao p=(ProcessDao) colArrayList.get(1);
+    	ProcessData p=(ProcessData) colArrayList.get(1);
     	p.setName((String)obj);
     	StaticDaoFacade.saveProcess(p);
     }catch (Exception e) {

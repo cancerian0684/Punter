@@ -6,7 +6,7 @@ import java.util.Properties;
 import javax.swing.table.AbstractTableModel;
 
 import com.sapient.punter.jpa.StaticDaoFacade;
-import com.sapient.punter.jpa.TaskDao;
+import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.utils.OutputParamValue;
  class OutputParamTableModel extends AbstractTableModel {
         private String[] columnNames = {"<html><b>Property",
@@ -17,7 +17,7 @@ import com.sapient.punter.utils.OutputParamValue;
         public OutputParamTableModel(Object[][] data) {
         	this.data=data;
 		}
-        public OutputParamTableModel(TaskDao t) {
+        public OutputParamTableModel(TaskData t) {
         	Map<String, OutputParamValue> prop = t.getOutputParams();
         	int size=prop.size();
         	this.data=new Object[size][3];
@@ -89,7 +89,7 @@ import com.sapient.punter.utils.OutputParamValue;
 
             data[row][col] = value;
             fireTableCellUpdated(row, col);
-            TaskDao t=(TaskDao) data[row][2];
+            TaskData t=(TaskData) data[row][2];
             OutputParamValue opv=t.getOutputParams().get((String)data[row][0]);
             opv.setValue((String)value);
             try {

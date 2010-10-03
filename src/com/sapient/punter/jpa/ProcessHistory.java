@@ -31,7 +31,7 @@ public class ProcessHistory implements Serializable{
 	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy="processHistory",fetch=FetchType.LAZY)
 	private List<TaskHistory> taskHistoryList;
 	@ManyToOne
-	private ProcessDao process;
+	private ProcessData process;
 //	@Basic(optional = false)
 //	@Column(nullable = false, columnDefinition = "char(1) default 'A'")
 	@Enumerated(EnumType.STRING)
@@ -68,10 +68,10 @@ public class ProcessHistory implements Serializable{
 	public void setTaskHistoryList(List<TaskHistory> taskHistoryList) {
 		this.taskHistoryList = taskHistoryList;
 	}
-	public ProcessDao getProcess() {
+	public ProcessData getProcess() {
 		return process;
 	}
-	public void setProcess(ProcessDao process) {
+	public void setProcess(ProcessData process) {
 		this.process = process;
 	}
 	public RunState getRunState() {

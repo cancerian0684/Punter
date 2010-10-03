@@ -20,7 +20,7 @@ public class TaskHistory implements Serializable{
 	private String logs;
 	private boolean status;
 	@ManyToOne
-	private TaskDao task;
+	private TaskData task;
 	@ManyToOne
 	private ProcessHistory processHistory;
 //	@Basic(optional = false)
@@ -52,10 +52,10 @@ public class TaskHistory implements Serializable{
 	public void setStatus(boolean status) {
 		this.status = status;
 	}
-	public TaskDao getTask() {
+	public TaskData getTask() {
 		return task;
 	}
-	public void setTask(TaskDao task) {
+	public void setTask(TaskData task) {
 		this.task = task;
 	}
 	public ProcessHistory getProcessHistory() {

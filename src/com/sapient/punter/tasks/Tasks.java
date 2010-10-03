@@ -19,7 +19,7 @@ import java.util.logging.MemoryHandler;
 
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
-import com.sapient.punter.jpa.TaskDao;
+import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.utils.InputParamValue;
 import com.sapient.punter.utils.OutputParamValue;
 
@@ -27,7 +27,7 @@ public abstract class Tasks {
 	private Map<String,Object> sessionMap;
 	private Map<String,OutputParamValue> outputParams;
 	private HashMap<String, InputParamValue> inputParams;
-	protected TaskDao taskDao;
+	protected TaskData taskDao;
 	private ConsoleHandler handler = null;
 	private MemoryHandler mHandler = null;
 	private Level loggingLevel=Level.INFO;
@@ -80,10 +80,10 @@ public abstract class Tasks {
 	public String getMemoryLogs(){
 		return strLogger.toString();
 	}
-	public void setTaskDao(TaskDao taskDao) {
+	public void setTaskDao(TaskData taskDao) {
 		this.taskDao = taskDao;
 	}
-	public TaskDao getTaskDao() {
+	public TaskData getTaskDao() {
 		return taskDao;
 	}
 	public static HashMap<String,InputParamValue> listInputParams(Tasks task){
