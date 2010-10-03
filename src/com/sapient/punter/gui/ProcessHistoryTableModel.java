@@ -1,15 +1,18 @@
 package com.sapient.punter.gui;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
 import com.sapient.punter.jpa.ProcessData;
+import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.StaticDaoFacade;
  
 public class ProcessHistoryTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflsdfl"};
 	private static final long serialVersionUID = 1L;
+	private static SimpleDateFormat sdf=new SimpleDateFormat("dd, MMM hh:mm:ss");
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
 
@@ -67,7 +70,8 @@ public class ProcessHistoryTableModel extends AbstractTableModel {
    */
   public Object getValueAt(int row, int col) {
     ArrayList colArrayList = (ArrayList) data.get(row);
-    return colArrayList.get(col);
+    ProcessHistory ph=(ProcessHistory) colArrayList.get(0);
+    return ""+ph.getId()+"  [ "+sdf.format(ph.getStartTime())+" ]";
   }
 
   /**
@@ -90,20 +94,8 @@ public class ProcessHistoryTableModel extends AbstractTableModel {
    */
   public void setValueAt( Object obj, int row, int col ) {
     ArrayList colArrayList = (ArrayList)data.get(row);
-    colArrayList.set( col, obj);
-    /*try{
-    	ProcessDao p=(ProcessDao) colArrayList.get(1);
-    	p.setName((String)obj);
-    	StaticDaoFacade.saveProcess(p);
-    }catch (Exception e) {
-    	e.printStackTrace();
-	}*/
-  /*  int totalFieldsSelected=0;
-    for(int i=0;i<data.size();i++){
-    	boolean select=Boolean.parseBoolean(((ArrayList)data.get(i)).get(5).toString());
-    	if( select==true )
-    		totalFieldsSelected++;
-     } */             	
+//    colArrayList.set( col, obj);
+               	
      super.fireTableDataChanged();
   }
 

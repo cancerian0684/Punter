@@ -67,7 +67,20 @@ public class TaskTableModel extends AbstractTableModel {
    */
   public Object getValueAt(int row, int col) {
     ArrayList colArrayList = (ArrayList) data.get(row);
-    return colArrayList.get(col);
+    TaskData task=(TaskData) colArrayList.get(0);
+    switch(col){
+    case 0:
+    	return task.getId();
+    case 1:
+    	return task.getName();
+    case 2:
+    	return task.getSequence();
+    case 3:
+    	return task.getDescription();
+    case 4:
+    	return task.isActive();
+    }
+    return null;
   }
 
   /**
@@ -90,10 +103,10 @@ public class TaskTableModel extends AbstractTableModel {
    */
   public void setValueAt( Object obj, int row, int col ) {
     ArrayList colArrayList = (ArrayList)data.get(row);
-    colArrayList.set( col, obj);
+//    colArrayList.set( col, obj);
     if(obj!=null){
     try{
-    TaskData task=(TaskData) colArrayList.get(6);
+    TaskData task=(TaskData) colArrayList.get(0);
     switch(col){
     case 2:
     	task.setSequence(Integer.parseInt(obj.toString()));

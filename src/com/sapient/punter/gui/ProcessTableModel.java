@@ -97,20 +97,14 @@ public class ProcessTableModel extends AbstractTableModel {
    */
   public void setValueAt( Object obj, int row, int col ) {
     ArrayList colArrayList = (ArrayList)data.get(row);
-    colArrayList.set( col, obj);
+//    colArrayList.set( col, obj);
     try{
-    	ProcessData p=(ProcessData) colArrayList.get(1);
+    	ProcessData p=(ProcessData) colArrayList.get(0);
     	p.setName((String)obj);
     	StaticDaoFacade.saveProcess(p);
     }catch (Exception e) {
     	e.printStackTrace();
 	}
-  /*  int totalFieldsSelected=0;
-    for(int i=0;i<data.size();i++){
-    	boolean select=Boolean.parseBoolean(((ArrayList)data.get(i)).get(5).toString());
-    	if( select==true )
-    		totalFieldsSelected++;
-     } */             	
      super.fireTableDataChanged();
   }
 
@@ -118,11 +112,11 @@ public class ProcessTableModel extends AbstractTableModel {
    * Adds a new row to the table.
    * @param <b>ArrayList </b> new row data
    */
- /* public synchronized ArrayList insertRow( ArrayList newrow ) {
+  public synchronized ArrayList insertRowAtBeginning( ArrayList newrow ) {
     data.add(0,newrow);
     super.fireTableRowsInserted(0,0);
     return (ArrayList) data.get(0);
-  }*/
+  }
   
   public synchronized ArrayList insertRow( ArrayList newrow ) {
 	    data.add(newrow);
