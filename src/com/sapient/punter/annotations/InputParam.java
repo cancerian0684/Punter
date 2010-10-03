@@ -11,5 +11,6 @@ public @interface InputParam{
 	public enum Required{TRUE,FALSE};
 	String bind() default "";
 	String type() default "";
+	String description() default "";
 	boolean required() default false;
 }

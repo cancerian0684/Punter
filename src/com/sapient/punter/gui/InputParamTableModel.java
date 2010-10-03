@@ -1,40 +1,35 @@
 package com.sapient.punter.gui;
 
+import java.util.HashMap;
 import java.util.Properties;
 
 import javax.swing.table.AbstractTableModel;
 
 import com.sapient.punter.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskDao;
- class ParamTableModel extends AbstractTableModel {
+import com.sapient.punter.utils.InputParamValue;
+ class InputParamTableModel extends AbstractTableModel {
         private String[] columnNames = {"<html><b>Property",
                                         "<html><b>Value"};
         private boolean inputParam;
-        public ParamTableModel() {
+        public InputParamTableModel() {
 			// TODO Auto-generated constructor stub
 		}
-        public ParamTableModel(Object[][] data) {
+        public InputParamTableModel(Object[][] data) {
 			// TODO Auto-generated constructor stub
         	this.data=data;
 		}
-        public ParamTableModel(TaskDao t,boolean input) {
-			// TODO Auto-generated constructor stub
-        	this.data=data;
-        	this.inputParam=input;
-        	Properties prop;
-        	if(input){
-        		prop=t.getInputParams();
-        	}
-        	else
-        		prop=t.getOutputParams();
+        public InputParamTableModel(TaskDao t) {
+        	HashMap<String,InputParamValue> prop;
+        	prop=t.getInputParams();
         	int size=prop.size();
         	this.data=new Object[size][3];
         	int i=0;
         	for(Object key : prop.keySet()) {  
-        		Object value = prop.get(key);    
-        		System.out.println(key + " = " + value);
+        		InputParamValue value = (InputParamValue) prop.get(key);    
+        		System.out.println(key + " = " + value.getValue());
         		this.data[i][0]=key;
-        		this.data[i][1]=value;
+        		this.data[i][1]=value.getValue();
         		this.data[i][2]=t;
         		i++;
         		}
@@ -98,10 +93,8 @@ import com.sapient.punter.jpa.TaskDao;
             data[row][col] = value;
             fireTableCellUpdated(row, col);
             TaskDao t=(TaskDao) data[row][2];
-            if(inputParam)
-            	t.getInputParams().setProperty((String)data[row][0], (String)value);
-            else
-            	t.getOutputParams().setProperty((String)data[row][0], (String)value);
+            InputParamValue ipv=(InputParamValue) t.getInputParams().get((String)data[row][0]);
+            ipv.setValue((String) value);
             try {
 				StaticDaoFacade.saveTask(t);
 			} catch (Exception e) {

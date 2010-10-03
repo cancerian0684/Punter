@@ -1,6 +1,8 @@
 package com.sapient.punter.jpa;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.persistence.Entity;
@@ -8,6 +10,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.sapient.punter.utils.InputParamValue;
+import com.sapient.punter.utils.OutputParamValue;
 
 @Entity
 @Table(name="TASK")
@@ -20,8 +25,9 @@ public class TaskDao implements Serializable{
 	private String className;
 	private String description;
 	private String author;
-	private Properties inputParams;
-	private Properties outputParams;
+	private boolean active=true;
+	private HashMap<String, InputParamValue> inputParams;
+	private HashMap<String,OutputParamValue> outputParams;
 	@ManyToOne
 	private ProcessDao process;
 	public long getId() {
@@ -62,16 +68,16 @@ public class TaskDao implements Serializable{
 	public void setAuthor(String author) {
 		this.author = author;
 	}
-	public Properties getInputParams() {
+	public  HashMap<String, InputParamValue> getInputParams() {
 		return inputParams;
 	}
-	public void setInputParams(Properties inputParams) {
+	public void setInputParams( HashMap<String, InputParamValue> inputParams) {
 		this.inputParams = inputParams;
 	}
-	public Properties getOutputParams() {
+	public HashMap<String,OutputParamValue> getOutputParams() {
 		return outputParams;
 	}
-	public void setOutputParams(Properties outputParams) {
+	public void setOutputParams(HashMap<String,OutputParamValue> outputParams) {
 		this.outputParams = outputParams;
 	}
 	public ProcessDao getProcess() {
@@ -80,4 +86,11 @@ public class TaskDao implements Serializable{
 	public void setProcess(ProcessDao process) {
 		this.process = process;
 	}
+	public boolean isActive() {
+		return active;
+	}
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+	
 }

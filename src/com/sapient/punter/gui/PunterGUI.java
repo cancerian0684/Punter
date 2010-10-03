@@ -11,7 +11,9 @@ import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.AbstractAction;
@@ -50,6 +52,8 @@ import com.sapient.punter.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskDao;
 import com.sapient.punter.jpa.TaskHistory;
 import com.sapient.punter.tasks.Tasks;
+import com.sapient.punter.utils.InputParamValue;
+import com.sapient.punter.utils.OutputParamValue;
 
 /** 
  * TableRenderDemo is just like TableDemo, except that it
@@ -86,11 +90,6 @@ public class PunterGUI extends JPanel implements TaskObserver{
         			int selectedRow = lsm.getMinSelectionIndex();
         			System.out.println("Row " + selectedRow + " is now selected.");
         			ProcessHistory ph=(ProcessHistory) ((RunningProcessTableModel) runningProcessTable.getModel()).getRow(selectedRow).get(4);
-        			try {
-//						ph=StaticDaoFacade.getProcessHistoryById(ph.getId());
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
         			List<TaskHistory> thList = ph.getTaskHistoryList();
         			((RunningTaskTableModel)runningTaskTable.getModel()).clearTable();
         			for (TaskHistory taskHistory : thList) {
@@ -254,18 +253,9 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        		  if ((s != null) && (s.length() > 0)) {
 	        		      System.out.println("Selected Task... " + s + "!");
 	        		      Class<?> cls = Class.forName(taskPackage+s);
-	    	        	  List<String> inParams = Tasks.listInputParams((Tasks)cls.newInstance());
-	    	        	  List<String> outParams = Tasks.listOutputParams((Tasks)cls.newInstance());
-	    	        	  Properties inProp=new Properties();
-	    	        	  for (String key : inParams) {
-	    					System.err.println(key);
-	    					inProp.setProperty(key, "");
-	    	        	  }
-	    	        	  Properties outProp=new Properties();
-	    	        	  for (String key : outParams) {
-	    					System.err.println(key);
-	    					outProp.setProperty(key, "");
-	    	        	  }
+	    	        	  HashMap<String, OutputParamValue> outProp = Tasks.listOutputParams((Tasks)cls.newInstance());
+	    	        	  HashMap<String, InputParamValue> inProp=Tasks.listInputParams((Tasks)cls.newInstance());
+	    	        	  
 	    	        	  TaskDao task=new TaskDao();
 	    	        	  task.setInputParams(inProp);
 	    	        	  task.setOutputParams(outProp);
@@ -407,12 +397,13 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		        	  }
 			}
 	      });
-        inputParamTable = new JTable(new ParamTableModel());
+        inputParamTable = new JTable(new InputParamTableModel());
         inputParamTable.setShowGrid(true);
         inputParamTable.setPreferredScrollableViewportSize(new Dimension(250, 150));
         inputParamTable.setFillsViewportHeight(true);
+        inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
         
-        outputParamTable = new JTable(new ParamTableModel());
+        outputParamTable = new JTable(new OutputParamTableModel());
         outputParamTable.setShowGrid(true);
         outputParamTable.setPreferredScrollableViewportSize(new Dimension(250, 150));
         outputParamTable.setFillsViewportHeight(true);
@@ -427,17 +418,19 @@ public class PunterGUI extends JPanel implements TaskObserver{
         			System.out.println("Row " + selectedRow + " is now selected.");
         			TaskDao t=(TaskDao) taskTable.getModel().getValueAt(selectedRow, 5);
         			if(t.getInputParams()!=null){
-        			inputParamTable.setModel(new ParamTableModel(t,true));
-        			initColumnSizes1(inputParamTable);
+        			inputParamTable.setModel(new InputParamTableModel(t));
+        			inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
+        			initColumnSizes11(inputParamTable);
         			}else{        				
-        				inputParamTable.setModel(new ParamTableModel());
-        				initColumnSizes1(inputParamTable);
+        				inputParamTable.setModel(new InputParamTableModel());
+        				inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
+        				initColumnSizes11(inputParamTable);
         			}
         			if(t.getOutputParams()!=null){
-        			outputParamTable.setModel(new ParamTableModel(t,false));
+        			outputParamTable.setModel(new OutputParamTableModel(t));
         			initColumnSizes1(outputParamTable);
         			}else{
-        				outputParamTable.setModel(new ParamTableModel());
+        				outputParamTable.setModel(new OutputParamTableModel());
         				initColumnSizes1(outputParamTable);
         			}
         		}
@@ -448,7 +441,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         JTabbedPane tabbedPane = new JTabbedPane();
         //Set up column sizes.
         initColumnSizes(taskTable);
-        initColumnSizes1(inputParamTable);
+        initColumnSizes11(inputParamTable);
         initColumnSizes2(processTable);
         //Fiddle with the Sport column's cell editors/renderers.
 //        setUpSportColumn(taskTable, taskTable.getColumnModel().getColumn(2));
@@ -512,9 +505,9 @@ public class PunterGUI extends JPanel implements TaskObserver{
                     if(taskTable.getModel().getRowCount()>0){
                     taskTable.setRowSelectionInterval(0, 0);
                     }else{
-                    	inputParamTable.setModel(new ParamTableModel());
-                    	outputParamTable.setModel(new ParamTableModel());
-                    	initColumnSizes1(inputParamTable);
+                    	inputParamTable.setModel(new InputParamTableModel());
+                    	outputParamTable.setModel(new OutputParamTableModel());
+                    	initColumnSizes11(inputParamTable);
                     	initColumnSizes1(outputParamTable);
                     }
                     
@@ -833,7 +826,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     }
     
     private void initColumnSizes1(JTable table) {
-    	ParamTableModel model = (ParamTableModel)table.getModel();
+    	OutputParamTableModel model = (OutputParamTableModel)table.getModel();
         TableColumn column = null;
         Component comp = null;
         int headerWidth = 0;
@@ -866,7 +859,40 @@ public class PunterGUI extends JPanel implements TaskObserver{
             column.setPreferredWidth(Math.max(headerWidth, cellWidth));
         }
     }
-    
+    private void initColumnSizes11(JTable table) {
+    	InputParamTableModel model = (InputParamTableModel)table.getModel();
+        TableColumn column = null;
+        Component comp = null;
+        int headerWidth = 0;
+        int cellWidth = 0;
+        Object[] longValues = model.longValues;
+        TableCellRenderer headerRenderer =
+            table.getTableHeader().getDefaultRenderer();
+
+        for (int i = 0; i < 2; i++) {
+            column = table.getColumnModel().getColumn(i);
+
+            comp = headerRenderer.getTableCellRendererComponent(
+                                 null, column.getHeaderValue(),
+                                 false, false, 0, 0);
+            headerWidth = comp.getPreferredSize().width;
+
+            comp = table.getDefaultRenderer(model.getColumnClass(i)).
+                             getTableCellRendererComponent(
+                                 table, longValues[i],
+                                 false, false, 0, i);
+            cellWidth = comp.getPreferredSize().width;
+
+            if (DEBUG) {
+                System.out.println("Initializing width of column "
+                                   + i + ". "
+                                   + "headerWidth = " + headerWidth
+                                   + "; cellWidth = " + cellWidth);
+            }
+
+            column.setPreferredWidth(Math.max(headerWidth, cellWidth));
+        }
+    }
     private void initColumnSizes5(JTable table) {
     	ProcessPropertyTableModel model = (ProcessPropertyTableModel)table.getModel();
         TableColumn column = null;
@@ -995,5 +1021,26 @@ public class PunterGUI extends JPanel implements TaskObserver{
             }
         });
     }
-
+    static class DefaultStringRenderer extends DefaultTableCellRenderer {
+    	
+    	public DefaultStringRenderer() { super(); }
+    	@Override
+    	public Component getTableCellRendererComponent(JTable table,
+    			Object value, boolean isSelected, boolean hasFocus, int row,
+    			int column) {
+    		TaskDao td=(TaskDao) ((InputParamTableModel)table.getModel()).getValueAt(row, 2);
+    		InputParamValue value1 = (InputParamValue) td.getInputParams().get(table.getModel().getValueAt(row, 0)); 
+    		String tooltip=value1.getInputParam().description();
+    		if(!tooltip.isEmpty())
+    			setToolTipText(tooltip);
+    		else
+    			setToolTipText(null);
+    		return super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+    				row, column);
+    	}
+    	public void setValue(Object value) {
+    	    setText((value.toString().isEmpty()) ? "---" : value.toString());
+//    	    setToolTipText();
+    	}
+        }
 }

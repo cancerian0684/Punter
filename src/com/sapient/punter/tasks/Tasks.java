@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -19,11 +20,13 @@ import java.util.logging.MemoryHandler;
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.jpa.TaskDao;
+import com.sapient.punter.utils.InputParamValue;
+import com.sapient.punter.utils.OutputParamValue;
 
 public abstract class Tasks {
 	private Map<String,Object> sessionMap;
-	private Map<String,String> outputParams;
-	private Properties inputParams;
+	private Map<String,OutputParamValue> outputParams;
+	private HashMap<String, InputParamValue> inputParams;
 	protected TaskDao taskDao;
 	private ConsoleHandler handler = null;
 	private MemoryHandler mHandler = null;
@@ -83,34 +86,34 @@ public abstract class Tasks {
 	public TaskDao getTaskDao() {
 		return taskDao;
 	}
-	public static List<String> listInputParams(Tasks task){
+	public static HashMap<String,InputParamValue> listInputParams(Tasks task){
 		Field[] fields = task.getClass().getDeclaredFields();
 		System.out.println("Listing input params");
-		List<String> inParams=new ArrayList<String>(10);
+		HashMap<String,InputParamValue> inProp=new HashMap<String,InputParamValue>();
 		for (Field field : fields) {
 			if(field.isAnnotationPresent(InputParam.class)){
 				InputParam ann = field.getAnnotation(InputParam.class);
 				System.out.println(ann.required()==true?"*"+field.getName():""+field.getName());
-				inParams.add(ann.required()==true?""+field.getName():""+field.getName());
+				inProp.put(field.getName(), new InputParamValue(ann, ""));
 			}
 		}
-		return inParams;
+		return inProp;
 	}
 	
-	public static List<String> listOutputParams(Tasks task){
+	public static HashMap<String,OutputParamValue> listOutputParams(Tasks task){
 		Field[] fields = task.getClass().getDeclaredFields();
 		System.out.println("Listing output params");
-		List<String> outParams=new ArrayList<String>(10);
+		HashMap<String,OutputParamValue> outProp=new HashMap<String, OutputParamValue>();
 		for (Field field : fields) {
 			if(field.isAnnotationPresent(OutputParam.class)){
 				OutputParam ann = field.getAnnotation(OutputParam.class);
 				System.out.println(field.getName());
-				outParams.add(field.getName());
+				outProp.put(field.getName(), new OutputParamValue(ann, ""));
 			}
 		}
-		return outParams;
+		return outProp;
 	}
-	public static Tasks getTask(String taskName,Properties input, Properties outputParams){
+	public static Tasks getTask(String taskName, HashMap<String, InputParamValue> input, HashMap<String,OutputParamValue> outputParams){
 		try {
 			Class<?> clz=Class.forName(taskName);
 			Tasks task=(Tasks) clz.newInstance();
@@ -133,7 +136,7 @@ public abstract class Tasks {
 			if(field.isAnnotationPresent(InputParam.class)){
 				try {
 					field.setAccessible(true);
-					String fieldValue=getInputParams().getProperty(field.getName(),"");
+					String fieldValue=getInputParams().get(field.getName()).getValue();
 					if(fieldValue.length()>=1){
 						if(fieldValue.startsWith("$")){
 							fieldValue=fieldValue.substring(1);
@@ -169,8 +172,8 @@ public abstract class Tasks {
 				try {
 					field.setAccessible(true);
 					Object value = field.get(this);
-					sessionMap.put(outputParams.get(field.getName()), value);
-					System.out.println(field.getName()+" bound to "+outputParams.get(field.getName())+" == "+value);
+					sessionMap.put(outputParams.get(field.getName()).getValue(), value);
+					System.out.println(field.getName()+" bound to "+outputParams.get(field.getName()).getValue()+" == "+value);
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
@@ -197,18 +200,18 @@ public abstract class Tasks {
 		afterTaskFinish();
 		return status;
 	}
-	public void setOutputParams(Map outputParams) {
+	public void setOutputParams(HashMap<String,OutputParamValue> outputParams) {
 		this.outputParams = outputParams;
 	}
-	public Map<String,String> getOutputParams() {
+	public Map<String,OutputParamValue> getOutputParams() {
 		return outputParams;
 	}
 	
-	public Properties getInputParams() {
+	public Map<String,InputParamValue> getInputParams() {
 		return inputParams;
 	}
 
-	public void setInputParams(Properties inputParams) {
+	public void setInputParams(HashMap<String,InputParamValue> inputParams) {
 		this.inputParams = inputParams;
 	}
 

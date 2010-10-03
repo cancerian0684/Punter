@@ -70,85 +70,6 @@ public class StaticDaoFacade {
     public StaticDaoFacade() {
     }
     
-    /**
-     * @param args the command line arguments
-     * @throws Exception 
-     * @throws UnknownHostException 
-     */
-    public static void main(String[] args) throws UnknownHostException, Exception {
-        // Create the EntityManager
-        EntityManager em = emf.createEntityManager();
-        
-        em.getTransaction().begin();
-        
-       /* for(Team team: teams) {
-            em.persist(team);
-        }
-        
-        for(Player player: dodgersPlayers) {
-            player.setTeam(teams[0]);
-            teams[0].addPlayer(player);
-            em.persist(player);
-        }
-        
-        for (Player player: giantsPlayers) {
-            player.setTeam(teams[1]);
-            teams[1].addPlayer(player);
-            em.persist(player);
-        }*/
-        ProcessDao p=new ProcessDao();
-        p.setDescription("A test process");
-        List<TaskDao> taskList=new ArrayList<TaskDao>();
-        for(int i=0;i<=1;i++){
-        TaskDao t=new TaskDao();
-        t.setName("EchoTask_"+i);
-        t.setProcess(p);
-        Properties props = new Properties();
-        props.setProperty("name", "munish chandel");
-        t.setInputParams(props);
-        taskList.add(t);
-        }
-        p.setTaskList(taskList);
-        em.persist(p);
-        em.getTransaction().commit();
-        
-        System.err.println("Listing tasks for process : "+p.getId()+"  -- "+p.getDescription());
-        ProcessDao np = em.find(ProcessDao.class,p.getId());
-        System.err.println("Listing tasks for process : "+np.getId()+"  -- "+np.getDescription());
-        Collection<TaskDao> tl = np.getTaskList();
-        for (TaskDao task : tl) {
-			System.out.println(task.getName());
-			System.out.println(task.getInputParams().getProperty("name"));
-		}
-        
-//        listProcesses();
-        em.close();
-    }
-    public static void main2(String[] args) throws UnknownHostException, Exception {
-//    	getProcessTasksById(801L);
-    	/*Task t=new Task();
-        t.setName("EchoTask_113");
-        ProcessDao p=new ProcessDao();
-        p.setId(51L);
-        t.setProcess(p);
-        Properties props = new Properties();
-        props.setProperty("name", "munish");
-        props.setProperty("last", "chandel");
-        t.setInputParams(props);
-    	createTask(t);*/
-    	listTask(351L);
-//    	EntityManager em = emf.createEntityManager();
-    	TaskDao task = em.find(TaskDao.class, 351L);
-    	task.getInputParams().setProperty("*name", "Rohit Banyal");    	
-    	saveTask(task);
-    	task.getInputParams().setProperty("age", "29");
-    	saveTask(task);
-    	task.getInputParams().setProperty("dob", "05-June-1983");
-    	saveTask(task);
-//    	em.close();
-    	listTask(351L);
-    	removeTask(task);
-	}
     public static void removeTask(TaskDao task)throws Exception{
     	EntityManager em = emf.createEntityManager();
     	try{
@@ -266,8 +187,8 @@ public class StaticDaoFacade {
         try{
         if(task!=null){
         	System.out.println("Listing task for "+task.getId());
-        	Set<Object> keySet = task.getInputParams().keySet();
-        for (Object object : keySet) {
+        	Set<String> keySet = task.getInputParams().keySet();
+        for (String object : keySet) {
         	System.out.println(object.toString()+" -- "+task.getInputParams().get(object));
 		}
         task.getOutputParams();
