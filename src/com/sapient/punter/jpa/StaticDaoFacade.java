@@ -168,6 +168,7 @@ public class StaticDaoFacade {
         task.setOutputParams(t.getOutputParams());
         task.setSequence(t.getSequence());
         task.setDescription(t.getDescription());
+        task.setActive(t.isActive());
         em.merge(task);
         em.getTransaction().commit();
     }

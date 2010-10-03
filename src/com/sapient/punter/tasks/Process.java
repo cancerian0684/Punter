@@ -37,15 +37,11 @@ private boolean emailsOnFailureOnly;
 private String scheduleString;
 protected ProcessObserver po;
 public Process() {
-	// TODO Auto-generated constructor stub
 }
 public void addObserver(ProcessObserver po){
 	this.po=po;
 }
-public void addTask(Tasks task){
-	task.setSessionMap(sessionMap);
-	taskList.add(task);
-}
+
 public void beforeProcessStart(){
 	System.err.println("Emails to notify : "+emailsToNotify);
 	ph.setRunState(RunState.RUNNING);

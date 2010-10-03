@@ -218,7 +218,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 						for (int selectedRow : selectedRows) {
 							ArrayList request=tableModel.getRow(selectedRow);
 							selectedRowsData.add(request);
-			                TaskDao task=(TaskDao) request.get(5);
+			                TaskDao task=(TaskDao) request.get(6);
 							try {
 								System.err.println("removing task : "+task.getId());
 								StaticDaoFacade.removeTask(task);
@@ -271,6 +271,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	    	              	newRequest.add(task.getName());
 	    	              	newRequest.add(task.getSequence());
 	    	              	newRequest.add(task.getDescription());
+	    	              	newRequest.add(task.isActive());
 	    	              	newRequest.add(task.getAuthor());
 	    	              	newRequest.add(task);
 	    	              	newRequest.add(p);
@@ -416,7 +417,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         		} else {
         			int selectedRow = lsm.getMinSelectionIndex();
         			System.out.println("Row " + selectedRow + " is now selected.");
-        			TaskDao t=(TaskDao) taskTable.getModel().getValueAt(selectedRow, 5);
+        			TaskDao t=(TaskDao) taskTable.getModel().getValueAt(selectedRow, 6);
         			if(t.getInputParams()!=null){
         			inputParamTable.setModel(new InputParamTableModel(t));
         			inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
@@ -459,7 +460,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
                 ListSelectionModel lsm = (ListSelectionModel)e.getSource();
                 if(e.getValueIsAdjusting()){
                 	System.err.println("Mouse is adjusting..");
-                }else if (lsm.isSelectionEmpty()) {
+                } else if (lsm.isSelectionEmpty()) {
                 } else {
                     int selectedRow = lsm.getMinSelectionIndex();
                     System.out.println("Row " + selectedRow + " is now selected.");
@@ -478,10 +479,6 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		      	          	newRequest.add(""+ph.getId()+"  [ "+sdf.format(ph.getStartTime())+" ]");
 		      	          	newRequest.add(ph);
 		      	          	phtmodel.insertRow(newRequest);
-		      	        /*List<TaskHistory> thl = ph.getTaskHistoryList();
-		      	        for(TaskHistory th:thl){
-		      	        	System.out.println(th.getId());
-		      	        }*/
 	      	  		}
 	      	        if(phtmodel.getRowCount()>0){
 	      	        	processHistoryTable.setRowSelectionInterval(0, 0);
@@ -491,19 +488,20 @@ public class PunterGUI extends JPanel implements TaskObserver{
                     ProcessDao process = StaticDaoFacade.getProcess(l);
                     TaskTableModel model=(TaskTableModel) taskTable.getModel();
                     model.clearTable();
-                    for(TaskDao t:taskList){
+                    for(TaskDao task:taskList){
                     	final ArrayList<Object> newRequest = new ArrayList<Object>();
-                    	newRequest.add(t.getId());
-                    	newRequest.add(t.getName());
-                    	newRequest.add(t.getSequence());
-                    	newRequest.add(t.getDescription());
-                    	newRequest.add(t.getAuthor());
-                    	newRequest.add(t);
+                    	newRequest.add(task.getId());
+                    	newRequest.add(task.getName());
+                    	newRequest.add(task.getSequence());
+                    	newRequest.add(task.getDescription());
+                    	newRequest.add(task.isActive());
+                    	newRequest.add(task.getAuthor());
+                    	newRequest.add(task);
                     	newRequest.add(process);
                     	model.insertRow(newRequest);
                     }
                     if(taskTable.getModel().getRowCount()>0){
-                    taskTable.setRowSelectionInterval(0, 0);
+                    	taskTable.setRowSelectionInterval(0, 0);
                     }else{
                     	inputParamTable.setModel(new InputParamTableModel());
                     	outputParamTable.setModel(new OutputParamTableModel());
@@ -573,17 +571,17 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			public void valueChanged(ListSelectionEvent e) {
                 ListSelectionModel lsm = (ListSelectionModel)e.getSource();
                 if(e.getValueIsAdjusting()){
-                	System.err.println("Mouse is adjusting..");
+//                	System.err.println("Mouse is adjusting..");
                 }
-                if (lsm.isSelectionEmpty()) {
-                	System.out.println("PTHL Empty --No Row is now selected.");
+                else if (lsm.isSelectionEmpty()) {
+//                	System.out.println("PTHL Empty --No Row is now selected.");
                 } else {
                     int selectedRow = lsm.getMinSelectionIndex();
-                    System.out.println("PTHL -- Row " + selectedRow + " is now selected.");
+//                    System.out.println("PTHL -- Row " + selectedRow + " is now selected.");
                     try{
                     ArrayList ar = ((ProcessHistoryTableModel)processHistoryTable.getModel()).getRow(processHistoryTable.getSelectedRow());
       	        	long l=(Long)((ProcessHistory)ar.get(1)).getId();
-      	        	System.out.println("PHID= "+l);
+//      	        	System.out.println("PHID= "+l);
       	        	ProcessHistory ph = StaticDaoFacade.getProcessHistoryById(l);
       	        	//populate ProcessTaskHistory
       	        	ProcessTaskHistoryTableModel pthtmodel=(ProcessTaskHistoryTableModel) processTaskHistoryTable.getModel();
@@ -677,7 +675,6 @@ public class PunterGUI extends JPanel implements TaskObserver{
 					 
 					@Override
 					public void update(ProcessHistory ph) {
-//						System.err.println("updating table model");
 						newRequest.set(0, ""+ph.getId()+"  [ "+sdf.format(ph.getStartTime())+" ]");
 						((ProcessHistoryTableModel)processHistoryTable.getModel()).refreshTable();
 						rptmRow.set(1, ph.getId());
@@ -691,7 +688,6 @@ public class PunterGUI extends JPanel implements TaskObserver{
 						if(rptm.getRowCount()>0&&runningProcessTable.getSelectedRow()==-1){
 							runningProcessTable.setRowSelectionInterval(0, 0);
 						}
-//						rptm.refreshTable();
 					}
 				});
 				runProcess(process);

@@ -8,16 +8,16 @@ import com.sapient.punter.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskDao;
  
 public class TaskTableModel extends AbstractTableModel {
-	public final Object[] longValues = {new Integer(5), "Kathy123",new Integer(5), "None of the above a,jbskjkjas jsahfk"};
+	public final Object[] longValues = {new Integer(5), "Kathy123",new Integer(5), "None of the above a,jbskjkjas jsahfk",new Boolean(true)};
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
 
 	/** Holds the column names */         
 	private String [] columnNames = new String [] 
-                                  {"<html><b>Task Id","<html><b>Task Name","<html><b>Sequence","<html><b>Description"};
+                                  {"<html><b>Task Id","<html><b>Task Name","<html><b>Sequence","<html><b>Description","<html><b>Active"};
 	private Class [] columnClasses = new Class[] 
-                                   {Integer.class,String.class,Integer.class,String.class};
+                                   {Integer.class,String.class,Integer.class,String.class,Boolean.class};
   
   /**
    * Constructor: Initializes the table structure, including number of columns
@@ -93,15 +93,16 @@ public class TaskTableModel extends AbstractTableModel {
     colArrayList.set( col, obj);
     if(obj!=null){
     try{
-    TaskDao task=(TaskDao) colArrayList.get(5);
+    TaskDao task=(TaskDao) colArrayList.get(6);
     switch(col){
     case 2:
     	task.setSequence(Integer.parseInt(obj.toString()));
-    	System.out.println("selected col 2");
     	break;
     case 3:
     	task.setDescription(obj.toString());
-    	System.out.println("selected col 3");
+    	break;
+    case 4:
+    	task.setActive(Boolean.parseBoolean(obj.toString()));
     	break;
 	default :
 		break;
@@ -118,11 +119,11 @@ public class TaskTableModel extends AbstractTableModel {
    * Adds a new row to the table.
    * @param <b>ArrayList </b> new row data
    */
- /* public synchronized ArrayList insertRow( ArrayList newrow ) {
+  public synchronized ArrayList insertRowAtBeginning( ArrayList newrow ) {
     data.add(0,newrow);
     super.fireTableRowsInserted(0,0);
     return (ArrayList) data.get(0);
-  }*/
+  }
   
   public synchronized ArrayList insertRow( ArrayList newrow ) {
 	    data.add(newrow);
