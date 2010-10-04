@@ -81,6 +81,7 @@ import com.sapient.punter.utils.InputParamValue;
 import com.sapient.punter.utils.Launcher;
 import com.sapient.punter.utils.OutputParamValue;
 import com.sapient.punter.utils.StackWindow;
+import com.sapient.punter.utils.TextAreaFIFO;
 import com.sun.awt.AWTUtilities;
 
 /** 
@@ -100,6 +101,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private final JTable processTaskHistoryTable;
     private final JTable runningProcessTable;
     private final JTable runningTaskTable;
+    private TextAreaFIFO logArea;
     private int selectedRow=-1;
     private final Timer timer;
     private static BufferedImage busyImage;
@@ -166,7 +168,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
         	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
         }
         header.setPreferredSize(new Dimension(30, 20));
-        JSplitPane splitRunningProcessPane=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(runningProcessTable), new JScrollPane(runningTaskTable));
+        JTabbedPane jtb=new JTabbedPane();
+        jtb.addTab("Tasks", new JScrollPane(runningTaskTable));
+        
+        JSplitPane splitRunningProcessPane=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(runningProcessTable), jtb);
         splitRunningProcessPane.setDividerSize(0);
 //        splitRunningProcessPane.setBorder(new TitledBorder("Process Explorer"));
         processTable=new JTable(new ProcessTableModel());/*{
@@ -605,7 +610,9 @@ public class PunterGUI extends JPanel implements TaskObserver{
         processPropertyTable.getColumn("<html><b>Value").setCellRenderer(new ProcessPropertyTableRenderer());
         JScrollPane processPropertyPane = new JScrollPane(processPropertyTable);
         tabbedPane.addTab("Process Property", null, processPropertyPane,"Properties for selected Process");
-        
+        logArea=new TextAreaFIFO();
+        logArea.setEditable(false);
+        tabbedPane.addTab("App Logs", null, new JScrollPane(logArea),"Application Wide Logging");
         JSplitPane jsp3=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,listPane,tabbedPane);
         jsp3.setDividerSize(1);
         JSplitPane jsp5=new JSplitPane(JSplitPane.VERTICAL_SPLIT, jsp3,splitRunningProcessPane);
@@ -660,6 +667,11 @@ public class PunterGUI extends JPanel implements TaskObserver{
         //create scheduled job picker
         ScheduledJobPicker sjp= new ScheduledJobPicker();
         sjp.setGuiReference(this);
+        
+        System.setOut( new PrintStream(
+				new ConsoleOutputStream (logArea.getDocument(), System.out), true));
+		System.setErr( new PrintStream(
+				new ConsoleOutputStream (logArea.getDocument(), System.err), true));
     }
     public void createProcess(final ProcessData procDao) throws Exception{
 		  System.out.println(procDao.getId()+" == "+procDao.getName());

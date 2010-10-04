@@ -27,7 +27,7 @@ import javax.swing.text.Element;
  
 public class TextAreaFIFO extends JTextArea implements DocumentListener,TextAreaFIFOMBean
 {
-	private int lineBufferSize=3000;
+	private int lineBufferSize=5000;
 	private boolean followTails=true;
 	private TitleMousListener listener;
 	public TextAreaFIFO()
