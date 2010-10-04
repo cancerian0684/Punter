@@ -11,6 +11,13 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.PlainDocument;
+import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
+
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.gui.ProcessObserver;
 import com.sapient.punter.gui.TaskObserver;
@@ -41,6 +48,11 @@ private boolean emailsOnFailureOnly;
 @InputParam(description="<html>provide cron4j formatted scheduling string<br>13 * * jan-jun,sep-dec mon-fri,sat")
 private String scheduleString;
 protected ProcessObserver po;
+private int lineBufferSize=1000;
+private Document logDocument;
+public Document getLogDocument() {
+	return logDocument;
+}
 public Process() {
 }
 public void addObserver(ProcessObserver po){
@@ -48,6 +60,25 @@ public void addObserver(ProcessObserver po){
 }
 
 public void beforeProcessStart(){
+	logDocument=new PlainDocument(){
+		protected void insertUpdate(DefaultDocumentEvent chng, AttributeSet attr) {
+			super.insertUpdate(chng, attr);
+			Element root = getDefaultRootElement();
+			while (root.getElementCount() > lineBufferSize)
+			{
+				Element firstLine = root.getElement(0);
+				try
+				{
+					System.err.println("removing");
+					remove(0, firstLine.getEndOffset());
+				}
+				catch(BadLocationException ble)
+				{
+					System.out.println(ble+" = "+lineBufferSize);
+				}
+			}
+		};
+	};
 	System.err.println("Emails to notify : "+emailsToNotify);
 	ph.setRunState(RunState.RUNNING);
 	try {
@@ -74,10 +105,12 @@ public void execute(){
 	boolean keepRunning=true;
 	int progressCounter=0;
 	ph.setRunStatus(RunStatus.RUNNING);
+	ph.setLogDocument(logDocument);
 	for (TaskHistory th : ph.getTaskHistoryList()) {
 		Tasks task=Tasks.getTask(th.getTask().getClassName(), th.getTask().getInputParams(), th.getTask().getOutputParams());
 		task.setTaskDao(th.getTask());
 		task.setSessionMap(sessionMap);
+		task.setLogDocument(logDocument);
 		th.setRunState(RunState.RUNNING);
 		boolean status=false;
 		if(keepRunning){

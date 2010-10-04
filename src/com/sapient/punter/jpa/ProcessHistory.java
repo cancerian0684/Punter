@@ -18,6 +18,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.swing.text.Document;
 
 @Entity
 public class ProcessHistory implements Serializable{
@@ -35,6 +36,8 @@ public class ProcessHistory implements Serializable{
 	private ProcessData process;
 	@Transient
 	private int progress;
+	@Transient
+	private Document logDocument;
 //	@Basic(optional = false)
 //	@Column(nullable = false, columnDefinition = "char(1) default 'A'")
 	@Enumerated(EnumType.STRING)
@@ -96,6 +99,13 @@ public class ProcessHistory implements Serializable{
 	}
 	public void setProgress(int progress) {
 		this.progress = progress;
+	}
+	
+	public Document getLogDocument() {
+		return logDocument;
+	}
+	public void setLogDocument(Document logDocument) {
+		this.logDocument = logDocument;
 	}
 	@Override
 	public int hashCode() {

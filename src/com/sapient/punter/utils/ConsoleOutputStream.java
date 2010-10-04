@@ -56,9 +56,9 @@ public class ConsoleOutputStream extends OutputStream
 		frame.setVisible(true);
  
 		System.setOut( new PrintStream(
-			new ConsoleOutputStream (textArea.getDocument (), System.out), true));
+			new ConsoleOutputStream (textArea.getDocument (), null), true));
 		System.setErr( new PrintStream(
-			new ConsoleOutputStream (textArea.getDocument (), System.err), true));
+			new ConsoleOutputStream (textArea.getDocument (), null), true));
  
 		Timer timer = new Timer(1000, new ActionListener()
 		{

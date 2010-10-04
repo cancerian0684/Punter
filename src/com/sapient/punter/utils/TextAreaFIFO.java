@@ -23,6 +23,7 @@ import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.text.Element;
  
 public class TextAreaFIFO extends JTextArea implements DocumentListener,TextAreaFIFOMBean
@@ -30,6 +31,13 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener,TextArea
 	private int lineBufferSize=5000;
 	private boolean followTails=true;
 	private TitleMousListener listener;
+	@Override
+	public void setDocument(Document doc) {
+		super.setDocument(doc);
+		getDocument().addDocumentListener( this );
+		listener=new TitleMousListener();
+		addMouseListener(listener);
+	}
 	public TextAreaFIFO()
 	{
 		getDocument().addDocumentListener( this );
@@ -50,7 +58,7 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener,TextArea
 			e.printStackTrace();
 		}
 	}
- 
+	
 	public void insertUpdate(DocumentEvent e)
 	{
 		SwingUtilities.invokeLater( new Runnable()
@@ -94,7 +102,7 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener,TextArea
 		textArea.setColumns(40);
 		JScrollPane scrollPane = new JScrollPane( textArea );
  
-		final Timer timer = new Timer(100, new ActionListener()
+		final Timer timer = new Timer(10, new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{

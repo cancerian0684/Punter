@@ -3,12 +3,9 @@ package com.sapient.punter.tasks;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -16,6 +13,12 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
+
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.PlainDocument;
 
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
@@ -28,10 +31,11 @@ public abstract class Tasks {
 	private Map<String,OutputParamValue> outputParams;
 	private HashMap<String, InputParamValue> inputParams;
 	protected TaskData taskDao;
-	private ConsoleHandler handler = null;
+	private ConsoleHandler cHandler = null;
 	private MemoryHandler mHandler = null;
 	private Level loggingLevel=Level.INFO;
 	private StringBuilder strLogger;
+	private Document logDocument;
 	public static final ThreadLocal<Logger> LOGGER = new ThreadLocal<Logger>() {
 		@Override
 		protected Logger initialValue() {
@@ -44,8 +48,9 @@ public abstract class Tasks {
 	public void beforeTaskStart(){
 		System.err.println("Calling before Task: ");
 		strLogger = new StringBuilder();
-	    handler = new ConsoleHandler();
-	    handler.setFormatter(new Formatter() {
+		
+	    cHandler = new ConsoleHandler();
+	    cHandler.setFormatter(new Formatter() {
 			@Override
 			public String format(LogRecord record) {
 				return new Date(record.getMillis())+" ["+Thread.currentThread().getName()+"] "+record.getLevel()
@@ -56,10 +61,16 @@ public abstract class Tasks {
 		});
 	    mHandler = new MemoryHandler(new Handler() {
 	        public void publish(LogRecord record) {
-	        	strLogger.append(new Date(record.getMillis())+" ["+Thread.currentThread().getName()+"] "+record.getLevel()
-	        		  + " "+record.getSourceClassName()+"." 
-			          + record.getSourceMethodName() + "() - "
-			          + record.getMessage() + "\r");
+	        	String msg=new Date(record.getMillis())+" ["+Thread.currentThread().getName()+"] "+record.getLevel()
+      		  + " "+record.getSourceClassName()+"." 
+	          + record.getSourceMethodName() + "() - "
+	          + record.getMessage();
+	        	strLogger.append(msg+"\r");
+	        	try {
+					logDocument.insertString(logDocument.getLength (),record.getMessage()+"\n", null);
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
 	    }
 
         public void flush() {
@@ -71,7 +82,7 @@ public abstract class Tasks {
         
       }, 2, loggingLevel);
 	    LOGGER.get().addHandler(mHandler);
-	    LOGGER.get().addHandler(handler);
+	    LOGGER.get().addHandler(cHandler);
 	    LOGGER.get().setUseParentHandlers(false);
 	}
 	public void setLoggingLevel(Level loggingLevel) {
@@ -186,7 +197,7 @@ public abstract class Tasks {
 	}
 	public void afterTaskFinish(){
 		LOGGER.get().removeHandler(mHandler);
-		LOGGER.get().removeHandler(handler);
+		LOGGER.get().removeHandler(cHandler);
 	}
 	/*
 	 * @return returns the status of the task. true means success and false is failure
@@ -220,7 +231,9 @@ public abstract class Tasks {
 	public void setSessionMap(Map sessionMap) {
 		this.sessionMap = sessionMap;
 	}
-
+	public void setLogDocument(Document logDocument) {
+		this.logDocument = logDocument;
+	}
 	public Object getSessionObject(String key) {
 		return sessionMap.get(key);
 	}
