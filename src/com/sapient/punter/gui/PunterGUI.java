@@ -560,6 +560,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         processTaskHistoryTable.setShowGrid(true);
         processTaskHistoryTable.setPreferredScrollableViewportSize(new Dimension(300, 300));
         processTaskHistoryTable.setFillsViewportHeight(true);
+        processTaskHistoryTable.setAutoCreateRowSorter(true);
         processTaskHistoryTable.getTableHeader().setReorderingAllowed(false);
         JScrollPane processHistoryPane = new JScrollPane(processHistoryTable);
         JScrollPane processTaskHistoryPane = new JScrollPane(processTaskHistoryTable);
@@ -662,6 +663,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     		  final ProcessHistory ph1 = StaticDaoFacade.createProcessHistory(ph);
     		  final ArrayList<Object> newRequest = new ArrayList<Object>();
   	          newRequest.add(ph1);
+				
   	          javax.swing.SwingUtilities.invokeLater(new Runnable() {
   	        	public void run() {
             	try{
@@ -672,37 +674,37 @@ public class PunterGUI extends JPanel implements TaskObserver{
             			processHistoryTable.setRowSelectionInterval(0, 0);
             		}
             		}
+            		final com.sapient.punter.tasks.Process process=com.sapient.punter.tasks.Process.getProcess(procDao.getInputParams(),ph1);
+            		process.setTaskObservable(PunterGUI.this);
+            		// Adding row to running process table model
+            		final RunningProcessTableModel rptm=(RunningProcessTableModel) runningProcessTable.getModel();
+            		ArrayList<Object> newRequest1 = new ArrayList<Object>();
+            		newRequest1.add(ph1);
+            		rptm.insertRowAtBeginning(newRequest1);
+            		process.addObserver(new ProcessObserver() {
+            			@Override
+            			public void update(ProcessHistory ph) {
+            				((ProcessHistoryTableModel)processHistoryTable.getModel()).refreshTable();
+            				rptm.refreshTable();
+            			}
+            			
+            			@Override
+            			public void processCompleted() {
+//      						rptm.deleteRow(rptmRow);
+            				if(rptm.getRowCount()>0&&runningProcessTable.getSelectedRow()==-1){
+            					runningProcessTable.setRowSelectionInterval(0, 0);
+            				}
+            			}
+            		});
+            		runProcess(process);
                     }catch (Exception e) {
                     	e.printStackTrace();
             		}
             	}
   	      	  });
-  	          final com.sapient.punter.tasks.Process process=com.sapient.punter.tasks.Process.getProcess(procDao.getInputParams(),ph1);
-    		  process.setTaskObservable(PunterGUI.this);
-    		  // Adding row to running process table model
-    		  final RunningProcessTableModel rptm=(RunningProcessTableModel) runningProcessTable.getModel();
-    		  ArrayList<Object> newRequest1 = new ArrayList<Object>();
-  	          newRequest1.add(ph1);
-  	          rptm.insertRowAtBeginning(newRequest1);
-			  process.addObserver(new ProcessObserver() {
-					@Override
-					public void update(ProcessHistory ph) {
-						((ProcessHistoryTableModel)processHistoryTable.getModel()).refreshTable();
-						rptm.refreshTable();
-					}
-
-					@Override
-					public void processCompleted() {
-//						rptm.deleteRow(rptmRow);
-						if(rptm.getRowCount()>0&&runningProcessTable.getSelectedRow()==-1){
-							runningProcessTable.setRowSelectionInterval(0, 0);
-						}
-					}
-				});
-				runProcess(process);
-				}catch (Exception e) {
-					e.printStackTrace();
-				}
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
 			}  
 		  };
 		  t.start();
@@ -807,10 +809,9 @@ public class PunterGUI extends JPanel implements TaskObserver{
         int headerWidth = 0;
         int cellWidth = 0;
         Object[] longValues = model.longValues;
-        TableCellRenderer headerRenderer =
-            table.getTableHeader().getDefaultRenderer();
+        TableCellRenderer headerRenderer = table.getTableHeader().getDefaultRenderer();
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < longValues.length; i++) {
             column = table.getColumnModel().getColumn(i);
 
             comp = headerRenderer.getTableCellRendererComponent(

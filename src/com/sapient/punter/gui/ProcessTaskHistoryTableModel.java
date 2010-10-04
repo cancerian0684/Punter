@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+import com.sapient.punter.jpa.RunStatus;
 import com.sapient.punter.jpa.TaskHistory;
  
 public class ProcessTaskHistoryTableModel extends AbstractTableModel {
@@ -16,7 +17,7 @@ public class ProcessTaskHistoryTableModel extends AbstractTableModel {
 	private String [] columnNames = new String [] 
                                   {"<html><b>Serial","<html><b>TaskDao","<html><b>Status","<html><b>Logs"};
 	private Class [] columnClasses = new Class[] 
-                                   {Integer.class,String.class,String.class,String.class};
+                                   {Integer.class,String.class,RunStatus.class,String.class};
   
   /**
    * Constructor: Initializes the table structure, including number of columns
