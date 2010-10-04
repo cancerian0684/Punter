@@ -1,16 +1,32 @@
 package com.sapient.punter.gui;
 
 
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridLayout;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.Shape;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
@@ -47,6 +64,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.text.Document;
 
 import com.sapient.punter.executors.ProcessExecutor;
 import com.sapient.punter.executors.ScheduledJobPicker;
@@ -58,8 +76,12 @@ import com.sapient.punter.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
 import com.sapient.punter.tasks.Tasks;
+import com.sapient.punter.utils.ConsoleOutputStream;
 import com.sapient.punter.utils.InputParamValue;
+import com.sapient.punter.utils.Launcher;
 import com.sapient.punter.utils.OutputParamValue;
+import com.sapient.punter.utils.StackWindow;
+import com.sun.awt.AWTUtilities;
 
 /** 
  * TableRenderDemo is just like TableDemo, except that it
@@ -80,6 +102,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private final JTable runningTaskTable;
     private int selectedRow=-1;
     private final Timer timer;
+    private static BufferedImage busyImage;
+    private static TrayIcon trayIcon;
     
     public PunterGUI() throws Exception {
         super(new GridLayout(1,0));
@@ -1075,14 +1099,162 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private static void createAndShowGUI() throws Exception {
         //Create and set up the window.
         frame = new JFrame("My Punter");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Create and set up the content pane.
         PunterGUI newContentPane = new PunterGUI();
         newContentPane.setOpaque(true); //content panes must be opaque
         frame.setContentPane(newContentPane);
         
+        
+		frame.addWindowListener(
+ 	        	new java.awt.event.WindowAdapter() {
+ 	        		public void windowIconified(WindowEvent e) {
+ 	        			//System.err.println("Iconifying window");
+// 	        			frame.dispose(); 
+ 	        		 }
+ 	        		public void windowClosing(WindowEvent e) {
+ 	        			//setVisible(false);
+ 	        			frame.dispose(); 
+ 	        			displayMsg("Punter has been minimized to System Tray");
+ 	        		}
+ 	        });	 
+        
+        Thread.UncaughtExceptionHandler handler =
+	         new StackWindow("Unhandled Exception", 500, 400);
+	       Thread.setDefaultUncaughtExceptionHandler(handler);
+	       
+	      /* 
+	       System.setOut( new PrintStream(
+					new ConsoleOutputStream (new Document(), System.out), true));
+			System.setErr( new PrintStream(
+					new ConsoleOutputStream (wcw.getLogArea().getDocument (), null), true));*/
+        /*try{
+			AWTUtilities.setWindowOpacity(frame, 0.990f);
+			Shape shape = null;
+			shape =  new RoundRectangle2D.Float(0, 0, frame.getWidth(), frame.getHeight(), 30, 30);
+	        shape = new Ellipse2D.Float(0, 0, frame.getWidth(), frame.getHeight());
+	        AWTUtilities.setWindowShape(frame, shape);
+		}catch(Exception e){};*/
+        try {
+			//invoke AWTUtilities.setWindowOpacity(win, 0.0f); using reflection so that earlier jdk's don't give erros
+			Class awtutil = Class.forName("com.sun.awt.AWTUtilities");
+			Method setWindowOpaque = awtutil.getMethod("setWindowOpacity", Window.class, float.class);
+			setWindowOpaque.invoke(null, frame, (float)0.99);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
         //Display the window.
+		if (SystemTray.isSupported()) {
+		    final SystemTray tray = SystemTray.getSystemTray();
+	        
+			try {
+	        	busyImage = ImageIO.read(PunterGUI.class.getResource("/images/punter.png"));
+	        	frame.setIconImage(busyImage);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	        catch(Exception e){
+	        	e.printStackTrace();
+	        }
+		    MouseListener mouseListener = new MouseListener() {
+		        public void mouseClicked(MouseEvent e) {
+		        	if(e.getButton()==MouseEvent.BUTTON1){
+		        	frame.setExtendedState(Frame.NORMAL);
+		        	frame.setVisible(true);
+		        	}
+//		            System.out.println("Tray Icon - Mouse clicked!");                 
+		        }
+
+		        public void mouseEntered(MouseEvent e) {
+//		            System.out.println("Tray Icon - Mouse entered!");                 
+		        }
+
+		        public void mouseExited(MouseEvent e) {
+		         //   System.out.println("Tray Icon - Mouse exited!");                 
+		        }
+
+		        public void mousePressed(MouseEvent e) {
+		         //   System.out.println("Tray Icon - Mouse pressed!");                 
+		        }
+
+		        public void mouseReleased(MouseEvent e) {
+		       //     System.out.println("Tray Icon - Mouse released!");                 
+		        }
+		    };
+		    Runtime rt = Runtime.getRuntime();
+		    System.err.println("Main: adding shutdown hook");
+		    rt.addShutdownHook(new Thread() {
+		      public void run() {
+		        System.out.println("Running shutdown hook");
+				System.out.println("Exiting...");
+		      }
+		    });
+
+		    ActionListener exitListener = new ActionListener() {
+		        public void actionPerformed(ActionEvent e) {
+		            int option=JOptionPane.showConfirmDialog(frame,"Exit Punter?","Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
+        			if(option==JOptionPane.OK_OPTION)
+        			{
+        				System.out.println("Removing tray icon");
+        				tray.remove(trayIcon);
+        				Launcher.programQuit();
+        				//dispose();
+        				//System.exit(0);
+        			}
+		        }
+		    };
+		            
+		    PopupMenu popup = new PopupMenu();
+		    MenuItem defaultItem1 = new MenuItem("Open Punter");
+		    defaultItem1.setFont(new Font("Tahoma", Font.BOLD, 12));
+		    defaultItem1.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					
+					frame.setExtendedState(Frame.NORMAL);
+					frame.setVisible(true);
+				}});
+		    popup.add(defaultItem1);
+		   
+		  //  popup.add(new JSeparator());
+		    MenuItem defaultItem = new MenuItem("Exit Punter");
+		    defaultItem.addActionListener(exitListener);
+		    popup.add(defaultItem);
+
+		    trayIcon = new TrayIcon(busyImage, "My Punter", popup);
+		    trayIcon.setToolTip("My Punter started.\nSapient Corp Pvt. Ltd.");
+		    trayIcon.setImageAutoSize(true);
+		   
+		    ActionListener actionListener = new ActionListener() {
+		        public void actionPerformed(ActionEvent e) {
+		        		frame.setExtendedState(Frame.NORMAL);
+		            	frame.setVisible(true);
+		        }
+		    };
+		            
+		    trayIcon.setImageAutoSize(true);
+		    trayIcon.addActionListener(actionListener);
+		    trayIcon.addMouseListener(mouseListener);
+
+		    try {
+		        tray.add(trayIcon);
+		        trayIcon.displayMessage("My Punter", 
+			            "Double click here to launch the Punter.",
+			            TrayIcon.MessageType.INFO);
+		      //  trayIcon.setImage(image);
+		       
+		    } catch (AWTException e) {
+		        System.err.println("TrayIcon could not be added.");
+		    }
+
+		} else {
+
+		    //  System Tray is not supported
+
+		}
         frame.pack();
         frame.setVisible(true);
     }
@@ -1101,6 +1273,13 @@ public class PunterGUI extends JPanel implements TaskObserver{
             }
         });
     }
+    public static void displayMsg(String msg){
+    	if(trayIcon!=null){
+    		trayIcon.displayMessage("My Punter", 
+    				msg,TrayIcon.MessageType.INFO);
+    	}
+    }
+   
     static class DefaultStringRenderer extends DefaultTableCellRenderer {
     	
     	public DefaultStringRenderer() { super(); }
