@@ -327,12 +327,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        	  try{
 	        		  ProcessData proc=new ProcessData();
 	        		  proc.setName("new Process");
-	        		  List<String> inputParams = com.sapient.punter.tasks.Process.listInputParams();
-	        		  Properties inProp=new Properties();
-    	        	  for (String key : inputParams) {
-    					System.err.println(key);
-    					inProp.setProperty(key, "");
-    	        	  }
+	        		  HashMap<String, InputParamValue> inProp = com.sapient.punter.tasks.Process.listInputParams();
     	        	  proc.setInputParams(inProp);
 	        		  StaticDaoFacade.createProcess(proc);
 	        		  ProcessTableModel model=(ProcessTableModel) processTable.getModel();
@@ -528,13 +523,13 @@ public class PunterGUI extends JPanel implements TaskObserver{
                     //populate process properties
                     ProcessPropertyTableModel pptmodel=(ProcessPropertyTableModel) processPropertyTable.getModel();
                     pptmodel.clearTable();
-                    Properties props = process.getInputParams();
+                    HashMap<String, InputParamValue> props = process.getInputParams();
                     for(Object key : props.keySet()) {  
-                		Object value = props.get(key);    
-                		System.out.println(key + " = " + value);
+                		InputParamValue value = props.get(key);    
+                		System.out.println(key + " = " + value.getValue());
                 		final ArrayList<Object> newRequest = new ArrayList<Object>();
                     	newRequest.add(key);
-                    	newRequest.add(value);
+                    	newRequest.add(value.getValue());
                     	newRequest.add(process);
                     	pptmodel.insertRow(newRequest);
                     }
@@ -582,6 +577,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         processPropertyTable.setIntercellSpacing(new Dimension(0,0));
         processPropertyTable.getColumn("<html><b>Property").setMaxWidth(200);
         processPropertyTable.getColumn("<html><b>Property").setPreferredWidth(150);
+        processPropertyTable.getColumn("<html><b>Value").setCellRenderer(new ProcessPropertyTableRenderer());
         JScrollPane processPropertyPane = new JScrollPane(processPropertyTable);
         tabbedPane.addTab("Process Property", null, processPropertyPane,"Properties for selected Process");
         
@@ -1112,6 +1108,28 @@ public class PunterGUI extends JPanel implements TaskObserver{
     			Object value, boolean isSelected, boolean hasFocus, int row,
     			int column) {
     		TaskData td=(TaskData) ((InputParamTableModel)table.getModel()).getValueAt(row, 2);
+    		InputParamValue value1 = (InputParamValue) td.getInputParams().get(table.getModel().getValueAt(row, 0)); 
+    		String tooltip=value1.getInputParam().description();
+    		if(!tooltip.isEmpty())
+    			setToolTipText(tooltip);
+    		else
+    			setToolTipText(null);
+    		return super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+    				row, column);
+    	}
+    	public void setValue(Object value) {
+    	    setText((value.toString().isEmpty()) ? "---" : value.toString());
+    	}
+    }
+    
+    static class ProcessPropertyTableRenderer extends DefaultTableCellRenderer {
+    	
+    	public ProcessPropertyTableRenderer() { super(); }
+    	@Override
+    	public Component getTableCellRendererComponent(JTable table,
+    			Object value, boolean isSelected, boolean hasFocus, int row,
+    			int column) {
+    		ProcessData td=(ProcessData)((ProcessPropertyTableModel)table.getModel()).getValueAt(row, 2);
     		InputParamValue value1 = (InputParamValue) td.getInputParams().get(table.getModel().getValueAt(row, 0)); 
     		String tooltip=value1.getInputParam().description();
     		if(!tooltip.isEmpty())

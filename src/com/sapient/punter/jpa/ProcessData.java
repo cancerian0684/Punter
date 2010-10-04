@@ -2,6 +2,7 @@ package com.sapient.punter.jpa;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -16,6 +17,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.sapient.punter.utils.InputParamValue;
+
 @Entity
 @Table(name="PROCESS")
 public class ProcessData implements Serializable{
@@ -27,7 +30,7 @@ public class ProcessData implements Serializable{
 	private String name;
 	private String description;
 	private String comments;
-	private Properties inputParams;
+	private HashMap<String, InputParamValue> inputParams;
 	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.LAZY)
 	private List<TaskData> taskList;
 	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy = "process",fetch=FetchType.LAZY)
@@ -68,10 +71,10 @@ public class ProcessData implements Serializable{
 	public void setProcessHistoryList(List<ProcessHistory> processHistoryList) {
 		this.processHistoryList = processHistoryList;
 	}
-	public Properties getInputParams() {
+	public HashMap<String, InputParamValue> getInputParams() {
 		return inputParams;
 	}
-	public void setInputParams(Properties inputParams) {
+	public void setInputParams(HashMap<String, InputParamValue> inputParams) {
 		this.inputParams = inputParams;
 	}
 	@Override

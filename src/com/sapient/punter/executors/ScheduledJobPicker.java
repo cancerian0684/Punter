@@ -35,7 +35,7 @@ public class ScheduledJobPicker {
 						lastReferenceTimeLong=System.currentTimeMillis();
 					}
 					for (ProcessData pd : scheduledProcList) {
-						String ss=pd.getInputParams().getProperty("scheduleString").trim();
+						String ss=pd.getInputParams().get("scheduleString").getValue().trim();
 						if(checkIfScheduledInPeriod(ss,lastReferenceTimeLong,TIMER_PERIOD)){
 							System.err.println(checkIfScheduledInPeriod(ss,lastReferenceTimeLong,TIMER_PERIOD)+" "+new Date());							
 							guiReference.createProcess(pd);

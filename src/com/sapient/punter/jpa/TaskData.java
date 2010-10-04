@@ -27,7 +27,7 @@ public class TaskData implements Serializable{
 	private String author;
 	private boolean active=true;
 	private HashMap<String, InputParamValue> inputParams;
-	private HashMap<String,OutputParamValue> outputParams;
+	private HashMap<String, OutputParamValue> outputParams;
 	@ManyToOne
 	private ProcessData process;
 	public long getId() {

@@ -1,7 +1,6 @@
 package com.sapient.punter.gui;
 
 import java.util.HashMap;
-import java.util.Properties;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -83,13 +82,6 @@ import com.sapient.punter.utils.InputParamValue;
          * data can change.
          */
         public void setValueAt(Object value, int row, int col) {
-            if (true) {
-                System.out.println("Setting value at " + row + "," + col
-                                   + " to " + value
-                                   + " (an instance of "
-                                   + value.getClass() + ")");
-            }
-
             data[row][col] = value;
             fireTableCellUpdated(row, col);
             TaskData t=(TaskData) data[row][2];
@@ -100,10 +92,6 @@ import com.sapient.punter.utils.InputParamValue;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-            if (true) {
-                System.out.println("New value of data:");
-                printDebugData();
-            }
         }
 
         private void printDebugData() {

@@ -217,7 +217,7 @@ public class StaticDaoFacade {
 	     List<ProcessData> dbProcList = q.getResultList();
 	     List<ProcessData> processList =new ArrayList<ProcessData>();
 	     for (ProcessData processDao :dbProcList  ) {
-	    	 String ss=processDao.getInputParams().getProperty("scheduleString").trim();
+	    	 String ss=processDao.getInputParams().get("scheduleString").getValue().trim();
 	    	 System.out.println(ss);
 	    	 if(!ss.isEmpty())
 	    	 processList.add(processDao);

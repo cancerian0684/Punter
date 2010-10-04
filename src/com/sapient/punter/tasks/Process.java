@@ -20,6 +20,7 @@ import com.sapient.punter.jpa.RunStatus;
 import com.sapient.punter.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
+import com.sapient.punter.utils.InputParamValue;
 import com.sapient.punter.utils.StringUtils;
 import com.sun.jmx.snmp.tasks.TaskServer;
 
@@ -27,17 +28,17 @@ public class Process {
 private List<Tasks> taskList=new ArrayList<Tasks>();
 private Map sessionMap=new HashMap<String, Object>();
 private TaskObserver ts;
-private Properties inputParams;
+private HashMap<String, InputParamValue> inputParams;
 private ProcessHistory ph;
 @InputParam
 private String comments;
-@InputParam
+@InputParam(description="Any of ALL, INFO, WARNING, SEVERE")
 private String loggingLevel;
-@InputParam
+@InputParam(description="Comma separated email List")
 private String emailsToNotify;
 @InputParam
 private boolean emailsOnFailureOnly;
-@InputParam
+@InputParam(description="<html>provide cron4j formatted scheduling string<br>13 * * jan-jun,sep-dec mon-fri,sat")
 private String scheduleString;
 protected ProcessObserver po;
 public Process() {
@@ -124,18 +125,18 @@ public void setTaskObservable(TaskObserver ts){
 	this.ts=ts;
 }
 
-public static List<String> listInputParams(){
+public static HashMap<String,InputParamValue> listInputParams(){
 	Field[] fields = Process.class.getDeclaredFields();
 	System.out.println("Listing input params for process");
-	List<String> inParams=new ArrayList<String>(10);
+	HashMap<String,InputParamValue> inProp=new HashMap<String,InputParamValue>();
 	for (Field field : fields) {
 		if(field.isAnnotationPresent(InputParam.class)){
 			InputParam ann = field.getAnnotation(InputParam.class);
 			System.out.println(ann.required()==true?"*"+field.getName():""+field.getName());
-			inParams.add(ann.required()==true?""+field.getName():""+field.getName());
+			inProp.put(field.getName(), new InputParamValue(ann, ""));
 		}
 	}
-	return inParams;
+	return inProp;
 }
 private void substituteParams() {
 	Field[] fields = getClass().getDeclaredFields();
@@ -143,7 +144,7 @@ private void substituteParams() {
 		if(field.isAnnotationPresent(InputParam.class)){
 			try {
 				field.setAccessible(true);
-				String fieldValue=inputParams.getProperty(field.getName(),"");
+				String fieldValue=inputParams.get(field.getName()).getValue();
 				if(fieldValue.length()>=1){
 					if(field.getType().getSimpleName().equals("String")){
 						field.set(this, fieldValue);
@@ -168,7 +169,7 @@ private void substituteParams() {
 		}
 	}
 }
-public static Process getProcess(Properties props,ProcessHistory ph){
+public static Process getProcess(HashMap<String, InputParamValue> props,ProcessHistory ph){
 	Process proc=new Process();
 	proc.inputParams=props;
 	proc.ph=ph;
