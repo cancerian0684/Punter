@@ -29,7 +29,7 @@ public class ScheduledJobPicker {
 				try {
 					sw.start();
 					List<ProcessData> scheduledProcList = StaticDaoFacade.getScheduledProcessList();
-					System.err.println(scheduledProcList.size()+" == "+sw.getElapsedTime()+ " ms");
+//					System.err.println(scheduledProcList.size()+" == "+sw.getElapsedTime()+ " ms");
 					sw.reset();
 					if(lastReferenceTimeLong==0L){
 						lastReferenceTimeLong=System.currentTimeMillis();
