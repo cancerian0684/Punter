@@ -1152,14 +1152,14 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        shape = new Ellipse2D.Float(0, 0, frame.getWidth(), frame.getHeight());
 	        AWTUtilities.setWindowShape(frame, shape);
 		}catch(Exception e){};*/
-        try {
+       /* try {
 			//invoke AWTUtilities.setWindowOpacity(win, 0.0f); using reflection so that earlier jdk's don't give erros
 			Class awtutil = Class.forName("com.sun.awt.AWTUtilities");
 			Method setWindowOpaque = awtutil.getMethod("setWindowOpacity", Window.class, float.class);
 			setWindowOpaque.invoke(null, frame, (float)0.99);
 			} catch (Exception ex) {
 				ex.printStackTrace();
-			}
+			}*/
         //Display the window.
 		if (SystemTray.isSupported()) {
 		    final SystemTray tray = SystemTray.getSystemTray();
