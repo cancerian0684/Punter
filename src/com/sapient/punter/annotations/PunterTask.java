@@ -7,8 +7,9 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PunterTask {
+public @interface PunterTask{
 String author() default "munishc";
 String name();
 String description() default "";
+String documentation() default "";
 }

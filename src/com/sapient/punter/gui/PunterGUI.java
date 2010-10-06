@@ -66,6 +66,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.text.Document;
 
+import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.executors.ProcessExecutor;
 import com.sapient.punter.executors.ScheduledJobPicker;
 import com.sapient.punter.jpa.ProcessData;
@@ -263,6 +264,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
         taskTable.setAutoCreateRowSorter(true);
         taskTable.setRowHeight(26);
         taskTable.setIntercellSpacing(new Dimension(0, 0));
+        taskTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        taskTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         header = taskTable.getTableHeader();
         headerRenderer = header.getDefaultRenderer();
         if(headerRenderer instanceof JLabel){
@@ -283,7 +286,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 						for (int selectedRow : selectedRows) {
 							ArrayList request=tableModel.getRow(selectedRow);
 							selectedRowsData.add(request);
-			                TaskData task=(TaskData) request.get(6);
+			                TaskData task=(TaskData) request.get(0);
 							try {
 								System.err.println("removing task : "+task.getId());
 								StaticDaoFacade.removeTask(task);
@@ -294,11 +297,12 @@ public class PunterGUI extends JPanel implements TaskObserver{
 						tableModel.deleteRows(selectedRowsData);
 	                }
 			}});
-        final JMenuItem addTaskMenu;
+        final JMenuItem addTaskMenu,taskDocsMenu;
 		final JPopupMenu popupTask = new JPopupMenu();
 		addTaskMenu = new JMenuItem("Add Task");
 	    addTaskMenu.addActionListener(new ActionListener() {
 	          public void actionPerformed(ActionEvent e) {
+	        	  if(processTable.getSelectedRow()!=-1){
 	        	  ArrayList ar = ((ProcessTableModel)processTable.getModel()).getRow(processTable.getSelectedRow());
 	        	  long procId=(Long)((ProcessData)ar.get(0)).getId();
 	        	  System.out.println(procId);
@@ -338,16 +342,48 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        	  }catch(Exception ee){
 	        		  ee.printStackTrace();
 	        	  }
+	        	 }
 	          }
 	    });
 	    popupTask.add(addTaskMenu);
+	    taskDocsMenu = new JMenuItem("Task Docs");
+	    taskDocsMenu.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				 if(taskTable.getSelectedRow()!=-1){
+					 try{
+					 TaskData td=(TaskData) ((TaskTableModel)taskTable.getModel()).getRow(taskTable.getSelectedRow()).get(0);
+					 Class<?> cls = Class.forName(td.getClassName());
+					 Tasks t=(Tasks) cls.newInstance();
+					 PunterTask ann = t.getClass().getAnnotation(PunterTask.class);
+					 System.err.println("url="+ann.documentation());
+					 DocumentationDialog.displayHelp(ann.documentation(), false, frame);
+					 }catch (Exception ee) {
+						 ee.printStackTrace();
+					}
+				 }
+			}
+		});
+	    popupTask.add(taskDocsMenu);
 	    taskTable.addMouseListener(new MouseAdapter() {
 	          //JPopupMenu popup;
 	          public void mousePressed(MouseEvent e) {
-      		  if (SwingUtilities.isRightMouseButton(e)) {
-      			  popupTask.show(e.getComponent(), 
-                            e.getX(), e.getY());
-      		 }
+	        	  int selRow = taskTable.rowAtPoint(e.getPoint());
+//	        	  System.out.println(selRow);
+	        	  if(selRow!=-1){
+	        		  taskTable.setRowSelectionInterval(selRow, selRow);
+	        		  int selRowInModel = taskTable.convertRowIndexToModel(selRow);
+	        	  }
+	      		  if (SwingUtilities.isRightMouseButton(e)) {
+	      			  if(taskTable.getSelectedRow()==-1||selRow==-1){
+	      				taskDocsMenu.setEnabled(false);
+	      			  }else{
+	      				taskDocsMenu.setEnabled(true);
+	      			  }
+	      			  popupTask.show(e.getComponent(), e.getX(), e.getY());
+	      		  	}
 	          }
 	      });
 	    
@@ -455,11 +491,13 @@ public class PunterGUI extends JPanel implements TaskObserver{
         inputParamTable.setPreferredScrollableViewportSize(new Dimension(250, 150));
         inputParamTable.setFillsViewportHeight(true);
         inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
+        inputParamTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         
         outputParamTable = new JTable(new OutputParamTableModel());
         outputParamTable.setShowGrid(true);
         outputParamTable.setPreferredScrollableViewportSize(new Dimension(250, 150));
         outputParamTable.setFillsViewportHeight(true);
+        outputParamTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         initColumnSizes1(outputParamTable);
         ListSelectionModel rowSM = taskTable.getSelectionModel();
         rowSM.addListSelectionListener(new ListSelectionListener() {

@@ -36,6 +36,7 @@ public class StackWindow extends JFrame
         final StringWriter sw = new StringWriter();
         PrintWriter out = new PrintWriter(sw);
         t.printStackTrace(out);
+        t.printStackTrace();
         // Add string to end of text area
         textArea.setText(sw.toString());
         

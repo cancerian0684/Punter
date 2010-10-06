@@ -12,7 +12,7 @@ import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 
-@PunterTask(author="munishc",name="DBExportTask",description="Export DB into specified file.")
+@PunterTask(author="munishc",name="DBExportTask",description="Export DB into specified file.",documentation="com/sapient/punter/tasks/docs/DBExportTask.html")
 public class DBExportTask extends Tasks {
 	@InputParam(required = true)
 	private String targetFile;
