@@ -92,7 +92,6 @@ import com.sun.awt.AWTUtilities;
  */
 public class PunterGUI extends JPanel implements TaskObserver{
     private boolean DEBUG = false;
-    private static JFrame frame;
     private final JTable taskTable;
     private final JTable processPropertyTable;
     private final JTable processTable;
@@ -106,8 +105,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private TextAreaFIFO procLogArea;
     private int selectedRow=-1;
     private final Timer timer;
-    private static BufferedImage busyImage;
-    private static TrayIcon trayIcon;
+  
     
     public PunterGUI() throws Exception {
         super(new GridLayout(1,0));
@@ -310,7 +308,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        		  String taskPackage="com.sapient.punter.tasks.";
 	        		  Object[] possibilities = {"EchoTask", "DBExportTask", "TestTask"};
 	        		  String s = (String)JOptionPane.showInputDialog(
-	        				  			  frame,
+	        				  			  Main.main,
 	        		                      "Choose the Task\n",
 	        		                      "Select Task",
 	        		                      JOptionPane.PLAIN_MESSAGE,
@@ -359,7 +357,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 					 Tasks t=(Tasks) cls.newInstance();
 					 PunterTask ann = t.getClass().getAnnotation(PunterTask.class);
 					 System.err.println("url="+ann.documentation());
-					 DocumentationDialog.displayHelp(ann.documentation(), false, frame);
+					 DocumentationDialog.displayHelp(ann.documentation(), false, Main.main);
 					 }catch (Exception ee) {
 						 ee.printStackTrace();
 					}
@@ -1140,198 +1138,6 @@ public class PunterGUI extends JPanel implements TaskObserver{
         sportColumn.setCellRenderer(renderer);
     }
 
-   
-
-    /**
-     * Create the GUI and show it.  For thread safety,
-     * this method should be invoked from the
-     * event-dispatching thread.
-     * @throws Exception 
-     */
-    private static void createAndShowGUI() throws Exception {
-        //Create and set up the window.
-        frame = new JFrame("My Punter");
-        JFrame.setDefaultLookAndFeelDecorated(true);
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //Create and set up the content pane.
-        PunterGUI newContentPane = new PunterGUI();
-        newContentPane.setOpaque(true); //content panes must be opaque
-        frame.setContentPane(newContentPane);
-        
-        
-		frame.addWindowListener(
- 	        	new java.awt.event.WindowAdapter() {
- 	        		public void windowIconified(WindowEvent e) {
- 	        			//System.err.println("Iconifying window");
-// 	        			frame.dispose(); 
- 	        		 }
- 	        		public void windowClosing(WindowEvent e) {
- 	        			//setVisible(false);
- 	        			frame.dispose(); 
- 	        			displayMsg("Punter has been minimized to System Tray");
- 	        		}
- 	        });	 
-        
-        Thread.UncaughtExceptionHandler handler =
-	         new StackWindow("Unhandled Exception", 500, 400);
-	       Thread.setDefaultUncaughtExceptionHandler(handler);
-	       
-	      /* 
-	       System.setOut( new PrintStream(
-					new ConsoleOutputStream (new Document(), System.out), true));
-			System.setErr( new PrintStream(
-					new ConsoleOutputStream (wcw.getLogArea().getDocument (), null), true));*/
-        /*try{
-			AWTUtilities.setWindowOpacity(frame, 0.990f);
-			Shape shape = null;
-			shape =  new RoundRectangle2D.Float(0, 0, frame.getWidth(), frame.getHeight(), 30, 30);
-	        shape = new Ellipse2D.Float(0, 0, frame.getWidth(), frame.getHeight());
-	        AWTUtilities.setWindowShape(frame, shape);
-		}catch(Exception e){};*/
-       /* try {
-			//invoke AWTUtilities.setWindowOpacity(win, 0.0f); using reflection so that earlier jdk's don't give erros
-			Class awtutil = Class.forName("com.sun.awt.AWTUtilities");
-			Method setWindowOpaque = awtutil.getMethod("setWindowOpacity", Window.class, float.class);
-			setWindowOpaque.invoke(null, frame, (float)0.99);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}*/
-        //Display the window.
-		if (SystemTray.isSupported()) {
-		    final SystemTray tray = SystemTray.getSystemTray();
-	        
-			try {
-	        	busyImage = ImageIO.read(PunterGUI.class.getResource("/images/punter.png"));
-	        	frame.setIconImage(busyImage);
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
-	        catch(Exception e){
-	        	e.printStackTrace();
-	        }
-		    MouseListener mouseListener = new MouseListener() {
-		        public void mouseClicked(MouseEvent e) {
-		        	if(e.getButton()==MouseEvent.BUTTON1){
-		        	frame.setExtendedState(Frame.NORMAL);
-		        	frame.setVisible(true);
-		        	}
-//		            System.out.println("Tray Icon - Mouse clicked!");                 
-		        }
-
-		        public void mouseEntered(MouseEvent e) {
-//		            System.out.println("Tray Icon - Mouse entered!");                 
-		        }
-
-		        public void mouseExited(MouseEvent e) {
-		         //   System.out.println("Tray Icon - Mouse exited!");                 
-		        }
-
-		        public void mousePressed(MouseEvent e) {
-		         //   System.out.println("Tray Icon - Mouse pressed!");                 
-		        }
-
-		        public void mouseReleased(MouseEvent e) {
-		       //     System.out.println("Tray Icon - Mouse released!");                 
-		        }
-		    };
-		    Runtime rt = Runtime.getRuntime();
-		    System.err.println("Main: adding shutdown hook");
-		    rt.addShutdownHook(new Thread() {
-		      public void run() {
-		        System.out.println("Running shutdown hook");
-				System.out.println("Exiting...");
-		      }
-		    });
-
-		    ActionListener exitListener = new ActionListener() {
-		        public void actionPerformed(ActionEvent e) {
-		            int option=JOptionPane.showConfirmDialog(frame,"Exit Punter?","Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
-        			if(option==JOptionPane.OK_OPTION)
-        			{
-        				System.out.println("Removing tray icon");
-        				tray.remove(trayIcon);
-        				Launcher.programQuit();
-        				//dispose();
-        				//System.exit(0);
-        			}
-		        }
-		    };
-		            
-		    PopupMenu popup = new PopupMenu();
-		    MenuItem defaultItem1 = new MenuItem("Open Punter");
-		    defaultItem1.setFont(new Font("Tahoma", Font.BOLD, 12));
-		    defaultItem1.addActionListener(new ActionListener(){
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					
-					frame.setExtendedState(Frame.NORMAL);
-					frame.setVisible(true);
-				}});
-		    popup.add(defaultItem1);
-		   
-		  //  popup.add(new JSeparator());
-		    MenuItem defaultItem = new MenuItem("Exit Punter");
-		    defaultItem.addActionListener(exitListener);
-		    popup.add(defaultItem);
-
-		    trayIcon = new TrayIcon(busyImage, "My Punter", popup);
-		    trayIcon.setToolTip("My Punter started.\nSapient Corp Pvt. Ltd.");
-		    trayIcon.setImageAutoSize(true);
-		   
-		    ActionListener actionListener = new ActionListener() {
-		        public void actionPerformed(ActionEvent e) {
-		        		frame.setExtendedState(Frame.NORMAL);
-		            	frame.setVisible(true);
-		        }
-		    };
-		            
-		    trayIcon.setImageAutoSize(true);
-		    trayIcon.addActionListener(actionListener);
-		    trayIcon.addMouseListener(mouseListener);
-
-		    try {
-		        tray.add(trayIcon);
-		        trayIcon.displayMessage("My Punter", 
-			            "Double click here to launch the Punter.",
-			            TrayIcon.MessageType.INFO);
-		      //  trayIcon.setImage(image);
-		       
-		    } catch (AWTException e) {
-		        System.err.println("TrayIcon could not be added.");
-		    }
-
-		} else {
-
-		    //  System Tray is not supported
-
-		}
-        frame.pack();
-        frame.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        //Schedule a job for the event-dispatching thread:
-        //creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-            	try{
-                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-                    createAndShowGUI();
-                    }catch (Exception e) {
-                    	e.printStackTrace();
-            		}
-            }
-        });
-    }
-    public static void displayMsg(String msg){
-    	if(trayIcon!=null){
-    		trayIcon.displayMessage("My Punter", 
-    				msg,TrayIcon.MessageType.INFO);
-    	}
-    }
-   
     static class DefaultStringRenderer extends DefaultTableCellRenderer {
     	
     	public DefaultStringRenderer() { super(); }
@@ -1440,6 +1246,5 @@ public class PunterGUI extends JPanel implements TaskObserver{
                System.out.println("1111");
            }
         }
-
     }
 }

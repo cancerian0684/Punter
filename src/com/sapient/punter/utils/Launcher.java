@@ -112,6 +112,6 @@ public class Launcher {
 
    public static void main(String[] args) {
       Launcher l = new Launcher();
-      l.launch("com.sapient.punter.gui.PunterGUI");
+      l.launch("com.sapient.punter.gui.Main");
    }
 }
