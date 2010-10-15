@@ -14,6 +14,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -21,6 +23,9 @@ import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
+import org.apache.derby.drda.NetworkServerControl;
+
+import com.sapient.kb.test.PunterKB;
 import com.sapient.punter.executors.ProcessExecutor;
 import com.sapient.punter.utils.Launcher;
 import com.sapient.punter.utils.StackWindow;
@@ -30,6 +35,19 @@ public class Main extends JFrame{
 	private static BufferedImage idleImage;
 	private static TrayIcon trayIcon;
 	public static Main main;
+	private PunterKB punterKBContentPane;
+	private PunterGUI punterContentPane;
+	private static NetworkServerControl serverControl;
+	static{
+		try {
+			serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
+			serverControl.start(null);
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	}
 	private Timer timer=new Timer(2000,new ActionListener(){
 		public void actionPerformed(ActionEvent e) {
 			if (isBusy()){
@@ -54,10 +72,9 @@ public class Main extends JFrame{
 private void createAndShowGUI() throws Exception {
     setDefaultLookAndFeelDecorated(true);
     setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
-    PunterGUI newContentPane = new PunterGUI();
-    newContentPane.setOpaque(true); //content panes must be opaque
-    setContentPane(newContentPane);
+    punterContentPane = new PunterGUI();
+    punterContentPane.setOpaque(true); //content panes must be opaque
+    setContentPane(punterContentPane);
     
 	addWindowListener(
 	        	new java.awt.event.WindowAdapter() {
@@ -139,8 +156,13 @@ private void createAndShowGUI() throws Exception {
 	    System.err.println("Main: adding shutdown hook");
 	    rt.addShutdownHook(new Thread() {
 	      public void run() {
+	    	try {
+	    		System.out.println("Shutting down DB server.");
+				serverControl.shutdown();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 	    	timer.stop();
-	        System.out.println("Running shutdown hook");
 			System.out.println("Exiting...");
 	      }
 	    });
@@ -160,15 +182,40 @@ private void createAndShowGUI() throws Exception {
 	    };
 	            
 	    PopupMenu popup = new PopupMenu();
-	    MenuItem defaultItem1 = new MenuItem("Open Punter");
-	    defaultItem1.setFont(new Font("Tahoma", Font.BOLD, 12));
-	    defaultItem1.addActionListener(new ActionListener(){
+	    MenuItem openPunterMenuItem = new MenuItem("My Punter");
+	    openPunterMenuItem.setFont(new Font("Tahoma", Font.BOLD, 12));
+	    openPunterMenuItem.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if(punterContentPane==null){
+					try {
+						punterContentPane=new PunterGUI();
+						punterContentPane.setOpaque(true);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+					
+				}
+				setContentPane(punterContentPane);
 				setExtendedState(Frame.NORMAL);
 				setVisible(true);
 			}});
-	    popup.add(defaultItem1);
+	    popup.add(openPunterMenuItem);
+	    
+	    openPunterMenuItem = new MenuItem("My KB");
+	    openPunterMenuItem.setFont(new Font("Tahoma", Font.BOLD, 12));
+	    openPunterMenuItem.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(punterKBContentPane==null){
+					punterKBContentPane = new PunterKB();
+					punterKBContentPane.setOpaque(true); //content panes must be opaque
+				}
+		        setContentPane(punterKBContentPane);
+				setExtendedState(Frame.NORMAL);
+				setVisible(true);
+			}});
+	    popup.add(openPunterMenuItem);
 	   
 	  //  popup.add(new JSeparator());
 	    MenuItem defaultItem = new MenuItem("Exit Punter");

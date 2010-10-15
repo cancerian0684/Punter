@@ -31,6 +31,9 @@ import oracle.toplink.essentials.config.TopLinkProperties;
 
 import org.apache.derby.drda.NetworkServerControl;
 
+import com.sapient.kb.jpa.Document;
+import com.sapient.kb.jpa.DocumentService;
+
 /**
  *
  * @author John O'Conner
@@ -38,8 +41,8 @@ import org.apache.derby.drda.NetworkServerControl;
 public class StaticDaoFacade {
 	static{
 		try{
-		final NetworkServerControl serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
-		serverControl.start(null);
+//		final NetworkServerControl serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
+//		serverControl.start(null);
 		Thread.currentThread();
 		Runtime.getRuntime().addShutdownHook(new Thread(){
 			@Override
@@ -47,7 +50,7 @@ public class StaticDaoFacade {
 				 try {
 					 em.close();
 					 emf.close();
-					serverControl.shutdown();
+//					serverControl.shutdown();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -358,5 +361,5 @@ public class StaticDaoFacade {
         em.close();
         emf.close();
     }
-   
+    
 }

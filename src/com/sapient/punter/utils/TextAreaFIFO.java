@@ -45,7 +45,7 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener,TextArea
 		addMouseListener(listener);
 		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 		try {
-			mbs.registerMBean(this,new ObjectName("punter.log.mbean:type=Punter-LogTextArea"));
+			mbs.registerMBean(this,new ObjectName("punter.log.mbean:type=Punter-LogTextArea"+Thread.currentThread().getId()));
 		} catch (MBeanRegistrationException e) {
 			e.printStackTrace();
 		} catch (MalformedObjectNameException e) {

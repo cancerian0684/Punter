@@ -6,6 +6,8 @@
     <class>com.sapient.punter.jpa.ProcessData</class>
     <class>com.sapient.punter.jpa.ProcessHistory</class>
     <class>com.sapient.punter.jpa.TaskHistory</class>
+    <class>com.sapient.kb.jpa.Document</class>
+    <class>com.sapient.kb.jpa.Attachment</class>
     <properties>
       <property name="toplink.jdbc.user" value="punter"/>
       <property name="toplink.jdbc.password" value="punter"/>
