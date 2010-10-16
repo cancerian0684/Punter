@@ -88,6 +88,15 @@ public class StaticDaoFacade {
 	    em.close();
 	    luceneIndexDao.getInstance().indexDocs(doc);
 	    return doc;
+  }
+  public static Attachment saveAttachment(Attachment doc){
+	  	EntityManager em = emf.createEntityManager();
+	  	DocumentService service = new DocumentService(em);
+	    em.getTransaction().begin();
+	    service.saveAttachment(doc);
+	    em.getTransaction().commit();
+	    em.close();
+	    return doc;
 }
   public static Document getDocument(Document doc){
 	  	EntityManager em = emf.createEntityManager();
@@ -95,5 +104,14 @@ public class StaticDaoFacade {
 	  	doc=service.getDocument(doc);
 	    em.close();
 	    return doc;
+}
+public static boolean deleteAttachment(Attachment attch) {
+	EntityManager em = emf.createEntityManager();
+	em.getTransaction().begin();
+  	DocumentService service = new DocumentService(em);
+  	service.deleteAttachment(attch);
+  	em.getTransaction().commit();
+    em.close();
+	return true;
 }
 }

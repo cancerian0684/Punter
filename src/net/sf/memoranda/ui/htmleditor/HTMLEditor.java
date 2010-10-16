@@ -56,7 +56,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
-import com.sapient.kb.test.TestEditor;
+import com.sapient.kb.test.EditorDialog;
 
 import net.sf.memoranda.ui.htmleditor.util.Local;
 
@@ -64,7 +64,7 @@ import net.sf.memoranda.ui.htmleditor.util.Local;
  *  
  */
 public class HTMLEditor extends JPanel {
-	TestEditor testEditor;
+	EditorDialog testEditor;
 	public HTMLEditorPane editor = new HTMLEditorPane("");
 
 
@@ -2788,7 +2788,7 @@ public class HTMLEditor extends JPanel {
 
 	}
 
-	public void registerSavAble(TestEditor testEditor) {
+	public void registerSavAble(EditorDialog testEditor) {
 		this.testEditor=testEditor;
 	}
 }

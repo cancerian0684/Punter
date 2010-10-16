@@ -37,7 +37,7 @@ public class Main extends JFrame{
 	public static Main main;
 	private PunterKB punterKBContentPane;
 	private PunterGUI punterContentPane;
-	private static NetworkServerControl serverControl;
+	public static NetworkServerControl serverControl;
 	static{
 		try {
 			serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);

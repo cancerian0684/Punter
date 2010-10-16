@@ -37,6 +37,7 @@ public class Attachment implements Serializable{
 	private long accessCount;
 	private float priority;
 	private boolean active;
+	private long length;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dateCreated;
 	@Temporal(TemporalType.TIMESTAMP)
@@ -45,9 +46,10 @@ public class Attachment implements Serializable{
 	private String category;
 	private String tag;
 	private String author;
+	private String comments;
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
-	@Column(columnDefinition="clob(2M)",table = "ATTACHMENT_LOB")
+	@Column(columnDefinition="blob(10M)",table = "ATTACHMENT_LOB")
 	private byte[] content;
 	@ManyToOne
 	private Document document;
@@ -123,6 +125,16 @@ public class Attachment implements Serializable{
 	public void setDateAccessed(Date dateAccessed) {
 		this.dateAccessed = dateAccessed;
 	}
-	
-	
+	public long getLength() {
+		return length;
+	}
+	public void setLength(long length) {
+		this.length = length;
+	}
+	public String getComments() {
+		return comments;
+	}
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
 }

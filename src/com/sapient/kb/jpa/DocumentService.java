@@ -19,17 +19,23 @@ public class DocumentService {
     doc.setDateCreated(new Date());
     doc.setCategory("/all/aisdb");
     em.persist(doc);
+    em.flush();
     return doc;
   }
   public void saveDocument(Document doc){
-    em.merge(doc);
+	  doc=em.merge(doc);
+	  em.flush();
   }
   public void updateAccessCounter(Document doc){
 	doc=em.find(Document.class, doc.getId());
+	em.refresh(doc);
 	doc.setAccessCount(doc.getAccessCount()+1);
+	doc.setDateAccessed(new Date());
+	em.flush();
   }
   public Document getDocument(Document doc){
 	  doc=em.find(Document.class, doc.getId());
+	  em.refresh(doc);
 	  return doc;
   }
   public Document createDocument(String title) {
@@ -64,4 +70,12 @@ public class DocumentService {
     Query query = em.createQuery("SELECT e FROM Document e");
     return (Collection<Document>) query.getResultList();
   }
+public void saveAttachment(Attachment doc) {
+	em.persist(doc);
+}
+public void deleteAttachment(Attachment attch) {
+	attch=em.find(Attachment.class, attch.getId());
+	em.remove(attch);
+	em.flush();
+}
 }

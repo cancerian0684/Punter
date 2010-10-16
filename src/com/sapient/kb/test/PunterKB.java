@@ -102,7 +102,7 @@ public class PunterKB extends JPanel{
         			}
 	               if (mEvent.getClickCount() == 2) {
                       	Document doc=(Document) ((DocumentTableModel)table.getModel()).getRow(table.getSelectedRow()).get(0);
-         				TestEditor.showEditor(docService.getDocument(doc),docService,Main.main);
+         				EditorDialog.showEditor(docService.getDocument(doc),docService,Main.main);
          				docService.updateAccessCounter(doc);
 	                  return false;
 	               } else if (!table.isRowSelected(row)) {
@@ -159,7 +159,7 @@ public class PunterKB extends JPanel{
  	          public void actionPerformed(ActionEvent e) {
  	        	  System.out.println("Adding Document");
  	        	  Document doc=docService.createDocument();
- 	        	  TestEditor.showEditor(doc,docService,Main.main);
+ 	        	  EditorDialog.showEditor(doc,docService,Main.main);
  	          }
  	    });
  		popupProcess.add(addProcessMenu);
@@ -169,7 +169,7 @@ public class PunterKB extends JPanel{
  				System.out.println("Opening Document");
  				if(table.getSelectedRow()>=0){
  				Document doc=(Document) ((DocumentTableModel)table.getModel()).getRow(table.getSelectedRow()).get(0);
- 				TestEditor.showEditor(docService.getDocument(doc),docService,Main.main);
+ 				EditorDialog.showEditor(docService.getDocument(doc),docService,Main.main);
  				docService.updateAccessCounter(doc);
  				}
  			}

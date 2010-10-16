@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -46,11 +47,12 @@ public class Document implements Serializable{
 	@Basic(fetch = FetchType.LAZY)
 	@Column(columnDefinition="clob(2M)",table = "DOCUMENT_LOB")
 	private String content;
+	private String md5;
 	@Transient
 	private String plainContent="";
 	@OneToMany(fetch=FetchType.LAZY)
     private Collection<Document> relatedDocs;
-	@OneToMany(mappedBy="document",fetch=FetchType.LAZY)
+	@OneToMany(mappedBy="document",fetch=FetchType.LAZY,cascade=CascadeType.ALL)
     private Collection<Attachment> attachments;
 	@ManyToMany(fetch=FetchType.LAZY)
 	private Collection<Document> referenceDocs; 
@@ -158,6 +160,12 @@ public class Document implements Serializable{
 	}
 	public void setDateAccessed(Date dateAccessed) {
 		this.dateAccessed = dateAccessed;
+	}
+	public String getMd5() {
+		return md5;
+	}
+	public void setMd5(String md5) {
+		this.md5 = md5;
 	}
 	
 	/*@Override
