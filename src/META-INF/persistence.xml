@@ -15,10 +15,10 @@
       <property name="toplink.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver"/>
       <property name="toplink.ddl-generation" value="create-tables"/>
       <property name="com.acme.persistence.sql-logging" value="on"/>
-      <property name="toplink.jdbc.read-connections.max" value="2"/>
+      <property name="toplink.jdbc.read-connections.max" value="1"/>
       <property name="toplink.jdbc.read-connections.min" value="1"/>
       <property name="toplink.jdbc.read-connections.shared" value="true"/>
-      <property name="toplink.jdbc.write-connections.max" value="2"/>
+      <property name="toplink.jdbc.write-connections.max" value="1"/>
       <property name="toplink.jdbc.bind-parameters" value="true"/>
     </properties>
   </persistence-unit>
