@@ -25,7 +25,7 @@ import javax.swing.UIManager;
 
 import org.apache.derby.drda.NetworkServerControl;
 
-import com.sapient.kb.test.PunterKB;
+import com.sapient.kb.gui.PunterKB;
 import com.sapient.punter.executors.ProcessExecutor;
 import com.sapient.punter.utils.Launcher;
 import com.sapient.punter.utils.StackWindow;
@@ -42,6 +42,8 @@ public class Main extends JFrame{
 		try {
 			serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
 			serverControl.start(null);
+			serverControl.logConnections(true);
+			System.err.println(serverControl.getRuntimeInfo());
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		} catch (Exception e1) {
