@@ -138,7 +138,7 @@ public class LuceneIndexDao {
 		Collection<Attachment> attchmts = pDoc.getAttachments();
 		StringBuilder attchs=new StringBuilder();
 		for (Attachment attachment : attchmts) {
-			attchs.append(PunterTextExtractor.getText(attachment.getContent(), attachment.getTitle()));
+			attchs.append(PunterTextExtractor.getText(attachment.getContent(), attachment.getTitle())+" "+attachment.getTitle()+" ");
 		}
 		System.out.println(attchs.toString());
 		doc.add(new Field("attachment", attchs.toString(), Field.Store.NO, Field.Index.ANALYZED));
