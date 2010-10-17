@@ -17,7 +17,7 @@ public class DocumentService {
     doc.setTitle(title);
     doc.setContent(Content);
     doc.setDateCreated(new Date());
-    doc.setCategory("/all/aisdb");
+    doc.setCategory("/all");
     em.persist(doc);
     em.flush();
     return doc;
@@ -28,9 +28,9 @@ public class DocumentService {
   }
   public void updateAccessCounter(Document doc){
 	doc=em.find(Document.class, doc.getId());
-	em.refresh(doc);
 	doc.setAccessCount(doc.getAccessCount()+1);
 	doc.setDateAccessed(new Date());
+	em.merge(doc);
 	em.flush();
   }
   public Document getDocument(Document doc){
@@ -64,10 +64,9 @@ public class DocumentService {
     return emp;
   }
 
-
-
   public Collection<Document> findAllDocuments() {
     Query query = em.createQuery("SELECT e FROM Document e");
+    query.setHint("toplink.refresh", "true");
     return (Collection<Document>) query.getResultList();
   }
 public void saveAttachment(Attachment doc) {
@@ -75,6 +74,11 @@ public void saveAttachment(Attachment doc) {
 }
 public void deleteAttachment(Attachment attch) {
 	attch=em.find(Attachment.class, attch.getId());
+	em.remove(attch);
+	em.flush();
+}
+public void deleteDocument(Document attch) {
+	attch=em.find(Document.class, attch.getId());
 	em.remove(attch);
 	em.flush();
 }

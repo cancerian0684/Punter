@@ -5,19 +5,22 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 
 import org.apache.derby.drda.NetworkServerControl;
 
-import com.sapient.kb.test.LuceneIndexDao;
+import com.sapient.kb.gui.LuceneIndexDao;
 
 public class StaticDaoFacade {
 	private static LuceneIndexDao luceneIndexDao;
 	private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("punter");
 	static{
 		try{
-		/*final NetworkServerControl serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
-		serverControl.start(null);*/
+		final NetworkServerControl serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
+		try{
+			serverControl.getRuntimeInfo();
+		}catch (Exception e) {
+			serverControl.start(null);
+		}
 		Thread.currentThread();
 		Runtime.getRuntime().addShutdownHook(new Thread(){
 			@Override
@@ -63,18 +66,14 @@ public class StaticDaoFacade {
 	    em.getTransaction().begin();
 
 	    Document doc = service.createDocument("test title","");
-	    System.out.println("Documents:");
-	    for (Document emp : service.findAllDocuments()) {
-	      System.out.println(emp.getCategory());
-	      luceneIndexDao.getInstance().indexDocs(emp);
-	    }
+	    luceneIndexDao.getInstance().indexDocs(doc);
 	    em.getTransaction().commit();
 	    em.close();
 	    return doc;
   }
-  public static List<Document> getDocList(String q){
+  public static List<Document> getDocList(String q,String category){
 	   long t1=System.currentTimeMillis();
-	   List<Document> result = luceneIndexDao.getInstance().search(q, 0, 100);
+	   List<Document> result = luceneIndexDao.getInstance().search(q, category,0, 100);
 	   long t2=System.currentTimeMillis();
 	   System.err.println("time consumed : "+(t2-t1));
 	   return result;
@@ -89,20 +88,24 @@ public class StaticDaoFacade {
 	    luceneIndexDao.getInstance().indexDocs(doc);
 	    return doc;
   }
-  public static Attachment saveAttachment(Attachment doc){
+  public static Attachment saveAttachment(Attachment attach){
 	  	EntityManager em = emf.createEntityManager();
 	  	DocumentService service = new DocumentService(em);
 	    em.getTransaction().begin();
-	    service.saveAttachment(doc);
+	    service.saveAttachment(attach);
 	    em.getTransaction().commit();
 	    em.close();
-	    return doc;
+	    luceneIndexDao.getInstance().indexDocs(attach.getDocument());
+	    return attach;
 }
   public static Document getDocument(Document doc){
 	  	EntityManager em = emf.createEntityManager();
+	  	try{
 	  	DocumentService service = new DocumentService(em);
 	  	doc=service.getDocument(doc);
+	  	}finally{
 	    em.close();
+	  	}
 	    return doc;
 }
 public static boolean deleteAttachment(Attachment attch) {
@@ -112,6 +115,27 @@ public static boolean deleteAttachment(Attachment attch) {
   	service.deleteAttachment(attch);
   	em.getTransaction().commit();
     em.close();
+    luceneIndexDao.getInstance().indexDocs(attch.getDocument());
 	return true;
+}
+public static boolean deleteDocument(Document attch) {
+	EntityManager em = emf.createEntityManager();
+	em.getTransaction().begin();
+  	DocumentService service = new DocumentService(em);
+  	service.deleteDocument(attch);
+  	em.getTransaction().commit();
+    em.close();
+    LuceneIndexDao.getInstance().deleteIndexForDoc(attch);
+	return true;
+}
+public static void rebuildIndex(){
+	EntityManager em = emf.createEntityManager();
+	em.getTransaction().begin();
+  	DocumentService service = new DocumentService(em);
+    for (Document emp : service.findAllDocuments()) {
+      System.out.println(emp.getCategory());
+      luceneIndexDao.getInstance().indexDocs(emp);
+    }
+    em.close();
 }
 }
