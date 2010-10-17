@@ -56,7 +56,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
-import com.sapient.kb.test.DocumentEditor;
+import com.sapient.kb.gui.DocumentEditor;
 
 import net.sf.memoranda.ui.htmleditor.util.Local;
 
