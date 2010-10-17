@@ -7,7 +7,24 @@
 	<classpathentry kind="lib" path="lib/toplink-essentials.jar"/>
 	<classpathentry kind="lib" path="lib/derbyclient.jar"/>
 	<classpathentry kind="lib" path="lib/derbynet.jar"/>
+	<classpathentry kind="lib" path="lib/cron4j-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/mail.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.0-beta.jar"/>
+	<classpathentry kind="lib" path="lib/jericho-html-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-core-3.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-highlighter-3.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-memory-3.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-snowball-3.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/memoranda.jar"/>
+	<classpathentry kind="lib" path="lib/poi-3.6-20091214.jar" sourcepath="C:/Users/Munish/.m2/repository/org/apache/poi/poi/3.6/poi-3.6-sources.jar"/>
+	<classpathentry kind="lib" path="lib/poi-contrib-3.6-20091214.jar"/>
+	<classpathentry kind="lib" path="lib/poi-examples-3.6-20091214.jar"/>
+	<classpathentry kind="lib" path="lib/poi-ooxml-3.6-20091214.jar"/>
+	<classpathentry kind="lib" path="lib/poi-ooxml-schemas-3.6-20091214.jar"/>
+	<classpathentry kind="lib" path="lib/poi-scratchpad-3.6-20091214.jar"/>
+	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/geronimo-stax-api_1.0_spec-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Cron4j"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
