@@ -71,9 +71,9 @@ public class StaticDaoFacade {
 	    em.close();
 	    return doc;
   }
-  public static List<Document> getDocList(String q,String category){
+  public static List<Document> getDocList(String q,String category,boolean isSpclTxt){
 	   long t1=System.currentTimeMillis();
-	   List<Document> result = luceneIndexDao.getInstance().search(q, category,0, 100);
+	   List<Document> result = luceneIndexDao.getInstance().search(q, category,isSpclTxt,0, 100);
 	   long t2=System.currentTimeMillis();
 	   System.err.println("time consumed : "+(t2-t1));
 	   return result;

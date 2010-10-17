@@ -287,7 +287,7 @@ public class LuceneIndexDao {
 		readerReadWriteLock.writeLock().unlock();
 		writerWriteLock.unlock();
 	}
-	public List<Document> search(String searchString,String category,int start, int batch){
+	public List<Document> search(String searchString,String category,boolean isSpclTxt,int start, int batch){
 		try {
 			if (!ireader.isCurrent()) {
 				System.out.println("Refreshing IndexSearcher version to :"+ ireader.getCurrentVersion(FSDirectory));
@@ -303,6 +303,7 @@ public class LuceneIndexDao {
 			if(searchString.isEmpty()){
 				return Collections.EMPTY_LIST;
 			}
+			if(isSpclTxt)
 			searchString=itrim(getPunterParsedText(searchString));
 			parser1.setAllowLeadingWildcard(true);
 			parser1.setDefaultOperator(QueryParser.OR_OPERATOR);
