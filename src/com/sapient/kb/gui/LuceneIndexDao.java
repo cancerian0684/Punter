@@ -121,7 +121,7 @@ public class LuceneIndexDao {
 	public static org.apache.lucene.document.Document Document(Document pDoc) {
 		org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
 		doc.add(new Field("id",""+ pDoc.getId(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-		doc.add(new Field("title", pDoc.getTitle(), Field.Store.YES, Field.Index.ANALYZED));
+		doc.add(new Field("title", getPunterParsedText(pDoc.getTitle()), Field.Store.YES, Field.Index.ANALYZED));
 		doc.add(new Field("category", pDoc.getCategory(), Field.Store.YES, Field.Index.ANALYZED));
 		doc.add(new Field("created",DateTools.timeToString(pDoc.getDateCreated().getTime(), DateTools.Resolution.MINUTE),
 		Field.Store.YES, Field.Index.NOT_ANALYZED));
@@ -130,8 +130,12 @@ public class LuceneIndexDao {
 			source = new Source(new StringReader(pDoc.getContent()));
 			TextExtractor te=new TextExtractor(source);
 //			System.err.println(te);
-			String contents=te.toString().toLowerCase();
-			doc.add(new Field("contents", contents.substring(0, contents.length()>10000?10000:contents.length()), Field.Store.YES, Field.Index.ANALYZED));
+			String contents=itrim(getPunterParsedText(te.toString().toLowerCase()));
+			int len=contents.length();
+			doc.add(new Field("contents", contents.substring(0, len>10000?10000:len), Field.Store.YES, Field.Index.ANALYZED));
+//			String content=te.toString().toLowerCase();
+//			len=content.length();
+//			doc.add(new Field("content", content.substring(0, len>10000?10000:len), Field.Store.YES, Field.Index.NOT_ANALYZED));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -140,9 +144,37 @@ public class LuceneIndexDao {
 		for (Attachment attachment : attchmts) {
 			attchs.append(PunterTextExtractor.getText(attachment.getContent(), attachment.getTitle())+" "+attachment.getTitle()+" ");
 		}
-		System.out.println(attchs.toString());
-		doc.add(new Field("attachment", attchs.toString(), Field.Store.NO, Field.Index.ANALYZED));
+//		System.out.println(attchs.toString());
+		doc.add(new Field("attachment", itrim(getPunterParsedText(attchs.toString())), Field.Store.NO, Field.Index.ANALYZED));
 		return doc;
+	}
+	public static String getPunterParsedText(String inText){
+		StringBuilder sb=new StringBuilder();
+		char curr;
+		char prev='\0';
+		for (int i = 0; i < inText.length(); i++) {
+			curr=inText.charAt(i);
+			if(!Character.isLetter(curr)&&Character.isLetter(prev)){
+//				System.err.println("boundary .. "+curr);
+				sb.append(' ');
+				if(Character.isLetterOrDigit(curr))
+					sb.append(curr);
+			}
+			else if(Character.isLetter(curr)&&!Character.isLetter(prev)){
+//				System.err.println("boundary .. "+curr);
+				sb.append(' ');
+				if(Character.isLetterOrDigit(curr))
+					sb.append(curr);
+			}else{	
+				if(Character.isLetterOrDigit(curr))
+					sb.append(curr);
+				else
+					sb.append(' ');
+					
+			}
+			prev=curr;
+		}
+		return sb.toString();
 	}
 	public void deleteIndex(){
 		writerWriteLock.lock();
@@ -255,7 +287,7 @@ public class LuceneIndexDao {
 		readerReadWriteLock.writeLock().unlock();
 		writerWriteLock.unlock();
 	}
-	public List<Document> search(String q,String category,int start, int batch){
+	public List<Document> search(String searchString,String category,int start, int batch){
 		try {
 			if (!ireader.isCurrent()) {
 				System.out.println("Refreshing IndexSearcher version to :"+ ireader.getCurrentVersion(FSDirectory));
@@ -265,12 +297,13 @@ public class LuceneIndexDao {
 			}
 //			TermEnum terms = ireader.terms(new Term("title", ""));
 //			System.out.println(terms.);
-			q = q.trim().toLowerCase();
+			searchString = searchString.trim().toLowerCase();
 			// Parse a simple query that searches for "text":
 			readerReadWriteLock.readLock().lock();
-			if(q.isEmpty()){
+			if(searchString.isEmpty()){
 				return Collections.EMPTY_LIST;
 			}
+			searchString=itrim(getPunterParsedText(searchString));
 			parser1.setAllowLeadingWildcard(true);
 			parser1.setDefaultOperator(QueryParser.OR_OPERATOR);
 			/*if (false) {
@@ -278,7 +311,7 @@ public class LuceneIndexDao {
 			} else {
 			}*/
 			QueryParser parser2 = new QueryParser(Version.LUCENE_30,"category",analyzer);
-			Query query1 = parser1.parse(q);
+			Query query1 = parser1.parse(searchString);
 			Query query2 = parser2.parse(category);
 			BooleanQuery query = new BooleanQuery();
 			query.add(query1,  BooleanClause.Occur.MUST);
