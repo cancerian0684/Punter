@@ -66,6 +66,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.text.Document;
 
+import com.sapient.kb.utils.TestEditor;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.executors.ProcessExecutor;
 import com.sapient.punter.executors.ScheduledJobPicker;
@@ -105,7 +106,14 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private TextAreaFIFO procLogArea;
     private int selectedRow=-1;
     private final Timer timer;
-  
+    private static Properties taskProps=new Properties();
+    static{
+    	try {
+			taskProps.load(PunterGUI.class.getClassLoader().getResourceAsStream("resources/tasks.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
     
     public PunterGUI() throws Exception {
         super(new GridLayout(1,0));
@@ -305,8 +313,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        	  long procId=(Long)((ProcessData)ar.get(0)).getId();
 	        	  System.out.println(procId);
 	        	  try{
-	        		  String taskPackage="com.sapient.punter.tasks.";
-	        		  Object[] possibilities = {"EchoTask", "DBExportTask", "TestTask"};
+	        		  Object[] possibilities =taskProps.keySet().toArray();
 	        		  String s = (String)JOptionPane.showInputDialog(
 	        				  			  Main.main,
 	        		                      "Choose the Task\n",
@@ -314,12 +321,12 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        		                      JOptionPane.PLAIN_MESSAGE,
 	        		                      null,
 	        		                      possibilities,
-	        		                      "EchoTask");
+	        		                      possibilities[0]);
 
 	        		  //If a string was returned, say so.
 	        		  if ((s != null) && (s.length() > 0)) {
 	        		      System.out.println("Selected Task... " + s + "!");
-	        		      Class<?> cls = Class.forName(taskPackage+s);
+	        		      Class<?> cls = Class.forName(taskProps.getProperty(s));
 	    	        	  HashMap<String, OutputParamValue> outProp = Tasks.listOutputParams((Tasks)cls.newInstance());
 	    	        	  HashMap<String, InputParamValue> inProp=Tasks.listInputParams((Tasks)cls.newInstance());
 	    	        	  
@@ -327,7 +334,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	    	        	  task.setInputParams(inProp);
 	    	        	  task.setOutputParams(outProp);
 	    	        	  task.setName(s);
-	    	        	  task.setClassName(taskPackage+s);
+	    	        	  task.setClassName(taskProps.getProperty(s));
 	    	        	  ProcessData p=new ProcessData();
 	    	        	  p.setId(procId);
 	    	        	  task.setProcess(p);
