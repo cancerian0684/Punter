@@ -1,6 +1,7 @@
 package com.sapient.kb.gui;
 
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -260,7 +261,9 @@ public class PunterKB extends JPanel{
  				System.out.println("Clearing old index");
  				LuceneIndexDao.getInstance().deleteIndex();
  				System.out.println("Rebuilding Index");
+ 				PunterKB.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
  				docService.rebuildIndex();
+ 				PunterKB.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
  			}
  		});
  		popupProcess.add(reindexDocsMenu);

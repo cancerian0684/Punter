@@ -28,6 +28,8 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermEnum;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -36,6 +38,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.CachingWrapperFilter;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MultiPhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.highlight.Highlighter;
@@ -57,47 +60,10 @@ public class LuceneIndexDao {
 	private IndexReader ireader;
 	private final Lock writerWriteLock = new ReentrantLock();
 	private ReentrantReadWriteLock readerReadWriteLock = new ReentrantReadWriteLock();
-	public static final String[] STOP_WORDS =
-    {
-       /* "0", "1", "2", "3", "4", "5", "6", "7", "8",
-        "9", "000", "$",*/
-        "about", "after", "also", "an", "and",
-        "another", "any", "are", "as", "at", "be",
-        "because", "been", "before", "being", "between",
-        "both", "but", "by", "came", "can", "come",
-        "could", "did", "do", "does", "each", "else",
-        "for", "from", "get", "got", "has", "had",
-        "he", "have", "her", "here", "him", "himself",
-        "his", "how","if", "in", "into", "is", "it",
-        "its", "just", "like", "make", "many", "me",
-        "might", "more", "most", "much", "must", "my",
-        "never", "now", "of", "on", "only", "or",
-        "other", "our", "out", "over", "re", "said",
-        "same", "see", "should", "since", "so", "some",
-        "still", "such", "take", "than", "that", "the",
-        "their", "them", "then", "there", "these",
-        "they", "this", "those", "through", "to", "too",
-        "under", "up", "use", "very", "want", "was",
-        "way", "we", "well", "were", "what", "when",
-        "where", "which", "while", "who", "will",
-        "with", "would", "you", "your",
-        "a", "b", "c", "d", "e", "f", "g", "h", "i",
-        "j", "k", "l", "m", "n", "o", "p", "q", "r",
-        "s", "t", "u", "v", "w", "x", "y", "z",
-        "a", "an", "and", "are", "as", "at", "be", "but", "by",
-        "for", "if", "in", "into", "is", "it",
-        "no", "not", "of", "on", "or", "such",
-        "that", "the", "their", "then", "there", "these",
-        "they", "this", "to", "was", "will", "with","/"
-    };
-	final CharArraySet stopSet = new CharArraySet(STOP_WORDS.length, false);
-    {
-    	stopSet.addAll(Arrays.asList(STOP_WORDS));  
-    }
-	Analyzer analyzer = new SnowballAnalyzer(Version.LUCENE_30,"English", CharArraySet.unmodifiableSet(stopSet));
-	
+	private Analyzer analyzer = new PunterAnalyzer();
 	private static LuceneIndexDao luceneIndexDao;
 	private final QueryParser parser1;
+	private final QueryParser parser2;
 	public void refreshIsearcher() {
 		try {
 			IndexReader tempReader = IndexReader.open(FSDirectory, true);
@@ -126,13 +92,12 @@ public class LuceneIndexDao {
 		doc.add(new Field("id",""+ pDoc.getId(), Field.Store.YES, Field.Index.NOT_ANALYZED));
 		doc.add(new Field("title", getPunterParsedText(pDoc.getTitle()), Field.Store.YES, Field.Index.ANALYZED));
 		doc.add(new Field("category", pDoc.getCategory(), Field.Store.YES, Field.Index.ANALYZED));
-		doc.add(new Field("created",DateTools.timeToString(pDoc.getDateCreated().getTime(), DateTools.Resolution.MINUTE),
-		Field.Store.YES, Field.Index.NOT_ANALYZED));
+		doc.add(new Field("created",DateTools.timeToString(pDoc.getDateCreated().getTime(), DateTools.Resolution.MINUTE),Field.Store.YES, Field.Index.NOT_ANALYZED));
 		Source source;
 		try {
 			source = new Source(new StringReader(pDoc.getContent()));
 			TextExtractor te=new TextExtractor(source);
-			String contents=itrim(getPunterParsedText(te.toString().toLowerCase()));
+			String contents=itrim(getPunterParsedText(te.toString()));
 			int len=contents.length();
 			doc.add(new Field("contents", contents.substring(0, len>10000?10000:len), Field.Store.YES, Field.Index.ANALYZED));
 //			String content=te.toString().toLowerCase();
@@ -144,7 +109,7 @@ public class LuceneIndexDao {
 		Collection<Attachment> attchmts = pDoc.getAttachments();
 		StringBuilder attchs=new StringBuilder();
 		for (Attachment attachment : attchmts) {
-			attchs.append(PunterTextExtractor.getText(attachment.getContent(), attachment.getTitle())+" "+attachment.getTitle()+" ");
+			attchs.append(PunterTextExtractor.getText(attachment.getContent(), attachment.getTitle())+" ");
 		}
 //		System.out.println(attchs.toString());
 		doc.add(new Field("attachment", itrim(getPunterParsedText(attchs.toString())), Field.Store.NO, Field.Index.ANALYZED));
@@ -202,7 +167,7 @@ public class LuceneIndexDao {
 	}
 	public void indexDocs(Document doc){
 		writerWriteLock.lock();
-		QueryParser parser = new QueryParser(Version.LUCENE_30,"id", new SnowballAnalyzer(Version.LUCENE_30,"English"));
+		QueryParser parser = new QueryParser(Version.LUCENE_30,"id", analyzer);
 		try {
 			Query query = parser.parse(QueryParser.escape(""+doc.getId()));
 			FSWriter.deleteDocuments(query);
@@ -230,52 +195,53 @@ public class LuceneIndexDao {
 		}
 	 }
 	private LuceneIndexDao(){
-		  try {
-			    FSDirectory = NIOFSDirectory.open(INDEX_DIR);
-				FSDirectory.clearLock("write.lock");
-				boolean alreadyExists = IndexReader.indexExists(FSDirectory);
-				if (!alreadyExists) {
-					System.out.println("Index directory does not exists. Creating one.");
-				}
-				FSWriter = new IndexWriter(FSDirectory, analyzer, !alreadyExists,
-						IndexWriter.MaxFieldLength.UNLIMITED);
-				FSWriter.setRAMBufferSizeMB(50);
-				FSWriter.maybeMerge();
-				FSWriter.optimize();
-				ireader = IndexReader.open(FSDirectory, true);
-				isearcher = new IndexSearcher(ireader);
-				
-				Runtime rt = Runtime.getRuntime();
-				rt.addShutdownHook(new Thread() {
-					public void run() {
-						try {
-							System.out.println("System shutdown initiated.");
-							readerReadWriteLock.writeLock().lock();
-							writerWriteLock.lock();
-							ireader.close();
-							FSWriter.optimize();
-							FSWriter.close();
-							FSDirectory.close();
-						} catch (Exception ex) {
-							ex.printStackTrace();
-						} finally {
-							readerReadWriteLock.writeLock().unlock();
-							writerWriteLock.unlock();
-							System.out.println("Lucene shutdown completed.");
-						}
+	  try {
+		    FSDirectory = NIOFSDirectory.open(INDEX_DIR);
+			FSDirectory.clearLock("write.lock");
+			boolean alreadyExists = IndexReader.indexExists(FSDirectory);
+			if (!alreadyExists) {
+				System.out.println("Index directory does not exists. Creating one.");
+			}
+			FSWriter = new IndexWriter(FSDirectory, analyzer, !alreadyExists,
+					IndexWriter.MaxFieldLength.UNLIMITED);
+			FSWriter.setRAMBufferSizeMB(50);
+			FSWriter.maybeMerge();
+			FSWriter.optimize();
+			ireader = IndexReader.open(FSDirectory, true);
+			isearcher = new IndexSearcher(ireader);
+			
+			Runtime rt = Runtime.getRuntime();
+			rt.addShutdownHook(new Thread() {
+				public void run() {
+					try {
+						System.out.println("Lucene shutdown initiated.");
+						readerReadWriteLock.writeLock().lock();
+						writerWriteLock.lock();
+						ireader.close();
+						FSWriter.optimize();
+						FSWriter.close();
+						FSDirectory.close();
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					} finally {
+						readerReadWriteLock.writeLock().unlock();
+						writerWriteLock.unlock();
+						System.out.println("Lucene shutdown completed.");
 					}
-				});
-		    } catch (IOException e) {
-		      System.out.println(" caught a " + e.getClass() +
-		       "\n with message: " + e.getMessage());
-		    }
+				}
+			});
+	    } catch (IOException e) {
+	      System.out.println(" caught a " + e.getClass() +
+	       "\n with message: " + e.getMessage());
+	    }
 		Map <String,Float> boostMap=new HashMap<String, Float>();
-		boostMap.put("title", 5.0f);
+		boostMap.put("title", 4.0f);
 		boostMap.put("contents", 3.0f);
 		boostMap.put("id", 5.0f);
 		boostMap.put("attachment", 1.0f);
-		boostMap.put("tags", 5.0f);
+		boostMap.put("tags", 4.0f);
 		parser1 = new MultiFieldQueryParser(Version.LUCENE_30, new String []{"title","contents","id","attachment","tags"}, analyzer, boostMap);
+		parser2 = new QueryParser(Version.LUCENE_30,"category",analyzer);
 	}
 	public void optimizeIndex(){
 		readerReadWriteLock.writeLock().lock();
@@ -306,10 +272,12 @@ public class LuceneIndexDao {
 			} else {
 				 System.err.println("Index not modified yet.");
 			}
-//			TermEnum terms = ireader.terms(new Term("title", ""));
-//			System.out.println(terms.);
+			/*System.err.println("Listing all the terms ");
+			TermEnum terms = ireader.terms(new Term("content", ""));
+			while(terms.next())
+			System.out.println(terms.term().text());
+			System.err.println("Listing all the terms done..");*/
 			searchString = searchString.trim().toLowerCase();
-			// Parse a simple query that searches for "text":
 			readerReadWriteLock.readLock().lock();
 			if(searchString.isEmpty()){
 				return Collections.EMPTY_LIST;
@@ -322,9 +290,11 @@ public class LuceneIndexDao {
 				parser.setDefaultOperator(QueryParser.AND_OPERATOR);
 			} else {
 			}*/
-			QueryParser parser2 = new QueryParser(Version.LUCENE_30,"category",analyzer);
 			Query query1 = parser1.parse(searchString);
 			Query query2 = parser2.parse(category);
+//			MultiPhraseQuery leaningTower = new MultiPhraseQuery();
+//			leaningTower.add(new Term("content", "tower"));
+//			leaningTower.add(new Term("content", "tower"));
 			BooleanQuery query = new BooleanQuery();
 			query.add(query1,  BooleanClause.Occur.MUST);
 			query.add(query2, BooleanClause.Occur.MUST);
@@ -342,12 +312,11 @@ public class LuceneIndexDao {
 //				System.err.println(exp.getDescription());
 			     org.apache.lucene.document.Document doc = isearcher.doc(hits.scoreDocs[i].doc);                    //get the next document 
                  Document document=new Document();
-                 try {
-					document.setDateCreated(DateTools.stringToDate(doc.get("created")));
-				} catch (java.text.ParseException e) {
-					e.printStackTrace();
-				}
-				
+            	 try {
+            		 document.setDateCreated(DateTools.stringToDate(doc.get("created")));
+            	 } catch (java.text.ParseException e) {
+            		 e.printStackTrace();
+            	 }
 				 document.setCategory(doc.get("category"));
                  document.setId(Long.parseLong(doc.get("id")));
                  String title=doc.get("title");

@@ -14,6 +14,7 @@ public static String getText(byte [] contents,String title){
 	StringBuilder text=new StringBuilder();
 	ByteArrayInputStream bais=new ByteArrayInputStream(contents);
 	String tt=title.toLowerCase();
+	text.append(tt+" ");
 	try{
 	if(tt.endsWith(".html")||tt.endsWith(".htm")){
 		
