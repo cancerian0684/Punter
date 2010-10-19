@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -146,6 +147,14 @@ public class LuceneIndexDao {
 		}
 //		System.out.println(attchs.toString());
 		doc.add(new Field("attachment", itrim(getPunterParsedText(attchs.toString())), Field.Store.NO, Field.Index.ANALYZED));
+		if(pDoc.getTag()!=null){
+		StringTokenizer stk=new StringTokenizer(pDoc.getTag(), " ;,");
+		StringBuilder tags=new StringBuilder();
+		while(stk.hasMoreTokens()){
+			tags.append(stk.nextToken()+" ");
+		}
+		doc.add(new Field("tags", itrim(getPunterParsedText(tags.toString())), Field.Store.NO, Field.Index.ANALYZED));
+		}
 		return doc;
 	}
 	public static String getPunterParsedText(String inText){
@@ -264,7 +273,8 @@ public class LuceneIndexDao {
 		boostMap.put("contents", 3.0f);
 		boostMap.put("id", 5.0f);
 		boostMap.put("attachment", 1.0f);
-		parser1 = new MultiFieldQueryParser(Version.LUCENE_30, new String []{"title","contents","id","attachment"}, analyzer, boostMap);
+		boostMap.put("tags", 5.0f);
+		parser1 = new MultiFieldQueryParser(Version.LUCENE_30, new String []{"title","contents","id","attachment","tags"}, analyzer, boostMap);
 	}
 	public void optimizeIndex(){
 		readerReadWriteLock.writeLock().lock();

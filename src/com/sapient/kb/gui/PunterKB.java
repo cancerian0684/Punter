@@ -204,7 +204,7 @@ public class PunterKB extends JPanel{
          c.gridy = 1;
          add(new JScrollPane(searchResultTable), c);
 
-         final JMenuItem addProcessMenu,openDocMenu,deleteDocMenu,reindexDocsMenu;
+         final JMenuItem addProcessMenu,openDocMenu,deleteDocMenu,docTagsMenu,reindexDocsMenu;
  		 final JPopupMenu popupProcess = new JPopupMenu();
  		 addProcessMenu = new JMenuItem("Add Document");
  		 addProcessMenu.addActionListener(new ActionListener() {
@@ -241,6 +241,19 @@ public class PunterKB extends JPanel{
  		});
  		popupProcess.add(deleteDocMenu);
  		
+ 		docTagsMenu = new JMenuItem("Document Tags");
+ 		docTagsMenu.addActionListener(new ActionListener() {
+ 			public void actionPerformed(ActionEvent e) {
+ 				System.out.println("Document Tags");
+ 				if(searchResultTable.getSelectedRow()>=0){
+ 					DocumentTableModel dtm = (DocumentTableModel)searchResultTable.getModel();
+	 				Document doc=(Document)dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+	 				TagDialog.getInstance(doc, docService);
+ 				}
+ 			}
+ 		});
+ 		popupProcess.add(docTagsMenu);
+ 		
  		reindexDocsMenu = new JMenuItem("Rebuild Index");
  		reindexDocsMenu.addActionListener(new ActionListener() {
  			public void actionPerformed(ActionEvent e) {
@@ -268,9 +281,11 @@ public class PunterKB extends JPanel{
 	 		        			  selectedRow=searchResultTable.convertRowIndexToModel(selectedRow);
 	 		        			  openDocMenu.setEnabled(true);
 	 		        			  deleteDocMenu.setEnabled(true);
+	 		        			  docTagsMenu.setEnabled(true);
  		        			  }else{
  		        				  openDocMenu.setEnabled(false);
  		        				  deleteDocMenu.setEnabled(false);
+ 		        				  docTagsMenu.setEnabled(false);
  		        			  }
  		        			  popupProcess.show(e.getComponent(),e.getX(), e.getY());
  		        		 }
