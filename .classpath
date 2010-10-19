@@ -11,7 +11,7 @@
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang3-3.0-beta.jar"/>
 	<classpathentry kind="lib" path="lib/jericho-html-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/lucene-core-3.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-core-3.0.2.jar" sourcepath="C:/Users/Munish/.m2/repository/org/apache/lucene/lucene-core/3.0.2/lucene-core-3.0.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-highlighter-3.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-memory-3.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-snowball-3.0.2.jar"/>

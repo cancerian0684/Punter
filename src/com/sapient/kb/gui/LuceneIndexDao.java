@@ -33,6 +33,8 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.CachingWrapperFilter;
+import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
@@ -130,7 +132,6 @@ public class LuceneIndexDao {
 		try {
 			source = new Source(new StringReader(pDoc.getContent()));
 			TextExtractor te=new TextExtractor(source);
-//			System.err.println(te);
 			String contents=itrim(getPunterParsedText(te.toString().toLowerCase()));
 			int len=contents.length();
 			doc.add(new Field("contents", contents.substring(0, len>10000?10000:len), Field.Store.YES, Field.Index.ANALYZED));
@@ -331,11 +332,14 @@ public class LuceneIndexDao {
 			Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter(
 					"<font color=red>", "</font>"), new QueryScorer(query));
 			TopDocs hits = null;
+//			CachingWrapperFilter cwf=new CachingWrapperFilter();
 			hits = isearcher.search(query, 100);
 			int numTotalHits = hits.totalHits;
 			System.out.println(query);
 			List<Document> resultDocs=new ArrayList<Document>(100);
 			for (int i = start; i < numTotalHits && i < (start + batch); i++) {
+//				Explanation exp = isearcher.explain(query, i);
+//				System.err.println(exp.getDescription());
 			     org.apache.lucene.document.Document doc = isearcher.doc(hits.scoreDocs[i].doc);                    //get the next document 
                  Document document=new Document();
                  try {

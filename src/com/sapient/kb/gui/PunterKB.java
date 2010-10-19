@@ -206,7 +206,7 @@ public class PunterKB extends JPanel{
 
          final JMenuItem addProcessMenu,openDocMenu,deleteDocMenu,docTagsMenu,reindexDocsMenu;
  		 final JPopupMenu popupProcess = new JPopupMenu();
- 		 addProcessMenu = new JMenuItem("Add Document");
+ 		 addProcessMenu = new JMenuItem("Add");
  		 addProcessMenu.addActionListener(new ActionListener() {
  	          public void actionPerformed(ActionEvent e) {
  	        	  System.out.println("Adding Document");
@@ -215,7 +215,7 @@ public class PunterKB extends JPanel{
  	          }
  	    });
  		popupProcess.add(addProcessMenu);
- 		openDocMenu = new JMenuItem("Open Document");
+ 		openDocMenu = new JMenuItem("Open");
  		openDocMenu.addActionListener(new ActionListener() {
  			public void actionPerformed(ActionEvent e) {
  				System.out.println("Opening Document");
@@ -227,7 +227,7 @@ public class PunterKB extends JPanel{
  			}
  		});
  		popupProcess.add(openDocMenu);
- 		deleteDocMenu = new JMenuItem("Delete Document");
+ 		deleteDocMenu = new JMenuItem("Delete");
  		deleteDocMenu.addActionListener(new ActionListener() {
  			public void actionPerformed(ActionEvent e) {
  				System.out.println("Delete Document");
@@ -241,7 +241,7 @@ public class PunterKB extends JPanel{
  		});
  		popupProcess.add(deleteDocMenu);
  		
- 		docTagsMenu = new JMenuItem("Document Tags");
+ 		docTagsMenu = new JMenuItem("Tags");
  		docTagsMenu.addActionListener(new ActionListener() {
  			public void actionPerformed(ActionEvent e) {
  				System.out.println("Document Tags");
@@ -254,7 +254,7 @@ public class PunterKB extends JPanel{
  		});
  		popupProcess.add(docTagsMenu);
  		
- 		reindexDocsMenu = new JMenuItem("Rebuild Index");
+ 		reindexDocsMenu = new JMenuItem("Rebuild Indexes");
  		reindexDocsMenu.addActionListener(new ActionListener() {
  			public void actionPerformed(ActionEvent e) {
  				System.out.println("Clearing old index");

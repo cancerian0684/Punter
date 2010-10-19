@@ -99,9 +99,11 @@ public class StaticDaoFacade {
 	  	DocumentService service = new DocumentService(em);
 	    em.getTransaction().begin();
 	    service.saveAttachment(attach);
+	    Document doc=attach.getDocument();
 	    em.getTransaction().commit();
+	    doc=em.find(Document.class, doc.getId());
 	    em.close();
-	    luceneIndexDao.getInstance().indexDocs(attach.getDocument());
+	    luceneIndexDao.getInstance().indexDocs(doc);
 	    return attach;
 }
   public static Document getDocument(Document doc){
@@ -119,9 +121,11 @@ public static boolean deleteAttachment(Attachment attch) {
 	em.getTransaction().begin();
   	DocumentService service = new DocumentService(em);
   	service.deleteAttachment(attch);
+  	Document doc=attch.getDocument();
   	em.getTransaction().commit();
+  	doc=em.find(Document.class, doc.getId());
     em.close();
-    luceneIndexDao.getInstance().indexDocs(attch.getDocument());
+    luceneIndexDao.getInstance().indexDocs(doc);
 	return true;
 }
 public static boolean deleteDocument(Document attch) {
