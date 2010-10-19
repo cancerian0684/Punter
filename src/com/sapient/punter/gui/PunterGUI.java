@@ -1,48 +1,29 @@
 package com.sapient.punter.gui;
 
-
-import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.GridLayout;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.Shape;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
 import javax.swing.InputMap;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -57,16 +38,13 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import javax.swing.text.Document;
 
-import com.sapient.kb.utils.TestEditor;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.executors.ProcessExecutor;
 import com.sapient.punter.executors.ScheduledJobPicker;
@@ -80,11 +58,8 @@ import com.sapient.punter.jpa.TaskHistory;
 import com.sapient.punter.tasks.Tasks;
 import com.sapient.punter.utils.ConsoleOutputStream;
 import com.sapient.punter.utils.InputParamValue;
-import com.sapient.punter.utils.Launcher;
 import com.sapient.punter.utils.OutputParamValue;
-import com.sapient.punter.utils.StackWindow;
 import com.sapient.punter.utils.TextAreaFIFO;
-import com.sun.awt.AWTUtilities;
 
 /** 
  * TableRenderDemo is just like TableDemo, except that it
@@ -353,10 +328,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	    popupTask.add(addTaskMenu);
 	    taskDocsMenu = new JMenuItem("Task Docs");
 	    taskDocsMenu.addActionListener(new ActionListener() {
-			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				 if(taskTable.getSelectedRow()!=-1){
 					 try{
 					 TaskData td=(TaskData) ((TaskTableModel)taskTable.getModel()).getRow(taskTable.getSelectedRow()).get(0);
