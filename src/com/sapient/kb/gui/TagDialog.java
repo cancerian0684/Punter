@@ -70,8 +70,4 @@ public class TagDialog extends JDialog{
 			});
 	    	 
 		}
-	    private void saveTags(Document doc,StaticDaoFacade docService){
-	    	
-	    }
-	    
 }
