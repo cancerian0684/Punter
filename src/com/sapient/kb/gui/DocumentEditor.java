@@ -487,7 +487,8 @@ public class DocumentEditor extends JDialog{
 	public void saveDocument(){
 		System.out.println("saving document..  "+textField.getText());
         doc.setTitle(textField.getText());
-        doc.setContent(editor.getContent().replaceAll("\\r\\n|\\r|\\n", " ")); 
+        doc.setContent(editor.getContent()); 
+//        currentMD5=getMD5(editor.getContent());
         doc.setMd5(currentMD5);
 //        RTFFileExport(editor.document);
 //        doc.setPlainContent(RTFFileExport(editor.document).toLowerCase().replace('\n', ' '));
@@ -495,7 +496,10 @@ public class DocumentEditor extends JDialog{
 	}
 	public boolean isDocumentModified(){
 		//check whether title and contents has changed since beginning.
-		currentMD5=getMD5(editor.getContent().replaceAll("\\r\\n|\\r|\\n", " "));
+//		System.err.println("previous content "+doc.getContent() );
+//		doc.setContent(editor.getContent().replaceAll("\\r\\n|\\r|\\n", "<BR/>")); 
+//		System.err.println("latest content "+doc.getContent() );
+		currentMD5=getMD5(editor.getContent());
 		return !(currentMD5.equals(doc.getMd5())&&doc.getTitle().equals(textField.getText()));
 	}
 	static void copy(InputStream is, OutputStream os) throws IOException {

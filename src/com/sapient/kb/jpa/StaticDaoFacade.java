@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.FlushModeType;
 import javax.persistence.Persistence;
 
 import org.apache.derby.drda.NetworkServerControl;
@@ -12,31 +13,36 @@ import com.sapient.kb.gui.LuceneIndexDao;
 
 public class StaticDaoFacade {
 	private static LuceneIndexDao luceneIndexDao;
-	private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("punter");
 	static{
 		try{
-		final NetworkServerControl serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
-		try{
-			serverControl.getRuntimeInfo();
-		}catch (Exception e) {
-			serverControl.start(null);
-		}
-		Thread.currentThread();
-		Runtime.getRuntime().addShutdownHook(new Thread(){
-			@Override
-			public void run() {
-				 try {
-					 emf.close();
-//					serverControl.shutdown();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			final NetworkServerControl serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
+			try{
+				serverControl.getRuntimeInfo();
+			}catch (Exception e) {
+				serverControl.start(null);
 			}
-		});
+			Thread.currentThread();
+			Runtime.getRuntime().addShutdownHook(new Thread(){
+				@Override
+				public void run() {
+					try {
+						em.close();
+						emf.close();
+//					serverControl.shutdown();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("punter");
+	private static EntityManager em = emf.createEntityManager();
+	    {
+	    	em.setFlushMode(FlushModeType.COMMIT);
+	    }
   public static void main(String[] a) throws Exception {
     EntityManager em = emf.createEntityManager();
     DocumentService service = new DocumentService(em);
@@ -99,12 +105,12 @@ public class StaticDaoFacade {
 	    return attach;
 }
   public static Document getDocument(Document doc){
-	  	EntityManager em = emf.createEntityManager();
+//	  	EntityManager em = emf.createEntityManager();
 	  	try{
 	  	DocumentService service = new DocumentService(em);
 	  	doc=service.getDocument(doc);
 	  	}finally{
-	    em.close();
+//	    em.close();
 	  	}
 	    return doc;
 }
