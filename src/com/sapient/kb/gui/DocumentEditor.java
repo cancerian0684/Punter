@@ -60,7 +60,6 @@ import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.gui.Main;
 
 public class DocumentEditor extends JDialog{
-	private DocumentEditor testEditor=null;
 	protected JTextField textField;
 	private JSplitPane jsp;
 	private EkitCore ekitCore;
@@ -93,12 +92,12 @@ public class DocumentEditor extends JDialog{
 		testEditor.setVisible(true);
 		testEditor.ekitCore.requestFocus();
 	}
-	public DocumentEditor(JFrame parent,final Document doc,StaticDaoFacade docServic) {
+	public DocumentEditor(JFrame parent,final Document ldoc,StaticDaoFacade docServic) {
 		super(parent,false);
 		setAlwaysOnTop(false);
 		setLayout(new GridBagLayout());
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.doc=doc;
+		this.doc=ldoc;
 		this.docService=docServic;
 //	    this.ekitCore = new EkitCoreSpell(false, str1, str2, str3, null, localURL, bool1, bool2, bool3, bool4, str4, str5, bool5, bool6, true, bool8, (bool8) ? "NW|NS|OP|SV|PR|SP|CT|CP|PS|SP|UN|RE|SP|FN|SP|UC|UM|SP|SR|*|BL|IT|UD|SP|SK|SU|SB|SP|AL|AC|AR|AJ|SP|UL|OL|SP|LK|*|ST|SP|FO" : "NW|NS|OP|SV|PR|SP|CT|CP|PS|SP|UN|RE|SP|BL|IT|UD|SP|FN|SP|UC|SP|LK|SP|SR|SP|ST", bool9);
 	    this.ekitCore = new EkitCoreSpell(false);
@@ -421,6 +420,8 @@ public class DocumentEditor extends JDialog{
 					    options[0]); //default button title
 					if(n==JOptionPane.YES_OPTION){
 						saveDocument();
+						doc=null;
+						docService=null;
 					}
 		    	}
 		        lastDim = DocumentEditor.this.getSize();

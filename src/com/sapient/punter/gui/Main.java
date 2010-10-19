@@ -63,6 +63,7 @@ public class Main extends JFrame{
 	public Main() {
 		super("My Punter");
 		try {
+			setSize(894, 661);
 			createAndShowGUI();
 			main=this;
 			timer.start();
@@ -86,6 +87,7 @@ private void createAndShowGUI() throws Exception {
 	        		 }
 	        		public void windowClosing(WindowEvent e) {
 	        			//setVisible(false);
+//	        			System.err.println(getSize());
 	        			dispose(); 
 	        			displayMsg("Punter has been minimized to System Tray");
 	        		}

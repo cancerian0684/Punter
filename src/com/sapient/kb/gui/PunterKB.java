@@ -14,6 +14,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -41,6 +43,7 @@ import javax.swing.table.TableModel;
 
 import com.sapient.kb.jpa.Document;
 import com.sapient.kb.jpa.StaticDaoFacade;
+import com.sapient.kb.utils.TestEditor;
 import com.sapient.punter.gui.Main;
 
 public class PunterKB extends JPanel{
@@ -50,9 +53,19 @@ public class PunterKB extends JPanel{
 	private JComboBox categoryComboBox;
 	private JToggleButton toggleButton = new JToggleButton("Spcl. Txt");
 
-	private Object[] categories = {"/all","/all/aisdb","/all/aisdb/article","/all/aisdb/query","/all/aisdb/dev",
-										"/all/daisy","/all/daisy/article","/all/daisy/query","/all/daisy/dev",
-										"/all/todo","/all/idea","/all/article","/all/personal","/all/misc"};
+	private static final List<String> categories;
+	static{
+		categories=new ArrayList<String>(20);
+		Scanner scanner = new Scanner(TestEditor.class.getClassLoader().getResourceAsStream("resources/categories"));
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            StringTokenizer stk=new StringTokenizer(line, ",");
+            while (stk.hasMoreTokens()) {
+            	categories.add(stk.nextToken());
+			}
+        }
+        scanner.close();
+	}
 	private static StaticDaoFacade docService;
 	{
 		docService.getDocList("","",false);
@@ -61,7 +74,7 @@ public class PunterKB extends JPanel{
 	public PunterKB() {
 		 setLayout(new GridBagLayout());
 		 GridBagConstraints c = new GridBagConstraints();
-
+//		 setSize(894, 661);
 		 List<String> dataList=new ArrayList<String>();
 		 dataList.add("Munish");
 		 dataList.add("Manu");
@@ -83,23 +96,6 @@ public class PunterKB extends JPanel{
 	                    	updateSearchResult();
 	                    }
 	                });
-		 /* searchTextField.addKeyListener(new KeyListener() {
-
-			public void keyPressed(KeyEvent ke) {
-				System.err.println("kp");
-				updateSearchResult();
-//				if (ke.getKeyCode() == KeyEvent.VK_ENTER)
-			}
-
-			public void keyReleased(KeyEvent arg0) {
-				System.err.println("kr");
-			}
-
-			public void keyTyped(KeyEvent arg0) {
-				System.err.println("kt");
-//				updateSearchResult();
-			}
-		});*/
 		 searchResultTable=new JTable(new DocumentTableModel()){
          public boolean editCellAt(int row, int column, java.util.EventObject e) {
     	 column=convertColumnIndexToModel(column);
@@ -129,7 +125,7 @@ public class PunterKB extends JPanel{
 		        	    	                    "Choose Category",
 		        	    	                    JOptionPane.PLAIN_MESSAGE,
 		        	    	                    null,
-		        	    	                    categories,
+		        	    	                    categories.toArray(),
 		        	    	                    category);
             	    	 if ((s != null) && (s.length() > 0)&&(!s.equals(category))) {
             	    		System.err.println("updating category.");
@@ -184,7 +180,7 @@ public class PunterKB extends JPanel{
             	 column.setPreferredWidth(100);
              }
          }
-         categoryComboBox = new JComboBox(categories);
+         categoryComboBox = new JComboBox(categories.toArray());
          categoryComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

@@ -349,7 +349,7 @@ public class LuceneIndexDao {
 					result=itrim(result);
 					document.setContent(result);
 				}else{
-					document.setContent(contents.substring(0, contents.length()>100?100:contents.length()));
+					document.setContent("");
 				}
                  resultDocs.add(document);
 			}
