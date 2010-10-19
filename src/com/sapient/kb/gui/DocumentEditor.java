@@ -52,18 +52,18 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.rtf.RTFEditorKit;
 
-import net.sf.memoranda.ui.htmleditor.HTMLEditor;
-
+import com.hexidec.ekit.EkitCore;
+import com.hexidec.ekit.EkitCoreSpell;
 import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.gui.Main;
 
 public class DocumentEditor extends JDialog{
-	private static DocumentEditor testEditor=null;
+	private DocumentEditor testEditor=null;
 	protected JTextField textField;
 	private JSplitPane jsp;
-	net.sf.memoranda.ui.htmleditor.HTMLEditor editor;
+	private EkitCore ekitCore;
 	private Document doc;
 	private StaticDaoFacade docService;
 	protected static Point lastLocation;
@@ -76,8 +76,6 @@ public class DocumentEditor extends JDialog{
 			byte[] messageDigest = md.digest(input.getBytes());
 			BigInteger number = new BigInteger(1, messageDigest);
 			String hashtext = number.toString(16);
-			// Now we need to zero pad it if you actually want the full 32
-			// chars.
 			while (hashtext.length() < 32) {
 				hashtext = "0" + hashtext;
 			}
@@ -87,16 +85,13 @@ public class DocumentEditor extends JDialog{
 		}
 	}
 	public static void showEditor(Document doc,StaticDaoFacade docService,JFrame parent){
-		if(testEditor==null){
-			//need to make singleton
-		}
-		testEditor=new DocumentEditor(parent,doc,docService);
-		testEditor.editor.editor.setText(doc.getContent());
+		DocumentEditor testEditor=new DocumentEditor(parent,doc,docService);
+		testEditor.ekitCore.setDocumentText(doc.getContent());
 		testEditor.textField.setText(doc.getTitle());
 		testEditor.setTitle(doc.getTitle().substring(0, doc.getTitle().length()>20?20:doc.getTitle().length())+" ... [ "+doc.getAccessCount()+" .. "+doc.getDateAccessed()+" ]");
 		testEditor.pack();
 		testEditor.setVisible(true);
-		testEditor.editor.requestFocus();
+		testEditor.ekitCore.requestFocus();
 	}
 	public DocumentEditor(JFrame parent,final Document doc,StaticDaoFacade docServic) {
 		super(parent,false);
@@ -105,49 +100,18 @@ public class DocumentEditor extends JDialog{
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.doc=doc;
 		this.docService=docServic;
-		editor=new HTMLEditor();
-		editor.editor.setAntiAlias(true);
-		editor.registerSavAble(this);
-//		editor.initEditor();
-		editor.editToolbar.setFloatable(false);
-		// editor.editor.enableInputMethods(false);
-		// editor.editor.getInputContext().selectInputMethod(Locale.getDefault());
-		/*titleField.addKeyListener(new KeyListener() {
-
-			public void keyPressed(KeyEvent ke) {
-				if (ke.getKeyCode() == KeyEvent.VK_ENTER)
-					editor.editor.requestFocus();
-			}
-
-			public void keyReleased(KeyEvent arg0) {
-			}
-
-			public void keyTyped(KeyEvent arg0) {
-			}
-		});*/
-		//HTMLFileExport
-//		editor.editor.setEditable(false);
+//	    this.ekitCore = new EkitCoreSpell(false, str1, str2, str3, null, localURL, bool1, bool2, bool3, bool4, str4, str5, bool5, bool6, true, bool8, (bool8) ? "NW|NS|OP|SV|PR|SP|CT|CP|PS|SP|UN|RE|SP|FN|SP|UC|UM|SP|SR|*|BL|IT|UD|SP|SK|SU|SB|SP|AL|AC|AR|AJ|SP|UL|OL|SP|LK|*|ST|SP|FO" : "NW|NS|OP|SV|PR|SP|CT|CP|PS|SP|UN|RE|SP|BL|IT|UD|SP|FN|SP|UC|SP|LK|SP|SR|SP|ST", bool9);
+	    this.ekitCore = new EkitCoreSpell(false);
+	    setJMenuBar(this.ekitCore.getMenuBar());
+	    this.ekitCore.setEnterKeyIsBreak(true);
+	    this.ekitCore.setFrame(Main.main);
+	    KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK , false);
+	    this.ekitCore.unregisterKeyboardAction(keystroke);
+	    textField = new JTextField(20);
 		GridBagConstraints c = new GridBagConstraints();
         c.gridwidth = GridBagConstraints.REMAINDER;
-
         c.fill = GridBagConstraints.HORIZONTAL;
-        textField = new JTextField(20);
 		getContentPane().add(textField, c);
-        textField.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				  String text = textField.getText();
-//			        textArea.append(text + newline);
-			        textField.selectAll();
-
-			        //Make sure the new text is visible, even if there
-			        //was a selection in the text area.
-//			        textArea.setCaretPosition(textArea.getDocument().getLength());
-				
-			}
-		});
-		editor.editToolbar.setVisible(true);
 		JTabbedPane jtp=new JTabbedPane();
 		attachmentTable=new JTable(new AttachmentTableModel()){
 	         public boolean editCellAt(int row, int column, java.util.EventObject e) {
@@ -192,8 +156,6 @@ public class DocumentEditor extends JDialog{
 	        		return false;
 //	    	 	return super.editCellAt(row, column, e);
 	         }
-
-			 
 		};
 		attachmentTable.setShowGrid(false);
 		attachmentTable.setPreferredScrollableViewportSize(new Dimension(200, 100));
@@ -206,11 +168,11 @@ public class DocumentEditor extends JDialog{
 		attachmentTable.getColumnModel().getColumn(0).setPreferredWidth(20);
 		attachmentTable.setDragEnabled(true);
 		InputMap imap = attachmentTable.getInputMap(JComponent.WHEN_FOCUSED);
-	     imap.put(KeyStroke.getKeyStroke("DELETE"), "table.delete");
-	     imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C,ActionEvent.CTRL_MASK,false), "table.copy");
-	     imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V,ActionEvent.CTRL_MASK,false), "table.paste");
-	     ActionMap amap = attachmentTable.getActionMap();
-	     amap.put("table.delete", new AbstractAction(){
+	    imap.put(KeyStroke.getKeyStroke("DELETE"), "table.delete");
+	    imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C,ActionEvent.CTRL_MASK,false), "table.copy");
+	    imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V,ActionEvent.CTRL_MASK,false), "table.paste");
+	    ActionMap amap = attachmentTable.getActionMap();
+	    amap.put("table.delete", new AbstractAction(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				 if(attachmentTable.getSelectedRow() != -1){
@@ -303,18 +265,18 @@ public class DocumentEditor extends JDialog{
                {
             	   System.err.println("Import possible .. rtf");
                try {
-               	 DataFlavor []dfs={new DataFlavor("text/rtf; class=java.io.InputStream")};
-               //	 df.s
+               	   DataFlavor []dfs={new DataFlavor("text/rtf; class=java.io.InputStream")};
+                //	df.s
                    InputStream in =(InputStream) t.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
-                //   System.out.println(out);
+                //  System.out.println(out);
                    File f=File.createTempFile("test",".doc");
                    FileOutputStream fo=new FileOutputStream(f);
                    copy(in, fo);
-                 //  fo.write(out.getBytes());
+                //  fo.write(out.getBytes());
                    fo.close();
-//                   fileListerWorker.getFileListQueue().add(f);
+//                  fileListerWorker.getFileListQueue().add(f);
                    System.out.println(f.getAbsolutePath());
-                   /*for (File f : l) {
+                  /*for (File f : l) {
                    	fileListerWorker.getFileListQueue().add(f);
                    	System.err.println(f.getName());
                    }*/
@@ -339,7 +301,6 @@ public class DocumentEditor extends JDialog{
                    FileOutputStream fo=new FileOutputStream(f);
                    copy(in, fo);
                    fo.close();
-//                   fileListerWorker.getFileListQueue().add(f);
                    System.out.println(f.getAbsolutePath());
                    return true;
                } catch (UnsupportedFlavorException e) {
@@ -362,16 +323,13 @@ public class DocumentEditor extends JDialog{
                return false;
            }
 
-           
-
            public int getSourceActions(JComponent c) {
                return MOVE;
            }
            
            protected Transferable createTransferable(JComponent c) {
-           	final DataFlavor flavors[] = {DataFlavor.javaFileListFlavor/*,uriListFlavor*/};
+           	   final DataFlavor flavors[] = {DataFlavor.javaFileListFlavor/*,uriListFlavor*/};
                JTable table = (JTable)c;
-            //   int selectedRow = table.getSelectedRow();
                int []selectedRows=table.getSelectedRows();
                final List<File> files=new java.util.ArrayList<File>();
                for(int selectedRow:selectedRows){
@@ -434,8 +392,8 @@ public class DocumentEditor extends JDialog{
 	     });
 		jtp.addTab("Attachments", new JScrollPane(attachmentTable));
 		jtp.setPreferredSize(new Dimension(200, 100));
-		editor.setPreferredSize(new Dimension(500,600));
-		jsp=new JSplitPane(JSplitPane.VERTICAL_SPLIT,editor,jtp);
+		ekitCore.setPreferredSize(new Dimension(500,600));
+		jsp=new JSplitPane(JSplitPane.VERTICAL_SPLIT,ekitCore,jtp);
 		jsp.setDividerSize(5);
 		jsp.setDividerLocation(1.0);
 		c.fill = GridBagConstraints.BOTH;
@@ -447,10 +405,6 @@ public class DocumentEditor extends JDialog{
         setPreferredSize(lastDim);
         if(lastLocation!=null)
         setLocation(lastLocation);
-//		pack();
-
-		//5. Show it.
-//		setVisible(true);
 		addWindowListener(new WindowAdapter() {
 		    public void windowClosing(WindowEvent we) {
 		    	if(isDocumentModified()){
@@ -465,7 +419,6 @@ public class DocumentEditor extends JDialog{
 					    null,     //do not use a custom Icon
 					    options,  //the titles of buttons
 					    options[0]); //default button title
-
 					if(n==JOptionPane.YES_OPTION){
 						saveDocument();
 					}
@@ -476,30 +429,24 @@ public class DocumentEditor extends JDialog{
 		});
 
 		 ActionListener actionListener = new ActionListener() {
-		      public void actionPerformed(ActionEvent actionEvent) {
-		    	  if(isDocumentModified())
-		    		  saveDocument();
-		      }
-		    };
-		    KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK , false);
-		    textField.registerKeyboardAction(actionListener, keystroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+	     public void actionPerformed(ActionEvent actionEvent) {
+    	     if(isDocumentModified())
+    		  saveDocument();
+	     }
+		 };
+		 keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK , false);
+		 textField.registerKeyboardAction(actionListener, keystroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 	public void saveDocument(){
 		System.out.println("saving document..  "+textField.getText());
         doc.setTitle(textField.getText());
-        doc.setContent(editor.getContent()); 
-//        currentMD5=getMD5(editor.getContent());
+        doc.setContent(ekitCore.getDocumentText()); 
         doc.setMd5(currentMD5);
-//        RTFFileExport(editor.document);
-//        doc.setPlainContent(RTFFileExport(editor.document).toLowerCase().replace('\n', ' '));
     	docService.saveDocument(doc);
 	}
 	public boolean isDocumentModified(){
-		//check whether title and contents has changed since beginning.
-//		System.err.println("previous content "+doc.getContent() );
-//		doc.setContent(editor.getContent().replaceAll("\\r\\n|\\r|\\n", "<BR/>")); 
-//		System.err.println("latest content "+doc.getContent() );
-		currentMD5=getMD5(editor.getContent());
+//		System.err.println(ekitCore.getDocumentText());
+		currentMD5=getMD5(ekitCore.getDocumentText());
 		return !(currentMD5.equals(doc.getMd5())&&doc.getTitle().equals(textField.getText()));
 	}
 	static void copy(InputStream is, OutputStream os) throws IOException {

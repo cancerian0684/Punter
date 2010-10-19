@@ -60,7 +60,7 @@ public class LuceneIndexDao {
 	private IndexReader ireader;
 	private final Lock writerWriteLock = new ReentrantLock();
 	private ReentrantReadWriteLock readerReadWriteLock = new ReentrantReadWriteLock();
-	private Analyzer analyzer = new PunterAnalyzer();
+	private Analyzer analyzer = new SnowballAnalyzer(Version.LUCENE_30,"English",PunterAnalyzer.stopWords);
 	private static LuceneIndexDao luceneIndexDao;
 	private final QueryParser parser1;
 	private final QueryParser parser2;
@@ -303,7 +303,7 @@ public class LuceneIndexDao {
 					"<font color=red>", "</font>"), new QueryScorer(query));
 			TopDocs hits = null;
 //			CachingWrapperFilter cwf=new CachingWrapperFilter();
-			hits = isearcher.search(query, 100);
+			hits = isearcher.search(query, 50);
 			int numTotalHits = hits.totalHits;
 			System.out.println(query);
 			List<Document> resultDocs=new ArrayList<Document>(100);

@@ -8,6 +8,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -81,6 +83,23 @@ public class PunterKB extends JPanel{
 	                    	updateSearchResult();
 	                    }
 	                });
+		 /* searchTextField.addKeyListener(new KeyListener() {
+
+			public void keyPressed(KeyEvent ke) {
+				System.err.println("kp");
+				updateSearchResult();
+//				if (ke.getKeyCode() == KeyEvent.VK_ENTER)
+			}
+
+			public void keyReleased(KeyEvent arg0) {
+				System.err.println("kr");
+			}
+
+			public void keyTyped(KeyEvent arg0) {
+				System.err.println("kt");
+//				updateSearchResult();
+			}
+		});*/
 		 searchResultTable=new JTable(new DocumentTableModel()){
          public boolean editCellAt(int row, int column, java.util.EventObject e) {
     	 column=convertColumnIndexToModel(column);
@@ -96,9 +115,9 @@ public class PunterKB extends JPanel{
         				return false;
         			}
 	               if (mEvent.getClickCount() == 2) {
-	            	   Document doc=(Document) ((DocumentTableModel)table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow())).get(0);
-	            	   docService.updateAccessCounter(doc);
-	            	   doc=docService.getDocument(doc);
+	            	   Document luceneDoc=(Document) ((DocumentTableModel)table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow())).get(0);
+	            	   docService.updateAccessCounter(luceneDoc);
+	            	   Document doc=docService.getDocument(luceneDoc);
 	            	   if(column==1){
          				DocumentEditor.showEditor(doc,docService,Main.main);
 	            	   	}
@@ -115,6 +134,7 @@ public class PunterKB extends JPanel{
             	    	 if ((s != null) && (s.length() > 0)&&(!s.equals(category))) {
             	    		System.err.println("updating category.");
             	    		doc.setCategory(s);
+            	    		luceneDoc.setCategory(s);
             	    		StaticDaoFacade.saveDocument(doc);
             	    	}
 	            	  }

@@ -42,9 +42,9 @@ public class PunterAnalyzer extends Analyzer {
         "for", "if", "in", "into", "is", "it",
         "no", "not", "of", "on", "or", "such",
         "that", "the", "their", "then", "there", "these",
-        "they", "this", "to", "was", "will", "with","/"
+        "they", "this", "to", "was", "will", "with",".","/"
     };
-	private Set stopWords = StopFilter.makeStopSet(STOP_WORDS);
+	public static Set stopWords = StopFilter.makeStopSet(STOP_WORDS);
 
 	public TokenStream tokenStream(String fieldName, Reader reader) {
 		TokenStream result = new WhitespaceTokenizer(reader);
