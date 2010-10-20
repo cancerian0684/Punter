@@ -15,7 +15,6 @@
 	<classpathentry kind="lib" path="lib/lucene-highlighter-3.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-memory-3.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-snowball-3.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/memoranda.jar"/>
 	<classpathentry kind="lib" path="lib/poi-3.6-20091214.jar" sourcepath="C:/Users/Munish/.m2/repository/org/apache/poi/poi/3.6/poi-3.6-sources.jar"/>
 	<classpathentry kind="lib" path="lib/poi-contrib-3.6-20091214.jar"/>
 	<classpathentry kind="lib" path="lib/poi-examples-3.6-20091214.jar"/>
