@@ -7,7 +7,10 @@ import java.util.Scanner;
 
 import javax.swing.JFrame;
 
+import org.apache.commons.lang3.time.StopWatch;
+
 import com.hexidec.ekit.EkitCore;
+import com.sapient.punter.utils.Stopwatch;
 
 public class TestEditor extends JFrame{
 	TestEditor(){
@@ -18,6 +21,9 @@ public class TestEditor extends JFrame{
 		
 	}
 	public static void main(String[] args) {
+		Stopwatch sw=new Stopwatch();
+		sw.start();
+		
 		Properties props = new Properties();
 
         //try retrieve data from file
@@ -31,8 +37,10 @@ public class TestEditor extends JFrame{
                System.out.println(line);
            }
 
+           System.out.println(sw.getElapsedTime());
+           sw.reset();
+           System.out.println(sw.getElapsedTime());
             }
-
            //catch exception in case properties file does not exist
 
            catch(IOException e)

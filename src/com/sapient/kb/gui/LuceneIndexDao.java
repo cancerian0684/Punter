@@ -51,6 +51,7 @@ import org.apache.lucene.util.Version;
 
 import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
+import com.sapient.punter.utils.Stopwatch;
 
 public class LuceneIndexDao {
 	static final File INDEX_DIR = new File("LuceneIndex");
@@ -265,6 +266,8 @@ public class LuceneIndexDao {
 		writerWriteLock.unlock();
 	}
 	public List<Document> search(String searchString,String category,boolean isSpclTxt,boolean isAND,int start, int batch){
+		Stopwatch sw=new Stopwatch();
+		sw.start();
 		try {
 			if (!ireader.isCurrent()) {
 				System.out.println("Refreshing IndexSearcher version to :"+ ireader.getCurrentVersion(FSDirectory));
@@ -272,6 +275,8 @@ public class LuceneIndexDao {
 			} else {
 				 System.err.println("Index not modified yet.");
 			}
+			System.out.print(sw.getElapsedTime()+" ");
+			sw.reset();
 			/*System.err.println("Listing all the terms ");
 			TermEnum terms = ireader.terms(new Term("content", ""));
 			while(terms.next())
@@ -302,12 +307,15 @@ public class LuceneIndexDao {
 			query.add(query2, BooleanClause.Occur.MUST);
 			BooleanQuery.setMaxClauseCount(100000);
 			Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter(
-					"<font color=red>", "</font>"), new QueryScorer(query));
+					"<font color=red>", "</font>"), new QueryScorer(query1));
 			TopDocs hits = null;
 //			CachingWrapperFilter cwf=new CachingWrapperFilter();
 			hits = isearcher.search(query, 50);
 			int numTotalHits = hits.totalHits;
 			System.out.println(query);
+			
+			System.out.print(sw.getElapsedTime()+" ");
+			sw.reset();
 			List<Document> resultDocs=new ArrayList<Document>(100);
 			for (int i = start; i < numTotalHits && i < (start + batch); i++) {
 //				Explanation exp = isearcher.explain(query, i);
@@ -325,24 +333,24 @@ public class LuceneIndexDao {
                  String contents=doc.get("contents");
                  int maxNumFragmentsRequired = 2;
  				 String fragmentSeparator = "...";
- 				 Source source;
+ 				 /*Source source;
  				 source = new Source(new StringReader(title));
  				 TextExtractor te=new TextExtractor(source);
- 				 title = te.toString();
+ 				 title = te.toString();*/
  				 TokenStream tokenStream = analyzer.tokenStream("title",new StringReader(title));
  				 CachingTokenFilter filter = new CachingTokenFilter(tokenStream);
  				 String result = highlighter.getBestFragments(filter, title,
  						maxNumFragmentsRequired, fragmentSeparator);
- 				// System.out.println(result);
  				if (result.length() > 0) {
  					result = result.replaceAll("\n", "<Br>");
- 					document.setTitle(result+"<sup>"+hits.scoreDocs[i].score+"</sup>");
+ 					document.setTitle(result);
  				}else{
- 					document.setTitle(title+"<sup>"+hits.scoreDocs[i].score+"</sup>");
+ 					document.setTitle(title);
  				}
-				source = new Source(new StringReader(contents));
+ 				document.setScore(hits.scoreDocs[i].score);
+				/*source = new Source(new StringReader(contents));
 				te=new TextExtractor(source);
- 				contents = te.toString();
+ 				contents = te.toString();*/
 				tokenStream = analyzer.tokenStream("contents",new StringReader(contents));
 				filter = new CachingTokenFilter(tokenStream);
 				result = highlighter.getBestFragments(filter, contents,maxNumFragmentsRequired, fragmentSeparator);
@@ -355,6 +363,8 @@ public class LuceneIndexDao {
 				}
                  resultDocs.add(document);
 			}
+			System.out.print(sw.getElapsedTime()+" \n");
+			sw.reset();
 			return resultDocs;
 		} catch (CorruptIndexException e1) {
 			e1.printStackTrace();

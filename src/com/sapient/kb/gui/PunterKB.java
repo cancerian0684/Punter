@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -188,6 +189,11 @@ public class PunterKB extends JPanel{
 			     updateSearchResult();
 			}
 		});
+         toggleButton.setOpaque(true); 
+         toggleButton.setFocusPainted(true); 
+         toggleButton.setBorderPainted(true); 
+         toggleButton.setContentAreaFilled(true); 
+         toggleButton.setBorder(BorderFactory.createEmptyBorder(5,5,5,5)); 
          toggleButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -195,6 +201,11 @@ public class PunterKB extends JPanel{
 			}
 		 });
          
+         andOrToggleButton.setOpaque(true); 
+         andOrToggleButton.setFocusPainted(true); 
+         andOrToggleButton.setBorderPainted(true); 
+         andOrToggleButton.setContentAreaFilled(true); 
+         andOrToggleButton.setBorder(BorderFactory.createEmptyBorder(5,5,5,5)); 
          andOrToggleButton.addActionListener(new ActionListener() {
         	 @Override
         	 public void actionPerformed(ActionEvent e) {

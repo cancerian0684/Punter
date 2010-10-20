@@ -50,6 +50,8 @@ public class Document implements Serializable{
 	private String md5;
 	@Transient
 	private String plainContent="";
+	@Transient
+	private float score;
 	@OneToMany(fetch=FetchType.LAZY)
     private Collection<Document> relatedDocs;
 	@OneToMany(mappedBy="document",fetch=FetchType.LAZY,cascade=CascadeType.ALL)
@@ -166,6 +168,12 @@ public class Document implements Serializable{
 	}
 	public void setMd5(String md5) {
 		this.md5 = md5;
+	}
+	public float getScore() {
+		return score;
+	}
+	public void setScore(float score) {
+		this.score = score;
 	}
 	
 	/*@Override

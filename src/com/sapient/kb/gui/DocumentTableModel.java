@@ -12,7 +12,7 @@ import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.gui.Main;
  
 public class DocumentTableModel extends AbstractTableModel {
-	SimpleDateFormat sdf =new SimpleDateFormat("dd/MM/yyyy");
+	SimpleDateFormat sdf =new SimpleDateFormat("dd/MM/yy");
 	public final Object[] longValues = {new Integer(5), "Kathy123",new Integer(5), "None of the above a,jbskjkjas jsahfk",new Boolean(true)};
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
@@ -83,7 +83,7 @@ public class DocumentTableModel extends AbstractTableModel {
     	if(doc.getDateUpdated()!=null){
     		s2=sdf.format(doc.getDateUpdated());
     	}
-    	return "<html>"+doc.getId()+"<br/>"+s1+"<br/>"+s2+"</html>";
+    	return "<html>"+(float)Math.round(doc.getScore() * 100) / 100+"<br/>"+doc.getId()+"<br/>"+s1+"<br/>"+s2+"</html>";
     case 1:
     	return "<html><b>"+doc.getTitle()+"</b><br/>"+doc.getContent()+"</html>";
     case 2:
