@@ -87,7 +87,7 @@ public class DocumentEditor extends JDialog{
 		DocumentEditor testEditor=new DocumentEditor(parent,doc,docService);
 		testEditor.ekitCore.setDocumentText(doc.getContent());
 		testEditor.textField.setText(doc.getTitle());
-		testEditor.setTitle(doc.getTitle().substring(0, doc.getTitle().length()>20?20:doc.getTitle().length())+" ... [ "+doc.getAccessCount()+" .. "+doc.getDateAccessed()+" ]");
+		testEditor.setTitle(doc.getId()+"-"+ doc.getTitle().substring(0, doc.getTitle().length()>20?20:doc.getTitle().length())+" ... [ "+doc.getAccessCount()+" .. "+doc.getDateAccessed()+" ]");
 		testEditor.pack();
 		testEditor.setVisible(true);
 		testEditor.ekitCore.requestFocus();

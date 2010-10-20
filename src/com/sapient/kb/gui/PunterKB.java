@@ -51,7 +51,8 @@ public class PunterKB extends JPanel{
 	private JTextField searchTextField;
 	private JTable searchResultTable;
 	private JComboBox categoryComboBox;
-	private JToggleButton toggleButton = new JToggleButton("Spcl. Txt");
+	private JToggleButton toggleButton = new JToggleButton("E");
+	private JToggleButton andOrToggleButton = new JToggleButton("O");
 
 	private static final List<String> categories;
 	static{
@@ -68,7 +69,7 @@ public class PunterKB extends JPanel{
 	}
 	private static StaticDaoFacade docService;
 	{
-		docService.getDocList("","",false);
+		docService.getDocList("","",false,false);
 	}
 	
 	public PunterKB() {
@@ -172,12 +173,12 @@ public class PunterKB extends JPanel{
          for (int i = 0; i < 3; i++) {
              column = searchResultTable.getColumnModel().getColumn(i);
              if (i == 1) {
-                 column.setPreferredWidth(1000); //third column is bigger
+                 column.setPreferredWidth(800); //second column is bigger
              } else if(i==0){
-                 column.setPreferredWidth(100);
+                 column.setPreferredWidth(120);
              }
              else{
-            	 column.setPreferredWidth(100);
+            	 column.setPreferredWidth(120);
              }
          }
          categoryComboBox = new JComboBox(categories.toArray());
@@ -192,23 +193,41 @@ public class PunterKB extends JPanel{
 			public void actionPerformed(ActionEvent e) {
 				updateSearchResult();
 			}
-		});
+		 });
+         
+         andOrToggleButton.addActionListener(new ActionListener() {
+        	 @Override
+        	 public void actionPerformed(ActionEvent e) {
+        		 if(andOrToggleButton.isSelected()){
+        			 andOrToggleButton.setText("A");
+        		 }else{
+        			 andOrToggleButton.setText("O");
+        		 }
+        		 updateSearchResult();
+        	 }
+         });
         
          c.fill = GridBagConstraints.HORIZONTAL;
-         c.weightx = 0.8;
+         c.weightx = 0.9;
          c.gridx = 0;
          c.gridy = 0;
          add(searchTextField,c);
          
          c.fill = GridBagConstraints.HORIZONTAL;
-         c.weightx = 0.05;
+         c.weightx = 0.01;
          c.gridx = 1;
          c.gridy = 0;
          add(toggleButton,c);
          
          c.fill = GridBagConstraints.HORIZONTAL;
-         c.weightx = 0.2;
+         c.weightx = 0.01;
          c.gridx = 2;
+         c.gridy = 0;
+         add(andOrToggleButton,c);
+         
+         c.fill = GridBagConstraints.HORIZONTAL;
+         c.weightx = 0.1;
+         c.gridx = 3;
          c.gridy = 0;
          add(categoryComboBox, c);
          
@@ -216,7 +235,7 @@ public class PunterKB extends JPanel{
          c.ipady = 0;      //make this component tall
          c.weightx = 0.0;
          c.weighty = 0.9;
-         c.gridwidth = 3;
+         c.gridwidth = 4;
          c.gridx = 0;
          c.gridy = 1;
          add(new JScrollPane(searchResultTable), c);
@@ -354,7 +373,7 @@ public class PunterKB extends JPanel{
 	private void updateSearchResult() {
 		DocumentTableModel ttm=((DocumentTableModel)searchResultTable.getModel());
     	ttm.clearTable();
-    	List<Document> docs = docService.getDocList(searchTextField.getText(),categoryComboBox.getSelectedItem().toString(),toggleButton.isSelected());
+    	List<Document> docs = docService.getDocList(searchTextField.getText(),categoryComboBox.getSelectedItem().toString(),toggleButton.isSelected(),andOrToggleButton.isSelected());
     	for (Document doc : docs) {
 			ArrayList<Document> docList=new ArrayList<Document>();
 			docList.add(doc);

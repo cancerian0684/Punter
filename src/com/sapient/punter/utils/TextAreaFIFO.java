@@ -43,7 +43,7 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener,TextArea
 		getDocument().addDocumentListener( this );
 		listener=new TitleMousListener();
 		addMouseListener(listener);
-		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+		/*MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 		try {
 			mbs.registerMBean(this,new ObjectName("punter.log.mbean:type=Punter-LogTextArea"+Thread.currentThread().getId()));
 		} catch (MBeanRegistrationException e) {
@@ -56,7 +56,7 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener,TextArea
 			e.printStackTrace();
 		} catch (NotCompliantMBeanException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	public void insertUpdate(DocumentEvent e)
@@ -163,7 +163,4 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener,TextArea
 		if(lineBufferSize>0)
 			this.lineBufferSize=lineBufferSize;
 	}
-
 }
-
-
