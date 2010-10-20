@@ -30,13 +30,13 @@ public class TagDialog extends JDialog{
 	    	tagDialog.docService=docService;
 	    	tagDialog.doc=docService.getDocument(doc);
 	    	tagDialog.textArea.setText(tagDialog.doc.getTag());
-	    	tagDialog.setLocationRelativeTo(Main.main);
+	    	tagDialog.setLocationRelativeTo(Main.KBFrame);
 	    	tagDialog.pack();
 	    	tagDialog.setVisible(true);
 	    	tagDialog.textArea.requestFocus();
 	    }
 	    public TagDialog() {
-	    	 super(Main.main,"; separated Tags");
+	    	 super(Main.KBFrame,"; separated Tags");
 	    	 setLayout(new GridBagLayout());
 			 GridBagConstraints c = new GridBagConstraints();
 	    	 textArea = new JTextArea();

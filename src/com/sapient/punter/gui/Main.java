@@ -30,13 +30,13 @@ import com.sapient.punter.executors.ProcessExecutor;
 import com.sapient.punter.utils.Launcher;
 import com.sapient.punter.utils.StackWindow;
 
-public class Main extends JFrame{
+public class Main{
 	private static BufferedImage busyImage;
 	private static BufferedImage idleImage;
 	private static TrayIcon trayIcon;
-	public static Main main;
-	private PunterKB punterKBContentPane;
-	private PunterGUI punterContentPane;
+	public static JFrame KBFrame;
+	public static JFrame PunterGuiFrame;
+	public static JFrame lastAccessed;
 	public static NetworkServerControl serverControl;
 	static{
 		try {
@@ -54,18 +54,17 @@ public class Main extends JFrame{
 		public void actionPerformed(ActionEvent e) {
 			if (isBusy()){
 				trayIcon.setImage(busyImage);
-				main.setIconImage(busyImage);
+				PunterGuiFrame.setIconImage(busyImage);
+				KBFrame.setIconImage(busyImage);
 			}else{
-				main.setIconImage(idleImage);
+				PunterGuiFrame.setIconImage(idleImage);
+				KBFrame.setIconImage(idleImage);
 				trayIcon.setImage(idleImage);
 			}
 		}});
 	public Main() {
-		super("My Punter");
 		try {
-			setSize(894, 661);
 			createAndShowGUI();
-			main=this;
 			timer.start();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -73,26 +72,43 @@ public class Main extends JFrame{
 	}
 
 private void createAndShowGUI() throws Exception {
-    setDefaultLookAndFeelDecorated(true);
-    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    punterContentPane = new PunterGUI();
-    punterContentPane.setOpaque(true); //content panes must be opaque
-    setContentPane(punterContentPane);
+	KBFrame=new JFrame("Punter KB");
+	JFrame.setDefaultLookAndFeelDecorated(true);
+	KBFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    KBFrame.setContentPane(new PunterKB());
+    if(AppSettings.getInstance().KBFrameLocation!=null)
+    KBFrame.setLocation(AppSettings.getInstance().KBFrameLocation);
+    KBFrame.pack();
+    KBFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+		public void windowIconified(WindowEvent e) {
+			//System.err.println("Iconifying window");
+//			frame.dispose(); 
+			KBFrame.dispose(); 
+		 }
+		public void windowClosing(WindowEvent e) {
+			//setVisible(false);
+			KBFrame.dispose(); 
+			displayMsg("Punter has been minimized to System Tray");
+		}
+    });	 
     
-	addWindowListener(
-	        	new java.awt.event.WindowAdapter() {
+    PunterGuiFrame=new JFrame("My Punter");
+    PunterGuiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    PunterGuiFrame.setContentPane(new PunterGUI());
+    
+    PunterGuiFrame.addWindowListener(new java.awt.event.WindowAdapter() {
 	        		public void windowIconified(WindowEvent e) {
-	        			//System.err.println("Iconifying window");
 //	        			frame.dispose(); 
 	        		 }
 	        		public void windowClosing(WindowEvent e) {
 	        			//setVisible(false);
-//	        			System.err.println(getSize());
-	        			dispose(); 
+	        			PunterGuiFrame.dispose(); 
 	        			displayMsg("Punter has been minimized to System Tray");
 	        		}
 	        });	 
-    
+    if(AppSettings.getInstance().PunterGuiFrameLocation!=null)
+    PunterGuiFrame.setLocation(AppSettings.getInstance().PunterGuiFrameLocation);
+    PunterGuiFrame.pack();
     Thread.UncaughtExceptionHandler handler =
          new StackWindow("Unhandled Exception", 500, 400);
        Thread.setDefaultUncaughtExceptionHandler(handler);
@@ -124,7 +140,8 @@ private void createAndShowGUI() throws Exception {
 		try {
         	busyImage = ImageIO.read(PunterGUI.class.getResource("/images/punter_busy.png"));
         	idleImage = ImageIO.read(PunterGUI.class.getResource("/images/punter_idle.png"));
-        	setIconImage(busyImage);
+        	PunterGuiFrame.setIconImage(busyImage);
+        	KBFrame.setIconImage(busyImage);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -134,8 +151,11 @@ private void createAndShowGUI() throws Exception {
 	    MouseListener mouseListener = new MouseListener() {
 	        public void mouseClicked(MouseEvent e) {
 	        	if(e.getButton()==MouseEvent.BUTTON1){
-	        	setExtendedState(Frame.NORMAL);
-	        	setVisible(true);
+	        		if(lastAccessed==null){
+		        		lastAccessed=KBFrame;
+		        	}
+		        	lastAccessed.setExtendedState(Frame.NORMAL);
+		        	lastAccessed.setVisible(true);
 	        	}
 //	            System.out.println("Tray Icon - Mouse clicked!");                 
 	        }
@@ -173,9 +193,11 @@ private void createAndShowGUI() throws Exception {
 
 	    ActionListener exitListener = new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
-	            int option=JOptionPane.showConfirmDialog(Main.this,"Exit Punter?","Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
+	            int option=JOptionPane.showConfirmDialog(PunterGuiFrame,"Exit Punter?","Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
     			if(option==JOptionPane.OK_OPTION)
     			{
+    				AppSettings.getInstance().KBFrameLocation=KBFrame.getLocation();
+    				AppSettings.getInstance().PunterGuiFrameLocation=PunterGuiFrame.getLocation();
     				System.out.println("Removing tray icon");
     				tray.remove(trayIcon);
     				Launcher.programQuit();
@@ -191,18 +213,9 @@ private void createAndShowGUI() throws Exception {
 	    openPunterMenuItem.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(punterContentPane==null){
-					try {
-						punterContentPane=new PunterGUI();
-						punterContentPane.setOpaque(true);
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-					
-				}
-				setContentPane(punterContentPane);
-				setExtendedState(Frame.NORMAL);
-				setVisible(true);
+				PunterGuiFrame.setExtendedState(Frame.NORMAL);
+				PunterGuiFrame.setVisible(true);
+				lastAccessed=PunterGuiFrame;
 			}});
 	    popup.add(openPunterMenuItem);
 	    
@@ -211,13 +224,9 @@ private void createAndShowGUI() throws Exception {
 	    openPunterMenuItem.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(punterKBContentPane==null){
-					punterKBContentPane = new PunterKB();
-					punterKBContentPane.setOpaque(true); //content panes must be opaque
-				}
-		        setContentPane(punterKBContentPane);
-				setExtendedState(Frame.NORMAL);
-				setVisible(true);
+				KBFrame.setExtendedState(Frame.NORMAL);
+				KBFrame.setVisible(true);
+				lastAccessed=KBFrame;
 			}});
 	    popup.add(openPunterMenuItem);
 	   
@@ -232,8 +241,11 @@ private void createAndShowGUI() throws Exception {
 	   
 	    ActionListener actionListener = new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
-	        		setExtendedState(Frame.NORMAL);
-	            	setVisible(true);
+	        	if(lastAccessed==null){
+	        		lastAccessed=KBFrame;
+	        	}
+	        	lastAccessed.setExtendedState(Frame.NORMAL);
+	        	lastAccessed.setVisible(true);
 	        }
 	    };
 	            
@@ -255,8 +267,6 @@ private void createAndShowGUI() throws Exception {
 	    //  System Tray is not supported
 
 	}
-    pack();
-    setVisible(true);
 }
 public static boolean isBusy(){
 	return ProcessExecutor.getInstance().isActive();

@@ -103,7 +103,7 @@ public class DocumentEditor extends JDialog{
 	    this.ekitCore = new EkitCoreSpell(false);
 	    setJMenuBar(this.ekitCore.getMenuBar());
 	    this.ekitCore.setEnterKeyIsBreak(true);
-	    this.ekitCore.setFrame(Main.main);
+	    this.ekitCore.setFrame(Main.KBFrame);
 	    KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK , false);
 	    this.ekitCore.unregisterKeyboardAction(keystroke);
 	    textField = new JTextField(20);

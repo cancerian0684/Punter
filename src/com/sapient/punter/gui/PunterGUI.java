@@ -290,7 +290,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        	  try{
 	        		  Object[] possibilities =taskProps.keySet().toArray();
 	        		  String s = (String)JOptionPane.showInputDialog(
-	        				  			  Main.main,
+	        				  			  Main.PunterGuiFrame,
 	        		                      "Choose the Task\n",
 	        		                      "Select Task",
 	        		                      JOptionPane.PLAIN_MESSAGE,
@@ -337,7 +337,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 					 Tasks t=(Tasks) cls.newInstance();
 					 PunterTask ann = t.getClass().getAnnotation(PunterTask.class);
 					 System.err.println("url="+ann.documentation());
-					 DocumentationDialog.displayHelp(ann.documentation(), false, Main.main);
+					 DocumentationDialog.displayHelp(ann.documentation(), false, Main.PunterGuiFrame);
 					 }catch (Exception ee) {
 						 ee.printStackTrace();
 					}

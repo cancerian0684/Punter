@@ -115,12 +115,12 @@ public class PunterKB extends JPanel{
 	            	   docService.updateAccessCounter(luceneDoc);
 	            	   Document doc=docService.getDocument(luceneDoc);
 	            	   if(column==1){
-         				DocumentEditor.showEditor(doc,docService,Main.main);
+         				DocumentEditor.showEditor(doc,docService,Main.KBFrame);
 	            	   	}
 	            	   String category = doc.getCategory();
 	            	   if(column ==2){
             	    	String s = (String)JOptionPane.showInputDialog(
-		        	    	                    Main.main,
+		        	    	                    Main.KBFrame,
 		        	    	                    "Select the Category:",
 		        	    	                    "Choose Category",
 		        	    	                    JOptionPane.PLAIN_MESSAGE,
@@ -228,7 +228,7 @@ public class PunterKB extends JPanel{
  	          public void actionPerformed(ActionEvent e) {
  	        	  System.out.println("Adding Document");
  	        	  Document doc=docService.createDocument();
- 	        	  DocumentEditor.showEditor(doc,docService,Main.main);
+ 	        	  DocumentEditor.showEditor(doc,docService,Main.KBFrame);
  	          }
  	    });
  		popupProcess.add(addProcessMenu);
@@ -238,7 +238,7 @@ public class PunterKB extends JPanel{
  				System.out.println("Opening Document");
  				if(searchResultTable.getSelectedRow()>=0){
  				Document doc=(Document) ((DocumentTableModel)searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
- 				DocumentEditor.showEditor(docService.getDocument(doc),docService,Main.main);
+ 				DocumentEditor.showEditor(docService.getDocument(doc),docService,Main.KBFrame);
  				docService.updateAccessCounter(doc);
  				}
  			}
