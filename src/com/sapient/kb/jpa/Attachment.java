@@ -16,6 +16,7 @@ import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Version;
 
 @Entity
 @Table(name="ATTACHMENT")
@@ -45,6 +46,9 @@ public class Attachment implements Serializable{
 	private byte[] content;
 	@ManyToOne
 	private Document document;
+	@Version
+	@Column(name = "OPT_LOCK")
+	private Long version;
 	public long getId() {
 		return id;
 	}
@@ -128,5 +132,11 @@ public class Attachment implements Serializable{
 	}
 	public void setComments(String comments) {
 		this.comments = comments;
+	}
+	public Long getVersion() {
+		return version;
+	}
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 }

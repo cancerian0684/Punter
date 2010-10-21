@@ -81,13 +81,11 @@ private void createAndShowGUI() throws Exception {
     KBFrame.pack();
     KBFrame.addWindowListener(new java.awt.event.WindowAdapter() {
 		public void windowIconified(WindowEvent e) {
-			//System.err.println("Iconifying window");
 //			frame.dispose(); 
-			KBFrame.dispose(); 
+			KBFrame.setVisible(false); 
 		 }
 		public void windowClosing(WindowEvent e) {
-			//setVisible(false);
-			KBFrame.dispose(); 
+			KBFrame.setVisible(false); 
 			displayMsg("Punter has been minimized to System Tray");
 		}
     });	 
@@ -106,9 +104,9 @@ private void createAndShowGUI() throws Exception {
 	        			displayMsg("Punter has been minimized to System Tray");
 	        		}
 	        });	 
+    PunterGuiFrame.pack();
     if(AppSettings.getInstance().PunterGuiFrameLocation!=null)
     PunterGuiFrame.setLocation(AppSettings.getInstance().PunterGuiFrameLocation);
-    PunterGuiFrame.pack();
     Thread.UncaughtExceptionHandler handler =
          new StackWindow("Unhandled Exception", 500, 400);
        Thread.setDefaultUncaughtExceptionHandler(handler);

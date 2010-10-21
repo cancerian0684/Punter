@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -18,6 +19,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.persistence.Version;
 import javax.swing.text.Document;
 
 @Entity
@@ -30,7 +32,7 @@ public class ProcessHistory implements Serializable{
 	private Date startTime;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date finishTime;
-	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy="processHistory",fetch=FetchType.LAZY)
+	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy="processHistory",fetch=FetchType.EAGER)
 	private List<TaskHistory> taskHistoryList;
 	@ManyToOne
 	private ProcessData process;
@@ -44,7 +46,9 @@ public class ProcessHistory implements Serializable{
 	private RunState runState = RunState.NEW;
 	@Enumerated(EnumType.STRING)
 	private RunStatus runStatus = RunStatus.NOT_RUN;
-
+	@Version
+	@Column(name = "OPT_LOCK")
+	private Long version;
 	public long getId() {
 		return id;
 	}
@@ -106,6 +110,13 @@ public class ProcessHistory implements Serializable{
 	}
 	public void setLogDocument(Document logDocument) {
 		this.logDocument = logDocument;
+	}
+	
+	public Long getVersion() {
+		return version;
+	}
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 	@Override
 	public int hashCode() {

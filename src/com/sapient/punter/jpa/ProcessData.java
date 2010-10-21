@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -16,6 +17,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import com.sapient.punter.utils.InputParamValue;
 
@@ -31,10 +33,13 @@ public class ProcessData implements Serializable{
 	private String description;
 	private String comments;
 	private HashMap<String, InputParamValue> inputParams;
-	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.LAZY)
+	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.EAGER)
 	private List<TaskData> taskList;
-	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy = "process",fetch=FetchType.LAZY)
+	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy = "process",fetch=FetchType.EAGER)
 	private List<ProcessHistory> processHistoryList;
+	@Version
+	@Column(name = "OPT_LOCK")
+	private Long version;
 	public long getId() {
 		return id;
 	}
@@ -96,6 +101,12 @@ public class ProcessData implements Serializable{
 		if (id != other.id)
 			return false;
 		return true;
+	}
+	public Long getVersion() {
+		return version;
+	}
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 	
 }

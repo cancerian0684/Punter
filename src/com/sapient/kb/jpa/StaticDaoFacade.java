@@ -53,13 +53,13 @@ public class StaticDaoFacade {
   public Document getDocument(Document doc) throws RemoteException{
 	  return stub.getDocument(doc);
   }
-public boolean deleteAttachment(Attachment attch) throws RemoteException {
-	return stub.deleteAttachment(attch);
-}
-public boolean deleteDocument(Document attch) throws RemoteException {
-	return stub.deleteDocument(attch);
-}
-public void rebuildIndex() throws RemoteException{
-	stub.rebuildIndex();
-}
+	public boolean deleteAttachment(Attachment attch) throws RemoteException {
+		return stub.deleteAttachment(attch);
+	}
+	public boolean deleteDocument(Document attch) throws RemoteException {
+		return stub.deleteDocument(attch);
+	}
+	public void rebuildIndex() throws RemoteException{
+		stub.rebuildIndex();
+	}
 }

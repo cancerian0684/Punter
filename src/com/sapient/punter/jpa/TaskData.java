@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import com.sapient.punter.utils.InputParamValue;
 import com.sapient.punter.utils.OutputParamValue;
@@ -30,6 +32,9 @@ public class TaskData implements Serializable{
 	private HashMap<String, OutputParamValue> outputParams;
 	@ManyToOne
 	private ProcessData process;
+	@Version
+	@Column(name = "OPT_LOCK")
+	private Long version;
 	public long getId() {
 		return id;
 	}
@@ -91,6 +96,13 @@ public class TaskData implements Serializable{
 	}
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+	
+	public Long getVersion() {
+		return version;
+	}
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 	@Override
 	public int hashCode() {

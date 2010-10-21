@@ -12,6 +12,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -70,6 +71,7 @@ public class DocumentEditor extends JDialog{
 	protected static Dimension lastDim;
 	private JTable attachmentTable;
 	private String currentMD5;
+	private boolean editable=false;
 	public static String getMD5(String input) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
@@ -105,6 +107,8 @@ public class DocumentEditor extends JDialog{
 	    setJMenuBar(this.ekitCore.getMenuBar());
 	    this.ekitCore.setEnterKeyIsBreak(true);
 	    this.ekitCore.setFrame(Main.KBFrame);
+	    this.ekitCore.getTextPane().setEditable(false);
+	    this.ekitCore.getTextPane().addMouseListener(new DocumentEditMousListener());
 	    KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK , false);
 	    this.ekitCore.unregisterKeyboardAction(keystroke);
 	    textField = new JTextField(20);
@@ -184,7 +188,6 @@ public class DocumentEditor extends JDialog{
 			            	try {
 								docService.deleteAttachment(attch);
 							} catch (RemoteException e1) {
-								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
 			            	atm.deleteRow(selectedRow);
@@ -193,6 +196,7 @@ public class DocumentEditor extends JDialog{
 			}});
 		AttachmentTableModel atm = ((AttachmentTableModel)attachmentTable.getModel());
 		Collection<Attachment> attchmts = doc.getAttachments();
+		if(attchmts!=null)
 		for (Attachment attachment : attchmts) {
 			ArrayList<Object> newRow= new ArrayList<Object>();
 			newRow.add(attachment);
@@ -463,9 +467,9 @@ public class DocumentEditor extends JDialog{
         doc.setContent(ekitCore.getDocumentText()); 
         doc.setMd5(currentMD5);
     	try {
-			docService.saveDocument(doc);
+    		docService.saveDocument(doc);
+    		doc=docService.getDocument(doc);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -578,5 +582,21 @@ public static String RTFFileExport(javax.swing.text.Document doc) {
         ex.printStackTrace();
     }
     return null;
+}
+private class DocumentEditMousListener extends MouseAdapter {
+    public void mouseClicked(MouseEvent e) {
+      if(e.getClickCount()==2){
+        	if(editable){
+        		editable=false;
+        		setTitle(doc.getId()+"-"+ doc.getTitle().substring(0, doc.getTitle().length()>20?20:doc.getTitle().length())+" ... [ "+doc.getAccessCount()+" .. "+doc.getDateAccessed()+" ]");
+        		ekitCore.getTextPane().setEditable(editable);
+        	}
+        	else{
+        		editable=true;
+        		setTitle(doc.getId()+"-"+ doc.getTitle().substring(0, doc.getTitle().length()>20?20:doc.getTitle().length())+" ... [ "+doc.getAccessCount()+" .. "+doc.getDateAccessed()+" ]..editing");
+        		ekitCore.getTextPane().setEditable(editable);
+        	}
+        }
+    }
 }
 }

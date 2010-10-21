@@ -102,6 +102,7 @@ public class LuceneIndexDao {
 		}
 		Collection<Attachment> attchmts = pDoc.getAttachments();
 		StringBuilder attchs=new StringBuilder();
+		if(attchmts!=null)
 		for (Attachment attachment : attchmts) {
 			attchs.append(PunterTextExtractor.getText(attachment.getContent(), attachment.getTitle())+" ");
 		}

@@ -20,6 +20,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.persistence.Version;
 
 @Entity
 @Table(name="DOCUMENT")
@@ -60,7 +61,9 @@ public class Document implements Serializable{
 	private Collection<Document> referenceDocs; 
 	@ManyToMany(mappedBy = "referenceDocs",fetch=FetchType.EAGER) 
 	private Collection<Document> docsReferred; 
-
+	@Version
+	@Column(name = "OPT_LOCK")
+	private Long version;
 	public long getId() {
 		return id;
 	}
@@ -174,6 +177,12 @@ public class Document implements Serializable{
 	}
 	public void setScore(float score) {
 		this.score = score;
+	}
+	public Long getVersion() {
+		return version;
+	}
+	public void setVersion(Long version) {
+		this.version = version;
 	}
 	
 	/*@Override
