@@ -4,9 +4,14 @@ import java.io.File;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
+
+import com.sapient.kb.jpa.Attachment;
+import com.sapient.kb.jpa.Document;
 
 public class PunterSearchServer implements PunterSearch {
-public static void main(String args[]) {
+	private SearchDaoFacade sdf;
+	public static void main(String args[]) {
         try {
         	String codebaseURI = new File("bin/").toURL().toURI().toString();
 			System.out.println("Codebase is :" + codebaseURI);
@@ -33,4 +38,50 @@ public static void main(String args[]) {
             e.printStackTrace();
         }
     }
+
+@Override
+public void updateAccessCounter(Document doc) {
+	sdf.updateAccessCounter(doc);
+}
+
+@Override
+public Document createDocument() {
+	return sdf.createDocument();
+}
+
+@Override
+public List<Document> getDocList(String q, String category, boolean isSpclTxt,
+		boolean isAND) {
+	return sdf.getDocList(q, category, isSpclTxt, isAND);
+}
+
+@Override
+public Document saveDocument(Document doc) {
+	return sdf.saveDocument(doc);
+}
+
+@Override
+public Attachment saveAttachment(Attachment attach) {
+	return sdf.saveAttachment(attach);
+}
+
+@Override
+public Document getDocument(Document doc) {
+	return sdf.getDocument(doc);
+}
+
+@Override
+public boolean deleteAttachment(Attachment attch) {
+	return sdf.deleteAttachment(attch);
+}
+
+@Override
+public boolean deleteDocument(Document attch) {
+	return sdf.deleteDocument(attch);
+}
+
+@Override
+public void rebuildIndex() {
+	sdf.rebuildIndex();
+}
 }
