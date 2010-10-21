@@ -1,152 +1,58 @@
 package com.sapient.kb.jpa;
-import java.net.InetAddress;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.FlushModeType;
-import javax.persistence.Persistence;
-
-import org.apache.derby.drda.NetworkServerControl;
-
-import com.sapient.server.LuceneIndexDao;
+import com.sapient.server.PunterSearch;
 
 
 public class StaticDaoFacade {
-	private static LuceneIndexDao luceneIndexDao;
-	static{
-		try{
-			final NetworkServerControl serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
-			try{
-				serverControl.getRuntimeInfo();
-			}catch (Exception e) {
-				serverControl.start(null);
-			}
-			Thread.currentThread();
-			Runtime.getRuntime().addShutdownHook(new Thread(){
-				@Override
-				public void run() {
-					try {
-						em.close();
-						emf.close();
-//					serverControl.shutdown();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
-		}catch (Exception e) {
-			e.printStackTrace();
+	private static StaticDaoFacade sdf;
+	private PunterSearch stub;
+	public static StaticDaoFacade getInstance(){
+		if(sdf==null){
+			sdf=new StaticDaoFacade();
 		}
+		return sdf;
 	}
-	private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("punter");
-	private static EntityManager em = emf.createEntityManager();
-	    {
-	    	em.setFlushMode(FlushModeType.COMMIT);
-	    }
-  public static void main(String[] a) throws Exception {
-    EntityManager em = emf.createEntityManager();
-    DocumentService service = new DocumentService(em);
+	private StaticDaoFacade() {
+		try {
+            Registry registry = LocateRegistry.getRegistry("localhost");
+            stub = (PunterSearch) registry.lookup("PunterSearch");
+//            String response = stub.sayHello();
+//            System.out.println("response: " + response);
+        } catch (Exception e) {
+            System.err.println("Client exception: " + e.toString());
+            e.printStackTrace();
+        }
+	}
 
-    em.getTransaction().begin();
-
-    service.createDocument("name");
-    System.out.println("Professors:");
-    for (Document emp : service.findAllDocuments()) {
-      System.out.println(emp);
-    }
-    em.getTransaction().commit();
-    em.close();
+  public void updateAccessCounter(Document doc) throws RemoteException{
+	  stub.updateAccessCounter(doc);
   }
-  public static void updateAccessCounter(Document doc){
-		EntityManager em = emf.createEntityManager();
-	    DocumentService service = new DocumentService(em);
-	    em.getTransaction().begin();
-	    service.updateAccessCounter(doc);
-	    em.getTransaction().commit();
-	    em.close();
+  public Document createDocument() throws RemoteException{
+	  return stub.createDocument();
   }
-  public static Document createDocument(){
-	  	EntityManager em = emf.createEntityManager();
-	    DocumentService service = new DocumentService(em);
-
-	    em.getTransaction().begin();
-
-	    Document doc = service.createDocument("test title","");
-	    luceneIndexDao.getInstance().indexDocs(doc);
-	    em.getTransaction().commit();
-	    em.close();
-	    return doc;
+  public List<Document> getDocList(String q,String category,boolean isSpclTxt,boolean isAND) throws RemoteException{
+	  return stub.getDocList(q, category, isSpclTxt, isAND);
   }
-  public static List<Document> getDocList(String q,String category,boolean isSpclTxt,boolean isAND){
-	   long t1=System.currentTimeMillis();
-	   List<Document> result = luceneIndexDao.getInstance().search(q, category,isSpclTxt,isAND,0, 25);
-	   long t2=System.currentTimeMillis();
-	   System.err.println("time consumed : "+(t2-t1));
-	   return result;
+  public Document saveDocument(Document doc) throws RemoteException{
+	  return stub.saveDocument(doc);
   }
-  public static Document saveDocument(Document doc){
-	  	EntityManager em = emf.createEntityManager();
-	  	DocumentService service = new DocumentService(em);
-	    em.getTransaction().begin();
-	    service.saveDocument(doc);
-	    em.getTransaction().commit();
-	    em.close();
-	    luceneIndexDao.getInstance().indexDocs(doc);
-	    return doc;
+  public Attachment saveAttachment(Attachment attach) throws RemoteException{
+	  return stub.saveAttachment(attach);
   }
-  public static Attachment saveAttachment(Attachment attach){
-	  	EntityManager em = emf.createEntityManager();
-	  	DocumentService service = new DocumentService(em);
-	    em.getTransaction().begin();
-	    service.saveAttachment(attach);
-	    Document doc=attach.getDocument();
-	    em.getTransaction().commit();
-	    doc=em.find(Document.class, doc.getId());
-	    em.close();
-	    luceneIndexDao.getInstance().indexDocs(doc);
-	    return attach;
+  public Document getDocument(Document doc) throws RemoteException{
+	  return stub.getDocument(doc);
+  }
+public boolean deleteAttachment(Attachment attch) throws RemoteException {
+	return stub.deleteAttachment(attch);
 }
-  public static Document getDocument(Document doc){
-//	  	EntityManager em = emf.createEntityManager();
-	  	try{
-	  	DocumentService service = new DocumentService(em);
-	  	doc=service.getDocument(doc);
-	  	}finally{
-//	    em.close();
-	  	}
-	    return doc;
+public boolean deleteDocument(Document attch) throws RemoteException {
+	return stub.deleteDocument(attch);
 }
-public static boolean deleteAttachment(Attachment attch) {
-	EntityManager em = emf.createEntityManager();
-	em.getTransaction().begin();
-  	DocumentService service = new DocumentService(em);
-  	service.deleteAttachment(attch);
-  	Document doc=attch.getDocument();
-  	em.getTransaction().commit();
-  	doc=em.find(Document.class, doc.getId());
-    em.close();
-    luceneIndexDao.getInstance().indexDocs(doc);
-	return true;
-}
-public static boolean deleteDocument(Document attch) {
-	EntityManager em = emf.createEntityManager();
-	em.getTransaction().begin();
-  	DocumentService service = new DocumentService(em);
-  	service.deleteDocument(attch);
-  	em.getTransaction().commit();
-    em.close();
-    LuceneIndexDao.getInstance().deleteIndexForDoc(attch);
-	return true;
-}
-public static void rebuildIndex(){
-	EntityManager em = emf.createEntityManager();
-	em.getTransaction().begin();
-  	DocumentService service = new DocumentService(em);
-    for (Document emp : service.findAllDocuments()) {
-      System.out.println(emp.getCategory());
-      luceneIndexDao.getInstance().indexDocs(emp);
-    }
-    em.close();
+public void rebuildIndex() throws RemoteException{
+	stub.rebuildIndex();
 }
 }

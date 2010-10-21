@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -180,7 +181,12 @@ public class DocumentEditor extends JDialog{
 						for (int selectedRow : selectedRows) {
 							AttachmentTableModel atm = ((AttachmentTableModel)attachmentTable.getModel());
 			            	Attachment attch=(Attachment) atm.getRow(attachmentTable.convertRowIndexToModel(attachmentTable.getSelectedRow())).get(0);
-			            	docService.deleteAttachment(attch);
+			            	try {
+								docService.deleteAttachment(attch);
+							} catch (RemoteException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 			            	atm.deleteRow(selectedRow);
 						}
 	                }
@@ -456,7 +462,12 @@ public class DocumentEditor extends JDialog{
         doc.setTitle(textField.getText());
         doc.setContent(ekitCore.getDocumentText()); 
         doc.setMd5(currentMD5);
-    	docService.saveDocument(doc);
+    	try {
+			docService.saveDocument(doc);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public boolean isDocumentModified(){
 //		System.err.println(ekitCore.getDocumentText());
@@ -503,11 +514,15 @@ public static void main(String[] args) throws ClassNotFoundException, Instantiat
 	//2. Optional: What happens when the frame closes?
 	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	Object abc = Main.serverControl;
-	StaticDaoFacade sdf=new StaticDaoFacade();
 	Document doc=new Document();
 	doc.setId(1L);
-	doc=sdf.getDocument(doc);
-	DocumentEditor.showEditor(doc, sdf, frame);
+	try {
+		doc=StaticDaoFacade.getInstance().getDocument(doc);
+	} catch (RemoteException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	DocumentEditor.showEditor(doc, StaticDaoFacade.getInstance(), frame);
 	/*net.sf.memoranda.ui.htmleditor.HTMLEditor editor=new HTMLEditor();
 	editor.editor.setAntiAlias(true);
 //	editor.initEditor();

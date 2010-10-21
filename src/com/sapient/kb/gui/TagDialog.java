@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -28,7 +29,11 @@ public class TagDialog extends JDialog{
 	    		tagDialog=new TagDialog();
 	    	}
 	    	tagDialog.docService=docService;
-	    	tagDialog.doc=docService.getDocument(doc);
+	    	try {
+				tagDialog.doc=docService.getDocument(doc);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 	    	tagDialog.textArea.setText(tagDialog.doc.getTag());
 	    	tagDialog.setLocationRelativeTo(Main.KBFrame);
 	    	tagDialog.pack();
@@ -64,7 +69,11 @@ public class TagDialog extends JDialog{
 				public void actionPerformed(ActionEvent e) {
 					System.err.println("saving Tags..");
 					doc.setTag(textArea.getText());
-					docService.saveDocument(doc);
+					try {
+						docService.saveDocument(doc);
+					} catch (RemoteException e1) {
+						e1.printStackTrace();
+					}
 					dispose();
 				}
 			});

@@ -143,6 +143,8 @@ public static boolean deleteDocument(Document attch) {
 	return true;
 }
 public static void rebuildIndex(){
+	System.out.println("Clearing old index");
+	LuceneIndexDao.getInstance().deleteIndex();
 	EntityManager em = emf.createEntityManager();
 	em.getTransaction().begin();
   	DocumentService service = new DocumentService(em);

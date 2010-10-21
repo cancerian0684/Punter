@@ -26,7 +26,7 @@ public class PunterSearchServer implements PunterSearch {
 			System.out.println("Starting the rmi registry");
 			Runtime.getRuntime().exec("rmiregistry");
 			Thread.sleep(1000);
-        	PunterSearchServer obj = new PunterSearchServer();
+			PunterSearch obj = new PunterSearchServer();
             PunterSearch stub = (PunterSearch) UnicastRemoteObject.exportObject(obj,0);
             // Bind the remote object's stub in the registry
             Registry registry = LocateRegistry.getRegistry();

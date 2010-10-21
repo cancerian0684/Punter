@@ -8,10 +8,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -46,7 +45,6 @@ import com.sapient.kb.jpa.Document;
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.kb.utils.TestEditor;
 import com.sapient.punter.gui.Main;
-import com.sapient.server.LuceneIndexDao;
 
 public class PunterKB extends JPanel{
 	private static JFrame frame;
@@ -69,9 +67,14 @@ public class PunterKB extends JPanel{
         }
         scanner.close();
 	}
-	private static StaticDaoFacade docService;
+	private static StaticDaoFacade docService=StaticDaoFacade.getInstance();
 	{
-		docService.getDocList("","",false,false);
+		try {
+			docService.getDocList("","",false,false);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public PunterKB() {
@@ -115,8 +118,19 @@ public class PunterKB extends JPanel{
         			}
 	               if (mEvent.getClickCount() == 2) {
 	            	   Document luceneDoc=(Document) ((DocumentTableModel)table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow())).get(0);
-	            	   docService.updateAccessCounter(luceneDoc);
-	            	   Document doc=docService.getDocument(luceneDoc);
+	            	   try {
+						docService.updateAccessCounter(luceneDoc);
+					} catch (RemoteException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
+	            	   Document doc = null;
+					try {
+						doc = docService.getDocument(luceneDoc);
+					} catch (RemoteException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
 	            	   if(column==1){
          				DocumentEditor.showEditor(doc,docService,Main.KBFrame);
 	            	   	}
@@ -134,7 +148,11 @@ public class PunterKB extends JPanel{
             	    		System.err.println("updating category.");
             	    		doc.setCategory(s);
             	    		luceneDoc.setCategory(s);
-            	    		StaticDaoFacade.saveDocument(doc);
+            	    		try {
+								StaticDaoFacade.getInstance().saveDocument(doc);
+							} catch (RemoteException e1) {
+								e1.printStackTrace();
+							}
             	    	}
 	            	  }
 	                  return false;
@@ -258,7 +276,13 @@ public class PunterKB extends JPanel{
  		 addProcessMenu.addActionListener(new ActionListener() {
  	          public void actionPerformed(ActionEvent e) {
  	        	  System.out.println("Adding Document");
- 	        	  Document doc=docService.createDocument();
+ 	        	  Document doc = null;
+				try {
+					doc = docService.createDocument();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
  	        	  DocumentEditor.showEditor(doc,docService,Main.KBFrame);
  	          }
  	    });
@@ -269,8 +293,13 @@ public class PunterKB extends JPanel{
  				System.out.println("Opening Document");
  				if(searchResultTable.getSelectedRow()>=0){
  				Document doc=(Document) ((DocumentTableModel)searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
- 				DocumentEditor.showEditor(docService.getDocument(doc),docService,Main.KBFrame);
- 				docService.updateAccessCounter(doc);
+ 				try {
+					DocumentEditor.showEditor(docService.getDocument(doc),docService,Main.KBFrame);
+					docService.updateAccessCounter(doc);
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
  				}
  			}
  		});
@@ -282,7 +311,12 @@ public class PunterKB extends JPanel{
  				if(searchResultTable.getSelectedRow()>=0){
  					DocumentTableModel dtm = (DocumentTableModel)searchResultTable.getModel();
 	 				Document doc=(Document)dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-	 				docService.deleteDocument(doc);
+	 				try {
+						docService.deleteDocument(doc);
+					} catch (RemoteException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 	 				dtm.deleteRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
  				}
  			}
@@ -305,11 +339,15 @@ public class PunterKB extends JPanel{
  		reindexDocsMenu = new JMenuItem("Rebuild Indexes");
  		reindexDocsMenu.addActionListener(new ActionListener() {
  			public void actionPerformed(ActionEvent e) {
- 				System.out.println("Clearing old index");
- 				LuceneIndexDao.getInstance().deleteIndex();
+ 				
  				System.out.println("Rebuilding Index");
  				PunterKB.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
- 				docService.rebuildIndex();
+ 				try {
+					docService.rebuildIndex();
+				} catch (RemoteException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
  				PunterKB.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
  			}
  		});
@@ -385,7 +423,13 @@ public class PunterKB extends JPanel{
 	private void updateSearchResult() {
 		DocumentTableModel ttm=((DocumentTableModel)searchResultTable.getModel());
     	ttm.clearTable();
-    	List<Document> docs = docService.getDocList(searchTextField.getText(),categoryComboBox.getSelectedItem().toString(),toggleButton.isSelected(),andOrToggleButton.isSelected());
+    	List<Document> docs = null;
+		try {
+			docs = docService.getDocList(searchTextField.getText(),categoryComboBox.getSelectedItem().toString(),toggleButton.isSelected(),andOrToggleButton.isSelected());
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	for (Document doc : docs) {
 			ArrayList<Document> docList=new ArrayList<Document>();
 			docList.add(doc);
