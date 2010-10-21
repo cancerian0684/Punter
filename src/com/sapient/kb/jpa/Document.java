@@ -44,7 +44,7 @@ public class Document implements Serializable{
 	private String tag;
 	private String author;
 	@Lob
-	@Basic(fetch = FetchType.LAZY)
+	@Basic(fetch = FetchType.EAGER)
 	@Column(columnDefinition="clob(2M)",table = "DOCUMENT_LOB")
 	private String content;
 	private String md5;
@@ -52,13 +52,13 @@ public class Document implements Serializable{
 	private String plainContent="";
 	@Transient
 	private float score;
-	@OneToMany(fetch=FetchType.LAZY)
+	@OneToMany(fetch=FetchType.EAGER)
     private Collection<Document> relatedDocs;
-	@OneToMany(mappedBy="document",fetch=FetchType.LAZY,cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="document",fetch=FetchType.EAGER,cascade=CascadeType.ALL)
     private Collection<Attachment> attachments;
-	@ManyToMany(fetch=FetchType.LAZY)
+	@ManyToMany(fetch=FetchType.EAGER)
 	private Collection<Document> referenceDocs; 
-	@ManyToMany(mappedBy = "referenceDocs",fetch=FetchType.LAZY) 
+	@ManyToMany(mappedBy = "referenceDocs",fetch=FetchType.EAGER) 
 	private Collection<Document> docsReferred; 
 
 	public long getId() {

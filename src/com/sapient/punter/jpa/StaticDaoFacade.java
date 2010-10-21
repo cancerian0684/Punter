@@ -32,7 +32,7 @@ import oracle.toplink.essentials.config.TopLinkProperties;
 import org.apache.derby.drda.NetworkServerControl;
 
 import com.sapient.kb.jpa.Document;
-import com.sapient.kb.jpa.DocumentService;
+import com.sapient.server.DocumentService;
 
 /**
  *

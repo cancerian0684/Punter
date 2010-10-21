@@ -3,13 +3,9 @@ package com.sapient.kb.gui;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 import com.sapient.kb.jpa.Document;
-import com.sapient.kb.jpa.DocumentService;
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.gui.Main;
  
 public class DocumentTableModel extends AbstractTableModel {
 	SimpleDateFormat sdf =new SimpleDateFormat("dd/MM/yy");

@@ -48,7 +48,7 @@ public class Attachment implements Serializable{
 	private String author;
 	private String comments;
 	@Lob
-	@Basic(fetch = FetchType.LAZY)
+	@Basic(fetch = FetchType.EAGER)
 	@Column(columnDefinition="blob(10M)",table = "ATTACHMENT_LOB")
 	private byte[] content;
 	@ManyToOne

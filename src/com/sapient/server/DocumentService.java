@@ -1,10 +1,13 @@
-package com.sapient.kb.jpa;
+package com.sapient.server;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
+import com.sapient.kb.jpa.Attachment;
+import com.sapient.kb.jpa.Document;
 
 public class DocumentService {
   protected EntityManager em;
