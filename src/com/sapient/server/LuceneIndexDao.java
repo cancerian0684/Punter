@@ -1,4 +1,4 @@
-package com.sapient.kb.jpa;
+package com.sapient.server;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +51,8 @@ import org.apache.lucene.util.Version;
 
 import com.sapient.kb.gui.PunterAnalyzer;
 import com.sapient.kb.gui.PunterTextExtractor;
+import com.sapient.kb.jpa.Attachment;
+import com.sapient.kb.jpa.Document;
 import com.sapient.punter.utils.Stopwatch;
 
 public class LuceneIndexDao {
