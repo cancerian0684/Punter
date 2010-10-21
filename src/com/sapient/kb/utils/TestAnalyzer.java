@@ -1,4 +1,4 @@
-package com.sapient.kb.gui;
+package com.sapient.kb.utils;
 
 import java.io.IOException;
 import java.io.Reader;

@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
-package com.sapient.kb.gui;
+package com.sapient.kb.utils;
 
 /*
  * TableFilterDemo.java requires SpringUtilities.java

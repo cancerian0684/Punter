@@ -1,4 +1,4 @@
-package com.sapient.kb.gui;
+package com.sapient.kb.utils;
 import java.util.List;
 
 import javax.swing.JTextField;
