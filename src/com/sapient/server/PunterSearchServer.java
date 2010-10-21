@@ -24,7 +24,7 @@ public static void main(String args[]) {
         	PunterSearchServer obj = new PunterSearchServer();
             PunterSearch stub = (PunterSearch) UnicastRemoteObject.exportObject(obj,0);
             // Bind the remote object's stub in the registry
-            Registry registry = LocateRegistry.getRegistry(2001);
+            Registry registry = LocateRegistry.getRegistry();
             registry.rebind("PunterSearch", stub);
 
             System.err.println("Server ready");

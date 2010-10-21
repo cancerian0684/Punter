@@ -43,6 +43,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import com.sapient.kb.jpa.Document;
+import com.sapient.kb.jpa.LuceneIndexDao;
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.kb.utils.TestEditor;
 import com.sapient.punter.gui.Main;

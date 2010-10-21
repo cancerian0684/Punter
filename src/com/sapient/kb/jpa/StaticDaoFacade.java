@@ -9,7 +9,6 @@ import javax.persistence.Persistence;
 
 import org.apache.derby.drda.NetworkServerControl;
 
-import com.sapient.kb.gui.LuceneIndexDao;
 
 public class StaticDaoFacade {
 	private static LuceneIndexDao luceneIndexDao;
