@@ -96,7 +96,7 @@ public class DocumentEditor extends JDialog{
 		super(parent,false);
 		setAlwaysOnTop(false);
 		setLayout(new GridBagLayout());
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.doc=ldoc;
 		this.docService=docServic;
 //	    this.ekitCore = new EkitCoreSpell(false, str1, str2, str3, null, localURL, bool1, bool2, bool3, bool4, str4, str5, bool5, bool6, true, bool8, (bool8) ? "NW|NS|OP|SV|PR|SP|CT|CP|PS|SP|UN|RE|SP|FN|SP|UC|UM|SP|SR|*|BL|IT|UD|SP|SK|SU|SB|SP|AL|AC|AR|AJ|SP|UL|OL|SP|LK|*|ST|SP|FO" : "NW|NS|OP|SV|PR|SP|CT|CP|PS|SP|UN|RE|SP|BL|IT|UD|SP|FN|SP|UC|SP|LK|SP|SR|SP|ST", bool9);
@@ -437,6 +437,19 @@ public class DocumentEditor extends JDialog{
 		 };
 		 keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK , false);
 		 textField.registerKeyboardAction(actionListener, keystroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+		 addWindowListener(new WindowAdapter() {
+			 public void windowClosing(WindowEvent e) {
+				 System.err.println("Dsiposing document.");
+					dispose(); 
+					DocumentEditor.this.doc=null;
+					DocumentEditor.this.docService=null;
+					DocumentEditor.this.currentMD5=null;
+					DocumentEditor.this.ekitCore=null;
+					DocumentEditor.this.attachmentTable=null;
+					DocumentEditor.this.jsp=null;
+					DocumentEditor.this.textField=null;
+				}
+		});
 	}
 	public void saveDocument(){
 		System.out.println("saving document..  "+textField.getText());
