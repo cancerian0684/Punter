@@ -1,4 +1,4 @@
-package com.sapient.kb.gui;
+package com.sapient.server;
 
 import java.io.Reader;
 import java.util.ArrayList;

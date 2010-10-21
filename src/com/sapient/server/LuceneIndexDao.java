@@ -49,8 +49,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.util.Version;
 
-import com.sapient.kb.gui.PunterAnalyzer;
-import com.sapient.kb.gui.PunterTextExtractor;
 import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
 import com.sapient.punter.utils.Stopwatch;
