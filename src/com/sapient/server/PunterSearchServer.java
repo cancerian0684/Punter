@@ -1,6 +1,7 @@
 package com.sapient.server;
 
 import java.io.File;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -83,5 +84,10 @@ public boolean deleteDocument(Document attch) {
 @Override
 public void rebuildIndex() {
 	sdf.rebuildIndex();
+}
+
+@Override
+public List<String> getCategories() throws RemoteException {
+	return sdf.getCategories();
 }
 }

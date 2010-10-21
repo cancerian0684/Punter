@@ -27,7 +27,14 @@ public class StaticDaoFacade {
             e.printStackTrace();
         }
 	}
-
+  public List<String> getCategories(){
+	  try {
+		return stub.getCategories();
+	} catch (RemoteException e) {
+		e.printStackTrace();
+	}
+	return null;
+  }
   public void updateAccessCounter(Document doc) throws RemoteException{
 	  stub.updateAccessCounter(doc);
   }

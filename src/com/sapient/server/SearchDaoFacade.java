@@ -1,7 +1,10 @@
 package com.sapient.server;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -12,6 +15,7 @@ import org.apache.derby.drda.NetworkServerControl;
 
 import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
+import com.sapient.kb.utils.TestEditor;
 
 public class SearchDaoFacade {
 
@@ -46,6 +50,20 @@ public class SearchDaoFacade {
 	    {
 	    	em.setFlushMode(FlushModeType.COMMIT);
 	    }
+	    
+  public static List<String> getCategories(){
+	List<String> categories=new ArrayList<String>(20);
+	Scanner scanner = new Scanner(TestEditor.class.getClassLoader().getResourceAsStream("resources/categories"));
+    while (scanner.hasNextLine()) {
+        String line = scanner.nextLine();
+        StringTokenizer stk=new StringTokenizer(line, ",");
+        while (stk.hasMoreTokens()) {
+        	categories.add(stk.nextToken());
+		}
+    }
+    scanner.close();
+    return categories;
+  }
   public static void main(String[] a) throws Exception {
     EntityManager em = emf.createEntityManager();
     DocumentService service = new DocumentService(em);

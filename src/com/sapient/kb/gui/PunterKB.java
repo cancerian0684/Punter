@@ -13,8 +13,6 @@ import java.awt.event.MouseEvent;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.StringTokenizer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
@@ -43,7 +41,6 @@ import javax.swing.table.TableModel;
 
 import com.sapient.kb.jpa.Document;
 import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.kb.utils.TestEditor;
 import com.sapient.punter.gui.Main;
 
 public class PunterKB extends JPanel{
@@ -53,26 +50,12 @@ public class PunterKB extends JPanel{
 	private JComboBox categoryComboBox;
 	private JToggleButton toggleButton = new JToggleButton("E");
 	private JToggleButton andOrToggleButton = new JToggleButton("O");
-
-	private static final List<String> categories;
-	static{
-		categories=new ArrayList<String>(20);
-		Scanner scanner = new Scanner(TestEditor.class.getClassLoader().getResourceAsStream("resources/categories"));
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            StringTokenizer stk=new StringTokenizer(line, ",");
-            while (stk.hasMoreTokens()) {
-            	categories.add(stk.nextToken());
-			}
-        }
-        scanner.close();
-	}
+	private static final List<String> categories=StaticDaoFacade.getInstance().getCategories();
 	private static StaticDaoFacade docService=StaticDaoFacade.getInstance();
 	{
 		try {
 			docService.getDocList("","",false,false);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -80,7 +63,6 @@ public class PunterKB extends JPanel{
 	public PunterKB() {
 		 setLayout(new GridBagLayout());
 		 GridBagConstraints c = new GridBagConstraints();
-//		 setSize(894, 661);
 		 List<String> dataList=new ArrayList<String>();
 		 dataList.add("Munish");
 		 dataList.add("Manu");
@@ -88,8 +70,6 @@ public class PunterKB extends JPanel{
 		 dataList.add("Parvesh");
 		 searchTextField=new JTextField(20);
 		 searchTextField.setFont(new Font("Arial",Font.TRUETYPE_FONT,12));
-//		 filterText.setMaximumSize(new Dimension(1200, 30));
-//		 filterText.setPreferredSize(new Dimension(800, 30));
 		 searchTextField.getDocument().addDocumentListener(
 	                new DocumentListener() {
 	                    public void changedUpdate(DocumentEvent e) {

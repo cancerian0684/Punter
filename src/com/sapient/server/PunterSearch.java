@@ -17,4 +17,5 @@ public interface PunterSearch extends Remote {
 	 boolean deleteAttachment(Attachment attch)throws RemoteException;
 	 boolean deleteDocument(Document attch)throws RemoteException;
 	 void rebuildIndex()throws RemoteException;
+	 List<String> getCategories()throws RemoteException;
 }
