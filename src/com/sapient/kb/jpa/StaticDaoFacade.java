@@ -2,8 +2,13 @@ package com.sapient.kb.jpa;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Collections;
 import java.util.List;
 
+import com.sapient.punter.jpa.ProcessData;
+import com.sapient.punter.jpa.ProcessHistory;
+import com.sapient.punter.jpa.TaskData;
+import com.sapient.punter.jpa.TaskHistory;
 import com.sapient.server.PunterSearch;
 
 
@@ -20,8 +25,7 @@ public class StaticDaoFacade {
 		try {
             Registry registry = LocateRegistry.getRegistry("localhost");
             stub = (PunterSearch) registry.lookup("PunterSearch");
-//            String response = stub.sayHello();
-//            System.out.println("response: " + response);
+            stub.ping();
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
@@ -61,5 +65,238 @@ public class StaticDaoFacade {
 	}
 	public void rebuildIndex() throws RemoteException{
 		stub.rebuildIndex();
+	}
+
+	public void ping()  {
+		
+	}
+
+	
+	public void removeTask(TaskData task)  {
+		try {
+			stub.removeTask(task);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	
+	public void removeProcess(ProcessData proc)  {
+		try {
+			stub.removeProcess(proc);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	
+	public TaskData createTask(TaskData task)  {
+		try {
+			return stub.createTask(task);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	public ProcessData createProcess(ProcessData proc)  {
+		try {
+			return stub.createProcess(proc);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return proc;
+	}
+
+	
+	public ProcessHistory createProcessHistory(ProcessHistory ph)
+			 {
+		try {
+			return stub.createProcessHistory(ph);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	public TaskHistory createTaskHistory(TaskHistory th)  {
+		try {
+			return stub.createTaskHistory(th);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	public void saveTaskHistory(TaskHistory t)  {
+		try {
+			stub.saveTaskHistory(t);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	
+	public void saveProcessHistory(ProcessHistory procHistory)
+			 {
+			try {
+				stub.saveProcessHistory(procHistory);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}		
+	}
+
+	
+	public void saveTask(TaskData t)  {
+		try {
+			stub.saveTask(t);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	
+	public void saveProcess(ProcessData p)  {
+		try {
+			stub.saveProcess(p);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	
+	public void listTask(long id)  {
+		try {
+			stub.listTask(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	
+	public List<ProcessData> getScheduledProcessList()  {
+		try {
+			return stub.getScheduledProcessList();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	public List<ProcessData> getProcessList()  {
+		try {
+			return stub.getProcessList();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	public ProcessData getProcess(long id)  {
+		try {
+			return stub.getProcess(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	public TaskHistory getTaskDao(TaskHistory td)  {
+		try {
+			return stub.getTaskDao(td);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	public List<ProcessHistory> getProcessHistoryListForProcessId(long id)
+			 {
+		try {
+			return stub.getProcessHistoryListForProcessId(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	public List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id)
+			 {
+		try {
+			return stub.getSortedProcessHistoryListForProcessId(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	public ProcessHistory getProcessHistoryById(long id)  {
+		try {
+			return stub.getProcessHistoryById(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	public List<TaskData> getProcessTasksById(long pid)  {
+		try {
+			return stub.getProcessTasksById(pid);
+		}  catch (Exception e) {
+			e.printStackTrace();
+		}
+		return Collections.EMPTY_LIST;
+	}
+
+	
+	public List<TaskData> getSortedTasksByProcessId(long pid)
+			 {
+		try {
+			return stub.getSortedTasksByProcessId(pid);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	public List<TaskData> getProcessTasks(long pid)  {
+		try {
+			return stub.getProcessTasks(pid);
+		}  catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	public void listProcesses()  {
+		try {
+			stub.listProcesses();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+
+	
+	public void deleteTeam()  {
+		try {
+			stub.deleteTeam();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 }

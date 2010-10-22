@@ -4,9 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.RunState;
-import com.sapient.punter.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskHistory;
 
 public class RunningTaskTableModel extends AbstractTableModel {

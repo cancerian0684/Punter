@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.ProcessData;
-import com.sapient.punter.jpa.StaticDaoFacade;
  
 public class ProcessTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflksdflksdfl"};
@@ -101,7 +101,7 @@ public class ProcessTableModel extends AbstractTableModel {
     try{
     	ProcessData p=(ProcessData) colArrayList.get(0);
     	p.setName((String)obj);
-    	StaticDaoFacade.saveProcess(p);
+    	StaticDaoFacade.getInstance().saveProcess(p);
     }catch (Exception e) {
     	e.printStackTrace();
 	}

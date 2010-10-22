@@ -30,23 +30,25 @@ import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
 
-public class SearchDaoFacade {
-	private static SearchDaoFacade sdf;
+public class StaticDaoFacade {
+	private static StaticDaoFacade sdf;
 	private EntityManagerFactory emf;
 	private EntityManager em;
-	public static SearchDaoFacade getInstance(){
+	public static StaticDaoFacade getInstance(){
 		if(sdf==null){
-			sdf=new SearchDaoFacade();
+			sdf=new StaticDaoFacade();
 		}
 		return sdf;
 	}
-	private SearchDaoFacade() {
+	private StaticDaoFacade() {
 		try{
 			final NetworkServerControl serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
 			try{
-				serverControl.getRuntimeInfo();
-			}catch (Exception e) {
 				serverControl.start(null);
+				serverControl.logConnections(true);
+				System.err.println(serverControl.getRuntimeInfo());
+			}catch (Exception e) {
+				e.printStackTrace();
 			}
 			Thread.currentThread();
 			Runtime.getRuntime().addShutdownHook(new Thread(){
@@ -55,6 +57,7 @@ public class SearchDaoFacade {
 					try {
 						em.close();
 						emf.close();
+						System.out.println("Shutting down DB server.");
 					    serverControl.shutdown();
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -435,7 +438,7 @@ public synchronized List<TaskData> getProcessTasks(long pid) throws UnknownHostE
 		em.close();
 	}
 }
-private synchronized void listProcesses(){
+public synchronized void listProcesses(){
     Query q = em.createQuery("select p from ProcessData p");
     List<ProcessData> processList = q.getResultList();
     

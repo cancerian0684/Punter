@@ -5,9 +5,7 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
-import com.sapient.punter.jpa.StaticDaoFacade;
  
 public class ProcessHistoryTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflsdfl"};

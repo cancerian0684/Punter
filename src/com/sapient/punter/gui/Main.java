@@ -37,19 +37,7 @@ public class Main{
 	public static JFrame KBFrame;
 	public static JFrame PunterGuiFrame;
 	public static JFrame lastAccessed;
-	public static NetworkServerControl serverControl;
-	static{
-		try {
-			serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
-			serverControl.start(null);
-			serverControl.logConnections(true);
-			System.err.println(serverControl.getRuntimeInfo());
-		} catch (UnknownHostException e1) {
-			e1.printStackTrace();
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
-	}
+	
 	private Timer timer=new Timer(2000,new ActionListener(){
 		public void actionPerformed(ActionEvent e) {
 			if (isBusy()){
@@ -178,12 +166,6 @@ private void createAndShowGUI() throws Exception {
 	    System.err.println("Main: adding shutdown hook");
 	    rt.addShutdownHook(new Thread() {
 	      public void run() {
-	    	try {
-	    		System.out.println("Shutting down DB server.");
-				serverControl.shutdown();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 	    	timer.stop();
 			System.out.println("Exiting...");
 	      }

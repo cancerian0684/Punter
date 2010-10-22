@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -16,20 +15,17 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.PlainDocument;
-import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
 
+import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.gui.ProcessObserver;
 import com.sapient.punter.gui.TaskObserver;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.RunState;
 import com.sapient.punter.jpa.RunStatus;
-import com.sapient.punter.jpa.StaticDaoFacade;
-import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
 import com.sapient.punter.utils.InputParamValue;
 import com.sapient.punter.utils.StringUtils;
-import com.sun.jmx.snmp.tasks.TaskServer;
 
 public class Process {
 private List<Tasks> taskList=new ArrayList<Tasks>();
@@ -92,7 +88,7 @@ public void beforeProcessStart(){
 }
 public void afterProcessFinish(){
 	try{
-	StaticDaoFacade.saveProcessHistory(ph);
+		StaticDaoFacade.getInstance().saveProcessHistory(ph);
 	}catch (Exception e) {
 		e.printStackTrace();
 	}

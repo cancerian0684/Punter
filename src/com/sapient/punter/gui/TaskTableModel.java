@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.punter.jpa.StaticDaoFacade;
+import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskData;
  
 public class TaskTableModel extends AbstractTableModel {
@@ -120,7 +120,7 @@ public class TaskTableModel extends AbstractTableModel {
 	default :
 		break;
     }
-    StaticDaoFacade.saveTask(task);
+    StaticDaoFacade.getInstance().saveTask(task);
     }catch(Exception e){
     	e.printStackTrace();
     }

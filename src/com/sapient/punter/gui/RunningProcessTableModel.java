@@ -4,10 +4,8 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.RunState;
-import com.sapient.punter.jpa.StaticDaoFacade;
 
 public class RunningProcessTableModel extends AbstractTableModel {
 	public final Object[] longValues = {new Integer(4),"Kaflksdfl","123456789",new Integer(2000000000)};

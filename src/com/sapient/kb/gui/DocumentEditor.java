@@ -72,6 +72,7 @@ public class DocumentEditor extends JDialog{
 	private JTable attachmentTable;
 	private String currentMD5;
 	private boolean editable=false;
+	private boolean everEdited=false;
 	public static String getMD5(String input) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
@@ -475,6 +476,8 @@ public class DocumentEditor extends JDialog{
 	}
 	public boolean isDocumentModified(){
 //		System.err.println(ekitCore.getDocumentText());
+		if((!everEdited)&&doc.getTitle().equals(textField.getText()))
+			return false;
 		currentMD5=getMD5(ekitCore.getDocumentText());
 		return !(currentMD5.equals(doc.getMd5())&&doc.getTitle().equals(textField.getText()));
 	}
@@ -517,13 +520,11 @@ public static void main(String[] args) throws ClassNotFoundException, Instantiat
 	UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 	//2. Optional: What happens when the frame closes?
 	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	Object abc = Main.serverControl;
 	Document doc=new Document();
 	doc.setId(1L);
 	try {
 		doc=StaticDaoFacade.getInstance().getDocument(doc);
 	} catch (RemoteException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
 	DocumentEditor.showEditor(doc, StaticDaoFacade.getInstance(), frame);
@@ -593,6 +594,7 @@ private class DocumentEditMousListener extends MouseAdapter {
         	}
         	else{
         		editable=true;
+        		everEdited=true;
         		setTitle(doc.getId()+"-"+ doc.getTitle().substring(0, doc.getTitle().length()>20?20:doc.getTitle().length())+" ... [ "+doc.getAccessCount()+" .. "+doc.getDateAccessed()+" ]..editing");
         		ekitCore.getTextPane().setEditable(editable);
         	}

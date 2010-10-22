@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.punter.jpa.StaticDaoFacade;
+import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.utils.OutputParamValue;
  class OutputParamTableModel extends AbstractTableModel {
@@ -93,7 +93,7 @@ import com.sapient.punter.utils.OutputParamValue;
             OutputParamValue opv=t.getOutputParams().get((String)data[row][0]);
             opv.setValue((String)value);
             try {
-				StaticDaoFacade.saveTask(t);
+            	StaticDaoFacade.getInstance().saveTask(t);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
