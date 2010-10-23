@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+" codebase="http://munish-pc:8080/" href="http://munish-pc:8080/punter.jnlp">
+<information>
+<title>Punter Client</title>
+<vendor>Munish Chandel</vendor>
+<description>Punter Client for UBS</description>
+<homepage href="/pdfg/"/>
+<offline-allowed/>
+<icon href="punter.png"/>
+<shortcut online="true">
+    <desktop/> 
+    <menu submenu="Punter Client"/> 
+</shortcut> 
+</information>
+<security>
+<all-permissions/>
+</security>
+<update check="always" policy="prompt-update"/>
+<resources>
+<j2se version="1.6+" java-vm-args="-Xms128m -Xmx128m -Dcom.sun.management.jmxremote" />
+<jar href="punter.jar" download="lazy" main="true"/>
+
+<jar href="lib/eclipselink.jar" download="lazy" main="false"/>
+<jar href="lib/javax.persistence_2.0.1.v201006031150.jar" download="lazy" main="false"/>
+
+<jar href="lib/ekitspell.jar" download="lazy" main="false"/>
+
+<jar href="lib/commons-beanutils-core-1.8.3.jar" download="lazy" main="false"/>
+<jar href="lib/commons-logging-1.1.1.jar" download="lazy" main="false"/>
+
+
+
+<!--
+<jar href="lib_l/dom4j-1.6.1.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/adobe-applicationmanager-client-sdk.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/adobe-auditworkflow-client.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/adobe-backup-restore-client-sdk.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/adobe-bmc-client.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/adobe-businesscalendar-client.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/adobe-repository-client.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/adobe-truststore-client.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/adobe-usermanager-client.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/adobe-jobmanager-client-sdk.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/adobe-usermanager-util-client.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/adobe-workflow-client-sdk.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/um-spi.jar" download="lazy" main="false"/>
+<jar href="lib_l/common/adobe-livecycle-client.jar" download="lazy" main="false"/>
+<jar href="lib_l/pdfg/adobe-distiller-client.jar" download="lazy" main="false"/>
+<jar href="lib_l/pdfg/adobe-generatepdf-client.jar" download="lazy" main="false"/>
+<jar href="lib_l/jboss/adobe-utilities.jar" download="lazy" main="false"/>
+<jar href="lib_l/jboss/jbossall-client.jar" download="lazy" main="false"/>
+
+<jar href="lib_l/lib/thirdparty/jaxen-1.1-beta-9.jar" download="lazy" main="false"/>
+<jar href="lib_l/lib/thirdparty/axis.jar" download="lazy" main="false"/>
+<jar href="lib_l/lib/thirdparty/dom3-xml-apis-2.5.0.jar" download="lazy" main="false"/>
+<jar href="lib_l/lib/thirdparty/jaxrpc.jar" download="lazy" main="false"/>
+<jar href="lib_l/lib/thirdparty/wsdl4j.jar" download="lazy" main="false"/>
+<jar href="lib_l/lib/thirdparty/xalan.jar" download="lazy" main="false"/>
+<jar href="lib_l/lib/thirdparty/xbean.jar" download="lazy" main="false"/>
+<jar href="lib_l/lib/thirdparty/xercesImpl.jar" download="lazy" main="false"/>
+<jar href="lib_l/lib/thirdparty/serializer.jar" download="lazy" main="false"/>
+
+<jar href="lib_l/metro/webservices-api.jar" download="lazy" main="false"/>
+<jar href="lib_l/metro/webservices-extra.jar" download="lazy" main="false"/>
+<jar href="lib_l/metro/webservices-extra-api.jar" download="lazy" main="false"/>
+<jar href="lib_l/metro/webservices-rt.jar" download="lazy" main="false"/>
+<jar href="lib_l/metro/webservices-tools.jar" download="lazy" main="false"/>
+
+<extension name="Apache Library" href="apache.jnlp">
+<ext-download ext-part="a"/>
+<ext-download ext-part="b"/>
+<ext-download ext-part="c"/>
+<ext-download ext-part="d"/>
+<ext-download ext-part="h"/>
+</extension>
+
+<extension name="Sun Library" href="activation.jnlp">
+<ext-download ext-part="activation"/>
+</extension>
+
+
+
+<extension name="Saaj Library" href="saaj.jnlp">
+<ext-download ext-part="saaj"/>
+</extension>
+-->
+<extension name="Mail Library" href="mail.jnlp">
+<ext-download ext-part="mail"/>
+</extension>
+
+</resources>
+<application-desc main-class="com.sapient.punter.gui.Main"/>
+</jnlp>

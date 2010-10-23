@@ -1,0 +1,25 @@
+<project name="Punter" default="init" basedir=".">
+    <description>
+        build file for signing all the punter jars.
+    </description>
+<target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <signjar destDir="lib"
+    alias="punter" keystore="punter.keystore"
+    storepass="punter" keypass="punter"
+    preservelastmodified="false">
+  <path>
+    <fileset dir="lib" includes="**/*.jar" />
+  </path>
+</signjar>
+<signjar destDir="."
+    alias="punter" keystore="punter.keystore"
+    storepass="punter" keypass="punter"
+    preservelastmodified="false">
+  <path>
+	<fileset dir="." includes="punter.jar" />
+  </path>
+</signjar>
+</target>
+</project>
