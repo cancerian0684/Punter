@@ -1,0 +1,1 @@
+java -Xms128m -Xmx128m -cp punter.jar;lib\eclipselink.jar;lib\mail.jar;lib\javax.persistence_2.0.1.v201006031150.jar com.sapient.punter.utils.Launcher
