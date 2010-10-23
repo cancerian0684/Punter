@@ -61,7 +61,9 @@ public class PunterSearchServer implements PunterSearch {
 			Registry registry = LocateRegistry.getRegistry();
 			registry.rebind("PunterSearch", stub);
 
-			System.err.println("Server ready");
+			System.err.println("RMI Server ready");
+			WebServer.main(new String[]{});
+			System.err.println("Web Server ready");
 		} catch (Exception e) {
 			System.err.println("Server exception: " + e.toString());
 			e.printStackTrace();
