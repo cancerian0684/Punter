@@ -89,5 +89,5 @@
 </extension>
 
 </resources>
-<application-desc main-class="com.sapient.punter.gui.Main"/>
+<application-desc main-class="com.sapient.punter.utils.Launcher"/>
 </jnlp>
