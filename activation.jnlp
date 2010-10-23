@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="http://munishc-lt:80/widget/" href="activation.jnlp">
+   <information>
+      <title>Activation</title>
+      <vendor>Sun Microsystems, Inc.</vendor>
+      <offline-allowed/>
+   </information>
+   <offline-allowed/>
+   <security>
+	<all-permissions/>
+   </security>
+   <update check="timeout" policy="always"/>
+   <resources>
+        <jar href="lib_l/lib/thirdparty/activation.jar" part="activation"/>
+   </resources>
+   <component-desc/>
+</jnlp>
