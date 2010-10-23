@@ -14,11 +14,9 @@ import java.util.StringTokenizer;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.FlushModeType;
+import javax.persistence.LockModeType;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-
-import oracle.toplink.essentials.config.CacheType;
-import oracle.toplink.essentials.config.TopLinkProperties;
 
 import org.apache.derby.drda.NetworkServerControl;
 
@@ -33,7 +31,6 @@ import com.sapient.punter.jpa.TaskHistory;
 public class StaticDaoFacade {
 	private static StaticDaoFacade sdf;
 	private EntityManagerFactory emf;
-	private EntityManager em;
 	public static StaticDaoFacade getInstance(){
 		if(sdf==null){
 			sdf=new StaticDaoFacade();
@@ -55,7 +52,6 @@ public class StaticDaoFacade {
 				@Override
 				public void run() {
 					try {
-						em.close();
 						emf.close();
 						System.out.println("Shutting down DB server.");
 					    serverControl.shutdown();
@@ -65,10 +61,8 @@ public class StaticDaoFacade {
 				}
 			});
 			Map properties = new HashMap();
-			properties.put(TopLinkProperties.CACHE_TYPE_DEFAULT, CacheType.Full);
+//			properties.put(TopLinkProperties.CACHE_TYPE_DEFAULT, CacheType.DEFAULT);
 			emf = Persistence.createEntityManagerFactory("punter",properties);
-			em = emf.createEntityManager();
-			em.setFlushMode(FlushModeType.COMMIT);
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -95,7 +89,7 @@ public class StaticDaoFacade {
 	    em.getTransaction().commit();
 	    em.close();*/
   }
-  public synchronized Document createDocument(){
+  public Document createDocument(){
 	  	EntityManager em = emf.createEntityManager();
 	    DocumentService service = new DocumentService(em);
 
@@ -114,17 +108,20 @@ public class StaticDaoFacade {
 	   System.err.println("time consumed : "+(t2-t1));
 	   return result;
   }
-  public synchronized Document saveDocument(Document doc){
+  public Document saveDocument(Document doc){
 	  	EntityManager em = emf.createEntityManager();
+	  	try{
 	  	DocumentService service = new DocumentService(em);
 	    em.getTransaction().begin();
 	    service.saveDocument(doc);
 	    em.getTransaction().commit();
-	    em.close();
 	    LuceneIndexDao.getInstance().indexDocs(doc);
 	    return doc;
+	  	}finally{
+	  		em.close();	  		
+	  	}
   }
-  public synchronized Attachment saveAttachment(Attachment attach){
+  public Attachment saveAttachment(Attachment attach){
 	  	EntityManager em = emf.createEntityManager();
 	  	DocumentService service = new DocumentService(em);
 	    em.getTransaction().begin();
@@ -136,17 +133,17 @@ public class StaticDaoFacade {
 	    LuceneIndexDao.getInstance().indexDocs(doc);
 	    return attach;
 }
-  public synchronized Document getDocument(Document doc){
-//	  	EntityManager em = emf.createEntityManager();
+  public Document getDocument(Document doc){
+	  	EntityManager em = emf.createEntityManager();
 	  	try{
 	  	DocumentService service = new DocumentService(em);
 	  	doc=service.getDocument(doc);
 	  	}finally{
-//	    em.close();
+	    em.close();
 	  	}
 	    return doc;
 }
-public synchronized boolean deleteAttachment(Attachment attch) {
+public boolean deleteAttachment(Attachment attch) {
 	EntityManager em = emf.createEntityManager();
 	em.getTransaction().begin();
   	DocumentService service = new DocumentService(em);
@@ -273,74 +270,105 @@ public synchronized void saveTaskHistory(TaskHistory t)throws Exception{
     em.getTransaction().commit();
     em.close();
 }
-public synchronized void saveProcessHistory(ProcessHistory procHistory)throws Exception{
-	EntityManager em = emf.createEntityManager();
-    em.getTransaction().begin();
-    ProcessHistory ph=em.find(ProcessHistory.class, procHistory.getId());
-    ph.setRunState(procHistory.getRunState());
-    ph.setRunStatus(procHistory.getRunStatus());
-    ph.setFinishTime(procHistory.getFinishTime());
-    em.merge(ph);
-    em.flush();
-    em.getTransaction().commit();
-    em.close();
-}
-public synchronized void saveTask(TaskData t)throws Exception{
-    em.getTransaction().begin();
-    TaskData task=em.find(TaskData.class, t.getId());
-    task.setInputParams(t.getInputParams());
-    task.setOutputParams(t.getOutputParams());
-    task.setSequence(t.getSequence());
-    task.setDescription(t.getDescription());
-    task.setActive(t.isActive());
-    em.merge(task);
-    em.getTransaction().commit();
-}
-public synchronized void saveProcess(ProcessData p)throws Exception{
-//	EntityManager em = emf.createEntityManager();
-    em.getTransaction().begin();
-    ProcessData proc=em.find(ProcessData.class, p.getId());
-    proc.setName(p.getName());
-    proc.setInputParams(p.getInputParams());
-    em.merge(proc);
-    em.flush();
-    em.getTransaction().commit();
-//    em.close();
-}
-public synchronized void listTask(long id)throws Exception{
-    TaskData task=em.find(TaskData.class, id);
-    try{
-    if(task!=null){
-    	System.out.println("Listing task for "+task.getId());
-    	Set<String> keySet = task.getInputParams().keySet();
-    for (String object : keySet) {
-    	System.out.println(object.toString()+" -- "+task.getInputParams().get(object));
+
+	public synchronized void saveProcessHistory(ProcessHistory procHistory)
+			throws Exception {
+		EntityManager em = emf.createEntityManager();
+		em.getTransaction().begin();
+		ProcessHistory ph = em.find(ProcessHistory.class, procHistory.getId());
+		ph.setRunState(procHistory.getRunState());
+		ph.setRunStatus(procHistory.getRunStatus());
+		ph.setFinishTime(procHistory.getFinishTime());
+		em.merge(ph);
+		em.flush();
+		em.getTransaction().commit();
+		em.close();
 	}
-    task.getOutputParams();
-    }
-    }catch(Exception e){
-    	
-    }
-}
-	public synchronized List<ProcessData> getScheduledProcessList() throws Exception{
-     Query q = em.createQuery("select p from ProcessData p");
-     q.setHint("toplink.refresh", "true");
-     List<ProcessData> dbProcList = q.getResultList();
-     List<ProcessData> processList =new ArrayList<ProcessData>();
-     for (ProcessData processDao :dbProcList  ) {
-    	 String ss=processDao.getInputParams().get("scheduleString").getValue().trim();
-//    	 System.out.println(ss);
-    	 if(!ss.isEmpty())
-    	 processList.add(processDao);
+
+	public synchronized TaskData saveTask(TaskData t) throws Exception {
+		EntityManager em = emf.createEntityManager();
+		try {
+			em.getTransaction().begin();
+			t=em.merge(t);
+			em.lock(t, LockModeType.READ);
+			em.flush();
+			em.getTransaction().commit();
+			return t;
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+			throw e;
+		}finally{
+			em.close();
+		}
 	}
-     return processList;
+
+	public synchronized ProcessData saveProcess(ProcessData p) throws Exception {
+		EntityManager em = emf.createEntityManager();
+		try {
+			em.getTransaction().begin();
+			p=em.merge(p);
+			em.lock(p, LockModeType.READ);
+			em.getTransaction().commit();
+			return p;
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+			throw e;
+		}finally{
+			em.close();
+		}
 	}
-public synchronized List<ProcessData> getProcessList() throws Exception{
-    Query q = em.createQuery("select p from ProcessData p");
-    q.setHint("toplink.refresh", "true");
-    List<ProcessData> processList = q.getResultList();
-    return processList;
-}
+
+	public synchronized void listTask(long id) throws Exception {
+		EntityManager em = emf.createEntityManager();
+		TaskData task = em.find(TaskData.class, id);
+		try {
+			if (task != null) {
+				System.out.println("Listing task for " + task.getId());
+				Set<String> keySet = task.getInputParams().keySet();
+				for (String object : keySet) {
+					System.out.println(object.toString() + " -- "
+							+ task.getInputParams().get(object));
+				}
+				task.getOutputParams();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			em.close();
+		}
+	}
+
+	public synchronized List<ProcessData> getScheduledProcessList()
+			throws Exception {
+		EntityManager em = emf.createEntityManager();
+		try {
+			Query q = em.createQuery("select p from ProcessData p");
+			q.setHint("toplink.refresh", "true");
+			List<ProcessData> dbProcList = q.getResultList();
+			List<ProcessData> processList = new ArrayList<ProcessData>();
+			for (ProcessData processDao : dbProcList) {
+				String ss = processDao.getInputParams().get("scheduleString")
+						.getValue().trim();
+				if (!ss.isEmpty())
+					processList.add(processDao);
+			}
+			return processList;
+		} finally {
+			em.close();
+		}
+	}
+
+	public synchronized List<ProcessData> getProcessList() throws Exception {
+		EntityManager em = emf.createEntityManager();
+		try {
+			Query q = em.createQuery("select p from ProcessData p");
+			q.setHint("toplink.refresh", "true");
+			List<ProcessData> processList = q.getResultList();
+			return processList;
+		} finally {
+			em.close();
+		}
+	}
 public synchronized ProcessData getProcess(long id) throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
@@ -373,11 +401,16 @@ public synchronized List<ProcessHistory> getProcessHistoryListForProcessId(long 
 	}
 }
 public synchronized List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id) throws Exception{
-    Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.id = :pid order by ph.id desc");
+	EntityManager em = emf.createEntityManager();
+	try{
+	Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.id = :pid order by ph.id desc");
     q.setHint("toplink.refresh", "true");
     q.setParameter("pid", id);
     List<ProcessHistory> processHistoryList = q.getResultList();
     return processHistoryList;
+	}finally{
+		em.close();
+	}
 }
 public synchronized ProcessHistory getProcessHistoryById(long id) throws Exception{
 	EntityManager em = emf.createEntityManager();
@@ -392,10 +425,9 @@ public synchronized ProcessHistory getProcessHistoryById(long id) throws Excepti
 public synchronized List<TaskData> getProcessTasksById(long pid) throws UnknownHostException, Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
-    ProcessData np = em.find(ProcessData.class,pid);
+    ProcessData np = em.find(ProcessData.class, pid);
     em.refresh(np);
 	List<TaskData> tl = np.getTaskList();
-//	System.err.println("Listing Tasks for process.");
 	for (TaskData task : tl) {
 		System.out.println(task.getName());
 	}
@@ -439,6 +471,8 @@ public synchronized List<TaskData> getProcessTasks(long pid) throws UnknownHostE
 	}
 }
 public synchronized void listProcesses(){
+	EntityManager em = emf.createEntityManager();
+	try{
     Query q = em.createQuery("select p from ProcessData p");
     List<ProcessData> processList = q.getResultList();
     
@@ -448,6 +482,9 @@ public synchronized void listProcesses(){
     	for (TaskData task : tl) {
     		System.out.println(task.getName());
     	}
+	}
+	}finally{
+		em.close();
 	}
 }
 

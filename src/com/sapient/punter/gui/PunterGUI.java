@@ -286,7 +286,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        	  if(processTable.getSelectedRow()!=-1){
 	        	  ArrayList ar = ((ProcessTableModel)processTable.getModel()).getRow(processTable.getSelectedRow());
 	        	  long procId=(Long)((ProcessData)ar.get(0)).getId();
-	        	  System.out.println(procId);
+	        	  System.out.println("Process ID : "+procId);
 	        	  try{
 	        		  Object[] possibilities =taskProps.keySet().toArray();
 	        		  String s = (String)JOptionPane.showInputDialog(
@@ -313,7 +313,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	    	        	  ProcessData p=new ProcessData();
 	    	        	  p.setId(procId);
 	    	        	  task.setProcess(p);
-	    	        	  StaticDaoFacade.getInstance().createTask(task);
+	    	        	  task=StaticDaoFacade.getInstance().createTask(task);
 	    	        	  TaskTableModel model=(TaskTableModel) taskTable.getModel();
 	    	        	  final ArrayList<Object> newRequest = new ArrayList<Object>();
 	    	              	newRequest.add(task);
@@ -376,7 +376,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        		  proc.setName("new Process");
 	        		  HashMap<String, InputParamValue> inProp = com.sapient.punter.tasks.Process.listInputParams();
     	        	  proc.setInputParams(inProp);
-    	        	  StaticDaoFacade.getInstance().createProcess(proc);
+    	        	  proc=StaticDaoFacade.getInstance().createProcess(proc);
 	        		  ProcessTableModel model=(ProcessTableModel) processTable.getModel();
 	        		  final ArrayList<Object> newRequest = new ArrayList<Object>();
 		              	newRequest.add(proc);

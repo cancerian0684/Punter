@@ -150,23 +150,22 @@ public class StaticDaoFacade {
 	}
 
 	
-	public void saveTask(TaskData t)  {
+	public TaskData saveTask(TaskData t) throws Exception  {
 		try {
-			stub.saveTask(t);
+			return stub.saveTask(t);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw e;
 		}
-		
 	}
 
 	
-	public void saveProcess(ProcessData p)  {
+	public ProcessData saveProcess(ProcessData p)  {
 		try {
-			stub.saveProcess(p);
+			return stub.saveProcess(p);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+		return null;
 	}
 
 	
@@ -186,17 +185,17 @@ public class StaticDaoFacade {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return Collections.EMPTY_LIST;
 	}
 
 	
-	public List<ProcessData> getProcessList()  {
+	public List<ProcessData> getProcessList() throws Exception  {
 		try {
 			return stub.getProcessList();
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw e;
 		}
-		return null;
 	}
 
 	
@@ -269,7 +268,7 @@ public class StaticDaoFacade {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return Collections.EMPTY_LIST;
 	}
 
 	
@@ -279,7 +278,7 @@ public class StaticDaoFacade {
 		}  catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return Collections.EMPTY_LIST;
 	}
 
 	

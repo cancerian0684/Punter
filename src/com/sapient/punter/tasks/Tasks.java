@@ -1,5 +1,6 @@
 package com.sapient.punter.tasks;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,14 +27,14 @@ import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.utils.InputParamValue;
 import com.sapient.punter.utils.OutputParamValue;
 
-public abstract class Tasks {
+public abstract class Tasks implements Serializable{
 	private Map<String,Object> sessionMap;
 	private Map<String,OutputParamValue> outputParams;
 	private HashMap<String, InputParamValue> inputParams;
 	protected TaskData taskDao;
-	private ConsoleHandler cHandler = null;
-	private MemoryHandler mHandler = null;
-	private Level loggingLevel=Level.INFO;
+	private transient ConsoleHandler cHandler = null;
+	private transient MemoryHandler mHandler = null;
+	private transient Level loggingLevel=Level.INFO;
 	private StringBuilder strLogger;
 	private Document logDocument;
 	public static final ThreadLocal<Logger> LOGGER = new ThreadLocal<Logger>() {

@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Collections;
 import java.util.List;
 
 import com.sapient.kb.jpa.Attachment;
@@ -202,23 +203,22 @@ public class PunterSearchServer implements PunterSearch {
 	}
 
 	@Override
-	public void saveTask(TaskData t) throws RemoteException {
+	public TaskData saveTask(TaskData t) throws RemoteException {
 		try {
-			sdf.saveTask(t);
+			return sdf.saveTask(t);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RemoteException("", e);
 		}
-		
 	}
 
 	@Override
-	public void saveProcess(ProcessData p) throws RemoteException {
+	public ProcessData saveProcess(ProcessData p) throws RemoteException {
 		try {
-			sdf.saveProcess(p);
+			return sdf.saveProcess(p);
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw new RemoteException("", e);
 		}
-		
 	}
 
 	@Override
@@ -238,7 +238,7 @@ public class PunterSearchServer implements PunterSearch {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return Collections.EMPTY_LIST;
 	}
 
 	@Override
@@ -247,8 +247,8 @@ public class PunterSearchServer implements PunterSearch {
 			return sdf.getProcessList();
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw new RemoteException("", e);
 		}
-		return null;
 	}
 
 	@Override
@@ -312,7 +312,7 @@ public class PunterSearchServer implements PunterSearch {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return Collections.EMPTY_LIST;
 	}
 
 	@Override

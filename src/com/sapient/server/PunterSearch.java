@@ -32,8 +32,8 @@ public interface PunterSearch extends Remote {
 	 TaskHistory createTaskHistory(TaskHistory th)throws RemoteException;
 	 void saveTaskHistory(TaskHistory t)throws RemoteException;
 	 void saveProcessHistory(ProcessHistory procHistory)throws RemoteException;
-	 void saveTask(TaskData t)throws RemoteException;
-	 void saveProcess(ProcessData p)throws RemoteException;
+	 TaskData saveTask(TaskData t)throws RemoteException;
+	 ProcessData saveProcess(ProcessData p)throws RemoteException;
 	 void listTask(long id)throws RemoteException;
 	 List<ProcessData> getScheduledProcessList()throws RemoteException;
 	 List<ProcessData> getProcessList()throws RemoteException;

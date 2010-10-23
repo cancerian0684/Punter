@@ -69,7 +69,6 @@ private void createAndShowGUI() throws Exception {
     KBFrame.pack();
     KBFrame.addWindowListener(new java.awt.event.WindowAdapter() {
 		public void windowIconified(WindowEvent e) {
-//			frame.dispose(); 
 			KBFrame.setVisible(false); 
 		 }
 		public void windowClosing(WindowEvent e) {

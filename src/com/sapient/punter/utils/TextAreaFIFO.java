@@ -30,18 +30,18 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener,TextArea
 {
 	private int lineBufferSize=5000;
 	private boolean followTails=true;
-	private TitleMousListener listener;
+	private MouseClickListener listener;
 	@Override
 	public void setDocument(Document doc) {
 		super.setDocument(doc);
 		getDocument().addDocumentListener( this );
-		listener=new TitleMousListener();
+		listener=new MouseClickListener();
 		addMouseListener(listener);
 	}
 	public TextAreaFIFO()
 	{
 		getDocument().addDocumentListener( this );
-		listener=new TitleMousListener();
+		listener=new MouseClickListener();
 		addMouseListener(listener);
 		/*MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 		try {
@@ -137,7 +137,7 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener,TextArea
 		frame.setVisible(true);
 	}
 	
-	private class TitleMousListener extends MouseAdapter {
+	private class MouseClickListener extends MouseAdapter {
         public void mouseClicked(MouseEvent e) {
         /*    System.out.println("TitleMouseListener");
             System.out.println("is consumed: " + e.isConsumed() + ", click count: " + e.getClickCount() + ", right button: "

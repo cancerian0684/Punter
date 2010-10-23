@@ -33,9 +33,9 @@ public class ProcessData implements Serializable{
 	private String description;
 	private String comments;
 	private HashMap<String, InputParamValue> inputParams;
-	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.EAGER)
+	@OneToMany(cascade={CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.LAZY)
 	private List<TaskData> taskList;
-	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy = "process",fetch=FetchType.EAGER)
+	@OneToMany(cascade={CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.LAZY)
 	private List<ProcessHistory> processHistoryList;
 	@Version
 	@Column(name = "OPT_LOCK")

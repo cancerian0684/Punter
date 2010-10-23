@@ -1,8 +1,6 @@
 package com.sapient.punter.jpa;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -32,14 +30,14 @@ public class ProcessHistory implements Serializable{
 	private Date startTime;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date finishTime;
-	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.REFRESH},mappedBy="processHistory",fetch=FetchType.EAGER)
+	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy="processHistory",fetch=FetchType.EAGER)
 	private List<TaskHistory> taskHistoryList;
 	@ManyToOne
 	private ProcessData process;
 	@Transient
 	private int progress;
 	@Transient
-	private Document logDocument;
+	private transient Document logDocument;
 //	@Basic(optional = false)
 //	@Column(nullable = false, columnDefinition = "char(1) default 'A'")
 	@Enumerated(EnumType.STRING)

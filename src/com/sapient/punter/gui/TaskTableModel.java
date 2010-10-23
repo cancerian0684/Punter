@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.commons.beanutils.BeanUtils;
+
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskData;
  
@@ -120,7 +122,8 @@ public class TaskTableModel extends AbstractTableModel {
 	default :
 		break;
     }
-    StaticDaoFacade.getInstance().saveTask(task);
+    task=StaticDaoFacade.getInstance().saveTask(task);
+    BeanUtils.copyProperties(colArrayList.get(0), task);
     }catch(Exception e){
     	e.printStackTrace();
     }

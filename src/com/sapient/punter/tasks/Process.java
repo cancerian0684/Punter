@@ -1,5 +1,6 @@
 package com.sapient.punter.tasks;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,10 +28,10 @@ import com.sapient.punter.jpa.TaskHistory;
 import com.sapient.punter.utils.InputParamValue;
 import com.sapient.punter.utils.StringUtils;
 
-public class Process {
+public class Process implements Serializable{
 private List<Tasks> taskList=new ArrayList<Tasks>();
 private Map sessionMap=new HashMap<String, Object>();
-private TaskObserver ts;
+private transient TaskObserver ts;
 private HashMap<String, InputParamValue> inputParams;
 private ProcessHistory ph;
 @InputParam
@@ -43,7 +44,7 @@ private String emailsToNotify;
 private boolean emailsOnFailureOnly;
 @InputParam(description="<html>provide cron4j formatted scheduling string<br>13 * * jan-jun,sep-dec mon-fri,sat")
 private String scheduleString;
-protected ProcessObserver po;
+protected transient ProcessObserver po;
 private int lineBufferSize=1000;
 private Document logDocument;
 public Document getLogDocument() {

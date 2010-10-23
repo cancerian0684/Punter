@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.commons.beanutils.BeanUtils;
+
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.utils.InputParamValue;
@@ -83,15 +85,16 @@ import com.sapient.punter.utils.InputParamValue;
          */
         public void setValueAt(Object value, int row, int col) {
             data[row][col] = value;
-            fireTableCellUpdated(row, col);
             TaskData t=(TaskData) data[row][2];
             InputParamValue ipv=(InputParamValue) t.getInputParams().get((String)data[row][0]);
             ipv.setValue((String) value);
             try {
-				StaticDaoFacade.getInstance().saveTask(t);
+				t=StaticDaoFacade.getInstance().saveTask(t);
+				BeanUtils.copyProperties(data[row][2], t);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			fireTableCellUpdated(row, col);
         }
 
         private void printDebugData() {

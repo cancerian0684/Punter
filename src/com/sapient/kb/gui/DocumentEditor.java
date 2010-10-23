@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.OptimisticLockException;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -430,52 +431,71 @@ public class DocumentEditor extends JDialog{
 					    options,  //the titles of buttons
 					    options[0]); //default button title
 					if(n==JOptionPane.YES_OPTION){
-						saveDocument();
+						try{
+							saveDocument();
+						}catch (OptimisticLockException e) {
+							JOptionPane.showMessageDialog(DocumentEditor.this, "Document updated in parallel.", "update conflict", JOptionPane.ERROR_MESSAGE);
+							return;
+						}catch (Exception e) {
+							JOptionPane.showMessageDialog(DocumentEditor.this, "Error saving the document."+e.getMessage(), "Error saving!", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
 						doc=null;
 						docService=null;
 					}
 		    	}
 		        lastDim = DocumentEditor.this.getSize();
 		        lastLocation=getLocationOnScreen();
+				DocumentEditor.this.doc=null;
+				DocumentEditor.this.docService=null;
+				DocumentEditor.this.currentMD5=null;
+				DocumentEditor.this.ekitCore=null;
+				DocumentEditor.this.attachmentTable=null;
+				DocumentEditor.this.jsp=null;
+				DocumentEditor.this.textField=null;
+				dispose(); 
 		    }
 		});
 
 		 ActionListener actionListener = new ActionListener() {
 	     public void actionPerformed(ActionEvent actionEvent) {
-    	     if(isDocumentModified())
-    		  saveDocument();
+				if (isDocumentModified()) {
+					try {
+						saveDocument();
+					} catch (OptimisticLockException e) {
+						JOptionPane.showMessageDialog(DocumentEditor.this,
+								"Document updated in parallel.",
+								"update conflict", JOptionPane.ERROR_MESSAGE);
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(DocumentEditor.this,
+								"Error saving the document." + e.getMessage(),
+								"Error saving!", JOptionPane.ERROR_MESSAGE);
+					}
+				}
 	     }
 		 };
 		 keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK , false);
 		 textField.registerKeyboardAction(actionListener, keystroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
-		 addWindowListener(new WindowAdapter() {
-			 public void windowClosing(WindowEvent e) {
-				 System.err.println("Dsiposing document.");
-					dispose(); 
-					DocumentEditor.this.doc=null;
-					DocumentEditor.this.docService=null;
-					DocumentEditor.this.currentMD5=null;
-					DocumentEditor.this.ekitCore=null;
-					DocumentEditor.this.attachmentTable=null;
-					DocumentEditor.this.jsp=null;
-					DocumentEditor.this.textField=null;
-				}
-		});
 	}
-	public void saveDocument(){
+	public void saveDocument() throws OptimisticLockException,Exception{
 		System.out.println("saving document..  "+textField.getText());
         doc.setTitle(textField.getText());
         doc.setContent(ekitCore.getDocumentText()); 
         doc.setMd5(currentMD5);
     	try {
-    		docService.saveDocument(doc);
-    		doc=docService.getDocument(doc);
+    		doc=docService.saveDocument(doc);
 		} catch (RemoteException e) {
 			e.printStackTrace();
+			throw e;
+		}catch(OptimisticLockException ole){
+			throw ole;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			throw e;
 		}
 	}
 	public boolean isDocumentModified(){
-//		System.err.println(ekitCore.getDocumentText());
 		if((!everEdited)&&doc.getTitle().equals(textField.getText()))
 			return false;
 		currentMD5=getMD5(ekitCore.getDocumentText());
