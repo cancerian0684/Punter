@@ -412,6 +412,8 @@ public synchronized List<ProcessHistory> getSortedProcessHistoryListForProcessId
 	Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.id = :pid order by ph.id desc");
     q.setHint("toplink.refresh", "true");
     q.setParameter("pid", id);
+    q.setFirstResult(0);
+    q.setMaxResults(30);
     List<ProcessHistory> processHistoryList = q.getResultList();
     return processHistoryList;
 	}finally{
