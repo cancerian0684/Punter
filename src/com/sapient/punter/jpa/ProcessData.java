@@ -1,33 +1,29 @@
 package com.sapient.punter.jpa;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 
-import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import javax.persistence.Version;
 
 import com.sapient.punter.utils.InputParamValue;
 
 @Entity
 @Table(name="PROCESS")
+@TableGenerator(name="seqGen",table="ID_GEN",pkColumnName="GEN_KEY",valueColumnName="GEN_VALUE",pkColumnValue="SEQ_ID",allocationSize=1)
 public class ProcessData implements Serializable{
-//	@SequenceGenerator(name="Emp_Gen", sequenceName="Emp_Seq", allocationSize=5)
-//	@GeneratedValue(generator="Emp_Gen")
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.TABLE, generator="seqGen")
 	private long id;
 	private String name;
 	private String description;

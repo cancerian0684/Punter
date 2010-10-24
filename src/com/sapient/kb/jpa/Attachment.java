@@ -8,24 +8,27 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 @Entity
 @Table(name="ATTACHMENT")
+@TableGenerator(name="seqGen",table="ID_GEN",pkColumnName="GEN_KEY",valueColumnName="GEN_VALUE",pkColumnValue="SEQ_ID",allocationSize=1)
 @SecondaryTable(name = "ATTACHMENT_LOB", pkJoinColumns = {
 @PrimaryKeyJoinColumn(name = "ID", referencedColumnName = "ID") 
 })
 public class Attachment implements Serializable{
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.TABLE, generator="seqGen")
 	private long id;
 	private long accessCount;
 	private float priority;

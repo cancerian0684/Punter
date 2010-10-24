@@ -124,7 +124,7 @@ private void createAndShowGUI() throws Exception {
         
 		try {
         	busyImage = ImageIO.read(PunterGUI.class.getResource("/images/punter_busy.png"));
-        	idleImage = ImageIO.read(PunterGUI.class.getResource("/images/punter_idle.png"));
+        	idleImage = ImageIO.read(PunterGUI.class.getResource("/images/punter_discnt.png"));
         	PunterGuiFrame.setIconImage(busyImage);
         	KBFrame.setIconImage(busyImage);
         } catch (IOException e) {

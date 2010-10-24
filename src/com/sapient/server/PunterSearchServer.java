@@ -2,6 +2,7 @@ package com.sapient.server;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -62,6 +63,7 @@ public class PunterSearchServer implements PunterSearch {
 			registry.rebind("PunterSearch", stub);
 
 			System.err.println("RMI Server ready");
+			java.awt.Desktop.getDesktop().browse(new URI("http://localhost:8080/index.html")); 
 			WebServer.main(new String[]{});
 			System.err.println("Web Server ready");
 		} catch (Exception e) {

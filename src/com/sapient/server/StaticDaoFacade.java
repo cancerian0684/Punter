@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,11 +92,14 @@ public class StaticDaoFacade {
   }
   public Document createDocument(){
 	  	EntityManager em = emf.createEntityManager();
-	    DocumentService service = new DocumentService(em);
-
 	    em.getTransaction().begin();
-
-	    Document doc = service.createDocument("test title","");
+	    Document doc = new Document();
+	    doc.setTitle("test title");
+	    doc.setContent("");
+	    doc.setDateCreated(new Date());
+	    doc.setCategory("/all");
+	    em.persist(doc);
+	    em.flush();
 	    LuceneIndexDao.getInstance().indexDocs(doc);
 	    em.getTransaction().commit();
 	    em.close();
@@ -111,9 +115,9 @@ public class StaticDaoFacade {
   public Document saveDocument(Document doc){
 	  	EntityManager em = emf.createEntityManager();
 	  	try{
-	  	DocumentService service = new DocumentService(em);
 	    em.getTransaction().begin();
-	    service.saveDocument(doc);
+	    doc=em.merge(doc);
+	    em.flush();
 	    em.getTransaction().commit();
 	    LuceneIndexDao.getInstance().indexDocs(doc);
 	    return doc;
@@ -123,9 +127,8 @@ public class StaticDaoFacade {
   }
   public Attachment saveAttachment(Attachment attach){
 	  	EntityManager em = emf.createEntityManager();
-	  	DocumentService service = new DocumentService(em);
 	    em.getTransaction().begin();
-	    service.saveAttachment(attach);
+	    em.persist(attach);
 	    Document doc=attach.getDocument();
 	    em.getTransaction().commit();
 	    doc=em.find(Document.class, doc.getId());
@@ -136,18 +139,19 @@ public class StaticDaoFacade {
   public Document getDocument(Document doc){
 	  	EntityManager em = emf.createEntityManager();
 	  	try{
-	  	DocumentService service = new DocumentService(em);
-	  	doc=service.getDocument(doc);
+	  		doc=em.find(Document.class, doc.getId());
+	  		em.refresh(doc);
 	  	}finally{
-	    em.close();
+	  		em.close();
 	  	}
 	    return doc;
 }
 public boolean deleteAttachment(Attachment attch) {
 	EntityManager em = emf.createEntityManager();
 	em.getTransaction().begin();
-  	DocumentService service = new DocumentService(em);
-  	service.deleteAttachment(attch);
+  	attch=em.find(Attachment.class, attch.getId());
+	em.remove(attch);
+	em.flush();
   	Document doc=attch.getDocument();
   	em.getTransaction().commit();
   	doc=em.find(Document.class, doc.getId());
@@ -155,14 +159,15 @@ public boolean deleteAttachment(Attachment attch) {
     LuceneIndexDao.getInstance().indexDocs(doc);
 	return true;
 }
-public synchronized boolean deleteDocument(Document attch) {
+public synchronized boolean deleteDocument(Document doc) {
 	EntityManager em = emf.createEntityManager();
 	em.getTransaction().begin();
-  	DocumentService service = new DocumentService(em);
-  	service.deleteDocument(attch);
+	doc=em.find(Document.class, doc.getId());
+	em.remove(doc);
+	em.flush();
   	em.getTransaction().commit();
     em.close();
-    LuceneIndexDao.getInstance().deleteIndexForDoc(attch);
+    LuceneIndexDao.getInstance().deleteIndexForDoc(doc);
 	return true;
 }
 public synchronized void rebuildIndex(){
@@ -170,8 +175,9 @@ public synchronized void rebuildIndex(){
 	LuceneIndexDao.getInstance().deleteIndex();
 	EntityManager em = emf.createEntityManager();
 	em.getTransaction().begin();
-  	DocumentService service = new DocumentService(em);
-    for (Document emp : service.findAllDocuments()) {
+	Query query = em.createQuery("SELECT e FROM Document e");
+	List<Document> allDocs = query.getResultList();
+    for (Document emp : allDocs) {
       System.out.println(emp.getCategory());
       LuceneIndexDao.getInstance().indexDocs(emp);
     }

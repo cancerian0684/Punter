@@ -8,9 +8,11 @@ import java.util.Properties;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import javax.persistence.Version;
 
 import com.sapient.punter.utils.InputParamValue;
@@ -18,9 +20,10 @@ import com.sapient.punter.utils.OutputParamValue;
 
 @Entity
 @Table(name="TASK")
+@TableGenerator(name="seqGen",table="ID_GEN",pkColumnName="GEN_KEY",valueColumnName="GEN_VALUE",pkColumnValue="SEQ_ID",allocationSize=1)
 public class TaskData implements Serializable{
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.TABLE, generator="seqGen")
 	private long id;
 	private int sequence;
 	private String name;

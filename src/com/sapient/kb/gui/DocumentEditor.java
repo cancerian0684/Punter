@@ -55,6 +55,13 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.rtf.RTFEditorKit;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.BeanUtilsBean2;
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.converters.DateConverter;
+import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
+
 import com.hexidec.ekit.EkitCore;
 import com.hexidec.ekit.EkitCoreSpell;
 import com.sapient.kb.jpa.Attachment;
@@ -483,7 +490,13 @@ public class DocumentEditor extends JDialog{
         doc.setContent(ekitCore.getDocumentText()); 
         doc.setMd5(currentMD5);
     	try {
-    		doc=docService.saveDocument(doc);
+    		Document tmpDoc = docService.saveDocument(doc);
+    		/*BeanUtilsBean.setInstance(new BeanUtilsBean2());
+    		ConvertUtils.deregister();*/
+    		DateLocaleConverter converter = new DateLocaleConverter();
+    		converter.setLenient(true);
+    		ConvertUtils.register(converter, java.util.Date.class);
+    		BeanUtils.copyProperties(doc, tmpDoc);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			throw e;
