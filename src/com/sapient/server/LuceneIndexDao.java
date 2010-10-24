@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -84,19 +86,20 @@ public class LuceneIndexDao {
 	public static org.apache.lucene.document.Document Document(Document pDoc) {
 		org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
 		doc.add(new Field("id",""+ pDoc.getId(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-		doc.add(new Field("title", getPunterParsedText(pDoc.getTitle()), Field.Store.YES, Field.Index.ANALYZED));
+		doc.add(new Field("title", getPunterParsedText2(pDoc.getTitle()), Field.Store.NO, Field.Index.ANALYZED));
+		doc.add(new Field("titleS", pDoc.getTitle(), Field.Store.YES, Field.Index.NO));
 		doc.add(new Field("category", pDoc.getCategory(), Field.Store.YES, Field.Index.ANALYZED));
 		doc.add(new Field("created",DateTools.timeToString(pDoc.getDateCreated().getTime(), DateTools.Resolution.MINUTE),Field.Store.YES, Field.Index.NOT_ANALYZED));
 		Source source;
 		try {
 			source = new Source(new StringReader(pDoc.getContent()));
 			TextExtractor te=new TextExtractor(source);
-			String contents=itrim(getPunterParsedText(te.toString()));
+			String contents=itrim(getPunterParsedText2(te.toString()));
 			int len=contents.length();
-			doc.add(new Field("contents", contents.substring(0, len>10000?10000:len), Field.Store.YES, Field.Index.ANALYZED));
-//			String content=te.toString().toLowerCase();
-//			len=content.length();
-//			doc.add(new Field("content", content.substring(0, len>10000?10000:len), Field.Store.YES, Field.Index.NOT_ANALYZED));
+			doc.add(new Field("contents", contents.substring(0, len>10000?10000:len), Field.Store.NO, Field.Index.ANALYZED));
+			String content=te.toString().toLowerCase();
+			len=content.length();
+			doc.add(new Field("content", content.substring(0, len>10000?10000:len), Field.Store.YES, Field.Index.NO));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -107,7 +110,7 @@ public class LuceneIndexDao {
 			attchs.append(PunterTextExtractor.getText(attachment.getContent(), attachment.getTitle())+" ");
 		}
 //		System.out.println(attchs.toString());
-		doc.add(new Field("attachment", itrim(getPunterParsedText(attchs.toString())), Field.Store.NO, Field.Index.ANALYZED));
+		doc.add(new Field("attachment", itrim(getPunterParsedText2(attchs.toString())), Field.Store.NO, Field.Index.ANALYZED));
 		if(pDoc.getTag()!=null){
 		StringTokenizer stk=new StringTokenizer(pDoc.getTag(), " ;,");
 		StringBuilder tags=new StringBuilder();
@@ -117,6 +120,61 @@ public class LuceneIndexDao {
 		doc.add(new Field("tags", itrim(getPunterParsedText(tags.toString())), Field.Store.NO, Field.Index.ANALYZED));
 		}
 		return doc;
+	}
+	public static String getPunterParsedText2(String inText){
+		StringTokenizer stk=new StringTokenizer(inText, " ,");
+		Set<String> words = new HashSet<String>(1000); 
+		while (stk.hasMoreTokens()) {
+			String token=stk.nextToken();
+			words.add(token);
+			words.addAll(getPunterParsedSubText(token));
+		}
+		StringBuilder sb=new StringBuilder(10000);
+		for(String word :words){
+			sb.append(word+" ");
+		}
+		return sb.toString();
+	}
+	public static List<String> getPunterParsedSubText(String inText){
+		StringBuilder sb=new StringBuilder();
+		List<String> wordsList =new ArrayList<String>(5);
+		char curr;
+		char prev='\0';
+		for (int i = 0; i < inText.length(); i++) {
+			curr=inText.charAt(i);
+			if(!Character.isLetter(curr)&&Character.isLetter(prev)){
+//				System.err.println("boundary .. "+curr);
+//				sb.append(' ');
+				if(sb.length()>0)
+				wordsList.add(sb.toString());
+				sb.setLength(0);
+				if(Character.isLetterOrDigit(curr))
+					sb.append(curr);
+			}
+			else if(Character.isLetter(curr)&&!Character.isLetter(prev)){
+//				System.err.println("boundary .. "+curr);
+//				sb.append(' ');
+				if(sb.length()>0)
+				wordsList.add(sb.toString());
+				sb.setLength(0);
+				if(Character.isLetterOrDigit(curr))
+					sb.append(curr);
+			}else{	
+				if(Character.isLetterOrDigit(curr)){
+					sb.append(curr);
+				}
+				else{
+//					sb.append(' ');
+					if(sb.length()>0)
+					wordsList.add(sb.toString());
+					sb.setLength(0);
+				}
+			}
+			prev=curr;
+		}
+		if(sb.length()>0)
+			wordsList.add(sb.toString());
+		return wordsList;
 	}
 	public static String getPunterParsedText(String inText){
 		StringBuilder sb=new StringBuilder();
@@ -323,15 +381,15 @@ public class LuceneIndexDao {
             	 }
 				 document.setCategory(doc.get("category"));
                  document.setId(Long.parseLong(doc.get("id")));
-                 String title=doc.get("title");
-                 String contents=doc.get("contents");
+                 String title=doc.get("titleS");
+                 String contents=doc.get("content");
                  int maxNumFragmentsRequired = 2;
  				 String fragmentSeparator = "...";
  				 /*Source source;
  				 source = new Source(new StringReader(title));
  				 TextExtractor te=new TextExtractor(source);
  				 title = te.toString();*/
- 				 TokenStream tokenStream = analyzer.tokenStream("title",new StringReader(title));
+ 				 TokenStream tokenStream = analyzer.tokenStream("titleS",new StringReader(title));
  				 CachingTokenFilter filter = new CachingTokenFilter(tokenStream);
  				 String result = highlighter.getBestFragments(filter, title,
  						maxNumFragmentsRequired, fragmentSeparator);
@@ -345,7 +403,7 @@ public class LuceneIndexDao {
 				/*source = new Source(new StringReader(contents));
 				te=new TextExtractor(source);
  				contents = te.toString();*/
-				tokenStream = analyzer.tokenStream("contents",new StringReader(contents));
+				tokenStream = analyzer.tokenStream("content",new StringReader(contents));
 				filter = new CachingTokenFilter(tokenStream);
 				result = highlighter.getBestFragments(filter, contents,maxNumFragmentsRequired, fragmentSeparator);
 				if (result.length() > 0) {
