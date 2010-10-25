@@ -56,10 +56,7 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.rtf.RTFEditorKit;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.BeanUtilsBean;
-import org.apache.commons.beanutils.BeanUtilsBean2;
 import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.beanutils.converters.DateConverter;
 import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
 
 import com.hexidec.ekit.EkitCore;
@@ -146,7 +143,7 @@ public class DocumentEditor extends JDialog{
 		                   		System.out.println("Opening up the file.."+attch.getTitle());
 		                   		File temp=new File("Temp");
 		                   		temp.mkdir();
-		                   		File nf=new File(temp,"A_"+attch.getId()+attch.getExt());
+		                   		File nf=new File(temp,"A"+attch.getId()+"_"+attch.getTitle());
 		                   		try {
 		                   			if(!nf.exists()){
 		                   			FileOutputStream fos = new FileOutputStream(nf);

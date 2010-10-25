@@ -159,7 +159,7 @@ public boolean deleteAttachment(Attachment attch) {
     LuceneIndexDao.getInstance().indexDocs(doc);
 	return true;
 }
-public synchronized boolean deleteDocument(Document doc) {
+public  boolean deleteDocument(Document doc) {
 	EntityManager em = emf.createEntityManager();
 	em.getTransaction().begin();
 	doc=em.find(Document.class, doc.getId());
@@ -170,7 +170,7 @@ public synchronized boolean deleteDocument(Document doc) {
     LuceneIndexDao.getInstance().deleteIndexForDoc(doc);
 	return true;
 }
-public synchronized void rebuildIndex(){
+public  void rebuildIndex(){
 	System.out.println("Clearing old index");
 	LuceneIndexDao.getInstance().deleteIndex();
 	EntityManager em = emf.createEntityManager();
@@ -184,7 +184,7 @@ public synchronized void rebuildIndex(){
     em.close();
 }
 
-public synchronized void removeTask(TaskData task)throws Exception{
+public  void removeTask(TaskData task)throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
 	em.getTransaction().begin();
@@ -199,7 +199,7 @@ public synchronized void removeTask(TaskData task)throws Exception{
 		em.close();
 	}
 }
-public synchronized void removeProcess(ProcessData proc)throws Exception{
+public  void removeProcess(ProcessData proc)throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
 	em.getTransaction().begin();
@@ -215,7 +215,7 @@ public synchronized void removeProcess(ProcessData proc)throws Exception{
 	}
 }
 
-public synchronized TaskData createTask(TaskData task)throws Exception{
+public  TaskData createTask(TaskData task)throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
         em.getTransaction().begin();
@@ -227,7 +227,7 @@ public synchronized TaskData createTask(TaskData task)throws Exception{
 		em.close();
 	}
 }
-public synchronized ProcessData createProcess(ProcessData proc)throws Exception{
+public  ProcessData createProcess(ProcessData proc)throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
     em.getTransaction().begin();
@@ -239,7 +239,7 @@ public synchronized ProcessData createProcess(ProcessData proc)throws Exception{
 		em.close();
 	}
 }
-public synchronized ProcessHistory createProcessHistory(ProcessHistory ph)throws Exception{
+public  ProcessHistory createProcessHistory(ProcessHistory ph)throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
     em.getTransaction().begin();
@@ -251,7 +251,7 @@ public synchronized ProcessHistory createProcessHistory(ProcessHistory ph)throws
 		em.close();
 	}
 }
-public synchronized TaskHistory createTaskHistory(TaskHistory th)throws Exception{
+public  TaskHistory createTaskHistory(TaskHistory th)throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
         em.getTransaction().begin();
@@ -263,7 +263,7 @@ public synchronized TaskHistory createTaskHistory(TaskHistory th)throws Exceptio
 		em.close();
 	}
 }
-public synchronized void saveTaskHistory(TaskHistory t)throws Exception{
+public  void saveTaskHistory(TaskHistory t)throws Exception{
 	EntityManager em = emf.createEntityManager();
     em.getTransaction().begin();
     TaskHistory task=em.find(TaskHistory.class, t.getId());
@@ -277,7 +277,7 @@ public synchronized void saveTaskHistory(TaskHistory t)throws Exception{
     em.close();
 }
 
-	public synchronized void saveProcessHistory(ProcessHistory procHistory)
+	public  void saveProcessHistory(ProcessHistory procHistory)
 			throws Exception {
 		EntityManager em = emf.createEntityManager();
 		em.getTransaction().begin();
@@ -291,7 +291,7 @@ public synchronized void saveTaskHistory(TaskHistory t)throws Exception{
 		em.close();
 	}
 
-	public synchronized TaskData saveTask(TaskData t) throws Exception {
+	public  TaskData saveTask(TaskData t) throws Exception {
 		EntityManager em = emf.createEntityManager();
 		try {
 			em.getTransaction().begin();
@@ -308,7 +308,7 @@ public synchronized void saveTaskHistory(TaskHistory t)throws Exception{
 		}
 	}
 
-	public synchronized ProcessData saveProcess(ProcessData p) throws Exception {
+	public  ProcessData saveProcess(ProcessData p) throws Exception {
 		EntityManager em = emf.createEntityManager();
 		try {
 			em.getTransaction().begin();
@@ -324,7 +324,7 @@ public synchronized void saveTaskHistory(TaskHistory t)throws Exception{
 		}
 	}
 
-	public synchronized void listTask(long id) throws Exception {
+	public  void listTask(long id) throws Exception {
 		EntityManager em = emf.createEntityManager();
 		TaskData task = em.find(TaskData.class, id);
 		try {
@@ -344,7 +344,7 @@ public synchronized void saveTaskHistory(TaskHistory t)throws Exception{
 		}
 	}
 
-	public synchronized List<ProcessData> getScheduledProcessList()
+	public  List<ProcessData> getScheduledProcessList()
 			throws Exception {
 		EntityManager em = emf.createEntityManager();
 		try {
@@ -364,7 +364,7 @@ public synchronized void saveTaskHistory(TaskHistory t)throws Exception{
 		}
 	}
 
-	public synchronized List<ProcessData> getProcessList() throws Exception {
+	public  List<ProcessData> getProcessList() throws Exception {
 		EntityManager em = emf.createEntityManager();
 		try {
 			Query q = em.createQuery("select p from ProcessData p");
@@ -375,7 +375,7 @@ public synchronized void saveTaskHistory(TaskHistory t)throws Exception{
 			em.close();
 		}
 	}
-public synchronized ProcessData getProcess(long id) throws Exception{
+public  ProcessData getProcess(long id) throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
 		ProcessData proc= em.find(ProcessData.class, id);
@@ -385,7 +385,7 @@ public synchronized ProcessData getProcess(long id) throws Exception{
 		em.close();
 	}
 }
-public synchronized TaskHistory getTaskDao(TaskHistory td) throws Exception{
+public  TaskHistory getTaskDao(TaskHistory td) throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
 		TaskHistory proc= em.find(TaskHistory.class, td.getId());
@@ -395,7 +395,7 @@ public synchronized TaskHistory getTaskDao(TaskHistory td) throws Exception{
 		em.close();
 	}
 }
-public synchronized List<ProcessHistory> getProcessHistoryListForProcessId(long id) throws Exception{
+public  List<ProcessHistory> getProcessHistoryListForProcessId(long id) throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
 		ProcessData proc= em.find(ProcessData.class, id);
@@ -406,7 +406,7 @@ public synchronized List<ProcessHistory> getProcessHistoryListForProcessId(long 
 		em.close();
 	}
 }
-public synchronized List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id) throws Exception{
+public  List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id) throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
 	Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.id = :pid order by ph.id desc");
@@ -420,7 +420,7 @@ public synchronized List<ProcessHistory> getSortedProcessHistoryListForProcessId
 		em.close();
 	}
 }
-public synchronized ProcessHistory getProcessHistoryById(long id) throws Exception{
+public  ProcessHistory getProcessHistoryById(long id) throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
 		ProcessHistory proc= em.find(ProcessHistory.class, id);
@@ -430,7 +430,7 @@ public synchronized ProcessHistory getProcessHistoryById(long id) throws Excepti
 		em.close();
 	}
 }
-public synchronized List<TaskData> getProcessTasksById(long pid) throws UnknownHostException, Exception{
+public  List<TaskData> getProcessTasksById(long pid) throws UnknownHostException, Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
     ProcessData np = em.find(ProcessData.class, pid);
@@ -444,7 +444,7 @@ public synchronized List<TaskData> getProcessTasksById(long pid) throws UnknownH
 		em.close();
 	}
 }
-public synchronized List<TaskData> getSortedTasksByProcessId(long pid) throws UnknownHostException, Exception{
+public  List<TaskData> getSortedTasksByProcessId(long pid) throws UnknownHostException, Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
 	Query q = em.createQuery("select t from TaskData t where t.process.id=:pid and t.active=true order by t.sequence");
@@ -460,7 +460,7 @@ public synchronized List<TaskData> getSortedTasksByProcessId(long pid) throws Un
 		em.close();
 	}
 }
-public synchronized List<TaskData> getProcessTasks(long pid) throws UnknownHostException, Exception{
+public  List<TaskData> getProcessTasks(long pid) throws UnknownHostException, Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
 	Query q = em.createQuery("select p from ProcessData p where p.id=:pid");
@@ -478,7 +478,7 @@ public synchronized List<TaskData> getProcessTasks(long pid) throws UnknownHostE
 		em.close();
 	}
 }
-public synchronized void listProcesses(){
+public  void listProcesses(){
 	EntityManager em = emf.createEntityManager();
 	try{
     Query q = em.createQuery("select p from ProcessData p");
@@ -496,7 +496,7 @@ public synchronized void listProcesses(){
 	}
 }
 
-public synchronized void deleteTeam(){
+public  void deleteTeam(){
     String aTeamName = "Anaheim Angels";
     
     // Create the EntityManager

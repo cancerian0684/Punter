@@ -26,12 +26,14 @@ import javax.swing.UIManager;
 import org.apache.derby.drda.NetworkServerControl;
 
 import com.sapient.kb.gui.PunterKB;
+import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.executors.ProcessExecutor;
 import com.sapient.punter.utils.Launcher;
 import com.sapient.punter.utils.StackWindow;
 
 public class Main{
 	private static BufferedImage busyImage;
+	private static BufferedImage dsctImage;
 	private static BufferedImage idleImage;
 	private static TrayIcon trayIcon;
 	public static JFrame KBFrame;
@@ -44,7 +46,10 @@ public class Main{
 				trayIcon.setImage(busyImage);
 				PunterGuiFrame.setIconImage(busyImage);
 				KBFrame.setIconImage(busyImage);
-			}else{
+			}else if(!isConnected()){
+				trayIcon.setImage(dsctImage);
+			}
+			else{
 				PunterGuiFrame.setIconImage(idleImage);
 				KBFrame.setIconImage(idleImage);
 				trayIcon.setImage(idleImage);
@@ -125,6 +130,7 @@ private void createAndShowGUI() throws Exception {
 		try {
         	busyImage = ImageIO.read(PunterGUI.class.getResource("/images/punter_busy.png"));
         	idleImage = ImageIO.read(PunterGUI.class.getResource("/images/punter_discnt.png"));
+        	dsctImage = ImageIO.read(PunterGUI.class.getResource("/images/punter_idle.png"));
         	PunterGuiFrame.setIconImage(busyImage);
         	KBFrame.setIconImage(busyImage);
         } catch (IOException e) {
@@ -249,6 +255,20 @@ private void createAndShowGUI() throws Exception {
 }
 public static boolean isBusy(){
 	return ProcessExecutor.getInstance().isActive();
+}
+public static boolean isConnected(){
+	try{
+		StaticDaoFacade.getInstance().ping();
+		return true;
+	}catch (Exception e) {
+		System.err.println("connection to server lost.");
+		try{
+			StaticDaoFacade.getInstance().makeConnection();
+		}catch (Exception ee) {
+			// TODO: handle exception
+		}
+		return false;
+	}
 }
 public static void displayMsg(String msg){
 	if(trayIcon!=null){

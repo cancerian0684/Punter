@@ -131,7 +131,7 @@ public class PunterKB extends JPanel{
 			                   		System.out.println("Opening up the file.."+doc.getTitle());
 			                   		File temp=new File("Temp");
 			                   		temp.mkdir();
-			                   		File nf=new File(temp,"D_"+doc.getId()+doc.getExt());
+			                   		File nf=new File(temp,"D"+doc.getId()+"_"+doc.getTitle());
 			                   		try {
 			                   			if(!nf.exists()){
 			                   			FileOutputStream fos = new FileOutputStream(nf);
@@ -261,12 +261,12 @@ public class PunterKB extends JPanel{
                        java.util.List<File> l =(java.util.List<File>)t.getTransferData(DataFlavor.javaFileListFlavor);
                        for (File f : l) {
                        	System.err.println(f.getName());
-                       	Document attchment=new Document();
-                       	attchment.setTitle(f.getName());
-                       	attchment.setContent(getBytesFromFile(f));
-                       	attchment.setExt(getExtension(f));
-                       	attchment.setDateCreated(new Date());
-                       	attchment=docService.saveDocument(attchment);
+                       	Document doc=new Document();
+                       	doc.setTitle(f.getName());
+                       	doc.setContent(getBytesFromFile(f));
+                       	doc.setExt(getExtension(f));
+                       	doc.setDateCreated(new Date());
+                       	doc=docService.saveDocument(doc);
                        	System.err.println("Document added : "+f.getName());
                        }
                        return true;
@@ -669,7 +669,26 @@ public class PunterKB extends JPanel{
 		extension = f.getName().substring(dotPos);
 		return extension;
 	}
-	
+	//save last modified time then after 2 seconds poll for modified time of files. pick all files after that last scan time.
+	public static void indexAllTempDocs(){
+		File temp=new File("Temp");
+		if(temp.exists()){
+			File[] files = temp.listFiles();
+			for (File file : files) {
+				Document doc = new Document();
+				try {
+					System.err.println("Picked file :"+file.getName().substring(1, file.getName().indexOf("_")));
+					int id=Integer.parseInt(file.getName().substring(1, file.getName().indexOf("_")));
+					doc.setId(id);
+					doc = docService.getDocument(doc);
+					doc.setContent(getBytesFromFile(file));
+					docService.saveDocument(doc);
+				} catch (Exception e2) {
+					e2.printStackTrace();
+				}
+			}
+		}
+	}
 	static void copy(InputStream is, OutputStream os) throws IOException {
 		byte buffer[] = new byte[8192];
 		int bytesRead;

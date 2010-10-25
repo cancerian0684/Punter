@@ -21,15 +21,21 @@ public class StaticDaoFacade {
 		}
 		return sdf;
 	}
+	public void ping() throws RemoteException  {
+		stub.ping();
+	}
 	private StaticDaoFacade() {
+		makeConnection();
+	}
+	public void makeConnection(){
 		try {
-            Registry registry = LocateRegistry.getRegistry("localhost");
-            stub = (PunterSearch) registry.lookup("PunterSearch");
-            stub.ping();
-        } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
-            e.printStackTrace();
-        }
+			Registry registry = LocateRegistry.getRegistry("localhost");
+			stub = (PunterSearch) registry.lookup("PunterSearch");
+			stub.ping();
+		} catch (Exception e) {
+			System.err.println("Client exception: " + e.toString());
+//			e.printStackTrace();
+		}
 	}
   public List<String> getCategories(){
 	  try {
@@ -67,11 +73,6 @@ public class StaticDaoFacade {
 		stub.rebuildIndex();
 	}
 
-	public void ping()  {
-		
-	}
-
-	
 	public void removeTask(TaskData task)  {
 		try {
 			stub.removeTask(task);
