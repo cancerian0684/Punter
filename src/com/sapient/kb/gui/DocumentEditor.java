@@ -99,7 +99,7 @@ public class DocumentEditor extends JDialog{
 		testEditor.setTitle(doc.getId()+"-"+ doc.getTitle().substring(0, doc.getTitle().length()>20?20:doc.getTitle().length())+" ... [ "+doc.getAccessCount()+" .. "+doc.getDateAccessed()+" ]");
 		testEditor.pack();
 		testEditor.setVisible(true);
-		testEditor.ekitCore.requestFocus();
+//		testEditor.ekitCore.requestFocus();
 	}
 	public DocumentEditor(JFrame parent,final Document ldoc,StaticDaoFacade docServic) {
 		super(parent,false);
@@ -634,6 +634,7 @@ private class DocumentEditMousListener extends MouseAdapter {
         		everEdited=true;
         		setTitle(doc.getId()+"-"+ doc.getTitle().substring(0, doc.getTitle().length()>20?20:doc.getTitle().length())+" ... [ "+doc.getAccessCount()+" .. "+doc.getDateAccessed()+" ]..editing");
         		ekitCore.getTextPane().setEditable(editable);
+        		ekitCore.getTextPane().getCaret().setVisible(true);
         	}
         }
     }
