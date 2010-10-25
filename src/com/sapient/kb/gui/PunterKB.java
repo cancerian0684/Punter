@@ -2,20 +2,32 @@ package com.sapient.kb.gui;
 
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -29,6 +41,7 @@ import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
@@ -39,6 +52,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.gui.Main;
@@ -101,18 +115,36 @@ public class PunterKB extends JPanel{
 	            	   try {
 						docService.updateAccessCounter(luceneDoc);
 					} catch (RemoteException e2) {
-						// TODO Auto-generated catch block
 						e2.printStackTrace();
 					}
 	            	   Document doc = null;
 					try {
 						doc = docService.getDocument(luceneDoc);
 					} catch (RemoteException e2) {
-						// TODO Auto-generated catch block
 						e2.printStackTrace();
 					}
 	            	   if(column==1){
-         				DocumentEditor.showEditor(doc,docService,Main.KBFrame);
+	            		   if(doc.getExt().isEmpty())
+	            			   DocumentEditor.showEditor(doc,docService,Main.KBFrame);
+	            		   else{
+	            			   if(Desktop.isDesktopSupported()){
+			                   		System.out.println("Opening up the file.."+doc.getTitle());
+			                   		File temp=new File("Temp");
+			                   		temp.mkdir();
+			                   		File nf=new File(temp,"D_"+doc.getId()+doc.getExt());
+			                   		try {
+			                   			if(!nf.exists()){
+			                   			FileOutputStream fos = new FileOutputStream(nf);
+			                   			fos.write(doc.getContent());
+			                   			fos.close();
+			                   			nf.deleteOnExit();
+			                   			}
+										Desktop.getDesktop().open(nf);
+									} catch (IOException e1) {
+										e1.printStackTrace();
+									}
+			                   	}
+	            		   }
 	            	   	}
 	            	   String category = doc.getCategory();
 	            	   if(column ==2){
@@ -181,6 +213,198 @@ public class PunterKB extends JPanel{
             	 column.setPreferredWidth(120);
              }
          }
+         searchResultTable.setTransferHandler(new TransferHandler(){
+           	 public boolean canImport(TransferHandler.TransferSupport support) {
+           		 try{
+                    if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)||support.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream"))||support.isDataFlavorSupported(new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16"))) {
+                    
+                    }else{
+                   	 DataFlavor []dfs=support.getDataFlavors();
+                   	 System.out.println("\n\nTotal MimeTypes Supported by this operation :"+dfs.length);
+                   	 for(DataFlavor df:dfs){
+                   		 System.out.println(df.getMimeType());
+                   	 }
+                   	 return false;
+                    }
+                    boolean copySupported = (COPY & support.getSourceDropActions()) == COPY;
+                    if (!copySupported) {
+                        return false;
+                    }
+                    support.setDropAction(COPY);
+                    return true;
+           		 }catch(Exception e){
+           			 e.printStackTrace();
+           			 return false;
+           		 }
+               }
+
+               private void displayDropLocation(final String string) {
+                   SwingUtilities.invokeLater(new Runnable() {
+                       public void run() {
+                           JOptionPane.showMessageDialog(null, string);
+                       }
+                   });
+               }
+
+               @SuppressWarnings("unchecked")
+    			public boolean importData(TransferHandler.TransferSupport support) {
+                   if (!canImport(support)) {
+                       return false;
+                   }
+                   System.err.println("Import possible");
+                   try{
+                   Transferable t = support.getTransferable();
+                   if(t.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
+                   {
+                	   System.err.println("Import possible .. file");
+                   try {
+                       java.util.List<File> l =(java.util.List<File>)t.getTransferData(DataFlavor.javaFileListFlavor);
+                       for (File f : l) {
+                       	System.err.println(f.getName());
+                       	Document attchment=new Document();
+                       	attchment.setTitle(f.getName());
+                       	attchment.setContent(getBytesFromFile(f));
+                       	attchment.setExt(getExtension(f));
+                       	attchment.setDateCreated(new Date());
+                       	attchment=docService.saveDocument(attchment);
+                       	System.err.println("Document added : "+f.getName());
+                       }
+                       return true;
+                   } catch (UnsupportedFlavorException e) {
+                       return false;
+                   } catch (IOException e) {
+                       return false;
+                   }
+                   }
+                  else if(t.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream")))
+                   {
+                	   System.err.println("Import possible .. rtf");
+                   try {
+                   	   DataFlavor []dfs={new DataFlavor("text/rtf; class=java.io.InputStream")};
+                    //	df.s
+                       InputStream in =(InputStream) t.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
+                    //  System.out.println(out);
+                       File f=File.createTempFile("test",".doc");
+                       FileOutputStream fo=new FileOutputStream(f);
+                       copy(in, fo);
+                    //  fo.write(out.getBytes());
+                       fo.close();
+//                      fileListerWorker.getFileListQueue().add(f);
+                       System.out.println(f.getAbsolutePath());
+                      /*for (File f : l) {
+                       	fileListerWorker.getFileListQueue().add(f);
+                       	System.err.println(f.getName());
+                       }*/
+                       return true;
+                   } catch (UnsupportedFlavorException e) {
+                   	System.out.println("UnsupportedFlavorException");
+                     //  return false;
+                   } catch (IOException e) {
+                   	System.out.println("IOException");
+                     //  return false;
+                   } catch (ClassNotFoundException e) {
+    					e.printStackTrace();
+    				}
+                   }
+                   else if(t.isDataFlavorSupported(new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16")))
+                   {
+                	   System.err.println("Import possible .. html");
+                   try {
+                   	 DataFlavor []dfs={new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16")};
+                       InputStream in =(InputStream) t.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
+                       File f=File.createTempFile("test",".html");
+                       FileOutputStream fo=new FileOutputStream(f);
+                       copy(in, fo);
+                       fo.close();
+                       System.out.println(f.getAbsolutePath());
+                       return true;
+                   } catch (UnsupportedFlavorException e) {
+                   	System.out.println("UnsupportedFlavorException");
+                   } catch (IOException e) {
+                   	System.out.println("IOException");
+                   } catch (ClassNotFoundException e) {
+    					e.printStackTrace();
+    				}
+                   }else{
+                   	System.err.println("Data Flavors not supported yet :");
+                   	DataFlavor dfs[]=t.getTransferDataFlavors();
+                   	for(DataFlavor df:dfs){
+                   		System.err.println(df.getMimeType());
+                   	}
+                   }
+                   }catch(Exception e){
+                   	e.printStackTrace();
+                   }
+                   return false;
+               }
+
+               public int getSourceActions(JComponent c) {
+                   return MOVE;
+               }
+               
+               protected Transferable createTransferable(JComponent c) {
+               	   final DataFlavor flavors[] = {DataFlavor.javaFileListFlavor/*,uriListFlavor*/};
+                   JTable table = (JTable)c;
+                   int []selectedRows=table.getSelectedRows();
+                   final List<File> files=new java.util.ArrayList<File>();
+                   for(int selectedRow:selectedRows){/*
+                	AttachmentTableModel atm = ((AttachmentTableModel)attachmentTable.getModel());
+               	   	Attachment attch=(Attachment) atm.getRow(attachmentTable.convertRowIndexToModel(attachmentTable.getSelectedRow())).get(0);
+               	   	File temp=new File("Temp");
+            		temp.mkdir();
+            		File nf=new File(temp,attch.getTitle());
+            		if(!nf.exists()){
+            			try{
+               			FileOutputStream fos = new FileOutputStream(nf);
+               			fos.write(attch.getContent());
+               			fos.close();
+               			nf.deleteOnExit();
+            			}catch (Exception e) {
+    						e.printStackTrace();
+    					}
+            		}
+            		files.add(nf);
+                   */}
+                   if(files.size()>0){
+                   Transferable transferable = new Transferable() {
+                     public Object getTransferData(DataFlavor flavor) {
+                         if (flavor.equals(DataFlavor.javaFileListFlavor)) {
+                             return files;
+                             
+                         }
+                         return null;
+                       }
+                     public DataFlavor[] getTransferDataFlavors() {
+                       return flavors;
+                     }
+                     public boolean isDataFlavorSupported(
+                         DataFlavor flavor) {
+                       return flavor.equals(
+                           DataFlavor.javaFileListFlavor);
+                     }
+                   };
+                   return transferable;
+                   }
+               //    displayDropLocation("Operation not completed Yet.");
+                   return null;
+               }
+           
+               public void exportDone(JComponent c, Transferable t, int action) {
+    				if (action == MOVE) {/*
+    					JTable table = (JTable) c;
+    					int[] selectedRows = table.getSelectedRows();
+    					ArrayList<Object> selectedRowsData = new ArrayList<Object>();
+    					for (int selectedRow : selectedRows) {
+    						ArrayList request=tableModel.getRow(selectedRow);
+    		                ConversionRequest requestRef=(ConversionRequest) request.get(4);
+    						if (requestRef.getStatus().equals(ConversionRequest.Status.SUCCESS)||requestRef.getStatus().equals(ConversionRequest.Status.FAILURE)) {
+    							selectedRowsData.add(tableModel.getRow(selectedRow));
+    						}
+    					}
+    					tableModel.deleteRows(selectedRowsData);
+                   */}
+               }
+    	     });
          categoryComboBox = new JComboBox(categories.toArray());
          categoryComboBox.addActionListener(new ActionListener() {
 			@Override
@@ -294,7 +518,6 @@ public class PunterKB extends JPanel{
 	 				try {
 						docService.deleteDocument(doc);
 					} catch (RemoteException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 	 				dtm.deleteRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
@@ -406,18 +629,59 @@ public class PunterKB extends JPanel{
     	List<Document> docs = null;
 		try {
 			docs = docService.getDocList(searchTextField.getText(),categoryComboBox.getSelectedItem().toString(),toggleButton.isSelected(),andOrToggleButton.isSelected());
+			for (Document doc : docs) {
+				ArrayList<Document> docList=new ArrayList<Document>();
+				docList.add(doc);
+				ttm.insertRow(docList);
+			}
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    	for (Document doc : docs) {
-			ArrayList<Document> docList=new ArrayList<Document>();
-			docList.add(doc);
-			ttm.insertRow(docList);
-		}
+	}
+	public static byte[] getBytesFromFile(File file) throws IOException {
+	    InputStream is = new FileInputStream(file);
+	    long length = file.length();
+	    if (length > Integer.MAX_VALUE) {
+	        // File is too large
+	    }
+
+	    byte[] bytes = new byte[(int)length];
+	    int offset = 0;
+	    int numRead = 0;
+	    while (offset < bytes.length
+	           && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+	        offset += numRead;
+	    }
+
+	    // Ensure all the bytes have been read in
+	    if (offset < bytes.length) {
+	        throw new IOException("Could not completely read file "+file.getName());
+	    }
+	    is.close();
+	    return bytes;
 	}
 
-	 private static void createAndShowGUI() throws Exception {
+	public static String getExtension(File f) {
+		String extension = "";
+		int dotPos = f.getName().lastIndexOf(".");
+		extension = f.getName().substring(dotPos);
+		return extension;
+	}
+	
+	static void copy(InputStream is, OutputStream os) throws IOException {
+		byte buffer[] = new byte[8192];
+		int bytesRead;
+		while ((bytesRead = is.read(buffer)) != -1) {
+			System.out.println(bytesRead);
+			os.write(buffer, 0, bytesRead);
+		}
+		os.flush();
+		os.close();
+	}
+	
+	private static void createAndShowGUI() throws Exception {
 	        //Create and set up the window.
 	        frame = new JFrame("Punter KB");
 	        JFrame.setDefaultLookAndFeelDecorated(true);

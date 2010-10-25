@@ -95,7 +95,7 @@ public class StaticDaoFacade {
 	    em.getTransaction().begin();
 	    Document doc = new Document();
 	    doc.setTitle("test title");
-	    doc.setContent("");
+	    doc.setContent("".getBytes());
 	    doc.setDateCreated(new Date());
 	    doc.setCategory("/all");
 	    em.persist(doc);

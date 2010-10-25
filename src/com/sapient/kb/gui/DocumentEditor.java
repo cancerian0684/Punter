@@ -97,7 +97,7 @@ public class DocumentEditor extends JDialog{
 	}
 	public static void showEditor(Document doc,StaticDaoFacade docService,JFrame parent){
 		DocumentEditor testEditor=new DocumentEditor(parent,doc,docService);
-		testEditor.ekitCore.setDocumentText(doc.getContent());
+		testEditor.ekitCore.setDocumentText(new String(doc.getContent()));
 		testEditor.textField.setText(doc.getTitle());
 		testEditor.setTitle(doc.getId()+"-"+ doc.getTitle().substring(0, doc.getTitle().length()>20?20:doc.getTitle().length())+" ... [ "+doc.getAccessCount()+" .. "+doc.getDateAccessed()+" ]");
 		testEditor.pack();
@@ -146,7 +146,7 @@ public class DocumentEditor extends JDialog{
 		                   		System.out.println("Opening up the file.."+attch.getTitle());
 		                   		File temp=new File("Temp");
 		                   		temp.mkdir();
-		                   		File nf=new File(temp,attch.getTitle());
+		                   		File nf=new File(temp,"A_"+attch.getId()+attch.getExt());
 		                   		try {
 		                   			if(!nf.exists()){
 		                   			FileOutputStream fos = new FileOutputStream(nf);
@@ -264,6 +264,7 @@ public class DocumentEditor extends JDialog{
                    	attchment.setContent(getBytesFromFile(f));
                    	attchment.setDateCreated(new Date());
                    	attchment.setDocument(doc);
+                   	attchment.setExt(getExtension(f));
                    	attchment.setLength(f.length());
                    	attchment=docService.saveAttachment(attchment);
 
@@ -487,7 +488,7 @@ public class DocumentEditor extends JDialog{
 	public void saveDocument() throws OptimisticLockException,Exception{
 		System.out.println("saving document..  "+textField.getText());
         doc.setTitle(textField.getText());
-        doc.setContent(ekitCore.getDocumentText()); 
+        doc.setContent(ekitCore.getDocumentText().getBytes()); 
         doc.setMd5(currentMD5);
     	try {
     		Document tmpDoc = docService.saveDocument(doc);
@@ -616,6 +617,12 @@ public static String RTFFileExport(javax.swing.text.Document doc) {
         ex.printStackTrace();
     }
     return null;
+}
+public static String getExtension(File f) {
+	String extension = "";
+	int dotPos = f.getName().lastIndexOf(".");
+	extension = f.getName().substring(dotPos);
+	return extension;
 }
 private class DocumentEditMousListener extends MouseAdapter {
     public void mouseClicked(MouseEvent e) {

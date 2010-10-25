@@ -33,6 +33,7 @@ public class Attachment implements Serializable{
 	private long accessCount;
 	private float priority;
 	private boolean active;
+	private String ext;
 	private long length;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dateCreated;
@@ -142,4 +143,11 @@ public class Attachment implements Serializable{
 	public void setVersion(Long version) {
 		this.version = version;
 	}
+	public String getExt() {
+		return ext;
+	}
+	public void setExt(String ext) {
+		this.ext = ext;
+	}
+	
 }

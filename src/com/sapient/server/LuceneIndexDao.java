@@ -16,9 +16,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import net.htmlparser.jericho.Source;
-import net.htmlparser.jericho.TextExtractor;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CachingTokenFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -90,24 +87,19 @@ public class LuceneIndexDao {
 		doc.add(new Field("titleS", pDoc.getTitle(), Field.Store.YES, Field.Index.NO));
 		doc.add(new Field("category", pDoc.getCategory(), Field.Store.YES, Field.Index.ANALYZED));
 		doc.add(new Field("created",DateTools.timeToString(pDoc.getDateCreated().getTime(), DateTools.Resolution.MINUTE),Field.Store.YES, Field.Index.NOT_ANALYZED));
-		Source source;
 		try {
-			source = new Source(new StringReader(pDoc.getContent()));
-			TextExtractor te=new TextExtractor(source);
-			String contents=itrim(getPunterParsedText2(te.toString()));
+			String contents=PunterTextExtractor.getText(pDoc.getContent(),"",pDoc.getExt());
+			doc.add(new Field("contents", itrim(getPunterParsedText2(contents)), Field.Store.NO, Field.Index.ANALYZED));
 			int len=contents.length();
-			doc.add(new Field("contents", contents.substring(0, len>10000?10000:len), Field.Store.NO, Field.Index.ANALYZED));
-			String content=te.toString().toLowerCase();
-			len=content.length();
-			doc.add(new Field("content", content.substring(0, len>10000?10000:len), Field.Store.YES, Field.Index.NO));
-		} catch (IOException e) {
+			doc.add(new Field("content", contents.substring(0, len>20000?20000:len), Field.Store.YES, Field.Index.NO));
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
 		Collection<Attachment> attchmts = pDoc.getAttachments();
 		StringBuilder attchs=new StringBuilder();
 		if(attchmts!=null)
 		for (Attachment attachment : attchmts) {
-			attchs.append(PunterTextExtractor.getText(attachment.getContent(), attachment.getTitle())+" ");
+			attchs.append(PunterTextExtractor.getText(attachment.getContent(), attachment.getTitle(),attachment.getExt()));
 		}
 //		System.out.println(attchs.toString());
 		doc.add(new Field("attachment", itrim(getPunterParsedText2(attchs.toString())), Field.Store.NO, Field.Index.ANALYZED));
@@ -409,9 +401,9 @@ public class LuceneIndexDao {
 				if (result.length() > 0) {
 					result = result.replace('\n', ' ');
 					result=itrim(result);
-					document.setContent(result);
+					document.setContent(result.getBytes());
 				}else{
-					document.setContent("");
+					document.setContent("".getBytes());
 				}
                  resultDocs.add(document);
 			}

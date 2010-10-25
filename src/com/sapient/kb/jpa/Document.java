@@ -44,13 +44,14 @@ public class Document implements Serializable{
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dateAccessed;
 	private String title;
+	private String ext="";
 	private String category="/all";
 	private String tag;
 	private String author;
 	@Lob
 	@Basic(fetch = FetchType.EAGER)
-	@Column(columnDefinition="clob(2M)",table = "DOCUMENT_LOB")
-	private String content;
+	@Column(columnDefinition="blob(5M)",table = "DOCUMENT_LOB")
+	private byte[] content;
 	private String md5;
 	@Transient
 	private String plainContent="";
@@ -115,10 +116,10 @@ public class Document implements Serializable{
 	public void setAuthor(String author) {
 		this.author = author;
 	}
-	public String getContent() {
+	public byte[] getContent() {
 		return content;
 	}
-	public void setContent(String content) {
+	public void setContent(byte[] content) {
 		this.content = content;
 	}
 	public Collection<Document> getRelatedDocs() {
@@ -186,6 +187,15 @@ public class Document implements Serializable{
 	}
 	public void setVersion(Long version) {
 		this.version = version;
+	}
+	public String getExt() {
+		return ext;
+	}
+	public void setExt(String ext) {
+		this.ext = ext;
+	}
+	public int getLength(){
+		return content.length;
 	}
 	
 	/*@Override
