@@ -50,7 +50,7 @@ public abstract class Tasks implements Serializable{
 		System.err.println("Calling before Task: ");
 		strLogger = new StringBuilder();
 		
-	    cHandler = new ConsoleHandler();
+	   /* cHandler = new ConsoleHandler();
 	    cHandler.setFormatter(new Formatter() {
 			@Override
 			public String format(LogRecord record) {
@@ -59,7 +59,7 @@ public abstract class Tasks implements Serializable{
 	          + record.getSourceMethodName() + "() - "
 	          + record.getMessage() + "\r\n";
 			}
-		});
+		});*/
 	    mHandler = new MemoryHandler(new Handler() {
 	        public void publish(LogRecord record) {
 	        	String msg=new Date(record.getMillis())+" ["+Thread.currentThread().getName()+"] "+record.getLevel()
@@ -83,7 +83,7 @@ public abstract class Tasks implements Serializable{
         
       }, 2, loggingLevel);
 	    LOGGER.get().addHandler(mHandler);
-	    LOGGER.get().addHandler(cHandler);
+//	    LOGGER.get().addHandler(cHandler);
 	    LOGGER.get().setUseParentHandlers(false);
 	}
 	public void setLoggingLevel(Level loggingLevel) {

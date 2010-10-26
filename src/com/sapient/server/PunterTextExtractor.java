@@ -3,6 +3,9 @@ package com.sapient.server;
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 
+import javax.swing.text.Document;
+import javax.swing.text.rtf.RTFEditorKit;
+
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.TextExtractor;
 
@@ -28,6 +31,12 @@ public class PunterTextExtractor {
 		}
 		else if(ext.equalsIgnoreCase(".txt")){
 			text.append(new String(contents));
+		}
+		else if(ext.equalsIgnoreCase(".rtf")){
+			RTFEditorKit kit = new RTFEditorKit();
+			Document doc = kit.createDefaultDocument();
+			kit.read(bais, doc, 0);
+			text.append(doc.getText(0, doc.getLength()));
 		}
 		else if(ext.equalsIgnoreCase(".html")||ext.equalsIgnoreCase(".htm")){
 			Source source = new Source(new StringReader(new String(contents)));
