@@ -45,6 +45,5 @@ public interface PunterSearch extends Remote {
 	 List<TaskData> getProcessTasksById(long pid)throws RemoteException;
 	 List<TaskData> getSortedTasksByProcessId(long pid)throws RemoteException;
 	 List<TaskData> getProcessTasks(long pid)throws RemoteException;
-	 void listProcesses()throws RemoteException;
 	 void deleteTeam()throws RemoteException;
 }

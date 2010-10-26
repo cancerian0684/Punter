@@ -271,7 +271,6 @@ public class StaticDaoFacade {
 		}
 		return Collections.EMPTY_LIST;
 	}
-
 	
 	public List<TaskData> getProcessTasks(long pid)  {
 		try {
@@ -281,16 +280,6 @@ public class StaticDaoFacade {
 		}
 		return Collections.EMPTY_LIST;
 	}
-
-	
-	public void listProcesses()  {
-		try {
-			stub.listProcesses();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
-
 	
 	public void deleteTeam()  {
 		try {

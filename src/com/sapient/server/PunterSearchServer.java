@@ -345,11 +345,6 @@ public class PunterSearchServer implements PunterSearch {
 	}
 
 	@Override
-	public void listProcesses() throws RemoteException {
-		sdf.listProcesses();
-	}
-
-	@Override
 	public void deleteTeam() throws RemoteException {
 		sdf.deleteTeam();
 	}

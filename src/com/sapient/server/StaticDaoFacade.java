@@ -119,6 +119,8 @@ public class StaticDaoFacade {
 	    doc=em.merge(doc);
 	    em.flush();
 	    em.getTransaction().commit();
+	    doc=em.find(Document.class, doc.getId());
+	    em.refresh(doc);
 	    LuceneIndexDao.getInstance().indexDocs(doc);
 	    return doc;
 	  	}finally{
@@ -129,9 +131,11 @@ public class StaticDaoFacade {
 	  	EntityManager em = emf.createEntityManager();
 	    em.getTransaction().begin();
 	    em.persist(attach);
+	    em.flush();
 	    Document doc=attach.getDocument();
 	    em.getTransaction().commit();
 	    doc=em.find(Document.class, doc.getId());
+	    em.refresh(doc);
 	    em.close();
 	    LuceneIndexDao.getInstance().indexDocs(doc);
 	    return attach;
@@ -474,23 +478,6 @@ public  List<TaskData> getProcessTasks(long pid) throws UnknownHostException, Ex
 		System.out.println(task.getName());
 	}
     return tl;
-	}finally{
-		em.close();
-	}
-}
-public  void listProcesses(){
-	EntityManager em = emf.createEntityManager();
-	try{
-    Query q = em.createQuery("select p from ProcessData p");
-    List<ProcessData> processList = q.getResultList();
-    
-    for (ProcessData np : processList) {	
-    	System.out.println(np.getDescription());
-    	Collection<TaskData> tl = np.getTaskList();
-    	for (TaskData task : tl) {
-    		System.out.println(task.getName());
-    	}
-	}
 	}finally{
 		em.close();
 	}

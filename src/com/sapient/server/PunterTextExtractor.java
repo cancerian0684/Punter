@@ -45,7 +45,7 @@ public class PunterTextExtractor {
 		}
 		else if(ext.equalsIgnoreCase(".pdf")){
 			PdfReader reader = new PdfReader(bais);
-			int pages=reader.getNumberOfPages()>10?10:reader.getNumberOfPages();
+			int pages=reader.getNumberOfPages()>20?20:reader.getNumberOfPages();
 			for (int i = 0; i < pages; i++) {
 				text.append(PdfTextExtractor.getTextFromPage(reader, i+1));
 		}
@@ -54,7 +54,7 @@ public class PunterTextExtractor {
 		else if(ext.equalsIgnoreCase(".doc")||ext.equalsIgnoreCase(".docx")||ext.equalsIgnoreCase(".xls")||ext.equalsIgnoreCase(".xlsx")||ext.equalsIgnoreCase(".ppt")||ext.equalsIgnoreCase(".pptx")){
 			POITextExtractor oleTextExtractor = ExtractorFactory.createExtractor(bais);
 			String ta=oleTextExtractor.getText();
-			text.append(ta.substring(0, ta.length()>10000?10000:ta.length()));
+			text.append(ta.substring(0, ta.length()>20000?20000:ta.length()));
 		}
 		else if(ext.equalsIgnoreCase(".msg")){
 			MAPIMessage msg=new MAPIMessage(bais);
