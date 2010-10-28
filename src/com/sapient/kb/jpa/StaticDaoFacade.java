@@ -28,8 +28,12 @@ public class StaticDaoFacade {
 		makeConnection();
 	}
 	public void makeConnection(){
+		String host="localhost";
 		try {
-			Registry registry = LocateRegistry.getRegistry("localhost");
+			try{
+			MultiCastServerLocator mcsl=new MultiCastServerLocator();
+			host=mcsl.LocateServerAddress();}catch (Exception e) {e.printStackTrace();}
+			Registry registry = LocateRegistry.getRegistry(host);
 			stub = (PunterSearch) registry.lookup("PunterSearch");
 			stub.ping();
 		} catch (Exception e) {

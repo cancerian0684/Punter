@@ -53,6 +53,7 @@ public class PunterSearchServer implements PunterSearch {
 				@Override
 				public void run() {
 					super.run();
+					MultiCastResponder.getInstance().shutdown();
 					proc.destroy();
 				}
 			});
@@ -61,8 +62,8 @@ public class PunterSearchServer implements PunterSearch {
 			PunterSearch stub = (PunterSearch) UnicastRemoteObject.exportObject(obj, 0);
 			Registry registry = LocateRegistry.getRegistry();
 			registry.rebind("PunterSearch", stub);
-
 			System.err.println("RMI Server ready");
+			MultiCastResponder.getInstance();
 			java.awt.Desktop.getDesktop().browse(new URI("http://localhost:8080/index.html")); 
 			WebServer.main(new String[]{});
 			System.err.println("Web Server ready");
