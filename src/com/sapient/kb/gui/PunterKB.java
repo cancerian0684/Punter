@@ -80,11 +80,6 @@ public class PunterKB extends JPanel{
 	public PunterKB() {
 		 setLayout(new GridBagLayout());
 		 GridBagConstraints c = new GridBagConstraints();
-		 List<String> dataList=new ArrayList<String>();
-		 dataList.add("Munish");
-		 dataList.add("Manu");
-		 dataList.add("banyal");
-		 dataList.add("Parvesh");
 		 searchTextField=new JTextField(20);
 		 searchTextField.setFont(new Font("Arial",Font.TRUETYPE_FONT,12));
 		 searchTextField.getDocument().addDocumentListener(
@@ -128,7 +123,7 @@ public class PunterKB extends JPanel{
 					}
 	            	   if(column==1){
 	            		   if(doc.getExt().isEmpty())
-	            			   DocumentEditor.showEditor(doc,docService,Main.KBFrame);
+	            			   DocumentEditor.showEditor(doc,docService,null);
 	            		   else{
 	            			   if(Desktop.isDesktopSupported()){
 			                   		System.out.println("Opening up the file.."+doc.getTitle());
