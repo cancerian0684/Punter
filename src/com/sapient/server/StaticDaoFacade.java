@@ -159,6 +159,7 @@ public boolean deleteAttachment(Attachment attch) {
   	Document doc=attch.getDocument();
   	em.getTransaction().commit();
   	doc=em.find(Document.class, doc.getId());
+  	em.refresh(doc);
     em.close();
     LuceneIndexDao.getInstance().indexDocs(doc);
 	return true;

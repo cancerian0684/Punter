@@ -22,8 +22,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
@@ -178,7 +181,6 @@ public class PunterKB extends JPanel{
     	 	}
     	 	return super.editCellAt(row, column, e);
          }
-
 		 };
 //		 table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		 searchResultTable.setShowGrid(false);
@@ -187,6 +189,7 @@ public class PunterKB extends JPanel{
 		 searchResultTable.setFillsViewportHeight(true);
 		 searchResultTable.setAutoCreateRowSorter(true);
 		 searchResultTable.setRowHeight(60);
+		 searchResultTable.setDragEnabled(true);
 		 searchResultTable.setIntercellSpacing(new Dimension(0, 0));
 		 searchResultTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		 searchResultTable.setFont(new Font("Arial",Font.TRUETYPE_FONT,11));
@@ -265,6 +268,8 @@ public class PunterKB extends JPanel{
                        	doc.setTitle(f.getName());
                        	doc.setContent(getBytesFromFile(f));
                        	doc.setExt(getExtension(f));
+                       	if(getExtension(f)==null||getExtension(f).isEmpty())
+                           	doc.setExt(".txt");
                        	doc.setDateCreated(new Date());
                        	doc=docService.saveDocument(doc);
                        	System.err.println("Document added : "+f.getName());
@@ -347,26 +352,38 @@ public class PunterKB extends JPanel{
                    JTable table = (JTable)c;
                    int []selectedRows=table.getSelectedRows();
                    final List<File> files=new java.util.ArrayList<File>();
-                   for(int selectedRow:selectedRows){/*
-                	AttachmentTableModel atm = ((AttachmentTableModel)attachmentTable.getModel());
-               	   	Attachment attch=(Attachment) atm.getRow(attachmentTable.convertRowIndexToModel(attachmentTable.getSelectedRow())).get(0);
-               	   	File temp=new File("Temp");
-            		temp.mkdir();
-            		File nf=new File(temp,attch.getTitle());
-            		if(!nf.exists()){
-            			try{
-               			FileOutputStream fos = new FileOutputStream(nf);
-               			fos.write(attch.getContent());
-               			fos.close();
-               			nf.deleteOnExit();
-            			}catch (Exception e) {
-    						e.printStackTrace();
-    					}
-            		}
-            		files.add(nf);
-                   */}
-                   if(files.size()>0){
-                   Transferable transferable = new Transferable() {
+                   for(int selectedRow:selectedRows){
+                	   DocumentTableModel dtm= (DocumentTableModel) searchResultTable.getModel();
+                	   Document doc=(Document) dtm.getRow(searchResultTable.convertRowIndexToModel(selectedRow)).get(0);
+                	   try {
+						doc=docService.getDocument(doc);
+						//Punter Doc
+						if(doc.getExt().isEmpty()){
+							files.add(createZipFromDocument(doc));
+						}
+						//System Doc
+						else{                		   
+							System.out.println("Opening up the file.."+doc.getTitle());
+							File temp=new File("Temp");
+							temp.mkdir();
+							File nf=new File(temp,"D"+doc.getId()+"_"+doc.getTitle());
+							try {
+								if(!nf.exists()){
+									FileOutputStream fos = new FileOutputStream(nf);
+									fos.write(doc.getContent());
+									fos.close();
+								}
+								files.add(nf);
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+						}
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						}
+	                 }
+	                 if(files.size()>0){
+	                 Transferable transferable = new Transferable() {
                      public Object getTransferData(DataFlavor flavor) {
                          if (flavor.equals(DataFlavor.javaFileListFlavor)) {
                              return files;
@@ -639,6 +656,39 @@ public class PunterKB extends JPanel{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	public static File createZipFromDocument(Document doc){
+		try {
+			// These are the files to include in the ZIP file
+			Collection<Attachment> attchs = doc.getAttachments();
+			// Create a buffer for reading the files
+			byte[] buf = new byte[1024];
+		    // Create the ZIP file
+		    String outFilename = doc.getId()+".zip";
+		    File tmpDir=new File("Temp");
+		    if(!tmpDir.exists())
+		    	tmpDir.mkdirs();
+		    File resultFile = new File(tmpDir, outFilename);
+		    ZipOutputStream out = new ZipOutputStream(new FileOutputStream(resultFile));
+
+		    out.putNextEntry(new ZipEntry(doc.getId()+".htm"));
+		 // Transfer bytes from the file to the ZIP file
+	        out.write(doc.getContent());
+	        // Complete the entry
+	        out.closeEntry();
+		    // Compress the files
+	        for (Attachment attch : attchs) {
+		        out.putNextEntry(new ZipEntry(attch.getId()+attch.getExt()));
+		        out.write(attch.getContent());
+		        out.closeEntry();
+			}
+		    // Complete the ZIP file
+		    out.close();
+		    return resultFile;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	public static byte[] getBytesFromFile(File file) throws IOException {
 	    InputStream is = new FileInputStream(file);
