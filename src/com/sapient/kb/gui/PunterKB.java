@@ -134,7 +134,7 @@ public class PunterKB extends JPanel{
 			                   		System.out.println("Opening up the file.."+doc.getTitle());
 			                   		File temp=new File("Temp");
 			                   		temp.mkdir();
-			                   		File nf=new File(temp,"D"+doc.getId()+"_"+doc.getTitle());
+			                   		File nf=new File(temp,"D_"+doc.getId()+doc.getExt());
 			                   		try {
 			                   			if(!nf.exists()){
 			                   			FileOutputStream fos = new FileOutputStream(nf);
@@ -366,7 +366,7 @@ public class PunterKB extends JPanel{
 							System.out.println("Opening up the file.."+doc.getTitle());
 							File temp=new File("Temp");
 							temp.mkdir();
-							File nf=new File(temp,"D"+doc.getId()+"_"+doc.getTitle());
+							File nf=new File(temp,"D_"+doc.getId()+doc.getExt());
 							try {
 								if(!nf.exists()){
 									FileOutputStream fos = new FileOutputStream(nf);
@@ -515,10 +515,29 @@ public class PunterKB extends JPanel{
  				if(searchResultTable.getSelectedRow()>=0){
  				Document doc=(Document) ((DocumentTableModel)searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
  				try {
-					DocumentEditor.showEditor(docService.getDocument(doc),docService,Main.KBFrame);
-					docService.updateAccessCounter(doc);
+					 doc=docService.getDocument(doc);
+					 if(doc.getExt().isEmpty())
+          			   DocumentEditor.showEditor(doc,docService,Main.KBFrame);
+          		     else{
+          			   if(Desktop.isDesktopSupported()){
+		                   		System.out.println("Opening up the file.."+doc.getExt());
+		                   		File temp=new File("Temp");
+		                   		temp.mkdir();
+		                   		File nf=new File(temp,"D_"+doc.getId()+doc.getExt());
+		                   		try {
+		                   			if(!nf.exists()){
+		                   			FileOutputStream fos = new FileOutputStream(nf);
+		                   			fos.write(doc.getContent());
+		                   			fos.close();
+		                   			nf.deleteOnExit();
+		                   			}
+									Desktop.getDesktop().open(nf);
+								} catch (IOException e1) {
+									e1.printStackTrace();
+								}
+		                   	}
+          		   }
 				} catch (RemoteException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
  				}

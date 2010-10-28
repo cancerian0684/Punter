@@ -395,7 +395,9 @@ public class LuceneIndexDao {
 				/*source = new Source(new StringReader(contents));
 				te=new TextExtractor(source);
  				contents = te.toString();*/
-				tokenStream = analyzer.tokenStream("content",new StringReader(contents));
+ 				
+				if(!searchString.equals("*")){
+ 				tokenStream = analyzer.tokenStream("content",new StringReader(contents));
 				filter = new CachingTokenFilter(tokenStream);
 				result = highlighter.getBestFragments(filter, contents,maxNumFragmentsRequired, fragmentSeparator);
 				if (result.length() > 0) {
@@ -404,6 +406,9 @@ public class LuceneIndexDao {
 					document.setContent(result.getBytes());
 				}else{
 					document.setContent("".getBytes());
+				}
+				}else{
+					document.setContent(contents.substring(0, contents.length()>100?100:contents.length()).getBytes());
 				}
                  resultDocs.add(document);
 			}
