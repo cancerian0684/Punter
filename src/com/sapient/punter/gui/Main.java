@@ -1,6 +1,7 @@
 package com.sapient.punter.gui;
 
 import java.awt.AWTException;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.MenuItem;
@@ -71,6 +72,8 @@ private void createAndShowGUI() throws Exception {
     KBFrame.setContentPane(new PunterKB());
     if(AppSettings.getInstance().KBFrameLocation!=null)
     KBFrame.setLocation(AppSettings.getInstance().KBFrameLocation);
+    if(AppSettings.getInstance().getKBFrameDimension()!=null)
+    KBFrame.setPreferredSize(AppSettings.getInstance().getKBFrameDimension());
     KBFrame.pack();
     KBFrame.addWindowListener(new java.awt.event.WindowAdapter() {
 		public void windowIconified(WindowEvent e) {
@@ -182,8 +185,9 @@ private void createAndShowGUI() throws Exception {
     			if(option==JOptionPane.OK_OPTION)
     			{
     				AppSettings.getInstance().KBFrameLocation=KBFrame.getLocation();
+    				AppSettings.getInstance().setKBFrameDimension(KBFrame.getSize());
     				AppSettings.getInstance().PunterGuiFrameLocation=PunterGuiFrame.getLocation();
-    				System.out.println("Removing tray icon");
+    				System.out.println("Removing tray icon : "+KBFrame.getSize());
     				tray.remove(trayIcon);
     				Launcher.programQuit();
     				//dispose();

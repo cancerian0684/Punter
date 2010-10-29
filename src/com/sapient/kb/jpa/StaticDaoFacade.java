@@ -5,6 +5,7 @@ import java.rmi.registry.Registry;
 import java.util.Collections;
 import java.util.List;
 
+import com.sapient.punter.gui.AppSettings;
 import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.TaskData;
@@ -30,9 +31,11 @@ public class StaticDaoFacade {
 	public void makeConnection(){
 		String host="localhost";
 		try {
-			try{
-			MultiCastServerLocator mcsl=new MultiCastServerLocator();
-			host=mcsl.LocateServerAddress();}catch (Exception e) {e.printStackTrace();}
+			if(AppSettings.getInstance().isMultiSearchEnable()){
+				try{
+				MultiCastServerLocator mcsl=new MultiCastServerLocator();
+				host=mcsl.LocateServerAddress();}catch (Exception e) {e.printStackTrace();}
+			}
 			Registry registry = LocateRegistry.getRegistry(host);
 			stub = (PunterSearch) registry.lookup("PunterSearch");
 			stub.ping();
@@ -55,8 +58,8 @@ public class StaticDaoFacade {
   public Document createDocument() throws RemoteException{
 	  return stub.createDocument();
   }
-  public List<Document> getDocList(String q,String category,boolean isSpclTxt,boolean isAND) throws RemoteException{
-	  return stub.getDocList(q, category, isSpclTxt, isAND);
+  public List<Document> getDocList(String q,String category,boolean isSpclTxt,boolean isAND,int maxResults) throws RemoteException{
+	  return stub.getDocList(q, category, isSpclTxt, isAND, maxResults);
   }
   public Document saveDocument(Document doc) throws RemoteException{
 	  return stub.saveDocument(doc);

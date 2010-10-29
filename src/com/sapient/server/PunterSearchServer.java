@@ -85,8 +85,8 @@ public class PunterSearchServer implements PunterSearch {
 
 	@Override
 	public List<Document> getDocList(String q, String category,
-			boolean isSpclTxt, boolean isAND) {
-		return sdf.getDocList(q, category, isSpclTxt, isAND);
+			boolean isSpclTxt, boolean isAND,int maxResults) {
+		return sdf.getDocList(q, category, isSpclTxt, isAND, maxResults);
 	}
 
 	@Override

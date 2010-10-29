@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -17,16 +18,51 @@ import javax.jnlp.FileContents;
 import javax.jnlp.PersistenceService;
 import javax.jnlp.ServiceManager;
 import javax.jnlp.UnavailableServiceException;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 
-public class AppSettings implements Serializable{
+public class AppSettings implements Serializable, AppSettingsMBean{
 	private static final long serialVersionUID = 8652757533411927346L;
 	private static AppSettings appSettings;
-	public Dimension KBFrameDimension;
+	private Dimension KBFrameDimension;
 	public Point KBFrameLocation; 
-	public Point PunterGuiFrameLocation; 
+	public Point PunterGuiFrameLocation;
+	private int maxResults;
+	private boolean multiSearchEnable=true;
 	private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);
+		maxResults=10;
+	}
+	@Override
+	public boolean isMultiSearchEnable() {
+		return multiSearchEnable;
+	}
+	@Override
+	public void setMultiSearchEnable(boolean multiSearchEnable) {
+		this.multiSearchEnable = multiSearchEnable;
+	}
+	@Override
+	public void setMaxResults(int maxResults){
+		this.maxResults=maxResults;
+	}
+	@Override
+	public int getMaxResults() {
+		if(maxResults==0)
+			maxResults=5;
+		return maxResults;
+	}
+	@Override
+	public Dimension getKBFrameDimension() {
+		return KBFrameDimension;
+	}
+	@Override
+	public void setKBFrameDimension(Dimension kBFrameDimension) {
+		KBFrameDimension = kBFrameDimension;
 	}
 	public static AppSettings getInstance(){
 		if(appSettings==null){
@@ -37,12 +73,27 @@ public class AppSettings implements Serializable{
 				super.run();
 				saveState();
 			}});
+			MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+			try {
+				mbs.registerMBean(appSettings,new ObjectName("punter.log.mbean:type=Punter-AppSettings"));
+				System.err.println("AppSettings registered with MBean Server.");
+			} catch (MBeanRegistrationException e) {
+				e.printStackTrace();
+			} catch (MalformedObjectNameException e) {
+				e.printStackTrace();
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+			} catch (InstanceAlreadyExistsException e) {
+				e.printStackTrace();
+			} catch (NotCompliantMBeanException e) {
+				e.printStackTrace();
+			}
 		}
 		return appSettings;
 	}
 	private static void saveState(){
 		  System.out.println("serializing the settings.");
-		  AppSettings appSettings=AppSettings.getInstance();
+		  AppSettingsMBean appSettings=AppSettings.getInstance();
 		  try {
 			  PersistenceService ps; 
 			  BasicService bs; 

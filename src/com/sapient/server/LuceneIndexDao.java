@@ -422,7 +422,7 @@ public class LuceneIndexDao {
 					document.setContent("".getBytes());
 				}
 				}else{
-					document.setContent(contents.substring(0, contents.length()>100?100:contents.length()).getBytes());
+					document.setContent(contents.substring(0, contents.length()>120?120:contents.length()).getBytes());
 				}
                  resultDocs.add(document);
 			}

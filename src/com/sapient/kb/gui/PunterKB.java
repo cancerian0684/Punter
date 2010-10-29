@@ -58,6 +58,7 @@ import javax.swing.table.TableModel;
 import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
 import com.sapient.kb.jpa.StaticDaoFacade;
+import com.sapient.punter.gui.AppSettings;
 import com.sapient.punter.gui.Main;
 
 public class PunterKB extends JPanel{
@@ -71,7 +72,7 @@ public class PunterKB extends JPanel{
 	private static StaticDaoFacade docService=StaticDaoFacade.getInstance();
 	{
 		try {
-			docService.getDocList("","",false,false);
+			docService.getDocList("","",false,false,1);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -184,10 +185,11 @@ public class PunterKB extends JPanel{
 		 searchResultTable.setFillsViewportHeight(true);
 		 searchResultTable.setAutoCreateRowSorter(true);
 		 searchResultTable.setRowHeight(60);
+		 searchResultTable.setRowMargin(0);
 		 searchResultTable.setDragEnabled(true);
 		 searchResultTable.setIntercellSpacing(new Dimension(0, 0));
 		 searchResultTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		 searchResultTable.setFont(new Font("Arial",Font.TRUETYPE_FONT,11));
+		 searchResultTable.setFont(new Font("Arial",Font.TRUETYPE_FONT,10));
 		 TableCellRenderer dcr = searchResultTable.getDefaultRenderer(String.class);
 		 if(dcr instanceof JLabel){
 	        	((JLabel)dcr).setVerticalTextPosition(SwingConstants.TOP);
@@ -198,7 +200,7 @@ public class PunterKB extends JPanel{
          if(headerRenderer instanceof JLabel){
         	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
          }
-         header.setPreferredSize(new Dimension(30, 20));
+         header.setPreferredSize(new Dimension(30, 15));
          TableColumn column = null;
          for (int i = 0; i < 3; i++) {
              column = searchResultTable.getColumnModel().getColumn(i);
@@ -659,7 +661,7 @@ public class PunterKB extends JPanel{
     	ttm.clearTable();
     	List<Document> docs = null;
 		try {
-			docs = docService.getDocList(searchTextField.getText(),categoryComboBox.getSelectedItem().toString(),toggleButton.isSelected(),andOrToggleButton.isSelected());
+			docs = docService.getDocList(searchTextField.getText(),categoryComboBox.getSelectedItem().toString(),toggleButton.isSelected(),andOrToggleButton.isSelected(),AppSettings.getInstance().getMaxResults());
 			for (Document doc : docs) {
 				ArrayList<Document> docList=new ArrayList<Document>();
 				docList.add(doc);
