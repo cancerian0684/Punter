@@ -143,6 +143,14 @@ public class LuceneIndexDao {
 				if(Character.isLetterOrDigit(curr))
 					sb.append(curr);
 			}
+			else if(!Character.isLowerCase(curr)&&Character.isLowerCase(prev)){ 
+//              System.err.println("boundary .. "+curr); 
+                if(sb.length()>0) 
+                wordsList.add(sb.toString()); 
+                sb.setLength(0); 
+                if(Character.isLetterOrDigit(curr)) 
+                        sb.append(curr); 
+			} 
 			else if(Character.isLetter(curr)&&!Character.isLetter(prev)){
 //				System.err.println("boundary .. "+curr);
 //				sb.append(' ');
@@ -180,6 +188,12 @@ public class LuceneIndexDao {
 				if(Character.isLetterOrDigit(curr))
 					sb.append(curr);
 			}
+			else if(!Character.isLowerCase(curr)&&Character.isLowerCase(prev)){ 
+//              System.err.println("boundary .. "+curr); 
+                sb.append(' '); 
+                if(Character.isLetterOrDigit(curr)) 
+                        sb.append(curr); 
+			} 
 			else if(Character.isLetter(curr)&&!Character.isLetter(prev)){
 //				System.err.println("boundary .. "+curr);
 				sb.append(' ');
@@ -281,10 +295,10 @@ public class LuceneIndexDao {
 	    }
 		Map <String,Float> boostMap=new HashMap<String, Float>();
 		boostMap.put("title", 4.0f);
-		boostMap.put("contents", 3.0f);
+		boostMap.put("contents", 4.0f);
 		boostMap.put("id", 5.0f);
-		boostMap.put("attachment", 1.0f);
-		boostMap.put("tags", 4.0f);
+		boostMap.put("attachment", 2.0f);
+		boostMap.put("tags", 5.0f);
 		parser1 = new MultiFieldQueryParser(Version.LUCENE_30, new String []{"title","contents","id","attachment","tags"}, analyzer, boostMap);
 		parser2 = new QueryParser(Version.LUCENE_30,"category",analyzer);
 	}
@@ -317,9 +331,9 @@ public class LuceneIndexDao {
 				System.out.println("Refreshing IndexSearcher version to :"+ ireader.getCurrentVersion(FSDirectory));
 				refreshIsearcher();
 			} else {
-				 System.err.println("Index not modified yet.");
+//				 System.err.println("Index not modified yet.");
 			}
-			System.out.print(sw.getElapsedTime()+" ");
+//			System.out.print(sw.getElapsedTime()+" ");
 			sw.reset();
 			/*System.err.println("Listing all the terms ");
 			TermEnum terms = ireader.terms(new Term("content", ""));
@@ -358,7 +372,7 @@ public class LuceneIndexDao {
 			int numTotalHits = hits.totalHits;
 			System.out.println(query);
 			
-			System.out.print(sw.getElapsedTime()+" ");
+//			System.out.print(sw.getElapsedTime()+" ");
 			sw.reset();
 			List<Document> resultDocs=new ArrayList<Document>(100);
 			for (int i = start; i < numTotalHits && i < (start + batch); i++) {
@@ -412,7 +426,7 @@ public class LuceneIndexDao {
 				}
                  resultDocs.add(document);
 			}
-			System.out.print(sw.getElapsedTime()+" \n");
+//			System.out.print(sw.getElapsedTime()+" \n");
 			sw.reset();
 			return resultDocs;
 		} catch (CorruptIndexException e1) {
