@@ -16,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.persistence.OptimisticLockException;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -65,6 +67,7 @@ import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.gui.Main;
+import com.sapient.punter.gui.PunterGUI;
 
 public class DocumentEditor extends JDialog{
 	protected JTextField textField;
@@ -78,6 +81,14 @@ public class DocumentEditor extends JDialog{
 	private String currentMD5;
 	private boolean editable=false;
 	private boolean everEdited=false;
+	private static BufferedImage idleImage;
+	static {
+		 try {
+			idleImage = ImageIO.read(PunterGUI.class.getResource("/images/punter_discnt.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	public static String getMD5(String input) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
@@ -104,6 +115,7 @@ public class DocumentEditor extends JDialog{
 	public DocumentEditor(JFrame parent,final Document ldoc,StaticDaoFacade docServic) {
 		super(parent,false);
 		setAlwaysOnTop(false);
+		setIconImage(idleImage);
 		setLayout(new GridBagLayout());
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.doc=ldoc;
