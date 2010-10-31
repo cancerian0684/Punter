@@ -155,7 +155,7 @@ public class DocumentEditor extends JDialog{
 		                   		System.out.println("Opening up the file.."+attch.getTitle());
 		                   		File temp=new File("Temp");
 		                   		temp.mkdir();
-		                   		File nf=new File(temp,"A"+attch.getId()+"_"+attch.getTitle());
+		                   		File nf=new File(temp,"A"+attch.getId()+""+attch.getExt());
 		                   		try {
 		                   			if(!nf.exists()){
 		                   			FileOutputStream fos = new FileOutputStream(nf);
@@ -362,7 +362,7 @@ public class DocumentEditor extends JDialog{
                final List<File> files=new java.util.ArrayList<File>();
                for(int selectedRow:selectedRows){
             	AttachmentTableModel atm = ((AttachmentTableModel)attachmentTable.getModel());
-           	   	Attachment attch=(Attachment) atm.getRow(attachmentTable.convertRowIndexToModel(attachmentTable.getSelectedRow())).get(0);
+           	   	Attachment attch=(Attachment) atm.getRow(attachmentTable.convertRowIndexToModel(selectedRow)).get(0);
            	   	File temp=new File("Temp");
         		temp.mkdir();
         		File nf=new File(temp,attch.getTitle());

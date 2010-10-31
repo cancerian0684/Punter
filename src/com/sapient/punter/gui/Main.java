@@ -17,10 +17,13 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JSeparator;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
@@ -40,7 +43,7 @@ public class Main{
 	public static JFrame KBFrame;
 	public static JFrame PunterGuiFrame;
 	public static JFrame lastAccessed;
-	
+	private static Logger logger = Logger.getLogger(Main.class.getName());
 	private Timer timer=new Timer(2000,new ActionListener(){
 		public void actionPerformed(ActionEvent e) {
 			if (isBusy()){
@@ -171,11 +174,10 @@ private void createAndShowGUI() throws Exception {
 	        }
 	    };
 	    Runtime rt = Runtime.getRuntime();
-	    System.err.println("Main: adding shutdown hook");
 	    rt.addShutdownHook(new Thread() {
 	      public void run() {
 	    	timer.stop();
-			System.out.println("Exiting...");
+	    	logger.log(Level.INFO, "Exiting...");
 	      }
 	    });
 
@@ -187,11 +189,9 @@ private void createAndShowGUI() throws Exception {
     				AppSettings.getInstance().KBFrameLocation=KBFrame.getLocation();
     				AppSettings.getInstance().setKBFrameDimension(KBFrame.getSize());
     				AppSettings.getInstance().PunterGuiFrameLocation=PunterGuiFrame.getLocation();
-    				System.out.println("Removing tray icon : "+KBFrame.getSize());
+    				logger.log(Level.INFO, "Removing tray icon : "+KBFrame.getSize());
     				tray.remove(trayIcon);
     				Launcher.programQuit();
-    				//dispose();
-    				//System.exit(0);
     			}
 	        }
 	    };
@@ -219,7 +219,7 @@ private void createAndShowGUI() throws Exception {
 			}});
 	    popup.add(openPunterMenuItem);
 	   
-	  //  popup.add(new JSeparator());
+//	    popup.add(new JSeparator());
 	    MenuItem defaultItem = new MenuItem("Exit Punter");
 	    defaultItem.addActionListener(exitListener);
 	    popup.add(defaultItem);
@@ -237,7 +237,6 @@ private void createAndShowGUI() throws Exception {
 	        	lastAccessed.setVisible(true);
 	        }
 	    };
-	            
 	    trayIcon.setImageAutoSize(true);
 	    trayIcon.addActionListener(actionListener);
 	    trayIcon.addMouseListener(mouseListener);
@@ -248,7 +247,7 @@ private void createAndShowGUI() throws Exception {
 		            "Double click here to launch the Punter.",
 		            TrayIcon.MessageType.INFO);
 	    } catch (AWTException e) {
-	        System.err.println("TrayIcon could not be added.");
+	    	logger.log(Level.WARNING, "TrayIcon could not be added.");
 	    }
 
 	} else {
@@ -265,7 +264,7 @@ public static boolean isConnected(){
 		StaticDaoFacade.getInstance().ping();
 		return true;
 	}catch (Exception e) {
-		System.err.println("connection to server lost.");
+		logger.log(Level.WARNING, "connection to server lost.");
 		try{
 			StaticDaoFacade.getInstance().makeConnection();
 		}catch (Exception ee) {
