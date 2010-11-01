@@ -60,4 +60,8 @@ public class ServerSettings implements ServerSettingsMBean {
 			maxResultsToDisplay=7;
 		return maxResultsToDisplay;
 	}
+	@Override
+	public void optimizeIndex() {
+		LuceneIndexDao.getInstance().optimizeIndex();
+	}
 }

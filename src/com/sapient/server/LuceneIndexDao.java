@@ -85,6 +85,7 @@ public class LuceneIndexDao {
 		doc.add(new Field("id",""+ pDoc.getId(), Field.Store.YES, Field.Index.NOT_ANALYZED));
 		doc.add(new Field("title", getPunterParsedText2(pDoc.getTitle()), Field.Store.NO, Field.Index.ANALYZED));
 		doc.add(new Field("titleS", pDoc.getTitle(), Field.Store.YES, Field.Index.NO));
+		doc.add(new Field("author", pDoc.getAuthor()!=null?pDoc.getAuthor():"", Field.Store.YES, Field.Index.NOT_ANALYZED));
 		doc.add(new Field("category", pDoc.getCategory(), Field.Store.YES, Field.Index.ANALYZED));
 		doc.add(new Field("created",DateTools.timeToString(pDoc.getDateCreated().getTime(), DateTools.Resolution.MINUTE),Field.Store.YES, Field.Index.NOT_ANALYZED));
 		try {
@@ -368,10 +369,10 @@ public class LuceneIndexDao {
 					"<font color=red>", "</font>"), new QueryScorer(query1));
 			TopDocs hits = null;
 //			CachingWrapperFilter cwf=new CachingWrapperFilter();
-			hits = isearcher.search(query, 50);
+			hits = isearcher.search(query, start + batch);
 			int numTotalHits = hits.totalHits;
 			System.out.println(query);
-			List<Document> resultDocs=new ArrayList<Document>(100);
+			List<Document> resultDocs=new ArrayList<Document>(50);
 			for (int i = start; i < numTotalHits && i < (start + batch); i++) {
 //				Explanation exp = isearcher.explain(query, i);
 //				System.err.println(exp.getDescription());
@@ -382,6 +383,7 @@ public class LuceneIndexDao {
             	 } catch (java.text.ParseException e) {
             		 e.printStackTrace();
             	 }
+            	 document.setAuthor(doc.get("author"));
 				 document.setCategory(doc.get("category"));
                  document.setId(Long.parseLong(doc.get("id")));
                  String title=doc.get("titleS");

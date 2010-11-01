@@ -79,9 +79,13 @@ public class DocumentTableModel extends AbstractTableModel {
     	if(doc.getDateUpdated()!=null){
     		s2=sdf.format(doc.getDateUpdated());
     	}
-    	return "<html>"+(float)Math.round(doc.getScore() * 100) / 100+"<br/>"+doc.getId()+"<br/>"+s1+"<br/>"+s2+"</html>";
+    	String author="";
+    	if(doc.getAuthor()!=null){
+    		author=doc.getAuthor();
+    	}
+    	return "<html>"+doc.getId()+"-"+(float)Math.round(doc.getScore() * 100) / 100+""+"<br/>"+s1+"<br/>"+s2+"<br/>"+author+"</html>";
     case 1:
-    	return "<html><b>"+doc.getTitle()+"</b><br/>"+new String(doc.getContent())+"</html>";
+    	return "<html>"+doc.getTitle()+"<br/>"+new String(doc.getContent())+"</html>";
     case 2:
     	return doc.getCategory();
     }
