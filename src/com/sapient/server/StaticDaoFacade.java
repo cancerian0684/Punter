@@ -90,7 +90,7 @@ public class StaticDaoFacade {
 	    em.getTransaction().commit();
 	    em.close();*/
   }
-  public Document createDocument(){
+  public Document createDocument(String author){
 	  	EntityManager em = emf.createEntityManager();
 	    em.getTransaction().begin();
 	    Document doc = new Document();
@@ -98,6 +98,7 @@ public class StaticDaoFacade {
 	    doc.setContent("".getBytes());
 	    doc.setDateCreated(new Date());
 	    doc.setCategory("/all");
+	    doc.setAuthor(author);
 	    em.persist(doc);
 	    em.flush();
 	    LuceneIndexDao.getInstance().indexDocs(doc);

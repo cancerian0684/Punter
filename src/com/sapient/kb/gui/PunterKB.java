@@ -496,9 +496,8 @@ public class PunterKB extends JPanel{
  	        	  System.out.println("Adding Document");
  	        	  Document doc = null;
 				try {
-					doc = docService.createDocument();
+					doc = docService.createDocument(docService.getUsername());
 				} catch (RemoteException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
  	        	  DocumentEditor.showEditor(doc,docService,Main.KBFrame);

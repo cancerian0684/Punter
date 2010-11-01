@@ -12,6 +12,7 @@ import javax.management.ObjectName;
 public class ServerSettings implements ServerSettingsMBean {
 	private static ServerSettings instance;
 	private StaticDaoFacade sdf;
+	private int maxResultsToDisplay=10;
 	public static synchronized ServerSettings getInstance(){
 		if(instance==null){
 			instance=new ServerSettings();
@@ -47,5 +48,16 @@ public class ServerSettings implements ServerSettingsMBean {
 	public void stopServer() {
 		System.err.println("Stopping system.");
 		System.exit(0);
+	}
+	@Override
+	public void setMaxResultsToDisplay(int maxResults) {
+		this.maxResultsToDisplay=maxResults;
+		
+	}
+	@Override
+	public int getMaxResultsToDisplay() {
+		if(maxResultsToDisplay<5)
+			maxResultsToDisplay=7;
+		return maxResultsToDisplay;
 	}
 }

@@ -16,6 +16,9 @@ import com.sapient.server.PunterSearch;
 public class StaticDaoFacade {
 	private static StaticDaoFacade sdf;
 	private PunterSearch stub;
+	public String getUsername(){
+		return System.getProperty("user.name");
+	}
 	public static StaticDaoFacade getInstance(){
 		if(sdf==null){
 			sdf=new StaticDaoFacade();
@@ -55,8 +58,8 @@ public class StaticDaoFacade {
   public void updateAccessCounter(Document doc) throws RemoteException{
 	  stub.updateAccessCounter(doc);
   }
-  public Document createDocument() throws RemoteException{
-	  return stub.createDocument();
+  public Document createDocument(String author) throws RemoteException{
+	  return stub.createDocument(author);
   }
   public List<Document> getDocList(String q,String category,boolean isSpclTxt,boolean isAND,int maxResults) throws RemoteException{
 	  return stub.getDocList(q, category, isSpclTxt, isAND, maxResults);

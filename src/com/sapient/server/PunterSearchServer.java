@@ -81,8 +81,8 @@ public class PunterSearchServer implements PunterSearch {
 	}
 
 	@Override
-	public Document createDocument() {
-		return sdf.createDocument();
+	public Document createDocument(String author) {
+		return sdf.createDocument(author);
 	}
 
 	@Override

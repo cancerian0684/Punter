@@ -61,11 +61,6 @@ import com.sapient.punter.utils.InputParamValue;
 import com.sapient.punter.utils.OutputParamValue;
 import com.sapient.punter.utils.TextAreaFIFO;
 
-/** 
- * TableRenderDemo is just like TableDemo, except that it
- * explicitly initializes column sizes and it uses a combo box
- * as an editor for the Sport column.
- */
 public class PunterGUI extends JPanel implements TaskObserver{
     private boolean DEBUG = false;
     private final JTable taskTable;

@@ -341,6 +341,9 @@ public class LuceneIndexDao {
 			System.out.println(terms.term().text());
 			System.err.println("Listing all the terms done..");*/
 			searchString = searchString.trim().toLowerCase();
+			if(batch<5){
+				batch=ServerSettings.getInstance().getMaxResultsToDisplay();
+			}
 			readerReadWriteLock.readLock().lock();
 			if(searchString.isEmpty()){
 				return Collections.EMPTY_LIST;
@@ -352,9 +355,6 @@ public class LuceneIndexDao {
 				parser1.setDefaultOperator(QueryParser.AND_OPERATOR);
 			else
 				parser1.setDefaultOperator(QueryParser.OR_OPERATOR);
-			/*if (false) {
-			} else {
-			}*/
 			Query query1 = parser1.parse(searchString);
 			Query query2 = parser2.parse(category);
 //			MultiPhraseQuery leaningTower = new MultiPhraseQuery();
@@ -371,9 +371,6 @@ public class LuceneIndexDao {
 			hits = isearcher.search(query, 50);
 			int numTotalHits = hits.totalHits;
 			System.out.println(query);
-			
-//			System.out.print(sw.getElapsedTime()+" ");
-			sw.reset();
 			List<Document> resultDocs=new ArrayList<Document>(100);
 			for (int i = start; i < numTotalHits && i < (start + batch); i++) {
 //				Explanation exp = isearcher.explain(query, i);

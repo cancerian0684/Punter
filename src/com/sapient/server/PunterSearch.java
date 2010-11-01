@@ -14,7 +14,7 @@ import com.sapient.punter.jpa.TaskHistory;
 public interface PunterSearch extends Remote {
 	 void ping()throws RemoteException;
 	 void updateAccessCounter(Document doc)throws RemoteException;
-	 Document createDocument()throws RemoteException;
+	 Document createDocument(String author)throws RemoteException;
 	 List<Document> getDocList(String q,String category,boolean isSpclTxt,boolean isAND,int maxResults)throws RemoteException;
 	 Document saveDocument(Document doc)throws RemoteException;
 	 Attachment saveAttachment(Attachment attach)throws RemoteException;
