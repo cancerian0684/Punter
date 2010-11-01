@@ -53,8 +53,9 @@ public class PunterSearchServer implements PunterSearch {
 				@Override
 				public void run() {
 					super.run();
-					MultiCastResponder.getInstance().shutdown();
+					System.err.println("stopping RMI server.");
 					proc.destroy();
+					MultiCastResponder.getInstance().shutdown();
 				}
 			});
 			Thread.sleep(1000);
@@ -64,6 +65,7 @@ public class PunterSearchServer implements PunterSearch {
 			registry.rebind("PunterSearch", stub);
 			System.err.println("RMI Server ready");
 			MultiCastResponder.getInstance();
+			ServerSettings.getInstance();
 			java.awt.Desktop.getDesktop().browse(new URI("http://localhost:8080/index.html")); 
 			WebServer.main(new String[]{});
 			System.err.println("Web Server ready");
