@@ -97,6 +97,7 @@ public class StaticDaoFacade {
 	    doc.setTitle("test title");
 	    doc.setContent("".getBytes());
 	    doc.setDateCreated(new Date());
+	    doc.setDateUpdated(new Date());
 	    doc.setCategory("/all");
 	    doc.setAuthor(author);
 	    em.persist(doc);

@@ -192,10 +192,11 @@ public class PunterKB extends JPanel{
 		 searchResultTable.setDragEnabled(true);
 		 searchResultTable.setIntercellSpacing(new Dimension(0, 0));
 		 searchResultTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		 searchResultTable.setFont(new Font("Arial",Font.TRUETYPE_FONT,10));
+		 searchResultTable.setFont(new Font("Arial",Font.TRUETYPE_FONT,11));
+//		 TableCellRenderer dcr=searchResultTable.getColumn("<html><b>Document Name").getCellRenderer();
 		 TableCellRenderer dcr = searchResultTable.getDefaultRenderer(String.class);
 		 if(dcr instanceof JLabel){
-	        	((JLabel)dcr).setVerticalTextPosition(SwingConstants.TOP);
+	        	((JLabel)dcr).setVerticalAlignment(SwingConstants.TOP);
 	        	((JLabel)dcr).setBorder(new EmptyBorder(0, 0, 0, 0));
 	         }
          JTableHeader header = searchResultTable.getTableHeader();

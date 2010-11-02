@@ -499,6 +499,7 @@ public class DocumentEditor extends JDialog{
         doc.setTitle(textField.getText());
         doc.setContent(ekitCore.getDocumentText().getBytes()); 
         doc.setMd5(currentMD5);
+        doc.setDateUpdated(new Date());
     	try {
     		Document tmpDoc = docService.saveDocument(doc);
     		/*BeanUtilsBean.setInstance(new BeanUtilsBean2());

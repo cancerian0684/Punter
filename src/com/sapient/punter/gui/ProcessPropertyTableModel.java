@@ -98,7 +98,6 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
     	p.getInputParams().get((String)colArrayList.get(0)).setValue((String) obj);
     	p = StaticDaoFacade.getInstance().saveProcess(p);
     	BeanUtils.copyProperties(colArrayList.get(2), p);
-//    	colArrayList.set(2, tmp);
     }catch (Exception e) {
     	e.printStackTrace();
 	}

@@ -88,6 +88,7 @@ public class LuceneIndexDao {
 		doc.add(new Field("author", pDoc.getAuthor()!=null?pDoc.getAuthor():"", Field.Store.YES, Field.Index.NOT_ANALYZED));
 		doc.add(new Field("category", pDoc.getCategory(), Field.Store.YES, Field.Index.ANALYZED));
 		doc.add(new Field("created",DateTools.timeToString(pDoc.getDateCreated().getTime(), DateTools.Resolution.MINUTE),Field.Store.YES, Field.Index.NOT_ANALYZED));
+		doc.add(new Field("updated",DateTools.timeToString(pDoc.getDateUpdated().getTime(), DateTools.Resolution.MINUTE),Field.Store.YES, Field.Index.NOT_ANALYZED));
 		try {
 			String contents=PunterTextExtractor.getText(pDoc.getContent(),"",pDoc.getExt());
 			doc.add(new Field("contents", itrim(getPunterParsedText2(contents)), Field.Store.NO, Field.Index.ANALYZED));
@@ -380,6 +381,7 @@ public class LuceneIndexDao {
                  Document document=new Document();
             	 try {
             		 document.setDateCreated(DateTools.stringToDate(doc.get("created")));
+            		 document.setDateUpdated(DateTools.stringToDate(doc.get("updated")));
             	 } catch (java.text.ParseException e) {
             		 e.printStackTrace();
             	 }
