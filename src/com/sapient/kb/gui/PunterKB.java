@@ -583,13 +583,13 @@ public class PunterKB extends JPanel{
  				try {
 					docService.rebuildIndex();
 				} catch (RemoteException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
  				PunterKB.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
  			}
  		});
  		popupProcess.add(reindexDocsMenu);
+ 		reindexDocsMenu.setEnabled(false);
  		searchResultTable.addMouseListener(new MouseAdapter() {
  	          //JPopupMenu popup;
  	          public void mousePressed(MouseEvent e) {
