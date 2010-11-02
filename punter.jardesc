@@ -13,12 +13,11 @@
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <javaElement handleIdentifier="=Punter/src&lt;com.sapient.kb.gui"/>
         <javaElement handleIdentifier="=Punter/src&lt;com.sapient.punter.annotations"/>
-        <file path="/Punter/src/images/punter_busy.png"/>
-        <file path="/Punter/src/images/punter_discnt.png"/>
         <javaElement handleIdentifier="=Punter/src&lt;com.sapient.kb.utils"/>
         <javaElement handleIdentifier="=Punter/src&lt;com.sapient.punter.utils"/>
         <javaElement handleIdentifier="=Punter/src&lt;com.sapient.punter.jpa"/>
         <javaElement handleIdentifier="=Punter/src&lt;com.sapient.punter.executors"/>
+        <javaElement handleIdentifier="=Punter/src&lt;images"/>
         <javaElement handleIdentifier="=Punter/src&lt;com.sapient.punter.test"/>
         <javaElement handleIdentifier="=Punter/src&lt;com.sapient.kb.jpa"/>
         <file path="/Punter/src/resources/tasks.properties"/>
@@ -26,6 +25,5 @@
         <javaElement handleIdentifier="=Punter/src&lt;com.sapient.punter.tasks"/>
         <javaElement handleIdentifier="=Punter/src&lt;com.sapient.punter.gui"/>
         <javaElement handleIdentifier="=Punter/src&lt;com.sapient.punter.tasks.docs"/>
-        <file path="/Punter/src/images/punter_idle.png"/>
     </selectedElements>
 </jardesc>

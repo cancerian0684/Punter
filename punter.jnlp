@@ -18,7 +18,8 @@
 <update check="always" policy="prompt-update"/>
 <resources>
 <j2se version="1.6+" java-vm-args="-Xms128m -Xmx128m -Dcom.sun.management.jmxremote" />
-<jar href="punter.jar" download="lazy" main="true" version="1.0"/>
+<!--jar href="punter.jar" download="lazy" main="true" version="1.0"/-->
+<jar href="punter.jar" download="lazy" main="true"/>
 
 <jar href="lib/eclipselink.jar" download="lazy" main="false"/>
 <jar href="lib/javax.persistence_2.0.1.v201006031150.jar" download="lazy" main="false"/>
@@ -27,8 +28,9 @@
 
 <jar href="lib/commons-beanutils-core-1.8.3.jar" download="lazy" main="false"/>
 <jar href="lib/commons-logging-1.1.1.jar" download="lazy" main="false"/>
+<jar href="lib/cron4j-2.2.3.jar" download="lazy" main="false"/>
 
-<property name="jnlp.versionEnabled" value="true"/>
+<property name="jnlp.versionEnabled" value="false"/>
 
 
 <!--
