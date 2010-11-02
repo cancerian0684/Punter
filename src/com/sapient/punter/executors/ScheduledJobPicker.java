@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.sapient.kb.jpa.StaticDaoFacade;
+import com.sapient.punter.gui.AppSettings;
 import com.sapient.punter.gui.PunterGUI;
 import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.utils.Stopwatch;
@@ -28,7 +29,7 @@ public class ScheduledJobPicker {
 			public void run() {
 				try {
 					sw.start();
-					List<ProcessData> scheduledProcList = StaticDaoFacade.getInstance().getScheduledProcessList();
+					List<ProcessData> scheduledProcList = StaticDaoFacade.getInstance().getScheduledProcessList(AppSettings.getInstance().getUsername());
 //					System.err.println(scheduledProcList.size()+" == "+sw.getElapsedTime()+ " ms");
 					sw.reset();
 					if(lastReferenceTimeLong==0L){

@@ -10,10 +10,11 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
 public class ServerSettings implements ServerSettingsMBean {
-	private static ServerSettings instance;
+	private static ServerSettingsMBean instance;
 	private StaticDaoFacade sdf;
 	private int maxResultsToDisplay=10;
-	public static synchronized ServerSettings getInstance(){
+	private int maxProcessHistory=30;
+	public static synchronized ServerSettingsMBean getInstance(){
 		if(instance==null){
 			instance=new ServerSettings();
 		}
@@ -63,5 +64,15 @@ public class ServerSettings implements ServerSettingsMBean {
 	@Override
 	public void optimizeIndex() {
 		LuceneIndexDao.getInstance().optimizeIndex();
+	}
+	@Override
+	public int getMaxProcessHistory() {
+		if(maxProcessHistory<=5)
+			maxProcessHistory=30;
+		return maxProcessHistory;
+	}
+	@Override
+	public void setMaxProcessHistory(int maxProcessHistory) {
+		this.maxProcessHistory = maxProcessHistory;
 	}
 }

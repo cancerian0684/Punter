@@ -236,11 +236,11 @@ public  TaskData createTask(TaskData task)throws Exception{
 public  ProcessData createProcess(ProcessData proc)throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
-    em.getTransaction().begin();
-    em.persist(proc);
-    em.flush();
-    em.getTransaction().commit();
-    return proc;
+	    em.getTransaction().begin();
+	    em.persist(proc);
+	    em.flush();
+	    em.getTransaction().commit();
+	    return proc;
 	}finally{
 		em.close();
 	}
@@ -248,11 +248,11 @@ public  ProcessData createProcess(ProcessData proc)throws Exception{
 public  ProcessHistory createProcessHistory(ProcessHistory ph)throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
-    em.getTransaction().begin();
-    em.persist(ph);
-    em.flush();
-    em.getTransaction().commit();
-    return ph;
+	    em.getTransaction().begin();
+	    em.persist(ph);
+	    em.flush();
+	    em.getTransaction().commit();
+	    return ph;
 	}finally{
 		em.close();
 	}
@@ -318,8 +318,13 @@ public  void saveTaskHistory(TaskHistory t)throws Exception{
 		EntityManager em = emf.createEntityManager();
 		try {
 			em.getTransaction().begin();
-			p=em.merge(p);
-			em.lock(p, LockModeType.READ);
+			ProcessData tmp = em.find(ProcessData.class, p.getId());
+			em.lock(tmp, LockModeType.READ);
+			tmp.setName(p.getName());
+			tmp.setInputParams(p.getInputParams());
+			tmp.setUsername(p.getUsername());
+			tmp.setDescription(p.getDescription());
+			em.flush();
 			em.getTransaction().commit();
 			return p;
 		} catch (Exception e) {
@@ -350,12 +355,13 @@ public  void saveTaskHistory(TaskHistory t)throws Exception{
 		}
 	}
 
-	public  List<ProcessData> getScheduledProcessList()
+	public  List<ProcessData> getScheduledProcessList(String username)
 			throws Exception {
 		EntityManager em = emf.createEntityManager();
 		try {
-			Query q = em.createQuery("select p from ProcessData p");
-			q.setHint("toplink.refresh", "true");
+			Query q = em.createQuery("select p from ProcessData p where p.username=:username");
+			q.setParameter("username", username);
+			q.setHint("eclipselink.refresh", "true");
 			List<ProcessData> dbProcList = q.getResultList();
 			List<ProcessData> processList = new ArrayList<ProcessData>();
 			for (ProcessData processDao : dbProcList) {
@@ -370,11 +376,12 @@ public  void saveTaskHistory(TaskHistory t)throws Exception{
 		}
 	}
 
-	public  List<ProcessData> getProcessList() throws Exception {
+	public  List<ProcessData> getProcessList(String username) throws Exception {
 		EntityManager em = emf.createEntityManager();
 		try {
-			Query q = em.createQuery("select p from ProcessData p");
-			q.setHint("toplink.refresh", "true");
+			Query q = em.createQuery("select p from ProcessData p where p.username=:username");
+			q.setParameter("username", username);
+			q.setHint("eclipselink.refresh", "true");
 			List<ProcessData> processList = q.getResultList();
 			return processList;
 		} finally {
@@ -416,10 +423,10 @@ public  List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id) th
 	EntityManager em = emf.createEntityManager();
 	try{
 	Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.id = :pid order by ph.id desc");
-    q.setHint("toplink.refresh", "true");
+    q.setHint("eclipselink.refresh", "true");
     q.setParameter("pid", id);
     q.setFirstResult(0);
-    q.setMaxResults(30);
+    q.setMaxResults(ServerSettings.getInstance().getMaxProcessHistory());
     List<ProcessHistory> processHistoryList = q.getResultList();
     return processHistoryList;
 	}finally{
@@ -455,7 +462,7 @@ public  List<TaskData> getSortedTasksByProcessId(long pid) throws UnknownHostExc
 	try{
 	Query q = em.createQuery("select t from TaskData t where t.process.id=:pid and t.active=true order by t.sequence");
     q.setParameter("pid", pid);
-    q.setHint("toplink.refresh", "true");
+    q.setHint("eclipselink.refresh", "true");
     List<TaskData> taskList = q.getResultList();
 	System.err.println("Listing Tasks for process.");
 	for (TaskData task : taskList) {
@@ -471,7 +478,7 @@ public  List<TaskData> getProcessTasks(long pid) throws UnknownHostException, Ex
 	try{
 	Query q = em.createQuery("select p from ProcessData p where p.id=:pid");
     q.setParameter("pid", pid);
-    q.setHint("toplink.refresh", "true");
+    q.setHint("eclipselink.refresh", "true");
     List<ProcessData> processList = q.getResultList();
 	System.out.println(processList.get(0).getDescription());
 	List<TaskData> tl = processList.get(0).getTaskList();

@@ -29,6 +29,7 @@ public class ProcessHistory implements Serializable{
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="seqGen")
 	private long id;
 	private String name;
+	private String username;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date startTime;
 	@Temporal(TemporalType.TIMESTAMP)
@@ -139,5 +140,10 @@ public class ProcessHistory implements Serializable{
 			return false;
 		return true;
 	}
-	
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
 }

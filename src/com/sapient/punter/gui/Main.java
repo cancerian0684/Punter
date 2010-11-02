@@ -69,6 +69,7 @@ public class Main{
 	}
 
 private void createAndShowGUI() throws Exception {
+	AppSettings.getInstance().setUsername(System.getProperty("user.name"));
 	KBFrame=new JFrame("Punter KB");
 	JFrame.setDefaultLookAndFeelDecorated(true);
 	KBFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

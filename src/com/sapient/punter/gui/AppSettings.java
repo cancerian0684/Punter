@@ -33,6 +33,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	public Point PunterGuiFrameLocation;
 	private int maxResults;
 	private boolean multiSearchEnable=true;
+	private String username;
 	private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);
@@ -165,5 +166,11 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 				   appSettings=new AppSettings();
 			   }
  			
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
 	}
 }

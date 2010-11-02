@@ -17,7 +17,7 @@ public class StaticDaoFacade {
 	private static StaticDaoFacade sdf;
 	private PunterSearch stub;
 	public String getUsername(){
-		return System.getProperty("user.name");
+		return AppSettings.getInstance().getUsername();
 	}
 	public static StaticDaoFacade getInstance(){
 		if(sdf==null){
@@ -190,9 +190,9 @@ public class StaticDaoFacade {
 	}
 
 	
-	public List<ProcessData> getScheduledProcessList()  {
+	public List<ProcessData> getScheduledProcessList(String username)  {
 		try {
-			return stub.getScheduledProcessList();
+			return stub.getScheduledProcessList(username);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -200,9 +200,9 @@ public class StaticDaoFacade {
 	}
 
 	
-	public List<ProcessData> getProcessList() throws Exception  {
+	public List<ProcessData> getProcessList(String username) throws Exception  {
 		try {
-			return stub.getProcessList();
+			return stub.getProcessList(username);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;

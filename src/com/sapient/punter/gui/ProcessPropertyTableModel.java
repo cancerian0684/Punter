@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.commons.beanutils.BeanUtils;
+
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.ProcessData;
  
@@ -94,7 +96,9 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
     try{
     	ProcessData p=(ProcessData) colArrayList.get(2);
     	p.getInputParams().get((String)colArrayList.get(0)).setValue((String) obj);
-    	StaticDaoFacade.getInstance().saveProcess(p);
+    	p = StaticDaoFacade.getInstance().saveProcess(p);
+    	BeanUtils.copyProperties(colArrayList.get(2), p);
+//    	colArrayList.set(2, tmp);
     }catch (Exception e) {
     	e.printStackTrace();
 	}

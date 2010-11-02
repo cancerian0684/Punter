@@ -239,9 +239,9 @@ public class PunterSearchServer implements PunterSearch {
 	}
 
 	@Override
-	public List<ProcessData> getScheduledProcessList() throws RemoteException {
+	public List<ProcessData> getScheduledProcessList(String username) throws RemoteException {
 		try {
-			return sdf.getScheduledProcessList();
+			return sdf.getScheduledProcessList(username);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -249,9 +249,9 @@ public class PunterSearchServer implements PunterSearch {
 	}
 
 	@Override
-	public List<ProcessData> getProcessList() throws RemoteException {
+	public List<ProcessData> getProcessList(String username) throws RemoteException {
 		try {
-			return sdf.getProcessList();
+			return sdf.getProcessList(username);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RemoteException("", e);

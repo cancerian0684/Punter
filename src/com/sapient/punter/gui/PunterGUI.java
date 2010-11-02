@@ -371,6 +371,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        		  proc.setName("new Process");
 	        		  HashMap<String, InputParamValue> inProp = com.sapient.punter.tasks.Process.listInputParams();
     	        	  proc.setInputParams(inProp);
+    	        	  proc.setUsername(AppSettings.getInstance().getUsername());
     	        	  proc=StaticDaoFacade.getInstance().createProcess(proc);
 	        		  ProcessTableModel model=(ProcessTableModel) processTable.getModel();
 	        		  final ArrayList<Object> newRequest = new ArrayList<Object>();
@@ -670,7 +671,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
                 }
             }});
         ProcessTableModel model=(ProcessTableModel) processTable.getModel();
-        List<ProcessData> pl = StaticDaoFacade.getInstance().getProcessList();
+        List<ProcessData> pl = StaticDaoFacade.getInstance().getProcessList(AppSettings.getInstance().getUsername());
         for (ProcessData p : pl) {
         	final ArrayList<Object> newRequest = new ArrayList<Object>();
         	newRequest.add(p);
