@@ -66,6 +66,7 @@ public class PunterKB extends JPanel{
 	private JTextField searchTextField;
 	private JTable searchResultTable;
 	private JComboBox categoryComboBox;
+	private PunterDelayQueue pdq;
 	private JToggleButton toggleButton = new JToggleButton("E");
 	private JToggleButton andOrToggleButton = new JToggleButton("O");
 	private static final List<String> categories=StaticDaoFacade.getInstance().getCategories();
@@ -95,6 +96,8 @@ public class PunterKB extends JPanel{
 	                    	updateSearchResult();
 	                    }
 	                });
+		 pdq=new PunterDelayQueue();
+		 startPunterDelayQueueThread();
 		 searchResultTable=new JTable(new DocumentTableModel()){
          public boolean editCellAt(int row, int column, java.util.EventObject e) {
     	 column=convertColumnIndexToModel(column);
@@ -655,22 +658,45 @@ public class PunterKB extends JPanel{
 	    // Set the width
 	    col.setPreferredWidth(width);
 	}
-	private void updateSearchResult() {
-		DocumentTableModel ttm=((DocumentTableModel)searchResultTable.getModel());
-    	ttm.clearTable();
-    	List<Document> docs = null;
-		try {
-			docs = docService.getDocList(searchTextField.getText(),categoryComboBox.getSelectedItem().toString(),toggleButton.isSelected(),andOrToggleButton.isSelected(),AppSettings.getInstance().getMaxResults());
-			for (Document doc : docs) {
-				ArrayList<Document> docList=new ArrayList<Document>();
-				docList.add(doc);
-				ttm.insertRow(docList);
+	private void startPunterDelayQueueThread(){
+		Thread c=new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while(true){
+				String query=pdq.take();
+				System.out.println(query);
+				try {
+					final DocumentTableModel ttm=((DocumentTableModel)searchResultTable.getModel());
+					final List<Document> docs = docService.getDocList(query,categoryComboBox.getSelectedItem().toString(),toggleButton.isSelected(),andOrToggleButton.isSelected(),AppSettings.getInstance().getMaxResults());
+					 javax.swing.SwingUtilities.invokeLater(new Runnable() {
+				            public void run() {
+				            	try{
+				            		ttm.clearTable();
+				            		for (Document doc : docs) {
+				            			ArrayList<Document> docList=new ArrayList<Document>();
+				            			docList.add(doc);
+				            			ttm.insertRow(docList);
+				            		}
+				                    }catch (Exception e) {
+				                    	e.printStackTrace();
+				            	}
+				            }
+				        });
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				}
 			}
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		});
+//		c.setPriority(Thread.MIN_PRIORITY);
+		c.setDaemon(true);
+		c.start();
+		System.err.println("Punter Delayed Queue Thread started.");
+	}
+	private void updateSearchResult() {
+		pdq.put(searchTextField.getText(), 200);
 	}
 	public static File createZipFromDocument(Document doc){
 		try {
