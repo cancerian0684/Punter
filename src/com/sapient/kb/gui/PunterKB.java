@@ -697,7 +697,7 @@ public class PunterKB extends JPanel{
 		System.err.println("Punter Delayed Queue Thread started.");
 	}
 	private void updateSearchResult() {
-		pdq.put(searchTextField.getText(), 200);
+		pdq.put(searchTextField.getText(), AppSettings.getInstance().getMaxKeyStrokeDelay());
 	}
 	public static File createZipFromDocument(Document doc){
 		try {

@@ -2,6 +2,8 @@ package com.sapient.kb.gui;
 
 import java.util.concurrent.TimeUnit;
 
+import com.sapient.punter.gui.AppSettings;
+
 public class PunterDelayQueue {
 private String element;
 private volatile long expiryTime=System.currentTimeMillis();
@@ -12,7 +14,7 @@ public synchronized void put(String element,int delay){
 }
 public synchronized String take(){
 	String tmp=null;
-	int counter=4;
+	int counter=AppSettings.getInstance().getKeyStrokeFlush();
 	while(element==null||remainingTime()>0){
 		try{
 			if(element==null)

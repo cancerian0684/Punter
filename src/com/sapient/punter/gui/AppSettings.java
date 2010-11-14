@@ -34,10 +34,34 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private int maxResults;
 	private boolean multiSearchEnable=true;
 	private String username;
+	private int keystrokeFlush;
+	private int maxKeyStrokeDelay;
 	private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);
 		maxResults=10;
+		keystrokeFlush=5;
+		maxKeyStrokeDelay=250;
+	}
+	@Override
+	public void setMaxKeyStrokeDelay(int maxKeyStrokeDelay) {
+		this.maxKeyStrokeDelay = maxKeyStrokeDelay;
+	}
+	@Override
+	public int getMaxKeyStrokeDelay() {
+		if(maxKeyStrokeDelay<100)
+			maxKeyStrokeDelay=250;
+		return maxKeyStrokeDelay;
+	}
+	@Override
+	public int getKeyStrokeFlush() {
+		if(keystrokeFlush<1)
+			keystrokeFlush=4;
+		return keystrokeFlush;
+	}
+	@Override
+	public void setKeyStrokeFlush(int keystrokeFlush) {
+		this.keystrokeFlush = keystrokeFlush;
 	}
 	@Override
 	public boolean isMultiSearchEnable() {

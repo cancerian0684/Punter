@@ -9,4 +9,8 @@ public interface AppSettingsMBean {
 	public abstract Dimension getKBFrameDimension();
 	public abstract void setMultiSearchEnable(boolean multiSearchEnable);
 	public abstract boolean isMultiSearchEnable();
+	public abstract void setKeyStrokeFlush(int keystrokeFlush);
+	public abstract int getKeyStrokeFlush();
+	public abstract int getMaxKeyStrokeDelay();
+	public abstract void setMaxKeyStrokeDelay(int maxKeyStrokeDelay);
 }
