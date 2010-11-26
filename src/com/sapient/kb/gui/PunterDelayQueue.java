@@ -36,7 +36,7 @@ public synchronized String take(){
 }
 private long remainingTime(){
 	long remaining=expiryTime-System.currentTimeMillis();
-	return remaining;
+	return remaining>0?remaining:0;
 }
 public static void main(String[] args) {
 	final PunterDelayQueue pdq=new PunterDelayQueue();
