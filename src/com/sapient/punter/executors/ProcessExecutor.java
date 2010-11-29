@@ -6,6 +6,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.sapient.punter.gui.AppSettings;
+
 public class ProcessExecutor {
 	private static ProcessExecutor processExecutor;
 	private ExecutorService executor;
@@ -16,7 +18,7 @@ public class ProcessExecutor {
 		return processExecutor;
 	}
 	public ProcessExecutor() {
-		executor = new ThreadPoolExecutor(2, 2,
+		executor = new ThreadPoolExecutor(AppSettings.getInstance().getMaxExecutorSize(), AppSettings.getInstance().getMaxExecutorSize(),
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
 	}

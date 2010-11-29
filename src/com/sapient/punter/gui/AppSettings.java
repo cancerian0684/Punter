@@ -36,12 +36,24 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private String username;
 	private int keystrokeFlush;
 	private int maxKeyStrokeDelay;
+	private int maxExecutorSize;
 	private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);
 		maxResults=10;
 		keystrokeFlush=5;
 		maxKeyStrokeDelay=250;
+		maxExecutorSize=2;
+	}
+	@Override
+	public int getMaxExecutorSize() {
+		if(maxExecutorSize<1)
+			maxExecutorSize=2;
+		return maxExecutorSize;
+	}
+	@Override
+	public void setMaxExecutorSize(int maxExecutorSize) {
+		this.maxExecutorSize = maxExecutorSize;
 	}
 	@Override
 	public void setMaxKeyStrokeDelay(int maxKeyStrokeDelay) {

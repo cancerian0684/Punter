@@ -13,4 +13,6 @@ public interface AppSettingsMBean {
 	public abstract int getKeyStrokeFlush();
 	public abstract int getMaxKeyStrokeDelay();
 	public abstract void setMaxKeyStrokeDelay(int maxKeyStrokeDelay);
+	public abstract void setMaxExecutorSize(int maxExecutorSize);
+	public abstract int getMaxExecutorSize();
 }
