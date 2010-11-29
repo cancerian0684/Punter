@@ -16,7 +16,7 @@ public class ProcessExecutor {
 		return processExecutor;
 	}
 	public ProcessExecutor() {
-		executor = new ThreadPoolExecutor(1, 2,
+		executor = new ThreadPoolExecutor(2, 2,
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
 	}

@@ -270,19 +270,19 @@ public  TaskHistory createTaskHistory(TaskHistory th)throws Exception{
 		em.close();
 	}
 }
-public  void saveTaskHistory(TaskHistory t)throws Exception{
-	EntityManager em = emf.createEntityManager();
-    em.getTransaction().begin();
-    TaskHistory task=em.find(TaskHistory.class, t.getId());
-    task.setRunState(t.getRunState());
-    task.setRunStatus(t.getRunStatus());
-    task.setSequence(t.getSequence());
-    task.setLogs(t.getLogs());
-    em.merge(task);
-    em.flush();
-    em.getTransaction().commit();
-    em.close();
-}
+	public  void saveTaskHistory(TaskHistory t)throws Exception{
+		EntityManager em = emf.createEntityManager();
+	    em.getTransaction().begin();
+	    TaskHistory task=em.find(TaskHistory.class, t.getId());
+	    task.setRunState(t.getRunState());
+	    task.setRunStatus(t.getRunStatus());
+	    task.setSequence(t.getSequence());
+	    task.setLogs(t.getLogs());
+	    em.merge(task);
+	    em.flush();
+	    em.getTransaction().commit();
+	    em.close();
+	}
 
 	public  void saveProcessHistory(ProcessHistory procHistory)
 			throws Exception {
@@ -302,11 +302,21 @@ public  void saveTaskHistory(TaskHistory t)throws Exception{
 		EntityManager em = emf.createEntityManager();
 		try {
 			em.getTransaction().begin();
-			t=em.merge(t);
-			em.lock(t, LockModeType.READ);
+			TaskData tmp = em.find(TaskData.class, t.getId());
+			em.lock(tmp, LockModeType.READ);
+			tmp.setActive(t.isActive());
+			tmp.setAuthor(t.getAuthor());
+			tmp.setClassName(t.getClassName());
+			tmp.setDescription(t.getDescription());
+			tmp.setInputParams(t.getInputParams());
+			tmp.setOutputParams(t.getOutputParams());
+			tmp.setName(t.getName());
+			tmp.setProcess(t.getProcess());
+			tmp.setSequence(t.getSequence());
+			em.merge(tmp);
 			em.flush();
 			em.getTransaction().commit();
-			return t;
+			return tmp;
 		} catch (Exception e) {
 			em.getTransaction().rollback();
 			throw e;

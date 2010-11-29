@@ -83,7 +83,7 @@ public class DocumentTableModel extends AbstractTableModel {
     	if(doc.getAuthor()!=null){
     		author=doc.getAuthor();
     	}
-    	return "<html>"+doc.getId()+"-"+(float)Math.round(doc.getScore() * 100) / 100+""+"<br/>"+s1+"<br/>"+s2+"<br/>"+author+"</html>";
+    	return "<html>"+doc.getId()+"-"+(float)Math.round(doc.getScore() * 100) / 100+""+"<br/>"+s2+"<br/>"+author+"</html>";
     case 1:
     	return "<html>"+doc.getTitle()+"<br/>"+new String(doc.getContent())+"</html>";
     case 2:
