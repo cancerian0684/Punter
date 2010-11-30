@@ -85,7 +85,7 @@ public class DocumentTableModel extends AbstractTableModel {
     	}
     	return "<html>"+doc.getId()+"-"+(float)Math.round(doc.getScore() * 100) / 100+""+"<br/>"+s2+"<br/>"+author+"</html>";
     case 1:
-    	return "<html>"+doc.getTitle()+"<br/>"+new String(doc.getContent())+"</html>";
+    	return "<html><b>"+doc.getTitle()+"</b><br/>"+new String(doc.getContent())+"</html>";
     case 2:
     	return doc.getCategory();
     }

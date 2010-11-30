@@ -66,6 +66,7 @@ import com.hexidec.ekit.EkitCoreSpell;
 import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
 import com.sapient.kb.jpa.StaticDaoFacade;
+import com.sapient.punter.gui.AppSettings;
 import com.sapient.punter.gui.Main;
 import com.sapient.punter.gui.PunterGUI;
 
@@ -75,8 +76,6 @@ public class DocumentEditor extends JDialog{
 	private EkitCore ekitCore;
 	private Document doc;
 	private StaticDaoFacade docService;
-	protected static Point lastLocation;
-	protected static Dimension lastDim;
 	private JTable attachmentTable;
 	private String currentMD5;
 	private boolean editable=false;
@@ -428,11 +427,8 @@ public class DocumentEditor extends JDialog{
         c.weightx = 1.0;
         c.weighty = 1.0;
         getContentPane().add(jsp, c);
-        if(lastDim==null)
-        	lastDim=new Dimension(800, 800);
-        setPreferredSize(lastDim);
-        if(lastLocation!=null)
-        setLocation(lastLocation);
+        setPreferredSize(AppSettings.getInstance().getDocumentEditorLastDim());
+        setLocation(AppSettings.getInstance().getDocumentEditorLocation());
 		addWindowListener(new WindowAdapter() {
 		    public void windowClosing(WindowEvent we) {
 		    	if(isDocumentModified()){
@@ -461,8 +457,8 @@ public class DocumentEditor extends JDialog{
 						docService=null;
 					}
 		    	}
-		        lastDim = DocumentEditor.this.getSize();
-		        lastLocation=getLocationOnScreen();
+		        AppSettings.getInstance().setDocumentEditorLocation(getLocationOnScreen());
+		        AppSettings.getInstance().setDocumentEditorLastDim(DocumentEditor.this.getSize());
 				DocumentEditor.this.doc=null;
 				DocumentEditor.this.docService=null;
 				DocumentEditor.this.currentMD5=null;

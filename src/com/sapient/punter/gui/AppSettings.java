@@ -29,7 +29,9 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private static final long serialVersionUID = 8652757533411927346L;
 	private static AppSettings appSettings;
 	private Dimension KBFrameDimension;
+	private  Dimension DocumentEditorLastDim;
 	public Point KBFrameLocation; 
+	public Point DocumentEditorLocation;
 	public Point PunterGuiFrameLocation;
 	private int maxResults;
 	private boolean multiSearchEnable=true;
@@ -40,10 +42,30 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);
+		DocumentEditorLocation=new Point(0, 0);
 		maxResults=10;
 		keystrokeFlush=5;
 		maxKeyStrokeDelay=250;
 		maxExecutorSize=2;
+	}
+	public Dimension getDocumentEditorLastDim() {
+		if(DocumentEditorLastDim==null){
+			DocumentEditorLastDim=new Dimension(800, 800);
+		}
+		return DocumentEditorLastDim;
+	}
+	public void setDocumentEditorLastDim(Dimension documentEditorLastDim) {
+		DocumentEditorLastDim = documentEditorLastDim;
+	}
+	@Override
+	public Point getDocumentEditorLocation() {
+		if(DocumentEditorLocation==null)
+			DocumentEditorLocation=new Point(0, 0);
+		return DocumentEditorLocation;
+	}
+	@Override
+	public void setDocumentEditorLocation(Point documentEditorLocation) {
+		DocumentEditorLocation = documentEditorLocation;
 	}
 	@Override
 	public int getMaxExecutorSize() {

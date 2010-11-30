@@ -1,6 +1,7 @@
 package com.sapient.punter.gui;
 
 import java.awt.Dimension;
+import java.awt.Point;
 
 public interface AppSettingsMBean {
 	public abstract void setMaxResults(int maxResults);
@@ -15,4 +16,6 @@ public interface AppSettingsMBean {
 	public abstract void setMaxKeyStrokeDelay(int maxKeyStrokeDelay);
 	public abstract void setMaxExecutorSize(int maxExecutorSize);
 	public abstract int getMaxExecutorSize();
+	public abstract void setDocumentEditorLocation(Point documentEditorLocation);
+	public abstract Point getDocumentEditorLocation();
 }
