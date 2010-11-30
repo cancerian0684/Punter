@@ -18,4 +18,8 @@ public interface AppSettingsMBean {
 	public abstract int getMaxExecutorSize();
 	public abstract void setDocumentEditorLocation(Point documentEditorLocation);
 	public abstract Point getDocumentEditorLocation();
+	public abstract void setDocumentEditorLastDim(Dimension documentEditorLastDim);
+	public abstract Dimension getDocumentEditorLastDim();
+	public abstract void setNimbusLookNFeel(boolean isNimbusLookNFeel);
+	public abstract boolean isNimbusLookNFeel();
 }

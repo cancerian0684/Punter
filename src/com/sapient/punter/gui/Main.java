@@ -283,7 +283,10 @@ public static void main(String[] args) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
         public void run() {
         	try{
-                UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+        		if(AppSettings.getInstance().isNimbusLookNFeel())
+        			UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+        		else
+        			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 Main main=new Main();
                 }catch (Exception e) {
                 	e.printStackTrace();

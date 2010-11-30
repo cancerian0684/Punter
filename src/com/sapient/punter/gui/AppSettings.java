@@ -34,6 +34,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	public Point DocumentEditorLocation;
 	public Point PunterGuiFrameLocation;
 	private int maxResults;
+	private boolean isNimbusLookNFeel;
 	private boolean multiSearchEnable=true;
 	private String username;
 	private int keystrokeFlush;
@@ -47,13 +48,24 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		keystrokeFlush=5;
 		maxKeyStrokeDelay=250;
 		maxExecutorSize=2;
+		isNimbusLookNFeel=false;
 	}
+	@Override
+	public boolean isNimbusLookNFeel() {
+		return isNimbusLookNFeel;
+	}
+	@Override
+	public void setNimbusLookNFeel(boolean isNimbusLookNFeel) {
+		this.isNimbusLookNFeel = isNimbusLookNFeel;
+	}
+	@Override
 	public Dimension getDocumentEditorLastDim() {
 		if(DocumentEditorLastDim==null){
 			DocumentEditorLastDim=new Dimension(800, 800);
 		}
 		return DocumentEditorLastDim;
 	}
+	@Override
 	public void setDocumentEditorLastDim(Dimension documentEditorLastDim) {
 		DocumentEditorLastDim = documentEditorLastDim;
 	}
