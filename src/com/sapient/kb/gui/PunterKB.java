@@ -272,6 +272,7 @@ public class PunterKB extends JPanel{
                        	if(getExtension(f)==null||getExtension(f).isEmpty())
                            	doc.setExt(".txt");
                        	doc.setDateCreated(new Date());
+                       	doc.setDateUpdated(new Date());
                        	doc=docService.saveDocument(doc);
                        	System.err.println("Document added : "+f.getName());
                        }
@@ -758,7 +759,8 @@ public class PunterKB extends JPanel{
 	public static String getExtension(File f) {
 		String extension = "";
 		int dotPos = f.getName().lastIndexOf(".");
-		extension = f.getName().substring(dotPos);
+		if(dotPos!=-1)
+			extension = f.getName().substring(dotPos);
 		return extension;
 	}
 	//save last modified time then after 2 seconds poll for modified time of files. pick all files after that last scan time.

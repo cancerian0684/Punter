@@ -151,10 +151,10 @@ public class DocumentEditor extends JDialog{
 		            	   AttachmentTableModel atm = ((AttachmentTableModel)attachmentTable.getModel());
 		            	   Attachment attch=(Attachment) atm.getRow(attachmentTable.convertRowIndexToModel(attachmentTable.getSelectedRow())).get(0);
 		            	   if(Desktop.isDesktopSupported()){
-		                   		System.out.println("Opening up the file.."+attch.getTitle());
 		                   		File temp=new File("Temp");
 		                   		temp.mkdir();
 		                   		File nf=new File(temp,"A"+attch.getId()+""+attch.getExt());
+		                   		System.out.println("Opening up the file.."+nf.getName());
 		                   		try {
 		                   			if(!nf.exists()){
 		                   			FileOutputStream fos = new FileOutputStream(nf);
@@ -627,7 +627,8 @@ public static String RTFFileExport(javax.swing.text.Document doc) {
 public static String getExtension(File f) {
 	String extension = "";
 	int dotPos = f.getName().lastIndexOf(".");
-	extension = f.getName().substring(dotPos);
+	if(dotPos!=-1)
+		extension = f.getName().substring(dotPos);
 	return extension;
 }
 private class DocumentEditMousListener extends MouseAdapter {

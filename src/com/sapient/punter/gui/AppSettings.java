@@ -46,7 +46,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		DocumentEditorLocation=new Point(0, 0);
 		maxResults=10;
 		keystrokeFlush=5;
-		maxKeyStrokeDelay=250;
+		maxKeyStrokeDelay=200;
 		maxExecutorSize=2;
 		isNimbusLookNFeel=false;
 	}
@@ -96,7 +96,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	@Override
 	public int getMaxKeyStrokeDelay() {
 		if(maxKeyStrokeDelay<100)
-			maxKeyStrokeDelay=250;
+			maxKeyStrokeDelay=200;
 		return maxKeyStrokeDelay;
 	}
 	@Override

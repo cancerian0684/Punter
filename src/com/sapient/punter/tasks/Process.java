@@ -66,7 +66,7 @@ public void beforeProcessStart(){
 				Element firstLine = root.getElement(0);
 				try
 				{
-					System.err.println("removing");
+//					System.err.println("removing");
 					remove(0, firstLine.getEndOffset());
 				}
 				catch(BadLocationException ble)

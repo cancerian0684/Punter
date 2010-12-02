@@ -31,7 +31,7 @@ public class Test {
 	 
 				try
 				{
-					System.err.println("removing");
+//					System.err.println("removing");
 					remove(0, firstLine.getEndOffset());
 					
 				}
