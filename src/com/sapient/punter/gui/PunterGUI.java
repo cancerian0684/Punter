@@ -902,7 +902,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         TableCellRenderer headerRenderer =
             table.getTableHeader().getDefaultRenderer();
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             column = table.getColumnModel().getColumn(i);
 
             comp = headerRenderer.getTableCellRendererComponent(

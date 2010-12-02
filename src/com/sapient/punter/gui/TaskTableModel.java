@@ -10,16 +10,16 @@ import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskData;
  
 public class TaskTableModel extends AbstractTableModel {
-	public final Object[] longValues = {new Integer(5), "Kathy123",new Integer(5), "None of the above a,jbskjkjas jsahfk",new Boolean(true)};
+	public final Object[] longValues = {new Integer(5), "Kathy123", "None of the above a,jbskjkjas jsahfk",new Boolean(true)};
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
 
 	/** Holds the column names */         
 	private String [] columnNames = new String [] 
-                                  {"<html><b>Task Id","<html><b>Task Name","<html><b>Sequence","<html><b>Description","<html><b>Active"};
+                                  {"<html><b>Sequence","<html><b>Task Name","<html><b>Description","<html><b>Active"};
 	private Class [] columnClasses = new Class[] 
-                                   {Integer.class,String.class,Integer.class,String.class,Boolean.class};
+                                   {Integer.class,String.class,String.class,Boolean.class};
   
   /**
    * Constructor: Initializes the table structure, including number of columns
@@ -72,14 +72,12 @@ public class TaskTableModel extends AbstractTableModel {
     TaskData task=(TaskData) colArrayList.get(0);
     switch(col){
     case 0:
-    	return task.getId();
+    	return task.getSequence();
     case 1:
     	return task.getName();
     case 2:
-    	return task.getSequence();
-    case 3:
     	return task.getDescription();
-    case 4:
+    case 3:
     	return task.isActive();
     }
     return null;
@@ -110,13 +108,13 @@ public class TaskTableModel extends AbstractTableModel {
     try{
     TaskData task=(TaskData) colArrayList.get(0);
     switch(col){
-    case 2:
+    case 0:
     	task.setSequence(Integer.parseInt(obj.toString()));
     	break;
-    case 3:
+    case 2:
     	task.setDescription(obj.toString());
     	break;
-    case 4:
+    case 3:
     	task.setActive(Boolean.parseBoolean(obj.toString()));
     	break;
 	default :
@@ -214,7 +212,7 @@ public class TaskTableModel extends AbstractTableModel {
     super.fireTableDataChanged();
   }
   public boolean isCellEditable(int row, int col) {
-	  if(col >=2){
+	  if(col >=2||col==0){
 		  return true;
 	  }
       return false;
