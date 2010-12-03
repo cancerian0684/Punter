@@ -67,7 +67,7 @@ public class PunterKB extends JPanel{
 	private JTable searchResultTable;
 	private JComboBox categoryComboBox;
 	private PunterDelayQueue pdq;
-	private JToggleButton toggleButton = new JToggleButton("E");
+	private JToggleButton toggleButton = new JToggleButton("<html>E</html>");
 	private JToggleButton andOrToggleButton = new JToggleButton("O");
 	private static final List<String> categories=StaticDaoFacade.getInstance().getCategories();
 	private static StaticDaoFacade docService=StaticDaoFacade.getInstance();
@@ -440,6 +440,11 @@ public class PunterKB extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				updateSearchResult();
+				if(toggleButton.isSelected()){
+					toggleButton.setText("<html><b>E</b></html>");
+				}else{
+					toggleButton.setText("<html>E</html>");					
+				}
 			}
 		 });
          
