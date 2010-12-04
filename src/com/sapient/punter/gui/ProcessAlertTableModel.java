@@ -14,7 +14,7 @@ import com.sapient.punter.jpa.TaskData;
 public class ProcessAlertTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflsdfl",Boolean.FALSE};
 	private static final long serialVersionUID = 1L;
-	private static SimpleDateFormat sdf=new SimpleDateFormat("dd, MMM hh:mm:ss");
+	private static SimpleDateFormat sdf=new SimpleDateFormat("dd, MMM hh:mm:ss aa");
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
 
@@ -108,7 +108,7 @@ public class ProcessAlertTableModel extends AbstractTableModel {
         ProcessHistory ph=(ProcessHistory) colArrayList.get(0);
         switch(col){
         case 1:
-        	ph.setClearAlert(true);
+        	ph.setClearAlert(Boolean.parseBoolean(obj.toString()));
         	break;
         }
         StaticDaoFacade.getInstance().saveProcessHistory(ph);

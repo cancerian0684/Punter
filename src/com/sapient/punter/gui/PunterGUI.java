@@ -74,6 +74,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private final JTable outputParamTable;
     private final JTable processHistoryTable;
     private final JTable processAlertTable;
+    private final JTable processTaskAlertTable;
     private final JTable processTaskHistoryTable;
     private final JTable runningProcessTable;
     private final JTable runningTaskTable;
@@ -546,7 +547,6 @@ public class PunterGUI extends JPanel implements TaskObserver{
                 } else if (lsm.isSelectionEmpty()) {
                 } else {
                     int selectedRow = lsm.getMinSelectionIndex();
-//                    System.out.println("Row " + selectedRow + " is now selected.");
                     try{
                     	ProcessTaskHistoryTableModel pthtmodel=(ProcessTaskHistoryTableModel) processTaskHistoryTable.getModel();
 	                    pthtmodel.clearTable();
@@ -652,7 +652,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         
         processAlertTable.setShowGrid(true);
         processAlertTable.setShowVerticalLines(false);
-        processAlertTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
+        processAlertTable.setPreferredScrollableViewportSize(new Dimension(350, 200));
         processAlertTable.setFillsViewportHeight(true);
         processAlertTable.setAutoCreateRowSorter(true);
         processAlertTable.setRowHeight(26);
@@ -665,17 +665,26 @@ public class PunterGUI extends JPanel implements TaskObserver{
         	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
         }
         processAlertTable.getTableHeader().setReorderingAllowed(false);
-        processAlertTable.getColumn("<html><b>Run ID").setPreferredWidth(400);
+        processAlertTable.getColumn("<html><b>Run ID").setPreferredWidth(250);
         processAlertTable.getColumn("<html><b>Clear Alert").setPreferredWidth(100);
         JScrollPane processAlertPane = new JScrollPane(processAlertTable);
-        tabbedPane.addTab("My Alerts", null, processAlertPane,"My Workflow Alerts");
+        
+        processTaskAlertTable=new JTable(new ProcessTaskHistoryTableModel());
+        processTaskAlertTable.setShowGrid(true);
+        processTaskAlertTable.setPreferredScrollableViewportSize(new Dimension(350, 300));
+        processTaskAlertTable.setFillsViewportHeight(true);
+        processTaskAlertTable.setAutoCreateRowSorter(true);
+        processTaskAlertTable.getTableHeader().setReorderingAllowed(false);
+        JScrollPane processTaskALertPane = new JScrollPane(processTaskAlertTable);
+        
+        JSplitPane jsp6=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,processAlertPane,processTaskALertPane);
+        jsp6.setDividerSize(0);
+        tabbedPane.addTab("My Alerts", null, jsp6,"My Workflow Alerts");
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent evt) {
                 JTabbedPane pane = (JTabbedPane)evt.getSource();
-                // Get current tab
                 int sel = pane.getSelectedIndex();
                 if(sel==3){
-                	System.err.println("3 selected");
                 	ProcessAlertTableModel phtmodel=(ProcessAlertTableModel) processAlertTable.getModel();
       	            List<ProcessHistory> phl = StaticDaoFacade.getInstance().getMySortedProcessHistoryList(AppSettings.getInstance().getUsername());
       	            phtmodel.clearTable();
@@ -685,13 +694,47 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	      	          	phtmodel.insertRow(newRequest);
       	  		}
       	        if(phtmodel.getRowCount()>0){
-      	        	processHistoryTable.setRowSelectionInterval(0, 0);
+      	        	processAlertTable.setRowSelectionInterval(0, 0);
       	        }
                 }
             }
         });
-
-        
+        ListSelectionModel PATSelectionModel = processAlertTable.getSelectionModel();
+        PATSelectionModel.addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+                ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+                if(e.getValueIsAdjusting()){
+//                	System.err.println("Mouse is adjusting..");
+                }
+                else if (lsm.isSelectionEmpty()) {
+//                	System.out.println("PTHL Empty --No Row is now selected.");
+                } else {
+                    int selectedRow = lsm.getMinSelectionIndex();
+//                    System.out.println("PTHL -- Row " + selectedRow + " is now selected.");
+                    try{
+                    ArrayList ar = ((ProcessAlertTableModel)processAlertTable.getModel()).getRow(processAlertTable.convertRowIndexToModel(processAlertTable.getSelectedRow()));
+      	        	long phId=(Long)((ProcessHistory)ar.get(0)).getId();
+//      	        	System.out.println("PHID= "+l);
+      	        	ProcessHistory ph = StaticDaoFacade.getInstance().getProcessHistoryById(phId);
+      	        	//populate ProcessTaskHistory
+      	        	ProcessTaskHistoryTableModel pthtmodel=(ProcessTaskHistoryTableModel) processTaskAlertTable.getModel();
+      	            List<TaskHistory> pthl = ph.getTaskHistoryList();
+      	            pthtmodel.clearTable();
+	      	          for (TaskHistory th : pthl) {
+	      	          	final ArrayList<Object> newRequest = new ArrayList<Object>();
+	      	          	newRequest.add(th);
+	      	          	pthtmodel.insertRow(newRequest);
+	      	  		}
+	      	        if(pthtmodel.getRowCount()>0){
+	      	        	processTaskAlertTable.setRowSelectionInterval(0, 0);
+	      	          }
+                    }catch (Exception ee) {
+                    	ee.printStackTrace();
+					}
+                }
+            }});
+               
         //end
         appLogArea=new TextAreaFIFO();
         appLogArea.setEditable(false);

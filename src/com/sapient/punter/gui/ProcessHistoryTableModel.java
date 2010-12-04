@@ -10,7 +10,7 @@ import com.sapient.punter.jpa.ProcessHistory;
 public class ProcessHistoryTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflsdfl"};
 	private static final long serialVersionUID = 1L;
-	private static SimpleDateFormat sdf=new SimpleDateFormat("dd, MMM hh:mm:ss");
+	private static SimpleDateFormat sdf=new SimpleDateFormat("dd, MMM hh:mm:ss aa");
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
 

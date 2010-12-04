@@ -191,7 +191,7 @@ public class ProcessTaskHistoryTableModel extends AbstractTableModel {
     super.fireTableDataChanged();
   }
   public boolean isCellEditable(int row, int col) {  
-      return true;
+      return false;
       }
   private void printDebugData() {
       int numRows = getRowCount();
