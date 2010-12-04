@@ -190,8 +190,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
         runningTaskTable.setFillsViewportHeight(true);
         runningTaskTable.setFont(new Font("Courier New",Font.TRUETYPE_FONT,12));
         runningTaskTable.setAutoCreateRowSorter(true);
-        runningTaskTable.setRowHeight(20);
+        runningTaskTable.setShowVerticalLines(false);
+        runningTaskTable.setRowHeight(26);
         runningTaskTable.setIntercellSpacing(new Dimension(0, 0));
+        runningTaskTable.getColumnModel().getColumn(0).setCellRenderer(dtcr);
         initColumnSizesRunningTaskTable(runningTaskTable);
         header = runningTaskTable.getTableHeader();
         headerRenderer = header.getDefaultRenderer();

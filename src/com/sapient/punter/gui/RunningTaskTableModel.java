@@ -8,16 +8,16 @@ import com.sapient.punter.jpa.RunState;
 import com.sapient.punter.jpa.TaskHistory;
 
 public class RunningTaskTableModel extends AbstractTableModel {
-	public final Object[] longValues = {new Integer(3),"Kaflksdfl","12345678","123456546865354343543543543584435"};
+	public final Object[] longValues = {new Integer(3),"Kaflksdfl","12345678"};
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
 
 	/** Holds the column names */         
 	private String [] columnNames = new String [] 
-                                  {"<html><b>Serial","<html><b>Task","<html><b>Status","<html><b>Logs"};
+                                  {"<html><b>Serial","<html><b>Task","<html><b>Status"};
 	private Class [] columnClasses = new Class[] 
-                                   {Integer.class,String.class,RunState.class,String.class};
+                                   {Integer.class,String.class,RunState.class};
   
   /**
    * Constructor: Initializes the table structure, including number of columns
@@ -75,8 +75,6 @@ public class RunningTaskTableModel extends AbstractTableModel {
     	return th.getTask().getName();
     case 2:
     	return th.getRunStatus();
-    case 3:
-    	return th.getLogs();
     }
     return colArrayList.get(col);
   }
