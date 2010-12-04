@@ -2,7 +2,6 @@ package com.sapient.punter.gui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -11,12 +10,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -56,8 +52,6 @@ import javax.swing.text.PlainDocument;
 
 import neoe.ne.EditPanel;
 
-import com.sapient.kb.gui.AttachmentTableModel;
-import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.executors.ProcessExecutor;
@@ -156,7 +150,41 @@ public class PunterGUI extends JPanel implements TaskObserver{
         	}
         });
         
-        runningTaskTable=new JTable(new RunningTaskTableModel());
+        runningTaskTable=new JTable(new RunningTaskTableModel()){
+
+	         public boolean editCellAt(int row, int column, java.util.EventObject e) {
+	        	 column=convertColumnIndexToModel(column);
+	    		 	if(isEditing()) {
+	    		 		getCellEditor().stopCellEditing();
+	    		 	}
+	        		if (e instanceof MouseEvent) {
+	        			JTable table = (JTable) e.getSource();
+	        			MouseEvent mEvent = ((MouseEvent) e);
+	        		
+	        			if( ((MouseEvent)e).getClickCount() == 1 && this.isRowSelected( row ) ){
+	        				return false;
+	        			}
+		               if (mEvent.getClickCount() == 2) {
+		            	   RunningTaskTableModel phtm = ((RunningTaskTableModel)runningTaskTable.getModel());
+		            	   TaskHistory ph=(TaskHistory) phtm.getRow(runningTaskTable.convertRowIndexToModel(runningTaskTable.getSelectedRow())).get(0);
+		            	   EditPanel editor;
+						   try {
+								editor = new EditPanel(ph.getLogs());
+								editor.openWindow();
+						   } catch (Exception e1) {
+								e1.printStackTrace();
+						   }
+		                  return false;
+		               } else if (!table.isRowSelected(row)) {
+		                  return false;
+		               } else {
+		                  return super.editCellAt(row, column, e);
+		              }
+	        		}
+	        		return false;
+//	    	 	return super.editCellAt(row, column, e);
+	         }
+        };
         runningTaskTable.setShowGrid(false);
         runningTaskTable.setPreferredScrollableViewportSize(new Dimension(300, 160));
         runningTaskTable.setFillsViewportHeight(true);
@@ -767,6 +795,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
                 JTabbedPane pane = (JTabbedPane)evt.getSource();
                 int sel = pane.getSelectedIndex();
                 if(sel==3){
+                	((ProcessTaskHistoryTableModel)processTaskAlertTable.getModel()).clearTable();
                 	ProcessAlertTableModel phtmodel=(ProcessAlertTableModel) processAlertTable.getModel();
       	            List<ProcessHistory> phl = StaticDaoFacade.getInstance().getMySortedProcessHistoryList(AppSettings.getInstance().getUsername());
       	            phtmodel.clearTable();
