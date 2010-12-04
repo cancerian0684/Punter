@@ -34,9 +34,9 @@ public class ProcessData implements Serializable{
 	private List<TaskData> taskList;
 	@OneToMany(cascade={CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.LAZY)
 	private List<ProcessHistory> processHistoryList;
-	@Version
+	/*@Version
 	@Column(name = "OPT_LOCK")
-	private Long version;
+	private Long version;*/
 	public long getId() {
 		return id;
 	}
@@ -99,12 +99,12 @@ public class ProcessData implements Serializable{
 			return false;
 		return true;
 	}
-	public Long getVersion() {
+	/*public Long getVersion() {
 		return version;
 	}
 	public void setVersion(Long version) {
 		this.version = version;
-	}
+	}*/
 	public String getUsername() {
 		return username;
 	}

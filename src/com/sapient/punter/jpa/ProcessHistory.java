@@ -48,9 +48,9 @@ public class ProcessHistory implements Serializable{
 	private RunState runState = RunState.NEW;
 	@Enumerated(EnumType.STRING)
 	private RunStatus runStatus = RunStatus.NOT_RUN;
-	@Version
+	/*@Version
 	@Column(name = "OPT_LOCK")
-	private Long version;
+	private Long version;*/
 	private boolean clearAlert;
 	public long getId() {
 		return id;
@@ -120,12 +120,12 @@ public class ProcessHistory implements Serializable{
 		this.logDocument = logDocument;
 	}
 	
-	public Long getVersion() {
+	/*public Long getVersion() {
 		return version;
 	}
 	public void setVersion(Long version) {
 		this.version = version;
-	}
+	}*/
 	@Override
 	public int hashCode() {
 		final int prime = 31;

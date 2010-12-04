@@ -3,6 +3,7 @@ package com.sapient.punter.jpa;
 import java.io.Serializable;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -38,9 +39,9 @@ public class TaskHistory implements Serializable{
 	private RunState runState = RunState.NEW;
 	@Enumerated(EnumType.STRING)
 	private RunStatus runStatus = RunStatus.NOT_RUN;
-	@Version
-	@Column(name = "OPT_LOCK")
-	private Long version;
+//	@Version
+//	@Column(name = "OPT_LOCK")
+//	private Long version;
 	public long getId() {
 		return id;
 	}
@@ -90,12 +91,12 @@ public class TaskHistory implements Serializable{
 		this.runStatus = runStatus;
 	}
 	
-	public Long getVersion() {
+	/*public Long getVersion() {
 		return version;
 	}
 	public void setVersion(Long version) {
 		this.version = version;
-	}
+	}*/
 	@Override
 	public int hashCode() {
 		final int prime = 31;

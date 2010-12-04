@@ -3,7 +3,6 @@ package com.sapient.server;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +13,6 @@ import java.util.StringTokenizer;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.FlushModeType;
-import javax.persistence.LockModeType;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
@@ -62,7 +59,6 @@ public class StaticDaoFacade {
 				}
 			});
 			Map properties = new HashMap();
-//			properties.put(TopLinkProperties.CACHE_TYPE_DEFAULT, CacheType.DEFAULT);
 			emf = Persistence.createEntityManagerFactory("punter",properties);
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -271,17 +267,19 @@ public  TaskHistory createTaskHistory(TaskHistory th)throws Exception{
 	}
 }
 	public  void saveTaskHistory(TaskHistory t)throws Exception{
+		System.out.println("-------------------------------START");
 		EntityManager em = emf.createEntityManager();
 	    em.getTransaction().begin();
-	    TaskHistory task=em.find(TaskHistory.class, t.getId());
-	    task.setRunState(t.getRunState());
-	    task.setRunStatus(t.getRunStatus());
-	    task.setSequence(t.getSequence());
-	    task.setLogs(t.getLogs());
-	    em.merge(task);
-	    em.flush();
+	    TaskHistory taskHistory=em.find(TaskHistory.class, t.getId());
+	    taskHistory.setRunState(t.getRunState());
+	    taskHistory.setRunStatus(t.getRunStatus());
+	    taskHistory.setSequence(t.getSequence());
+	    taskHistory.setLogs(t.getLogs());
+	    em.merge(taskHistory);
+//	    em.flush();
 	    em.getTransaction().commit();
 	    em.close();
+	    System.out.println("-------------------------------END");
 	}
 
 	public  void saveProcessHistory(ProcessHistory procHistory)
@@ -293,7 +291,7 @@ public  TaskHistory createTaskHistory(TaskHistory th)throws Exception{
 		ph.setRunStatus(procHistory.getRunStatus());
 		ph.setFinishTime(procHistory.getFinishTime());
 		em.merge(ph);
-		em.flush();
+//		em.flush();
 		em.getTransaction().commit();
 		em.close();
 	}
@@ -303,7 +301,7 @@ public  TaskHistory createTaskHistory(TaskHistory th)throws Exception{
 		try {
 			em.getTransaction().begin();
 			TaskData tmp = em.find(TaskData.class, t.getId());
-			em.lock(tmp, LockModeType.READ);
+//			em.lock(tmp, LockModeType.READ);
 			tmp.setActive(t.isActive());
 			tmp.setAuthor(t.getAuthor());
 			tmp.setClassName(t.getClassName());
@@ -330,7 +328,7 @@ public  TaskHistory createTaskHistory(TaskHistory th)throws Exception{
 		try {
 			em.getTransaction().begin();
 			ProcessData tmp = em.find(ProcessData.class, p.getId());
-			em.lock(tmp, LockModeType.READ);
+//			em.lock(tmp, LockModeType.READ);
 			tmp.setName(p.getName());
 			tmp.setInputParams(p.getInputParams());
 			tmp.setUsername(p.getUsername());

@@ -35,9 +35,9 @@ public class TaskData implements Serializable{
 	private HashMap<String, OutputParamValue> outputParams;
 	@ManyToOne
 	private ProcessData process;
-	@Version
+	/*@Version
 	@Column(name = "OPT_LOCK")
-	private Long version;
+	private Long version;*/
 	public long getId() {
 		return id;
 	}
@@ -101,12 +101,12 @@ public class TaskData implements Serializable{
 		this.active = active;
 	}
 	
-	public Long getVersion() {
+	/*public Long getVersion() {
 		return version;
 	}
 	public void setVersion(Long version) {
 		this.version = version;
-	}
+	}*/
 	@Override
 	public int hashCode() {
 		final int prime = 31;
