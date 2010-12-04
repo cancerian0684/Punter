@@ -78,14 +78,7 @@ public void beforeProcessStart(){
 	};
 	System.err.println("Emails to notify : "+emailsToNotify);
 	ph.setRunState(RunState.RUNNING);
-	try {
-		for (int i = 0; i < 8; i++) {			
-			TimeUnit.MILLISECONDS.sleep(20);
-			po.update(ph);
-		}
-	} catch (InterruptedException e) {
-		e.printStackTrace();
-	}
+	po.update(ph);
 }
 public void afterProcessFinish(){
 	try{
@@ -112,11 +105,17 @@ public void execute(){
 		boolean status=false;
 		if(keepRunning){
 		try{
-		status=task.execute();
-		keepRunning=status;
+			task.beforeTaskStart();
+			task.LOGGER.get().log(Level.INFO,"started executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
+			status=task.execute();
+			task.LOGGER.get().log(Level.INFO,"Finished executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
+			keepRunning=status;
 		}catch (Throwable e) {
 			keepRunning=false;
 			task.LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+			task.LOGGER.get().log(Level.INFO,"Finished executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
+		}finally{
+			task.afterTaskFinish();
 		}
 		progressCounter++;
 		ph.setProgress(100*progressCounter/ph.getTaskHistoryList().size());
@@ -191,10 +190,13 @@ private void substituteParams() {
 				}
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
+				Tasks.LOGGER.get().severe(e.toString());
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
+				Tasks.LOGGER.get().severe(e.toString());
 			} catch (ParseException e) {
 				e.printStackTrace();
+				Tasks.LOGGER.get().severe(e.toString());
 			}
 		}
 	}

@@ -51,13 +51,19 @@ public class ProcessHistory implements Serializable{
 	@Version
 	@Column(name = "OPT_LOCK")
 	private Long version;
+	private boolean clearAlert;
 	public long getId() {
 		return id;
 	}
 	public void setId(long id) {
 		this.id = id;
 	}
-	
+	public void setClearAlert(boolean clearAlert) {
+		this.clearAlert = clearAlert;
+	}
+	public boolean isClearAlert() {
+		return clearAlert;
+	}
 	public String getName() {
 		return name;
 	}

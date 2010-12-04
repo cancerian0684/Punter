@@ -218,7 +218,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				 if(processTable.getSelectedRow() != -1){
-	                	System.out.println("Delete Key Pressed.");
+//	                	System.out.println("Delete Key Pressed.");
 	                	ProcessTableModel tableModel=(ProcessTableModel) processTable.getModel();
 	                	int[] selectedRows = processTable.getSelectedRows();
 						ArrayList<Object> selectedRowsData = new ArrayList<Object>();
@@ -271,7 +271,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				 if(taskTable.getSelectedRow() != -1){
-	                	System.out.println("Delete Key Pressed.");
+//	                	System.out.println("Delete Key Pressed.");
 	                	TaskTableModel tableModel=(TaskTableModel) taskTable.getModel();
 	                	int[] selectedRows = taskTable.getSelectedRows();
 						ArrayList<Object> selectedRowsData = new ArrayList<Object>();
@@ -297,7 +297,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        	  if(processTable.getSelectedRow()!=-1){
 	        	  ArrayList ar = ((ProcessTableModel)processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow()));
 	        	  long procId=(Long)((ProcessData)ar.get(0)).getId();
-	        	  System.out.println("Process ID : "+procId);
+//	        	  System.out.println("Process ID : "+procId);
 	        	  try{
 	        		  Object[] possibilities =taskProps.keySet().toArray();
 	        		  String s = (String)JOptionPane.showInputDialog(
@@ -311,7 +311,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 
 	        		  //If a string was returned, say so.
 	        		  if ((s != null) && (s.length() > 0)) {
-	        		      System.out.println("Selected Task... " + s + "!");
+//	        		      System.out.println("Selected Task... " + s + "!");
 	        		      Class<?> cls = Class.forName(taskProps.getProperty(s));
 	    	        	  HashMap<String, OutputParamValue> outProp = Tasks.listOutputParams((Tasks)cls.newInstance());
 	    	        	  HashMap<String, InputParamValue> inProp=Tasks.listInputParams((Tasks)cls.newInstance());
@@ -381,7 +381,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		addProcessMenu = new JMenuItem("Add Process");
 		addProcessMenu.addActionListener(new ActionListener() {
 	          public void actionPerformed(ActionEvent e) {
-	        	  System.out.println("Adding new Process");
+//	        	  System.out.println("Adding new Process");
 	        	  try{
 	        		  ProcessData proc=new ProcessData();
 	        		  proc.setName("new Process");
@@ -421,7 +421,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		runProcessMenu = new JMenuItem("Run Process");
 		runProcessMenu.addActionListener(new ActionListener() {
 	          public void actionPerformed(ActionEvent e) {
-	        	  System.out.println("Running Process");
+//	        	  System.out.println("Running Process");
 	        	  try{
 	        		  if(processTable.getSelectedRow()!=-1){
 	        			  final ProcessData procDao=(ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
@@ -549,7 +549,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	                    pthtmodel.clearTable();
 	                    ArrayList ar = ((ProcessTableModel)processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow()));
 	      	        	long procId=(Long)((ProcessData)ar.get(0)).getId();
-	      	        	System.out.println("PID= "+procId);
+//	      	        	System.out.println("PID= "+procId);
 	      	        	//populate processHistory
 	      	        	ProcessHistoryTableModel phtmodel=(ProcessHistoryTableModel) processHistoryTable.getModel();
 	      	            List<ProcessHistory> phl = StaticDaoFacade.getInstance().getSortedProcessHistoryListForProcessId(procId);
@@ -587,7 +587,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
                     HashMap<String, InputParamValue> props = process.getInputParams();
                     for(Object key : props.keySet()) {  
                 		InputParamValue value = props.get(key);    
-                		System.out.println(key + " = " + value.getValue());
+//                		System.out.println(key + " = " + value.getValue());
                 		final ArrayList<Object> newRequest = new ArrayList<Object>();
                     	newRequest.add(key);
                     	newRequest.add(value.getValue());
@@ -704,7 +704,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		System.setErr( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.err), true));
     }
     public void createProcess(final ProcessData procDao) throws Exception{
-		  System.out.println(procDao.getId()+" == "+procDao.getName());
+//		  System.out.println(procDao.getId()+" == "+procDao.getName());
 		  List<TaskData> ptl = StaticDaoFacade.getInstance().getSortedTasksByProcessId(procDao.getId());
 		  
 		  final List<TaskHistory> thList=new ArrayList<TaskHistory>(10);
@@ -714,7 +714,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		  ph.setProcess(procDao);
 		  ph.setTaskHistoryList(thList);
 		  for (TaskData taskDao : ptl) {
-			System.out.println("Task -"+taskDao.getId());
+//			System.out.println("Task -"+taskDao.getId());
 			TaskHistory th = new TaskHistory();
 			th.setTask(taskDao);
 			th.setProcessHistory(ph);
@@ -791,7 +791,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		            	ArrayList ar = ((ProcessHistoryTableModel)processHistoryTable.getModel()).getRow(processHistoryTable.convertRowIndexToModel(processHistoryTable.getSelectedRow()));
 		            	long pidTable=(Long)((ProcessHistory)ar.get(0)).getId();
 		            	long pid=taskHistory.getProcessHistory().getId();
-		            	System.out.println(""+pid+" == "+pidTable);
+//		            	System.out.println(""+pid+" == "+pidTable);
 		            	if(pid==pidTable){
 		            		ProcessHistory ph = StaticDaoFacade.getInstance().getProcessHistoryById(pid);
 		      	        	//populate ProcessTaskHistory

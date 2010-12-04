@@ -28,7 +28,7 @@ import com.sapient.punter.utils.InputParamValue;
         	int i=0;
         	for(Object key : prop.keySet()) {  
         		InputParamValue value = (InputParamValue) prop.get(key);    
-        		System.out.println(key + " = " + value.getValue());
+//        		System.out.println(key + " = " + value.getValue());
         		this.data[i][0]=key;
         		this.data[i][1]=value.getValue();
         		this.data[i][2]=t;

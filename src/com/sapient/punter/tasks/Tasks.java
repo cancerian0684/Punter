@@ -47,9 +47,7 @@ public abstract class Tasks implements Serializable{
 		}
 	};
 	public void beforeTaskStart(){
-		System.err.println("Calling before Task: ");
 		strLogger = new StringBuilder();
-		
 	   /* cHandler = new ConsoleHandler();
 	    cHandler.setFormatter(new Formatter() {
 			@Override
@@ -144,7 +142,7 @@ public abstract class Tasks implements Serializable{
 		return null;
 	}
 
-	private void substituteParams() {
+	private void substituteParams() throws Exception{
 		Field[] fields = getClass().getDeclaredFields();
 		for (Field field : fields) {
 			if(field.isAnnotationPresent(InputParam.class)){
@@ -170,11 +168,16 @@ public abstract class Tasks implements Serializable{
 						}
 					}
 				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
+//					e.printStackTrace();
+//					LOGGER.get().severe(e.toString());
+					throw e;
 				} catch (IllegalAccessException e) {
-					e.printStackTrace();
+//					e.printStackTrace();
+//					LOGGER.get().severe(e.toString());
+					throw e;
 				} catch (ParseException e) {
-					e.printStackTrace();
+//					LOGGER.get().log(Level.SEVERE,e.toString(),e);
+					throw e;
 				}
 			}
 		}
@@ -205,13 +208,10 @@ public abstract class Tasks implements Serializable{
 	 */
 	public abstract boolean run();
 	
-	public boolean execute(){
-		System.out.println("started executing task..");
+	public boolean execute()throws Exception{
 		substituteParams();
-		beforeTaskStart();
 		boolean status= run();
 		substituteResult();
-		afterTaskFinish();
 		return status;
 	}
 	public void setOutputParams(HashMap<String,OutputParamValue> outputParams) {

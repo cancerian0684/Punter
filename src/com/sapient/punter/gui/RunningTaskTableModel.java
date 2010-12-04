@@ -74,7 +74,7 @@ public class RunningTaskTableModel extends AbstractTableModel {
     case 1:
     	return th.getTask().getName();
     case 2:
-    	return th.getRunState();
+    	return th.getRunStatus();
     case 3:
     	return th.getLogs();
     }
