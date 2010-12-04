@@ -28,8 +28,10 @@
 	<classpathentry kind="lib" path="lib/ekitspell.jar"/>
 	<classpathentry kind="lib" path="lib/commons-beanutils-core-1.8.3.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/eclipselink.jar"/>
+	<classpathentry kind="lib" path="lib/eclipselink.jar" sourcepath="E:/Downloads/eclipselink-src-2.1.1.v20100817-r8050.zip"/>
 	<classpathentry kind="lib" path="lib/javax.persistence_2.0.1.v201006031150.jar"/>
+	<classpathentry kind="lib" path="lib/javaws.jar"/>
+	<classpathentry kind="lib" path="lib/neoeedit.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
