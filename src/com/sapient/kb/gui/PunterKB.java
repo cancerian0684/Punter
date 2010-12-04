@@ -112,7 +112,7 @@ public class PunterKB extends JPanel{
         			if( ((MouseEvent)e).getClickCount() == 1 && this.isRowSelected( row ) ){
         				return false;
         			}
-	               if (mEvent.getClickCount() == 2) {
+	               if (mEvent.getClickCount() == 2&&table.getSelectedRow()!=-1) {
 	            	   Document luceneDoc=(Document) ((DocumentTableModel)table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow())).get(0);
 	            	   try {
 						docService.updateAccessCounter(luceneDoc);

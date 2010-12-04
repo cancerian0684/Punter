@@ -23,6 +23,7 @@ import com.sapient.kb.jpa.Document;
 import com.sapient.kb.utils.TestEditor;
 import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
+import com.sapient.punter.jpa.RunStatus;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
 
@@ -523,9 +524,10 @@ public  void deleteTeam(){
 public List<ProcessHistory> getMySortedProcessHistoryList(String username) {
 	EntityManager em = emf.createEntityManager();
 	try{
-	Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.username = :username AND ph.clearAlert=0 order by ph.startTime desc");
+	Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.username = :username AND ph.clearAlert=0 AND ph.runStatus!=:runStatus order by ph.startTime desc");
     q.setHint("eclipselink.refresh", "true");
     q.setParameter("username", username);
+    q.setParameter("runStatus", RunStatus.SUCCESS);
     q.setFirstResult(0);
     q.setMaxResults(ServerSettings.getInstance().getMaxProcessAlerts());
     List<ProcessHistory> processHistoryList = q.getResultList();
