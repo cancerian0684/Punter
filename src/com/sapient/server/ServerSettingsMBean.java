@@ -8,4 +8,6 @@ public int getMaxResultsToDisplay();
 public void optimizeIndex();
 public abstract void setMaxProcessHistory(int maxProcessHistory);
 public abstract int getMaxProcessHistory();
+public abstract void setMaxProcessAlerts(int maxProcessAlerts);
+public abstract int getMaxProcessAlerts();
 }

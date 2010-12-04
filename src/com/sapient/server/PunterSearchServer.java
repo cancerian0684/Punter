@@ -351,5 +351,16 @@ public class PunterSearchServer implements PunterSearch {
 	public void deleteTeam() throws RemoteException {
 		sdf.deleteTeam();
 	}
+
+	@Override
+	public List<ProcessHistory> getMySortedProcessHistoryList(String username)
+			throws RemoteException {
+		try {
+			return sdf.getMySortedProcessHistoryList(username);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 }

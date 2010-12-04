@@ -290,6 +290,7 @@ public  TaskHistory createTaskHistory(TaskHistory th)throws Exception{
 		ph.setRunState(procHistory.getRunState());
 		ph.setRunStatus(procHistory.getRunStatus());
 		ph.setFinishTime(procHistory.getFinishTime());
+		ph.setClearAlert(procHistory.isClearAlert());
 		em.merge(ph);
 //		em.flush();
 		em.getTransaction().commit();
@@ -518,5 +519,19 @@ public  void deleteTeam(){
 
     em.close();
     emf.close();
+}
+public List<ProcessHistory> getMySortedProcessHistoryList(String username) {
+	EntityManager em = emf.createEntityManager();
+	try{
+	Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.username = :username AND ph.clearAlert=0 order by ph.startTime desc");
+    q.setHint("eclipselink.refresh", "true");
+    q.setParameter("username", username);
+    q.setFirstResult(0);
+    q.setMaxResults(ServerSettings.getInstance().getMaxProcessAlerts());
+    List<ProcessHistory> processHistoryList = q.getResultList();
+    return processHistoryList;
+	}finally{
+		em.close();
+	}
 }
 }

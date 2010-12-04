@@ -41,6 +41,7 @@ public interface PunterSearch extends Remote {
 	 TaskHistory getTaskDao(TaskHistory td)throws RemoteException;
 	 List<ProcessHistory> getProcessHistoryListForProcessId(long id)throws RemoteException;
 	 List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id)throws RemoteException;
+	 public List<ProcessHistory> getMySortedProcessHistoryList(String username)throws RemoteException;
 	 ProcessHistory getProcessHistoryById(long id)throws RemoteException;
 	 List<TaskData> getProcessTasksById(long pid)throws RemoteException;
 	 List<TaskData> getSortedTasksByProcessId(long pid)throws RemoteException;

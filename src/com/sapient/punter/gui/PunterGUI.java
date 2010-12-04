@@ -39,6 +39,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -71,6 +73,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private final JTable inputParamTable;
     private final JTable outputParamTable;
     private final JTable processHistoryTable;
+    private final JTable processAlertTable;
     private final JTable processTaskHistoryTable;
     private final JTable runningProcessTable;
     private final JTable runningTaskTable;
@@ -642,6 +645,54 @@ public class PunterGUI extends JPanel implements TaskObserver{
         processPropertyTable.getColumn("<html><b>Value").setCellRenderer(new ProcessPropertyTableRenderer());
         JScrollPane processPropertyPane = new JScrollPane(processPropertyTable);
         tabbedPane.addTab("Process Property", null, processPropertyPane,"Properties for selected Process");
+        
+        // processAlertTable
+        processAlertTable=new JTable(new ProcessAlertTableModel());
+//        initColumnSizes5(processPropertyTable);
+        
+        processAlertTable.setShowGrid(true);
+        processAlertTable.setShowVerticalLines(false);
+        processAlertTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
+        processAlertTable.setFillsViewportHeight(true);
+        processAlertTable.setAutoCreateRowSorter(true);
+        processAlertTable.setRowHeight(26);
+        processAlertTable.setIntercellSpacing(new Dimension(0, 0));
+        processAlertTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        processAlertTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        header = processAlertTable.getTableHeader();
+        headerRenderer = header.getDefaultRenderer();
+        if(headerRenderer instanceof JLabel){
+        	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
+        }
+        processAlertTable.getTableHeader().setReorderingAllowed(false);
+        processAlertTable.getColumn("<html><b>Run ID").setPreferredWidth(400);
+        processAlertTable.getColumn("<html><b>Clear Alert").setPreferredWidth(100);
+        JScrollPane processAlertPane = new JScrollPane(processAlertTable);
+        tabbedPane.addTab("My Alerts", null, processAlertPane,"My Workflow Alerts");
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent evt) {
+                JTabbedPane pane = (JTabbedPane)evt.getSource();
+                // Get current tab
+                int sel = pane.getSelectedIndex();
+                if(sel==3){
+                	System.err.println("3 selected");
+                	ProcessAlertTableModel phtmodel=(ProcessAlertTableModel) processAlertTable.getModel();
+      	            List<ProcessHistory> phl = StaticDaoFacade.getInstance().getMySortedProcessHistoryList(AppSettings.getInstance().getUsername());
+      	            phtmodel.clearTable();
+	      	        for (ProcessHistory ph : phl) {
+	      	          	final ArrayList<Object> newRequest = new ArrayList<Object>();
+	      	          	newRequest.add(ph);
+	      	          	phtmodel.insertRow(newRequest);
+      	  		}
+      	        if(phtmodel.getRowCount()>0){
+      	        	processHistoryTable.setRowSelectionInterval(0, 0);
+      	        }
+                }
+            }
+        });
+
+        
+        //end
         appLogArea=new TextAreaFIFO();
         appLogArea.setEditable(false);
         tabbedPane.addTab("App Logs", null, new JScrollPane(appLogArea),"Application Wide Logging");

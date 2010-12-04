@@ -242,9 +242,19 @@ public class StaticDaoFacade {
 
 	
 	public List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id)
-			 {
+	{
 		try {
 			return stub.getSortedProcessHistoryListForProcessId(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public List<ProcessHistory> getMySortedProcessHistoryList(String username)
+	{
+		try {
+			return stub.getMySortedProcessHistoryList(username);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

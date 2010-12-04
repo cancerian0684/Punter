@@ -14,6 +14,7 @@ public class ServerSettings implements ServerSettingsMBean {
 	private StaticDaoFacade sdf;
 	private int maxResultsToDisplay=10;
 	private int maxProcessHistory=30;
+	private int maxProcessAlerts=30;
 	public static synchronized ServerSettingsMBean getInstance(){
 		if(instance==null){
 			instance=new ServerSettings();
@@ -74,5 +75,15 @@ public class ServerSettings implements ServerSettingsMBean {
 	@Override
 	public void setMaxProcessHistory(int maxProcessHistory) {
 		this.maxProcessHistory = maxProcessHistory;
+	}
+	@Override
+	public int getMaxProcessAlerts() {
+		if(maxProcessAlerts<=5)
+			maxProcessAlerts=30;
+		return maxProcessAlerts;
+	}
+	@Override
+	public void setMaxProcessAlerts(int maxProcessAlerts) {
+		this.maxProcessAlerts = maxProcessAlerts;
 	}
 }
