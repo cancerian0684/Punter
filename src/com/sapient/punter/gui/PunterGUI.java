@@ -36,6 +36,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
@@ -254,7 +255,15 @@ public class PunterGUI extends JPanel implements TaskObserver{
         if(headerRenderer instanceof JLabel){
         	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
         }
+
         header.setPreferredSize(new Dimension(30, 26));
+        TableColumn col2 = taskTable.getColumnModel().getColumn(0);
+
+        DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
+        dtcr.setHorizontalAlignment(SwingConstants.CENTER);
+//        dtcr.setHorizontalTextPosition(SwingConstants.CENTER);
+
+        col2.setCellRenderer(dtcr);
         imap = taskTable.getInputMap(JComponent.WHEN_FOCUSED);
 	    imap.put(KeyStroke.getKeyStroke("DELETE"), "table.delete");
 	    amap = taskTable.getActionMap();
