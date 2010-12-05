@@ -579,7 +579,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			public void valueChanged(ListSelectionEvent e) {
                 ListSelectionModel lsm = (ListSelectionModel)e.getSource();
                 if(e.getValueIsAdjusting()){
-                	System.err.println("Mouse is adjusting..");
+//                	System.err.println("Mouse is adjusting..");
                 } else if (lsm.isSelectionEmpty()) {
                 } else {
                     int selectedRow = lsm.getMinSelectionIndex();
