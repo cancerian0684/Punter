@@ -76,7 +76,7 @@ public void beforeProcessStart(){
 			}
 		};
 	};
-	System.err.println("Emails to notify : "+emailsToNotify);
+//	System.err.println("Emails to notify : "+emailsToNotify);
 	ph.setRunState(RunState.RUNNING);
 	po.update(ph);
 }
@@ -161,7 +161,7 @@ public static HashMap<String,InputParamValue> listInputParams(){
 	for (Field field : fields) {
 		if(field.isAnnotationPresent(InputParam.class)){
 			InputParam ann = field.getAnnotation(InputParam.class);
-			System.out.println(ann.required()==true?"*"+field.getName():""+field.getName());
+//			System.out.println(ann.required()==true?"*"+field.getName():""+field.getName());
 			inProp.put(field.getName(), new InputParamValue(ann, ""));
 		}
 	}

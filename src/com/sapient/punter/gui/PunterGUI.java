@@ -991,7 +991,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     @Override
 	public void saveTaskHistory(final TaskHistory taskHistory) {
     	try {
-    		System.err.println("Creating task history");
+//    		System.err.println("Creating task history");
     		StaticDaoFacade.getInstance().saveTaskHistory(taskHistory);
 			if(processHistoryTable.getSelectedRow()!=-1){
 			 javax.swing.SwingUtilities.invokeLater(new Runnable() {

@@ -42,7 +42,7 @@ public abstract class Tasks implements Serializable{
 		protected Logger initialValue() {
 		    Logger logger = Logger.getLogger("Logger for "
 			    + Thread.currentThread().getName());
-		    System.out.println("Created logger: " + logger.getName());
+//		    System.out.println("Created logger: " + logger.getName());
 		    return logger;
 		}
 	};
@@ -73,7 +73,7 @@ public abstract class Tasks implements Serializable{
 	    }
 
         public void flush() {
-        	System.out.println("flush called..");
+//        	System.out.println("flush called..");
         }
 
         public void close() {
@@ -100,12 +100,12 @@ public abstract class Tasks implements Serializable{
 	}
 	public static HashMap<String,InputParamValue> listInputParams(Tasks task){
 		Field[] fields = task.getClass().getDeclaredFields();
-		System.out.println("Listing input params");
+//		System.out.println("Listing input params");
 		HashMap<String,InputParamValue> inProp=new HashMap<String,InputParamValue>();
 		for (Field field : fields) {
 			if(field.isAnnotationPresent(InputParam.class)){
 				InputParam ann = field.getAnnotation(InputParam.class);
-				System.out.println(ann.required()==true?"*"+field.getName():""+field.getName());
+//				System.out.println(ann.required()==true?"*"+field.getName():""+field.getName());
 				inProp.put(field.getName(), new InputParamValue(ann, ""));
 			}
 		}
@@ -114,12 +114,12 @@ public abstract class Tasks implements Serializable{
 	
 	public static HashMap<String,OutputParamValue> listOutputParams(Tasks task){
 		Field[] fields = task.getClass().getDeclaredFields();
-		System.out.println("Listing output params");
+//		System.out.println("Listing output params");
 		HashMap<String,OutputParamValue> outProp=new HashMap<String, OutputParamValue>();
 		for (Field field : fields) {
 			if(field.isAnnotationPresent(OutputParam.class)){
 				OutputParam ann = field.getAnnotation(OutputParam.class);
-				System.out.println(field.getName());
+//				System.out.println(field.getName());
 				outProp.put(field.getName(), new OutputParamValue(ann, ""));
 			}
 		}
@@ -190,7 +190,7 @@ public abstract class Tasks implements Serializable{
 					field.setAccessible(true);
 					Object value = field.get(this);
 					sessionMap.put(outputParams.get(field.getName()).getValue(), value);
-					System.out.println(field.getName()+" bound to "+outputParams.get(field.getName()).getValue()+" == "+value);
+//					System.out.println(field.getName()+" bound to "+outputParams.get(field.getName()).getValue()+" == "+value);
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
