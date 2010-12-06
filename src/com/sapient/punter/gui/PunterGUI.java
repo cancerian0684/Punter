@@ -168,6 +168,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		            	   RunningTaskTableModel phtm = ((RunningTaskTableModel)runningTaskTable.getModel());
 		            	   TaskHistory ph=(TaskHistory) phtm.getRow(runningTaskTable.convertRowIndexToModel(runningTaskTable.getSelectedRow())).get(0);
 		            	   EditPanel editor;
+		            	   if(ph.getLogs()!=null)
 						   try {
 								editor = new EditPanel(ph.getLogs());
 								editor.openWindow();
@@ -673,6 +674,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		            	   ProcessTaskHistoryTableModel phtm = ((ProcessTaskHistoryTableModel)processTaskHistoryTable.getModel());
 		            	   TaskHistory ph=(TaskHistory) phtm.getRow(processTaskHistoryTable.convertRowIndexToModel(processTaskHistoryTable.getSelectedRow())).get(0);
 		            	   EditPanel editor;
+		            	   if(ph.getLogs()!=null)
 						   try {
 								editor = new EditPanel(ph.getLogs());
 								editor.openWindow();
@@ -760,6 +762,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		            	   ProcessTaskHistoryTableModel phtm = ((ProcessTaskHistoryTableModel)processTaskAlertTable.getModel());
 		            	   TaskHistory ph=(TaskHistory) phtm.getRow(processTaskAlertTable.convertRowIndexToModel(processTaskAlertTable.getSelectedRow())).get(0);
 		            	   EditPanel editor;
+		            	   if(ph.getLogs()!=null)
 						   try {
 								editor = new EditPanel(ph.getLogs());
 								editor.openWindow();
