@@ -6,6 +6,7 @@ import javax.swing.table.AbstractTableModel;
 
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.RunState;
+import com.sapient.punter.jpa.RunStatus;
 
 public class RunningProcessTableModel extends AbstractTableModel {
 	public final Object[] longValues = {new Integer(4),"Kaflksdfl","123456789",new Integer(2000000000)};
@@ -17,7 +18,7 @@ public class RunningProcessTableModel extends AbstractTableModel {
 	private String [] columnNames = new String [] 
                                   {"<html><b>Run ID","<html><b>Process","<html><b>Status","<html><b>Completed"};
 	private Class [] columnClasses = new Class[] 
-                                   {Integer.class,String.class,RunState.class,Integer.class};
+                                   {Integer.class,String.class,RunStatus.class,Integer.class};
   
   /**
    * Constructor: Initializes the table structure, including number of columns
@@ -74,7 +75,7 @@ public class RunningProcessTableModel extends AbstractTableModel {
     case 1:
     	return ph.getName();
     case 2:
-    	return ph.getRunState();
+    	return ph.getRunStatus();
     case 3:
     	return ph.getProgress();
     }
