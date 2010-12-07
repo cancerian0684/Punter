@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -972,6 +973,11 @@ public class PunterGUI extends JPanel implements TaskObserver{
             				if(rptm.getRowCount()>0&&runningProcessTable.getSelectedRow()==-1){
             					runningProcessTable.setRowSelectionInterval(0, 0);
             				}
+            				if(ph1.getRunStatus().equals(RunStatus.SUCCESS))
+            					Main.displayMsg(""+ph1.getName()+" Success",TrayIcon.MessageType.INFO);
+            				else
+            					Main.displayMsg(""+ph1.getName()+" Failed",TrayIcon.MessageType.WARNING);
+            					
             			}
             		});
             		runProcess(process);

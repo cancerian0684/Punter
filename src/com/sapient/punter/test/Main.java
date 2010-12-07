@@ -15,6 +15,7 @@ public class Main {
 //			editor.
 //			editor.page.ptSelection.selectAll();
 			editor.openWindow();
+			editor.setLocation(100, 100);
 		}
 	}
 }

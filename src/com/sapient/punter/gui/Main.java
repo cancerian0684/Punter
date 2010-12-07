@@ -85,7 +85,7 @@ private void createAndShowGUI() throws Exception {
 		 }
 		public void windowClosing(WindowEvent e) {
 			KBFrame.setVisible(false); 
-			displayMsg("Punter has been minimized to System Tray");
+			displayMsg("Punter has been minimized to System Tray",TrayIcon.MessageType.INFO);
 		}
     });	 
     
@@ -100,7 +100,7 @@ private void createAndShowGUI() throws Exception {
 	        		public void windowClosing(WindowEvent e) {
 	        			//setVisible(false);
 	        			PunterGuiFrame.dispose(); 
-	        			displayMsg("Punter has been minimized to System Tray");
+	        			displayMsg("Punter has been minimized to System Tray",TrayIcon.MessageType.INFO);
 	        		}
 	        });	 
     PunterGuiFrame.pack();
@@ -274,9 +274,9 @@ public static boolean isConnected(){
 		return false;
 	}
 }
-public static void displayMsg(String msg){
+public static void displayMsg(String msg,TrayIcon.MessageType msgType){
 	if(trayIcon!=null){
-		trayIcon.displayMessage("My Punter", msg,TrayIcon.MessageType.INFO);
+		trayIcon.displayMessage("My Punter", msg,msgType);
 	}
 }
 public static void main(String[] args) {

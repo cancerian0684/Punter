@@ -1,5 +1,6 @@
 package com.sapient.punter.utils;
 
+import java.awt.TrayIcon;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
@@ -16,7 +17,7 @@ public class ListenerThread extends Thread {
          while (true) {
             System.out.println("about to listen");
             Socket socket = server.accept();   
-            Main.displayMsg("I am already here to serve you. why u need a new Instance ?");
+            Main.displayMsg("I am already here to serve you. why u need a new Instance ?",TrayIcon.MessageType.INFO);
             System.out.println("opened socket from client");
             InputStream iStream = socket.getInputStream();
             int length = iStream.read();
@@ -30,7 +31,7 @@ public class ListenerThread extends Thread {
             	System.exit(0);
             }
             else if(className.equalsIgnoreCase("NULL")){
-            	Main.displayMsg("Double click here to launch My Punter.");
+            	Main.displayMsg("Double click here to launch My Punter.",TrayIcon.MessageType.INFO);
             	iStream.close();
             }
             else
