@@ -557,12 +557,20 @@ public class PunterKB extends JPanel{
  				if(searchResultTable.getSelectedRow()>=0){
  					DocumentTableModel dtm = (DocumentTableModel)searchResultTable.getModel();
 	 				Document doc=(Document)dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-	 				try {
-						docService.deleteDocument(doc);
-					} catch (RemoteException e1) {
-						e1.printStackTrace();
-					}
-	 				dtm.deleteRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
+	 				if(doc.getAuthor().equalsIgnoreCase(AppSettings.getInstance().getUsername())){
+	 					int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete?", "Confirm",
+	 					        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+	 					   if (response == JOptionPane.YES_OPTION) {
+	 						   try {
+	 					    	docService.deleteDocument(doc);
+	 					    	dtm.deleteRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
+	 						   } catch (RemoteException e1) {
+	 							   e1.printStackTrace();
+	 						   }
+	 					    } 
+	 				}else{
+	 					JOptionPane.showMessageDialog(null, "You do not have rights to delete this doc.");
+	 				}
  				}
  			}
  		});
