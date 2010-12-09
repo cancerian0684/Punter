@@ -22,4 +22,8 @@ public interface AppSettingsMBean {
 	public abstract Dimension getDocumentEditorLastDim();
 	public abstract void setNimbusLookNFeel(boolean isNimbusLookNFeel);
 	public abstract boolean isNimbusLookNFeel();
+	public abstract Point getTextAreaEditorLocation();
+	public abstract void setTextAreaEditorLocation(Point textAreaEditorLocation);
+	public abstract Dimension getTextAreaEditorLastDim();
+	public abstract void setTextAreaEditorLastDim(Dimension textAreaEditorLastDim);
 }

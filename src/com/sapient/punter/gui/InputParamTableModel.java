@@ -7,6 +7,7 @@ import javax.swing.table.AbstractTableModel;
 import org.apache.commons.beanutils.BeanUtils;
 
 import com.sapient.kb.jpa.StaticDaoFacade;
+import com.sapient.punter.gui.TextAreaEditor.EditorListener;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.utils.InputParamValue;
  class InputParamTableModel extends AbstractTableModel {
@@ -83,8 +84,8 @@ import com.sapient.punter.utils.InputParamValue;
          * Don't need to implement this method unless your table's
          * data can change.
          */
-        public void setValueAt(Object value, int row, int col) {
-            data[row][col] = value;
+        public void setValueAt(final Object value,final int row,final int col) {
+        	data[row][col] = value;
             TaskData t=(TaskData) data[row][2];
             InputParamValue ipv=(InputParamValue) t.getInputParams().get((String)data[row][0]);
             ipv.setValue((String) value);

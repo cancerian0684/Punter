@@ -57,6 +57,7 @@ import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.executors.ProcessExecutor;
 import com.sapient.punter.executors.ScheduledJobPicker;
+import com.sapient.punter.gui.TextAreaEditor.EditorListener;
 import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.RunState;
@@ -518,7 +519,40 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		        	  }
 			}
 	      });
-        inputParamTable = new JTable(new InputParamTableModel());
+        inputParamTable = new JTable(new InputParamTableModel()){
+
+	         public boolean editCellAt(final int row,final int column, java.util.EventObject e) {
+//	        	 column=convertColumnIndexToModel(column);
+	    		 	if(isEditing()) {
+	    		 		getCellEditor().stopCellEditing();
+	    		 	}
+	        		if (e instanceof MouseEvent) {
+	        			JTable table = (JTable) e.getSource();
+	        			MouseEvent mEvent = ((MouseEvent) e);
+	        		
+	        			if( ((MouseEvent)e).getClickCount() == 1 && this.isRowSelected( row ) ){
+	        				return false;
+	        			}
+		               if (mEvent.getClickCount() == 2&&column==1) {
+		            	   final InputParamTableModel iptm = ((InputParamTableModel)inputParamTable.getModel());
+		            	   String value= (String) iptm.getValueAt(row, column);
+		            	   TextAreaEditor.getInstance(value, new EditorListener() {
+							@Override
+							public void save(String text) {
+								iptm.setValueAt(text, row, column);
+							}
+		            	   },Main.PunterGuiFrame);
+		                  return false;
+		               } else if (!table.isRowSelected(row)) {
+		                  return false;
+		               } else {
+		                  return super.editCellAt(row, column, e);
+		              }
+	        		}
+	        		return false;
+//	    	 	return super.editCellAt(row, column, e);
+	         }
+       };
         inputParamTable.setShowGrid(true);
         inputParamTable.setPreferredScrollableViewportSize(new Dimension(250, 150));
         inputParamTable.setFillsViewportHeight(true);

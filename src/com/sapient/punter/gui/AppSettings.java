@@ -29,10 +29,12 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private static final long serialVersionUID = 8652757533411927346L;
 	private static AppSettings appSettings;
 	private Dimension KBFrameDimension;
-	private  Dimension DocumentEditorLastDim;
+	private Dimension DocumentEditorLastDim;
+	private Dimension TextAreaEditorLastDim;
 	public Point KBFrameLocation; 
 	public Point DocumentEditorLocation;
 	public Point PunterGuiFrameLocation;
+	public Point TextAreaEditorLocation;
 	private int maxResults;
 	private boolean isNimbusLookNFeel;
 	private boolean multiSearchEnable=true;
@@ -43,6 +45,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);
+		TextAreaEditorLocation=new Point(0, 0);
 		DocumentEditorLocation=new Point(0, 0);
 		maxResults=10;
 		keystrokeFlush=5;
@@ -70,6 +73,17 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		DocumentEditorLastDim = documentEditorLastDim;
 	}
 	@Override
+	public void setTextAreaEditorLastDim(Dimension textAreaEditorLastDim) {
+		TextAreaEditorLastDim = textAreaEditorLastDim;
+	}
+	@Override
+	public Dimension getTextAreaEditorLastDim() {
+		if(TextAreaEditorLastDim==null){
+			TextAreaEditorLastDim=new Dimension(400, 400);
+		}
+		return TextAreaEditorLastDim;
+	}
+	@Override
 	public Point getDocumentEditorLocation() {
 		if(DocumentEditorLocation==null)
 			DocumentEditorLocation=new Point(0, 0);
@@ -78,6 +92,17 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	@Override
 	public void setDocumentEditorLocation(Point documentEditorLocation) {
 		DocumentEditorLocation = documentEditorLocation;
+	}
+	@Override
+	public void setTextAreaEditorLocation(Point textAreaEditorLocation) {
+		TextAreaEditorLocation = textAreaEditorLocation;
+	}
+	@Override
+	public Point getTextAreaEditorLocation() {
+		if(TextAreaEditorLocation==null){
+			TextAreaEditorLocation=new Point(0, 0);
+		}
+		return TextAreaEditorLocation;
 	}
 	@Override
 	public int getMaxExecutorSize() {
