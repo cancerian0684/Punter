@@ -2,10 +2,12 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 	version="2.0" xmlns="http://java.sun.com/xml/ns/persistence">
 	<persistence-unit name="punter" transaction-type="RESOURCE_LOCAL">
-    <class>com.sapient.expense.jpa.House</class>
-    <class>com.sapient.expense.jpa.Transaction</class>
-    <class>com.sapient.expense.jpa.User</class>
-    <class>com.sapient.expense.jpa.TransactionDetail</class>
+    <class>com.sapient.punter.jpa.TaskData</class>
+    <class>com.sapient.punter.jpa.ProcessData</class>
+    <class>com.sapient.punter.jpa.ProcessHistory</class>
+    <class>com.sapient.punter.jpa.TaskHistory</class>
+    <class>com.sapient.kb.jpa.Document</class>
+    <class>com.sapient.kb.jpa.Attachment</class>
     <properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver" />
 			<property name="javax.persistence.jdbc.url"  value="jdbc:derby://localhost:1527/punterDB;create=true" />
