@@ -55,6 +55,8 @@ public class TextAreaEditor extends JDialog {
 					listener.save(_resultArea.getText());
 					_resultArea.setText("");
 					listener=null;
+					AppSettings.getInstance().setTextAreaEditorLocation(instance.getLocation());
+					AppSettings.getInstance().setTextAreaEditorLastDim(instance.getSize());
 					dispose();
 				}
 			}
@@ -72,6 +74,8 @@ public class TextAreaEditor extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				listener=null;
 				_resultArea.setText("");
+				AppSettings.getInstance().setTextAreaEditorLocation(instance.getLocation());
+				AppSettings.getInstance().setTextAreaEditorLastDim(instance.getSize());
 				dispose();
 			}
 		});

@@ -467,7 +467,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
 //	        	  System.out.println("Running Process");
 	        	  try{
 	        		  if(processTable.getSelectedRow()!=-1){
-	        			  final ProcessData procDao=(ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
+	        			  ProcessData procDao=(ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
+	        			  procDao=StaticDaoFacade.getInstance().getProcess(procDao.getId());
 	        			  createProcess(procDao);
 	        		  }
 	        	  }catch(Exception ee){

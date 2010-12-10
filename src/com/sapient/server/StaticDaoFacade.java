@@ -457,13 +457,15 @@ public  ProcessHistory getProcessHistoryById(long id) throws Exception{
 public  List<TaskData> getProcessTasksById(long pid) throws UnknownHostException, Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
-    ProcessData np = em.find(ProcessData.class, pid);
-    em.refresh(np);
-	List<TaskData> tl = np.getTaskList();
-	for (TaskData task : tl) {
-		System.out.println(task.getName());
-	}
-    return tl;
+		Query q = em.createQuery("select t from TaskData t where t.process.id=:pid order by t.sequence");
+	    q.setParameter("pid", pid);
+	    q.setHint("eclipselink.refresh", "true");
+	    List<TaskData> taskList = q.getResultList();
+		System.err.println("Listing Tasks for process.");
+		for (TaskData task : taskList) {
+			System.out.println(task.getSequence()+" -- "+task.getName());
+		}
+	    return taskList;
 	}finally{
 		em.close();
 	}
@@ -524,10 +526,10 @@ public  void deleteTeam(){
 public List<ProcessHistory> getMySortedProcessHistoryList(String username) {
 	EntityManager em = emf.createEntityManager();
 	try{
-	Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.username = :username AND ph.clearAlert=0 AND ph.runStatus!=:runStatus order by ph.startTime desc");
+	Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.username = :username AND ph.clearAlert=0 order by ph.startTime desc");
     q.setHint("eclipselink.refresh", "true");
     q.setParameter("username", username);
-    q.setParameter("runStatus", RunStatus.SUCCESS);
+//    q.setParameter("runStatus", RunStatus.SUCCESS);
     q.setFirstResult(0);
     q.setMaxResults(ServerSettings.getInstance().getMaxProcessAlerts());
     List<ProcessHistory> processHistoryList = q.getResultList();

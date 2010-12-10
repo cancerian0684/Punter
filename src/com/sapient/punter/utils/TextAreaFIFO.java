@@ -5,15 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.management.ManagementFactory;
 import java.util.Date;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -31,6 +24,9 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener,TextArea
 	private int lineBufferSize=5000;
 	private boolean followTails=true;
 	private MouseClickListener listener;
+	public boolean isFollowTails() {
+		return followTails;
+	}
 	@Override
 	public void setDocument(Document doc) {
 		super.setDocument(doc);

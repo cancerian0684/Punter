@@ -51,7 +51,7 @@ public class ProcessHistory implements Serializable{
 	/*@Version
 	@Column(name = "OPT_LOCK")
 	private Long version;*/
-	private boolean clearAlert;
+	private boolean clearAlert=false;
 	public long getId() {
 		return id;
 	}

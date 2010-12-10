@@ -32,8 +32,13 @@ public class Process implements Serializable{
 private List<Tasks> taskList=new ArrayList<Tasks>();
 private Map sessionMap=new HashMap<String, Object>();
 private transient TaskObserver ts;
+private boolean failed=false;
 private HashMap<String, InputParamValue> inputParams;
 private ProcessHistory ph;
+@InputParam(description="Stop process on task failure")
+private boolean stopOnTaskFailure=true;
+@InputParam(description="Always raise alert for the task")
+private boolean alwaysRaiseAlert=false;
 @InputParam
 private String comments;
 @InputParam(description="Any of ALL, INFO, WARNING, SEVERE")
@@ -109,9 +114,17 @@ public void execute(){
 			task.LOGGER.get().log(Level.INFO,"started executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
 			status=task.execute();
 			task.LOGGER.get().log(Level.INFO,"Finished executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
-			keepRunning=status;
+			if(stopOnTaskFailure){
+				keepRunning=status;
+			}
+			if(!status){
+				failed=true;
+			}
 		}catch (Throwable e) {
-			keepRunning=false;
+			failed=true;
+			if(stopOnTaskFailure){
+				keepRunning=false;
+			}
 			task.LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
 			task.LOGGER.get().log(Level.INFO,"Finished executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
 		}finally{
@@ -135,18 +148,16 @@ public void execute(){
 			th.setLogs("");
 			ts.saveTaskHistory(th);
 		}
-		
-		try {
-			TimeUnit.SECONDS.sleep(1);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 	}
 	ph.setRunState(RunState.COMPLETED);
-	if(keepRunning)
+	if(!failed){
 		ph.setRunStatus(RunStatus.SUCCESS);
-	else
+		if(!alwaysRaiseAlert)
+			ph.setClearAlert(true);
+	}
+	else{
 		ph.setRunStatus(RunStatus.FAILURE);
+	}
 		
 	afterProcessFinish();
 }
@@ -186,7 +197,10 @@ private void substituteParams() {
 					}else if(field.getType().getSimpleName().equals("double")){
 						double tmp=Double.parseDouble(fieldValue);
 						field.set(this,tmp);
-					}
+					}else if(field.getType().getSimpleName().equals("boolean")){
+						boolean tmp=Boolean.parseBoolean(fieldValue);
+						field.set(this,tmp);
+				}
 				}
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
@@ -195,6 +209,9 @@ private void substituteParams() {
 				e.printStackTrace();
 				Tasks.LOGGER.get().severe(e.toString());
 			} catch (ParseException e) {
+				e.printStackTrace();
+				Tasks.LOGGER.get().severe(e.toString());
+			} catch (Exception e) {
 				e.printStackTrace();
 				Tasks.LOGGER.get().severe(e.toString());
 			}

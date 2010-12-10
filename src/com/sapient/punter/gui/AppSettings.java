@@ -149,7 +149,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	@Override
 	public int getMaxResults() {
 		if(maxResults==0)
-			maxResults=5;
+			maxResults=20;
 		return maxResults;
 	}
 	@Override

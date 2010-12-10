@@ -1,5 +1,7 @@
 package com.sapient.punter.gui;
 
+import it.sauronsoftware.cron4j.Predictor;
+
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
@@ -98,6 +100,17 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
     	p.getInputParams().get((String)colArrayList.get(0)).setValue((String) obj);
     	p = StaticDaoFacade.getInstance().saveProcess(p);
     	BeanUtils.copyProperties(colArrayList.get(2), p);
+    	try{
+    	if("scheduleString".equalsIgnoreCase((String)colArrayList.get(0))){
+    		Predictor pr = new Predictor((String) obj);
+    		 for (int i = 0; i < 4; i++) {
+    		        System.out.println(pr.nextMatchingDate()+" ");
+    		 }
+    		 System.out.println("----------xxx-------------");
+    	}
+    	}catch (Exception e) {
+    		System.err.println("Wrong Format for Schedule");
+		}
     }catch (Exception e) {
     	e.printStackTrace();
 	}

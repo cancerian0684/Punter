@@ -15,6 +15,8 @@ public InputParam getInputParam() {
 	return inputParam;
 }
 public String getValue() {
+	if(value==null)
+		value="";
 	return value;
 }
 public void setValue(String value) {
