@@ -31,6 +31,7 @@
 <jar href="lib/cron4j-2.2.3.jar" download="lazy" main="false"/>
 
 <jar href="lib/neoeedit.jar" download="lazy" main="false"/>
+<jar href="lib/jsch-0.1.44.jar" download="lazy" main="false"/>
 
 <property name="jnlp.versionEnabled" value="false"/>
 
