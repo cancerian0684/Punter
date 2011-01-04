@@ -72,7 +72,7 @@ public class ProcessTaskHistoryTableModel extends AbstractTableModel {
     case 0:
     	return th.getSequence();
     case 1:
-    	return th.getTask().getName();
+    	return th.getTask().getDescription();
     case 2:
     	return th.getRunStatus();
     }

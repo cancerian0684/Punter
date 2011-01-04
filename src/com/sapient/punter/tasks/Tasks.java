@@ -60,10 +60,8 @@ public abstract class Tasks implements Serializable{
 		});*/
 	    mHandler = new MemoryHandler(new Handler() {
 	        public void publish(LogRecord record) {
-	        	String msg=new Date(record.getMillis())+" ["+Thread.currentThread().getName()+"] "+record.getLevel()
-      		  + " "+record.getSourceClassName()+"." 
-	          + record.getSourceMethodName() + "() - "
-	          + record.getMessage();
+	        	String msg=new Date(record.getMillis())+" ["+record.getLevel()+"] "
+	           + record.getMessage();
 	        	strLogger.append(msg+"\r");
 	        	try {
 					logDocument.insertString(logDocument.getLength (),record.getMessage()+"\n", null);

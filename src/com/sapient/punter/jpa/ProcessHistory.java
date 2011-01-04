@@ -21,6 +21,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 import javax.swing.text.Document;
+import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 @TableGenerator(name="seqGen",table="ID_GEN",pkColumnName="GEN_KEY",valueColumnName="GEN_VALUE",pkColumnValue="SEQ_ID",allocationSize=1)
@@ -112,7 +113,7 @@ public class ProcessHistory implements Serializable{
 	public void setProgress(int progress) {
 		this.progress = progress;
 	}
-	
+	@XmlTransient()
 	public Document getLogDocument() {
 		return logDocument;
 	}

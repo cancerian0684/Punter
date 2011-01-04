@@ -3,10 +3,13 @@ package com.sapient.server;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -15,6 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 import org.apache.derby.drda.NetworkServerControl;
 
@@ -26,6 +30,7 @@ import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.RunStatus;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
+import com.sapient.punter.utils.InputParamValue;
 
 public class StaticDaoFacade {
 	private static StaticDaoFacade sdf;
@@ -38,6 +43,8 @@ public class StaticDaoFacade {
 	}
 	private StaticDaoFacade() {
 		try{
+			Properties p = System.getProperties();
+			p.put("derby.system.home", "C:\\workspace\\punter-distributed");
 			final NetworkServerControl serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
 			try{
 				serverControl.start(null);
@@ -399,52 +406,75 @@ public  TaskHistory createTaskHistory(TaskHistory th)throws Exception{
 			em.close();
 		}
 	}
-public  ProcessData getProcess(long id) throws Exception{
-	EntityManager em = emf.createEntityManager();
-	try{
-		ProcessData proc= em.find(ProcessData.class, id);
-		em.refresh(proc);
-		return proc;
-	}finally{
-		em.close();
+	public void updateAllProcessProperties(){
+		EntityManager em = emf.createEntityManager();
+		try {
+			Query q = em.createQuery("select p from ProcessData p");
+			q.setHint("eclipselink.refresh", "true");
+			List<ProcessData> processList = q.getResultList();
+			for (ProcessData processData : processList) {
+				 HashMap<String, InputParamValue> inProp = com.sapient.punter.tasks.Process.listInputParams();
+				 processData.setInputParams(inProp);
+				 try {
+				 	em.getTransaction().begin();
+					ProcessData tmp = em.find(ProcessData.class, processData.getId());
+					tmp.setInputParams(processData.getInputParams());
+					em.flush();
+					em.getTransaction().commit();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		} finally {
+			em.close();
+		}
 	}
-}
-public  TaskHistory getTaskDao(TaskHistory td) throws Exception{
-	EntityManager em = emf.createEntityManager();
-	try{
-		TaskHistory proc= em.find(TaskHistory.class, td.getId());
-		em.refresh(proc);
-		return proc;
-	}finally{
-		em.close();
+	public  ProcessData getProcess(long id) throws Exception{
+		EntityManager em = emf.createEntityManager();
+		try{
+			ProcessData proc= em.find(ProcessData.class, id);
+			em.refresh(proc);
+			return proc;
+		}finally{
+			em.close();
+		}
 	}
-}
-public  List<ProcessHistory> getProcessHistoryListForProcessId(long id) throws Exception{
-	EntityManager em = emf.createEntityManager();
-	try{
-		ProcessData proc= em.find(ProcessData.class, id);
-		em.refresh(proc);
-		List<ProcessHistory> phl = proc.getProcessHistoryList();
-		return phl;
-	}finally{
-		em.close();
+	public  TaskHistory getTaskDao(TaskHistory td) throws Exception{
+		EntityManager em = emf.createEntityManager();
+		try{
+			TaskHistory proc= em.find(TaskHistory.class, td.getId());
+			em.refresh(proc);
+			return proc;
+		}finally{
+			em.close();
+		}
 	}
-}
-public  List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id) throws Exception{
-	EntityManager em = emf.createEntityManager();
-	try{
-	Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.id = :pid order by ph.id desc");
-    q.setHint("eclipselink.refresh", "true");
-    q.setParameter("pid", id);
-    q.setFirstResult(0);
-    q.setMaxResults(ServerSettings.getInstance().getMaxProcessHistory());
-    List<ProcessHistory> processHistoryList = q.getResultList();
-    return processHistoryList;
-	}finally{
-		em.close();
+	public  List<ProcessHistory> getProcessHistoryListForProcessId(long id) throws Exception{
+		EntityManager em = emf.createEntityManager();
+		try{
+			ProcessData proc= em.find(ProcessData.class, id);
+			em.refresh(proc);
+			List<ProcessHistory> phl = proc.getProcessHistoryList();
+			return phl;
+		}finally{
+			em.close();
+		}
 	}
-}
-public  ProcessHistory getProcessHistoryById(long id) throws Exception{
+	public  List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id) throws Exception{
+		EntityManager em = emf.createEntityManager();
+		try{
+		Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.id = :pid order by ph.id desc");
+	    q.setHint("eclipselink.refresh", "true");
+	    q.setParameter("pid", id);
+	    q.setFirstResult(0);
+	    q.setMaxResults(ServerSettings.getInstance().getMaxProcessHistory());
+	    List<ProcessHistory> processHistoryList = q.getResultList();
+	    return processHistoryList;
+		}finally{
+			em.close();
+		}
+	}
+	public  ProcessHistory getProcessHistoryById(long id) throws Exception{
 	EntityManager em = emf.createEntityManager();
 	try{
 		ProcessHistory proc= em.find(ProcessHistory.class, id);
@@ -523,6 +553,33 @@ public  void deleteTeam(){
     em.close();
     emf.close();
 }
+
+public void deleteStaleHistory(int days){
+	EntityManager em = emf.createEntityManager();
+	try{
+	Query q = em.createQuery("select ph from ProcessHistory ph where ph.startTime <= :staledate");
+	Calendar cal=GregorianCalendar.getInstance();
+	cal.set(cal.DATE, cal.get(cal.DATE)-days);
+	 q.setHint("eclipselink.refresh", "true");
+    q.setParameter("staledate",cal,TemporalType.TIMESTAMP);
+    q.setFirstResult(0);
+    q.setMaxResults(100);
+    List<ProcessHistory> processHistoryList = q.getResultList();
+    em.getTransaction().begin();
+    for (ProcessHistory processHistory : processHistoryList) {
+	  ProcessHistory ph = em.find(ProcessHistory.class, processHistory.getId());
+	  em.remove(ph);
+	  System.out.println("Removed : "+ph.getId());
+    }
+    em.getTransaction().commit();
+	}catch (Exception e) {
+		e.printStackTrace();
+	}
+	finally{
+		em.close();
+	}
+}
+
 public List<ProcessHistory> getMySortedProcessHistoryList(String username) {
 	EntityManager em = emf.createEntityManager();
 	try{
@@ -538,4 +595,21 @@ public List<ProcessHistory> getMySortedProcessHistoryList(String username) {
 		em.close();
 	}
 }
+
+public void compressTables(){ 
+    String []tables={"PROCESSHISTORY","PROCESS","TASK","TASKHISTORY","DOCUMENT","DOCUMENT_LOB","ATTACHMENT","ATTACHMENT_LOB"};
+    EntityManager em = emf.createEntityManager(); 
+    try{ 
+    for (String string : tables) { 
+            Query q = em.createNativeQuery("call SYSCS_UTIL.SYSCS_COMPRESS_TABLE('PUNTER', '"+string+"', 1)"); 
+            em.getTransaction().begin(); 
+            q.executeUpdate(); 
+            em.getTransaction().commit();           
+    } 
+    }catch (Exception e) { 
+            e.printStackTrace(); 
+    }finally{ 
+            em.close(); 
+    } 
+} 
 }

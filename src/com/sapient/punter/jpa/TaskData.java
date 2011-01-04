@@ -14,6 +14,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Version;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import com.sapient.punter.utils.InputParamValue;
 import com.sapient.punter.utils.OutputParamValue;
@@ -21,8 +25,24 @@ import com.sapient.punter.utils.OutputParamValue;
 @Entity
 @Table(name="TASK")
 @TableGenerator(name="seqGen",table="ID_GEN",pkColumnName="GEN_KEY",valueColumnName="GEN_VALUE",pkColumnValue="SEQ_ID",allocationSize=1)
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "", propOrder = {
+    "sequence",
+    "name",
+    "className",
+    "description",
+    "author",
+    "active",
+    "inputParams",
+    "outputParams"
+})
 public class TaskData implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1907841119637052268L;
 	@Id
+	@XmlTransient
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="seqGen")
 	private long id;
 	private int sequence;
@@ -34,10 +54,8 @@ public class TaskData implements Serializable{
 	private HashMap<String, InputParamValue> inputParams;
 	private HashMap<String, OutputParamValue> outputParams;
 	@ManyToOne
+	@XmlTransient
 	private ProcessData process;
-	/*@Version
-	@Column(name = "OPT_LOCK")
-	private Long version;*/
 	public long getId() {
 		return id;
 	}
@@ -100,13 +118,6 @@ public class TaskData implements Serializable{
 	public void setActive(boolean active) {
 		this.active = active;
 	}
-	
-	/*public Long getVersion() {
-		return version;
-	}
-	public void setVersion(Long version) {
-		this.version = version;
-	}*/
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -15,14 +15,37 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Version;
+import javax.xml.bind.annotation.XmlAccessOrder;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorOrder;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import com.sapient.punter.utils.InputParamValue;
 
 @Entity
 @Table(name="PROCESS")
 @TableGenerator(name="seqGen",table="ID_GEN",pkColumnName="GEN_KEY",valueColumnName="GEN_VALUE",pkColumnValue="SEQ_ID",allocationSize=1)
+@XmlRootElement()
+//@XmlAccessorOrder(value=XmlAccessOrder.ALPHABETICAL)
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "", propOrder = {
+    "username",
+    "name",
+    "description",
+    "comments",
+    "inputParams",
+    "taskList"
+})
 public class ProcessData implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3450975996342231267L;
 	@Id
+	@XmlTransient
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="seqGen")
 	private long id;
 	private String username;
@@ -30,13 +53,11 @@ public class ProcessData implements Serializable{
 	private String description;
 	private String comments;
 	private HashMap<String, InputParamValue> inputParams;
-	@OneToMany(cascade={CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.LAZY)
+	@OneToMany(cascade={CascadeType.REMOVE,CascadeType.PERSIST},mappedBy = "process",fetch=FetchType.EAGER)
 	private List<TaskData> taskList;
 	@OneToMany(cascade={CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.LAZY)
+	@XmlTransient
 	private List<ProcessHistory> processHistoryList;
-	/*@Version
-	@Column(name = "OPT_LOCK")
-	private Long version;*/
 	public long getId() {
 		return id;
 	}
@@ -99,12 +120,6 @@ public class ProcessData implements Serializable{
 			return false;
 		return true;
 	}
-	/*public Long getVersion() {
-		return version;
-	}
-	public void setVersion(Long version) {
-		this.version = version;
-	}*/
 	public String getUsername() {
 		return username;
 	}

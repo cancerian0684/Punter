@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,14 +13,12 @@ import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 
-@PunterTask(author="munishc",name="DBExportTask",description="Export DB into specified file.",documentation="com/sapient/punter/tasks/docs/DBExportTask.html")
+@PunterTask(author="munishc",name="DBExportTask",documentation="com/sapient/punter/tasks/docs/DBExportTask.html") 
 public class DBExportTask extends Tasks {
-	@InputParam(required = true)
-	private String targetFile;
-	@InputParam(required = false)
-	private String tnsEntry;
-	@InputParam(required = false)
-	private Date dob;
+	@InputParam(required = true,description="Get expCommand help from DBExport Task.") 
+	private String expCommand;
+	@InputParam(required = false,description="P:/dump/daisy")
+	private String outFolderName;
 
 	@OutputParam
 	private String dumpFile;
@@ -28,19 +27,21 @@ public class DBExportTask extends Tasks {
 	public boolean run() {
 		boolean status=false;
 		try{
-		java.lang.Process p = Runtime.getRuntime().exec("");
-//		 Process p = Runtime.getRuntime().exec("");
-		 startOutputAndErrorReadThreads(p.getInputStream(),p.getErrorStream());
-		 p.waitFor();
-		 System.out.println("DB Backup taken successfully");
-		 status=true;
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");
+			dumpFile=outFolderName+"/"+sdf.format(new Date())+".dmp";
+			LOGGER.get().log(Level.INFO, expCommand+" file="+dumpFile);
+			java.lang.Process p = Runtime.getRuntime().exec(expCommand+" file="+dumpFile);
+			status=startOutputAndErrorReadThreads(p.getInputStream(),p.getErrorStream());
+			p.waitFor();
+			LOGGER.get().log(Level.INFO,"DB Backup taken successfully to file : "+dumpFile);
+//			status=true;
 		}catch (Exception e) {
 			status=false;
 			LOGGER.get().log(Level.SEVERE, e.getMessage());
 		}
 		 return status;
 	}
-	private static void startOutputAndErrorReadThreads(InputStream processOut, InputStream processErr) throws Exception
+	private static boolean startOutputAndErrorReadThreads(InputStream processOut, InputStream processErr) throws Exception
 	{
 		StringBuffer fCmdOutput = new StringBuffer();
 		AsyncStreamReader  fCmdOutputThread = new AsyncStreamReader(processOut, fCmdOutput, new myLogger(LOGGER.get()), "OUTPUT");		
@@ -51,10 +52,14 @@ public class DBExportTask extends Tasks {
 		fCmdErrorThread.start();
 		fCmdOutputThread.join();
 		fCmdErrorThread.join();
-		LOGGER.get().log(Level.INFO, fCmdErrorThread.getBuffer());
+		
+		if(fCmdError.toString().contains("Export terminated successfully")||fCmdOutput.toString().contains("Export terminated successfully")){
+			return true;
+		}else{
+			return false;
+		}
+//		LOGGER.get().log(Level.INFO, fCmdErrorThread.getBuffer());
 	}
-
-
 	}
 	interface ILogDevice
 	{
@@ -116,7 +121,7 @@ public class DBExportTask extends Tasks {
 				printToDisplayDevice(line);
 			}		
 			bufOut.close();
-			printToConsole("END OF: " + fThreadId); //DEBUG
+//			printToConsole("END OF: " + fThreadId); //DEBUG
 		}
 		
 		public void stopReading() {

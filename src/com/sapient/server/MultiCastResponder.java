@@ -7,7 +7,7 @@ import java.net.MulticastSocket;
 
 public class MultiCastResponder {
 	private static MultiCastResponder mcr;
-	private volatile boolean keepRunning=true;
+	private volatile boolean keepRunning=false;
 	public static MultiCastResponder getInstance(){
 		if(mcr==null){
 			try {
@@ -26,7 +26,9 @@ public class MultiCastResponder {
 	    Thread t=new Thread(){
 			public void run() {		
 				try {
+					checkForPause();
 					while(keepRunning) {
+						checkForPause();
 					    byte[] buf = new byte[256];
 					    DatagramPacket packet;
 			            packet = new DatagramPacket(buf, buf.length);
@@ -56,5 +58,22 @@ public class MultiCastResponder {
 	}
 	public void shutdown(){
 		keepRunning=false;
+	}
+	public synchronized boolean toggle(){
+		if(keepRunning)
+			keepRunning=false;
+		else
+			keepRunning=true;
+		notify();
+		return keepRunning;
+	}
+	public synchronized void checkForPause(){
+		while(keepRunning==false){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

@@ -11,7 +11,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +30,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.InputMap;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -50,6 +55,11 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.text.PlainDocument;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
+import org.apache.commons.beanutils.BeanUtils;
 
 import neoe.ne.EditPanel;
 
@@ -419,7 +429,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	          }
 	      });
 	    
-	    final JMenuItem addProcessMenu, runProcessMenu;
+	    final JMenuItem addProcessMenu, runProcessMenu, exportProcess, importProcess;
 		final JPopupMenu popupProcess = new JPopupMenu();
 		addProcessMenu = new JMenuItem("Add Process");
 		addProcessMenu.addActionListener(new ActionListener() {
@@ -461,6 +471,66 @@ public class PunterGUI extends JPanel implements TaskObserver{
 				}
 			}});
 		timer.start();
+		importProcess = new JMenuItem("Imp Process");
+		importProcess.addActionListener(new ActionListener() {
+	          public void actionPerformed(ActionEvent e) {
+	        	  try{
+	        		  if(processTable.getSelectedRow()!=-1){
+	        			  JAXBContext context = JAXBContext.newInstance(ProcessData.class);
+	        		      Unmarshaller unmarshaller = context.createUnmarshaller();
+	        		      final JFileChooser fc = new JFileChooser();
+	        		      fc.setDialogType(JFileChooser.OPEN_DIALOG);
+	        		      int returnVal = fc.showOpenDialog(PunterGUI.this);
+	        		      if (returnVal == JFileChooser.APPROVE_OPTION) {
+	        		            File file = fc.getSelectedFile();
+	        		            ProcessData procDao = (ProcessData)unmarshaller.unmarshal(new FileReader(file));
+	        		            procDao.setUsername(AppSettings.getInstance().getUsername());
+	        		            List<TaskData> tl = procDao.getTaskList();
+	        		            for (TaskData taskData : tl) {
+									taskData.setProcess(procDao);
+								}
+	        		            procDao=StaticDaoFacade.getInstance().createProcess(procDao);
+	        		            ArrayList<Object> newrow=new ArrayList<Object>();
+	        		            newrow.add(procDao);
+	        		            ((ProcessTableModel) processTable.getModel()).insertRow(newrow);
+	        		        } else {
+//	        		            log.append("Open command cancelled by user." + newline);
+	        		        }
+	        		  }
+	        	  }catch(Exception ee){
+	        		  ee.printStackTrace();
+	        	  }
+	          }
+	    });
+		exportProcess = new JMenuItem("Exp Process");
+		exportProcess.addActionListener(new ActionListener() {
+	          public void actionPerformed(ActionEvent e) {
+	        	  try{
+	        		  if(processTable.getSelectedRow()!=-1){
+	        			  ProcessData procDao=(ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
+	        			  procDao=StaticDaoFacade.getInstance().getProcess(procDao.getId());
+	        			  JAXBContext context = JAXBContext.newInstance(ProcessData.class);
+	        		      Marshaller marshaller = context.createMarshaller();
+	        		      marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+	        		      
+	        		      final JFileChooser fc = new JFileChooser();
+	        		      fc.setDialogType(JFileChooser.SAVE_DIALOG);
+	        		      fc.setSelectedFile(new File(procDao.getName()+".xml"));
+	        		      int returnVal = fc.showOpenDialog(PunterGUI.this);
+	        		      if (returnVal == JFileChooser.APPROVE_OPTION) {
+	        		            File file = fc.getSelectedFile();
+	        		            marshaller.marshal(procDao, new FileWriter(file));
+	        		            System.out.println("File saved to :"+file.getAbsolutePath());
+	        		        } else {
+//	        		            log.append("Open command cancelled by user." + newline);
+	        		        }
+	        		  }
+	        	  }catch(Exception ee){
+	        		  ee.printStackTrace();
+	        	  }
+	          }
+	    });
+		
 		runProcessMenu = new JMenuItem("Run Process");
 		runProcessMenu.addActionListener(new ActionListener() {
 	          public void actionPerformed(ActionEvent e) {
@@ -478,6 +548,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	    });
 		popupProcess.add(addProcessMenu);
 		popupProcess.add(runProcessMenu);
+		popupProcess.add(exportProcess);
+		popupProcess.add(importProcess);
 	    processTable.addMouseListener(new MouseAdapter() {
 	          //JPopupMenu popup;
 	          public void mousePressed(MouseEvent e) {
@@ -1391,8 +1463,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
     			Object value, boolean isSelected, boolean hasFocus, int row,
     			int column) {
     		TaskData td=(TaskData) ((InputParamTableModel)table.getModel()).getValueAt(row, 2);
-    		InputParamValue value1 = (InputParamValue) td.getInputParams().get(table.getModel().getValueAt(row, 0)); 
-    		String tooltip=value1.getInputParam().description();
+    		InputParamValue value1 = (InputParamValue) td.getInputParams().get(table.getModel().getValueAt(row, 0));
+    		String tooltip="";
+    		if(value1.getInputParam()!=null)
+    		tooltip=value1.getInputParam().description();
     		if(!tooltip.isEmpty())
     			setToolTipText(tooltip);
     		else
@@ -1413,8 +1487,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
     			Object value, boolean isSelected, boolean hasFocus, int row,
     			int column) {
     		ProcessData td=(ProcessData)((ProcessPropertyTableModel)table.getModel()).getValueAt(row, 2);
-    		InputParamValue value1 = (InputParamValue) td.getInputParams().get(table.getModel().getValueAt(row, 0)); 
-    		String tooltip=value1.getInputParam().description();
+    		InputParamValue value1 = (InputParamValue) td.getInputParams().get(table.getModel().getValueAt(row, 0));
+    		String tooltip="";
+    		if(value1.getInputParam()!=null)
+    		tooltip=value1.getInputParam().description();
     		if(!tooltip.isEmpty())
     			setToolTipText(tooltip);
     		else
