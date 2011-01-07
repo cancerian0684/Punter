@@ -291,14 +291,25 @@ public class PunterKB extends JPanel{
                    	   DataFlavor []dfs={new DataFlavor("text/rtf; class=java.io.InputStream")};
                     //	df.s
                        InputStream in =(InputStream) t.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
-                    //  System.out.println(out);
+//                    //  System.out.println(out);
                        File f=File.createTempFile("test",".doc");
                        FileOutputStream fo=new FileOutputStream(f);
                        copy(in, fo);
                     //  fo.write(out.getBytes());
                        fo.close();
+                       Document doc=new Document();
+                   		doc.setAuthor(AppSettings.getInstance().getUsername());
+                   		doc.setTitle(f.getName());
+                   		doc.setContent(getBytesFromFile(f));
+                   	doc.setExt(getExtension(f));
+                   	if(getExtension(f)==null||getExtension(f).isEmpty())
+                       	doc.setExt(".txt");
+                   	doc.setDateCreated(new Date());
+                   	doc.setDateUpdated(new Date());
+                   	doc=docService.saveDocument(doc);
+                   	System.err.println("Document added : test");
 //                      fileListerWorker.getFileListQueue().add(f);
-                       System.out.println(f.getAbsolutePath());
+//                       System.out.println(f.getAbsolutePath());
                       /*for (File f : l) {
                        	fileListerWorker.getFileListQueue().add(f);
                        	System.err.println(f.getName());
