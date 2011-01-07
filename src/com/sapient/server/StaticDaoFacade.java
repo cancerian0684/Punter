@@ -170,7 +170,7 @@ public boolean deleteAttachment(Attachment attch) {
     LuceneIndexDao.getInstance().indexDocs(doc);
 	return true;
 }
-public  boolean deleteDocument(Document doc) {
+public boolean deleteDocument(Document doc) {
 	EntityManager em = emf.createEntityManager();
 	em.getTransaction().begin();
 	doc=em.find(Document.class, doc.getId());

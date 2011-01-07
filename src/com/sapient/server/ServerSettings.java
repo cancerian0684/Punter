@@ -23,6 +23,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
+import com.sapient.kb.jpa.Document;
 import com.sapient.punter.gui.AppSettings;
 import com.sapient.punter.gui.AppSettingsMBean;
 
@@ -212,6 +213,13 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 	@Override
 	public void deleteStaleProcessHistory(int staleDays) {
 		StaticDaoFacade.getInstance().deleteStaleHistory(staleDays);
+	}
+	
+	@Override
+	public void deleteDocument(int docId) {
+		Document doc=new Document();
+		doc.setId(docId);
+		StaticDaoFacade.getInstance().deleteDocument(doc);
 	}
 
 	@Override

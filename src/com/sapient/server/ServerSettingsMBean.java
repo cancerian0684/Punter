@@ -14,4 +14,5 @@ public void updateAllProcessProperties();
 public abstract String toggleMultiCastResponder();
 public abstract void deleteStaleProcessHistory(int staleDays);
 public abstract void compressTables();
+public abstract void deleteDocument(int docId);
 }
