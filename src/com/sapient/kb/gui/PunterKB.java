@@ -266,6 +266,7 @@ public class PunterKB extends JPanel{
                        for (File f : l) {
                        	System.err.println(f.getName());
                        	Document doc=new Document();
+                       	doc.setAuthor(AppSettings.getInstance().getUsername());
                        	doc.setTitle(f.getName());
                        	doc.setContent(getBytesFromFile(f));
                        	doc.setExt(getExtension(f));
