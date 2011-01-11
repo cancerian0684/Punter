@@ -44,7 +44,7 @@ public class StaticDaoFacade {
 	private StaticDaoFacade() {
 		try{
 			Properties p = System.getProperties();
-			p.put("derby.system.home", "C:\\workspace\\punter-distributed");
+			p.put("derby.system.home", ".");
 			final NetworkServerControl serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
 			try{
 				serverControl.start(null);

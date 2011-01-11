@@ -1,3 +1,4 @@
-/all,/all/aisdb,/all/aisdb/article,/all/aisdb/query,/all/aisdb/dev,
-/all/daisy,/all/daisy/article,/all/daisy/query,/all/daisy/dev,
-/all/todo,/all/idea,/all/article,/all/personal,/all/misc
+/all,/all/ais,/all/aisdb,/all/daisy,
+/all/sft,/all/fondue,/all/wheelbarrow,
+/all/todo,/all/idea,/all/article,/all/personal,
+/all/misc,/all/dailytasks,/all/interview,/all/software

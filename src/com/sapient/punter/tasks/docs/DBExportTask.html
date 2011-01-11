@@ -1,1 +1,42 @@
-This is dummy readMe for the task.
+<html>
+<body>
+<!-- This is an uneditable <code>JEditorPane</code>,
+which was <em>initialized</em>
+with <strong>HTML</strong> text <font size=-2>from</font> a
+-->
+<font size=+2">DBExport Task</font>.
+<p>Export DB into specified file using Oracle Exp Command.
+<br/><br/>
+For dAISy
+<br>
+<code><font size=+0.5" color="blue">
+tnsEntry<br/>
+exp 'AIS1/ais1_123@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1523)(HOST=sldn0576por.ldn.swissbank.com)))(CONNECT_DATA=(SERVICE_NAME=AISU2)))' GRANTS=y INDEXES=y CONSISTENT=y
+<br/>
+outputDir
+<br/>
+P:/dump/daisy
+</font></code>
+<br/><br/>
+For AISDb
+<br/>
+<code><font size=+0.5" color="blue">
+tnsEntry<br/>
+exp 'AIS_DBO/ais1973@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1522)(HOST=sldn0576por.ldn.swissbank.com)))(CONNECT_DATA=(SERVICE_NAME=AISPROD2)))' GRANTS=y INDEXES=y CONSISTENT=y
+
+<br/>
+outputDir<br/>
+P:/dump/aisdb</code>
+
+<br/><br/>
+For SFT
+<br/>
+<code><font size=+0.5" color="blue">
+tnsEntry<br/>
+exp 'sft/sftProdX1@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1522)(HOST=sldn0577por.ldn.swissbank.com)))(CONNECT_DATA=(SERVICE_NAME=EQSFTP1)))' GRANTS=y INDEXES=y CONSISTENT=y
+<br/>
+outputDir<br/>
+P:/dump/sft</code>
+</p>
+</body>
+</html>
