@@ -17,6 +17,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -266,7 +267,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         };*/
         
         processTable.setShowGrid(true);
-        processTable.setPreferredScrollableViewportSize(new Dimension(100, 300));
+        processTable.setPreferredScrollableViewportSize(new Dimension(150, 300));
         processTable.setFillsViewportHeight(true);
         processTable.setRowHeight(20);
         InputMap imap = processTable.getInputMap(JComponent.WHEN_FOCUSED);
@@ -276,25 +277,29 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				 if(processTable.getSelectedRow() != -1){
+					 int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete Process('s) ?", "Confirm",
+	 					        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+ 					   if (response == JOptionPane.YES_OPTION) {	 						   
 //	                	System.out.println("Delete Key Pressed.");
-	                	ProcessTableModel tableModel=(ProcessTableModel) processTable.getModel();
-	                	int[] selectedRows = processTable.getSelectedRows();
-						ArrayList<Object> selectedRowsData = new ArrayList<Object>();
-						for (int selectedRow : selectedRows) {
-							ArrayList request=tableModel.getRow(processTable.convertRowIndexToModel(selectedRow));
-							selectedRowsData.add(request);
-			                ProcessData proc=(ProcessData) request.get(0);
-							try {
-								System.err.println("removing process : "+proc.getId());
-								StaticDaoFacade.getInstance().removeProcess(proc);
-							} catch (Exception e1) {
-								e1.printStackTrace();
-							}
-						}
-						tableModel.deleteRows(selectedRowsData);
-						if(tableModel.getRowCount()>0){
-							processTable.setRowSelectionInterval(0, 0);
-						}
+ 						   ProcessTableModel tableModel=(ProcessTableModel) processTable.getModel();
+ 						   int[] selectedRows = processTable.getSelectedRows();
+ 						   ArrayList<Object> selectedRowsData = new ArrayList<Object>();
+ 						   for (int selectedRow : selectedRows) {
+ 							   ArrayList request=tableModel.getRow(processTable.convertRowIndexToModel(selectedRow));
+ 							   selectedRowsData.add(request);
+ 							   ProcessData proc=(ProcessData) request.get(0);
+ 							   try {
+ 								   System.err.println("removing process : "+proc.getId());
+ 								   StaticDaoFacade.getInstance().removeProcess(proc);
+ 							   } catch (Exception e1) {
+ 								   e1.printStackTrace();
+ 							   }
+ 						   }
+ 						   tableModel.deleteRows(selectedRowsData);
+ 						   if(tableModel.getRowCount()>0){
+ 							   processTable.setRowSelectionInterval(0, 0);
+ 						   }
+ 					   }
 	                }
 			}});
 	    
@@ -466,8 +471,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
 					}
 					((RunningTaskTableModel)runningTaskTable.getModel()).refreshTable();
 				}else{
-					if(((RunningTaskTableModel)runningTaskTable.getModel()).getRowCount()>0)
+					if(((RunningTaskTableModel)runningTaskTable.getModel()).getRowCount()>0){
 					((RunningTaskTableModel)runningTaskTable.getModel()).clearTable();
+					procLogArea.setDocument(new PlainDocument());
+					}
 				}
 			}});
 		timer.start();
