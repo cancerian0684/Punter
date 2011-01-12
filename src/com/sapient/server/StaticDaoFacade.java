@@ -397,7 +397,7 @@ public  TaskHistory createTaskHistory(TaskHistory th)throws Exception{
 	public  List<ProcessData> getProcessList(String username) throws Exception {
 		EntityManager em = emf.createEntityManager();
 		try {
-			Query q = em.createQuery("select p from ProcessData p where p.username=:username");
+			Query q = em.createQuery("select p from ProcessData p where p.username=:username order by p.id asc");
 			q.setParameter("username", username);
 			q.setHint("eclipselink.refresh", "true");
 			List<ProcessData> processList = q.getResultList();
