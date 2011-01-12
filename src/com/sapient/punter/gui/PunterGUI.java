@@ -516,10 +516,12 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        		      final JFileChooser fc = new JFileChooser();
 	        		      fc.setDialogType(JFileChooser.SAVE_DIALOG);
 	        		      fc.setSelectedFile(new File(procDao.getName()+".xml"));
-	        		      int returnVal = fc.showOpenDialog(PunterGUI.this);
+	        		      int returnVal = fc.showSaveDialog(PunterGUI.this);
 	        		      if (returnVal == JFileChooser.APPROVE_OPTION) {
 	        		            File file = fc.getSelectedFile();
-	        		            marshaller.marshal(procDao, new FileWriter(file));
+	        		            FileWriter fw = new FileWriter(file);
+	        		            marshaller.marshal(procDao,fw);
+	        		            fw.close();
 	        		            System.out.println("File saved to :"+file.getAbsolutePath());
 	        		        } else {
 //	        		            log.append("Open command cancelled by user." + newline);
