@@ -6,15 +6,20 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.TrayIcon;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.rmi.RemoteException;
@@ -47,6 +52,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.TransferHandler;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -64,6 +70,7 @@ import org.apache.commons.beanutils.BeanUtils;
 
 import neoe.ne.EditPanel;
 
+import com.sapient.kb.jpa.Document;
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.executors.ProcessExecutor;
@@ -302,7 +309,131 @@ public class PunterGUI extends JPanel implements TaskObserver{
  					   }
 	                }
 			}});
-	    
+	    processTable.setDragEnabled(true);
+	    processTable.setTransferHandler(new TransferHandler(){
+	    	public boolean canImport(TransferHandler.TransferSupport support) {
+          		 try{
+                   if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                   
+                   }else{
+                  	 DataFlavor []dfs=support.getDataFlavors();
+                  	 System.out.println("\n\nTotal MimeTypes Supported by this operation :"+dfs.length);
+                  	 for(DataFlavor df:dfs){
+                  		 System.out.println(df.getMimeType());
+                  	 }
+                  	 return false;
+                   }
+                   boolean copySupported = (COPY & support.getSourceDropActions()) == COPY;
+                   if (!copySupported) {
+                       return false;
+                   }
+                   support.setDropAction(COPY);
+                   return true;
+          		 }catch(Exception e){
+          			 e.printStackTrace();
+          			 return false;
+          		 }
+              }
+	    	public boolean importData(TransferHandler.TransferSupport support) {
+                if (!canImport(support)) {
+                    return false;
+                }
+                System.err.println("Import possible");
+                try{
+                Transferable t = support.getTransferable();
+                if(t.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
+                {
+             	   System.err.println("Import possible .. file");
+                try {
+                    java.util.List<File> l =(java.util.List<File>)t.getTransferData(DataFlavor.javaFileListFlavor);
+                    JAXBContext context = JAXBContext.newInstance(ProcessData.class);
+      		      	Unmarshaller unmarshaller = context.createUnmarshaller();
+                    for (File f : l) {
+                    	System.err.println(f.getName());
+                    	ProcessData procDao = (ProcessData)unmarshaller.unmarshal(new FileReader(f));
+    		            procDao.setUsername(AppSettings.getInstance().getUsername());
+    		            List<TaskData> tl = procDao.getTaskList();
+    		            for (TaskData taskData : tl) {
+							taskData.setProcess(procDao);
+						}
+    		            procDao=StaticDaoFacade.getInstance().createProcess(procDao);
+    		            ArrayList<Object> newrow=new ArrayList<Object>();
+    		            newrow.add(procDao);
+    		            ((ProcessTableModel) processTable.getModel()).insertRow(newrow);
+                    	System.err.println("Process added : "+procDao.getName());
+                    }
+                    return true;
+                } catch (UnsupportedFlavorException e) {
+                    return false;
+                } catch (IOException e) {
+                    return false;
+                }
+                }
+               else{
+                	System.err.println("Data Flavors not supported yet :");
+                	DataFlavor dfs[]=t.getTransferDataFlavors();
+                	for(DataFlavor df:dfs){
+                		System.err.println(df.getMimeType());
+                	}
+                }
+                }catch(Exception e){
+                	e.printStackTrace();
+                }
+                return false;
+            }
+	    	 public int getSourceActions(JComponent c) {
+                return MOVE;
+             }
+	    	 protected Transferable createTransferable(JComponent c) {
+	    		  final DataFlavor flavors[] = {DataFlavor.javaFileListFlavor};
+                  JTable table = (JTable)c;
+                  int []selectedRows=table.getSelectedRows();
+                  try{
+                  JAXBContext context = JAXBContext.newInstance(ProcessData.class);
+                  Marshaller marshaller = context.createMarshaller();
+                  marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                  File temp=new File("Temp");
+             	  temp.mkdir();
+             	  temp.deleteOnExit();
+             	  final List<File> files=new java.util.ArrayList<File>();
+                  for (int i : selectedRows) {
+                	  ProcessData procDao=(ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(i)).get(0);
+        			  procDao=StaticDaoFacade.getInstance().getProcess(procDao.getId());
+        			  File file = new File(temp,procDao.getName()+".xml");
+	  		          FileWriter fw = new FileWriter(file);
+	  		          marshaller.marshal(procDao,fw);
+	  		          fw.close();
+	  		          files.add(file);
+                  }
+                  if(files.size()>0){
+ 	                 Transferable transferable = new Transferable() {
+                      public Object getTransferData(DataFlavor flavor) {
+                          if (flavor.equals(DataFlavor.javaFileListFlavor)) {
+                              return files;
+                              
+                          }
+                          return null;
+                        }
+                      public DataFlavor[] getTransferDataFlavors() {
+                        return flavors;
+                      }
+                      public boolean isDataFlavorSupported(
+                          DataFlavor flavor) {
+                        return flavor.equals(
+                            DataFlavor.javaFileListFlavor);
+                      }
+                    };
+                    return transferable;
+                    }
+                  }catch (Exception e) {
+                	  e.printStackTrace();
+				}
+                  return null;
+    		  
+	    	 }
+	    	 public void exportDone(JComponent c, Transferable t, int action) {
+            }
+	    });
         taskTable = new JTable(new TaskTableModel());
         taskTable.setShowGrid(true);
         taskTable.setShowVerticalLines(false);
