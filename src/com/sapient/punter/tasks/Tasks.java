@@ -34,7 +34,7 @@ public abstract class Tasks implements Serializable{
 	protected TaskData taskDao;
 	private transient ConsoleHandler cHandler = null;
 	private transient MemoryHandler mHandler = null;
-	private transient Level loggingLevel=Level.INFO;
+	private transient Level loggingLevel=Level.FINE;
 	private StringBuilder strLogger;
 	private Document logDocument;
 	public static final ThreadLocal<Logger> LOGGER = new ThreadLocal<Logger>() {
@@ -146,6 +146,7 @@ public abstract class Tasks implements Serializable{
 			if(field.isAnnotationPresent(InputParam.class)){
 				try {
 					field.setAccessible(true);
+					if(getInputParams().get(field.getName())!=null){
 					String fieldValue=getInputParams().get(field.getName()).getValue();
 					if(fieldValue.length()>=1){
 						if(fieldValue.startsWith("$")){
@@ -163,8 +164,13 @@ public abstract class Tasks implements Serializable{
 						}else if(field.getType().getSimpleName().equals("double")){
 							double tmp=Double.parseDouble(fieldValue);
 							field.set(this,tmp);
+						}else if(field.getType().getSimpleName().equals("boolean")){
+							boolean tmp=Boolean.parseBoolean(fieldValue);
+							field.set(this,tmp);
 						}
+						
 					}
+				 }
 				} catch (IllegalArgumentException e) {
 //					e.printStackTrace();
 //					LOGGER.get().severe(e.toString());

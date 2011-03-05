@@ -5,6 +5,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
@@ -19,6 +24,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
@@ -28,34 +34,30 @@ import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 
-@PunterTask(author="munishc",name="ShellScriptTask",description="Runs Script in Bash Shell",documentation="com/sapient/punter/tasks/docs/ShellScriptTask.html")
-public class ShellScriptTask extends Tasks {
+@PunterTask(author="munishc",name="SCPTask",description="SCP File to remote machine.",documentation="com/sapient/punter/tasks/docs/SCPTask.html")
+public class SCPTask extends Tasks {
 	@InputParam(required = true,description="Hostname of Unix machine")
 	private String hostname;
 	@InputParam(required = true)
 	private String username;
 	@InputParam(required = true)
 	private String password;
-	@InputParam(required = true,description="Provide Punter syntax script")
-	private String script;
-	@InputParam(required = false)
-	private long timeout;
-	@OutputParam
-	private String outName;
+	@InputParam(required = true,description="Source File to be copied")
+	private String sourceFile;
+	@InputParam(required = true,description="Target Dir/File name")
+	private String targetFile;
 
 	@Override
 	public boolean run() {
 		boolean status=false;
 		try{
-//		LOGGER.get().log(Level.INFO, outName);
-			if(timeout<1000)
-				timeout=600000; //10 minutes
+//		  LOGGER.get().log(Level.INFO, outName);
+		  FileInputStream fis=null;
 	      JSch jsch=new JSch();
 
 	      //jsch.setKnownHosts("/home/foo/.ssh/known_hosts");
 
 	      Session session=jsch.getSession(username, hostname, 22);
-
 	      session.setPassword(password);
 
 	      // username and password will be given via UserInfo interface.
@@ -64,91 +66,96 @@ public class ShellScriptTask extends Tasks {
 
 	      // session.setConfig("StrictHostKeyChecking", "no");
 
-	      //session.connect();
-	      session.connect(30000);   // making a connection with timeout.
-
-	      Channel channel=session.openChannel("shell");
-
+	      session.connect();
+//	      session.connect(30000);   // making a connection with timeout.
 	      LOGGER.get().log(Level.INFO, "Connected to Shell.");
-	      // Enable agent-forwarding.
-	      //((ChannelShell)channel).setAgentForwarding(true);
 	      
-	      PipedOutputStream pipeOut = new PipedOutputStream();
-	      PrintStream ps=new PrintStream(pipeOut);
+	   // exec 'scp -t rfile' remotely
+	      String command="scp -p -t "+targetFile;
+	      Channel channel=session.openChannel("exec");
+	      ((ChannelExec)channel).setCommand(command);
+
+	      // get I/O streams for remote scp
+	      OutputStream out=channel.getOutputStream();
+	      InputStream in=channel.getInputStream();
+
+	      channel.connect();
+
+	      if(checkAck(in)!=0){
+	    	  LOGGER.get().log(Level.SEVERE, "UnKnown Error transmitting the file.");
+	    	  return false;
+	      }
 	      
-	      PipedInputStream pipeIn = new PipedInputStream(pipeOut);
-	      
-//	      channel.setOutputStream(pipeOut);
-	      final PipedInputStream in = new PipedInputStream();
-	      PipedOutputStream out = new PipedOutputStream(in);
-	      channel.setOutputStream(out);
-//	      channel.setOutputStream(System.out);
-//	      channel.setInputStream(pipeIn);
-	      channel.setInputStream(pipeIn);
-	      ((ChannelShell)channel).setPtyType("vt102");
-	      channel.connect(3*1000);
-	      
-	      MyThread t=new MyThread(in,LOGGER.get());
-	      t.setDaemon(true);
-	      t.start();
-	      
-	      ps.print("bash\r");
-	      ps.flush();
-	      TimeUnit.SECONDS.sleep(2);
-	      ps.print("echo munish1234\r");
-		  ps.flush();
-		  t.getResult(timeout);
-	      
-		  Scanner stk = new Scanner(script).useDelimiter("\r\n|\n\r|\r|\n");
-	      while (stk.hasNext()) {
-			String token = stk.next().trim();
-			if(!token.isEmpty()){
-				if(token.equalsIgnoreCase("f")){
-					 ps.flush();
-				}else if(token.equalsIgnoreCase("e")){
-					 ps.print("echo munish1234\r");
-				     ps.flush();
-				     LOGGER.get().log(Level.INFO, t.getResult(timeout));
-				}else if(token.startsWith("e ")){
-					 String[] tmp = token.split(" ");
-					 if(tmp.length>1){
-						 t.setToken(tmp[1]);
-					 }
-				     LOGGER.get().log(Level.INFO, t.getResult(timeout));
-				}else if(token.toLowerCase().startsWith("e-")){
-					 String[] tmp = token.split("-");
-					 long localTimeout=timeout;
-					 if(tmp.length>1){
-						 localTimeout=Long.parseLong(tmp[1])*1000;
-					 }
-					 ps.print("echo munish1234\r");
-				     ps.flush();
-				     LOGGER.get().log(Level.INFO, t.getResult(localTimeout));
-				}else{
-					try{
-					int sleep=Integer.parseInt(token);
-					TimeUnit.SECONDS.sleep(sleep);
-					}catch (Exception e) {
-						System.err.println("P: "+token+"\r");
-						ps.print(token+"\r");
-					}
-				}
-			}			
-		 }
-	      stk.close(); 
-	      ps.print("exit\r");
-	      ps.flush();
-	      TimeUnit.SECONDS.sleep(3);
-	      session.disconnect();
+	   // send "C0644 filesize filename", where filename should not include '/'
+	      long filesize=(new File(sourceFile)).length();
+	      command="C0644 "+filesize+" ";
+	      if(sourceFile.lastIndexOf('/')>0){
+	        command+=sourceFile.substring(sourceFile.lastIndexOf('/')+1);
+	      }
+	      else{
+	        command+=sourceFile;
+	      }
+	      command+="\n";
+	      out.write(command.getBytes()); out.flush();
+	      if(checkAck(in)!=0){
+	    	  LOGGER.get().log(Level.SEVERE, "UnKnown Error transmitting the file.");
+	    	  return false;
+	      }
+	      // send a content of lfile
+	      fis=new FileInputStream(sourceFile);
+	      byte[] buf=new byte[1024];
+	      while(true){
+	        int len=fis.read(buf, 0, buf.length);
+	        if(len<=0) break;
+	        	out.write(buf, 0, len);
+	        	out.flush();
+	      }
+	      fis.close();
+	      fis=null;
+	      // send '\0'
+	      buf[0]=0; out.write(buf, 0, 1); out.flush();
+	      if(checkAck(in)!=0){
+	    	  LOGGER.get().log(Level.SEVERE, "UnKnown Error transmitting the file.");
+	    	  return false;
+	      }
+	      out.close();
+
 	      channel.disconnect();
-	      System.out.println("Disconnected");
-	    
-		status=true;
+	      session.disconnect();
+	      LOGGER.get().log(Level.INFO, "File sent successfully : "+targetFile);
+	      status=true;
 		}catch (Exception e) {
+			LOGGER.get().log(Level.SEVERE,"Error in SCP operation",e);
 			e.printStackTrace();
 		}
 		return status;
 	}
+	static int checkAck(InputStream in) throws IOException{
+	    int b=in.read();
+	    // b may be 0 for success,
+	    //          1 for error,
+	    //          2 for fatal error,
+	    //          -1
+	    if(b==0) return b;
+	    if(b==-1) return b;
+
+	    if(b==1 || b==2){
+	      StringBuffer sb=new StringBuffer();
+	      int c;
+	      do {
+		c=in.read();
+		sb.append((char)c);
+	      }
+	      while(c!='\n');
+	      if(b==1){ // error
+		System.out.print(sb.toString());
+	      }
+	      if(b==2){ // fatal error
+		System.out.print(sb.toString());
+	      }
+	    }
+	    return b;
+	  }
 public static class MyUserInfo implements UserInfo, UIKeyboardInteractive{
     public String getPassword(){ return passwd; }
     public boolean promptYesNo(String str){

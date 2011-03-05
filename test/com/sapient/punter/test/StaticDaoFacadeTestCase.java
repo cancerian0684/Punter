@@ -13,6 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.sapient.kb.jpa.StaticDaoFacade;
+import com.sapient.punter.gui.AppSettings;
 import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.TaskData;
@@ -106,15 +107,15 @@ public class StaticDaoFacadeTestCase {
 	public void testGetProcessList() throws Exception{
 		com.sapient.punter.jpa.ProcessData process=new com.sapient.punter.jpa.ProcessData();
 		process.setName("UBS-101");
-		List<ProcessData> pl1 = StaticDaoFacade.getInstance().getProcessList();
+		List<ProcessData> pl1 = StaticDaoFacade.getInstance().getProcessList(AppSettings.getInstance().getUsername());
 		StaticDaoFacade.getInstance().createProcess(process);
-		List<ProcessData> pl2 = StaticDaoFacade.getInstance().getProcessList();
+		List<ProcessData> pl2 = StaticDaoFacade.getInstance().getProcessList(AppSettings.getInstance().getUsername());
 		assertEquals(1, (pl2.size()-pl1.size()));
 	}
 
 	@Test
 	public void testGetProcess() throws Exception{
-		List<ProcessData> pl1 = StaticDaoFacade.getInstance().getProcessList();
+		List<ProcessData> pl1 = StaticDaoFacade.getInstance().getProcessList(AppSettings.getInstance().getUsername());
 		for (ProcessData process : pl1) {
 			System.out.println(process.getId()+" -- "+process.getName());
 		}

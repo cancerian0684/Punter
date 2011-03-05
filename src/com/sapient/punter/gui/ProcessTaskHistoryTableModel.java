@@ -8,7 +8,8 @@ import com.sapient.punter.jpa.RunStatus;
 import com.sapient.punter.jpa.TaskHistory;
  
 public class ProcessTaskHistoryTableModel extends AbstractTableModel {
-	public final Object[] longValues = {new Integer(2),"Kathys","1234","123456789123456789123456789123456123456123456"};
+	public final int[] cellWidth={19,363,18};
+	public final Object[] longValues = {new Integer(2),"Kathys135454231321354365143543543654321231","45126"};
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          

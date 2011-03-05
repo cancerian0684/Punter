@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.TrayIcon;
 import java.awt.datatransfer.DataFlavor;
@@ -32,6 +34,7 @@ import java.util.Properties;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
 import javax.swing.InputMap;
 import javax.swing.JComboBox;
@@ -47,20 +50,25 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 import javax.swing.text.PlainDocument;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -92,6 +100,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private boolean DEBUG = false;
     private final JTable taskTable;
     private final JTable processPropertyTable;
+    private TableRowSorter<ProcessTableModel> sorter;
     private final JTable processTable;
     private final JTable inputParamTable;
     private final JTable outputParamTable;
@@ -229,7 +238,9 @@ public class PunterGUI extends JPanel implements TaskObserver{
         JSplitPane splitRunningProcessPane=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(runningProcessTable), jtb);
         splitRunningProcessPane.setDividerSize(0);
 //        splitRunningProcessPane.setBorder(new TitledBorder("Process Explorer"));
-        processTable=new JTable(new ProcessTableModel());/*{
+        ProcessTableModel model=new ProcessTableModel();
+        sorter = new TableRowSorter<ProcessTableModel>(model);
+        processTable=new JTable(model);/*{
     	         public boolean editCellAt(int row, int column, java.util.EventObject e) {
     	        	 column=convertColumnIndexToModel(column);
     	        	 if(column==0||column==5){
@@ -272,7 +283,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     	         }
     	   
         };*/
-        
+        processTable.setRowSorter(sorter);
         processTable.setShowGrid(true);
         processTable.setPreferredScrollableViewportSize(new Dimension(150, 300));
         processTable.setFillsViewportHeight(true);
@@ -955,7 +966,13 @@ public class PunterGUI extends JPanel implements TaskObserver{
         jsp4.setDividerSize(0);
         tabbedPane.addTab("Process History", null, jsp4,"Tasks Run History for selected Process");
         initColumnSizes4(processTaskHistoryTable);
-        
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+        	@Override
+        	public void run() {
+        		super.run();
+        		listColumnSizes(processTaskHistoryTable);
+        	}
+        });
         processPropertyTable=new JTable(new ProcessPropertyTableModel());
         initColumnSizes5(processPropertyTable);
         processPropertyTable.setShowGrid(true);
@@ -1104,7 +1121,35 @@ public class PunterGUI extends JPanel implements TaskObserver{
         appLogArea=new TextAreaFIFO();
         appLogArea.setEditable(false);
         tabbedPane.addTab("App Logs", null, new JScrollPane(appLogArea),"Application Wide Logging");
-        JSplitPane jsp3=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,listPane,tabbedPane);
+        JPanel panel=new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        final JTextField searchText=new JTextField("*");
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1.0;
+        panel.add(searchText, c);
+        
+        c.fill = GridBagConstraints.VERTICAL;
+        c.weightx = 1.0;
+        c.weighty=1.0;
+        c.gridx = 0;
+        c.gridy = 1;
+        panel.add(listPane,c);
+        
+        searchText.getDocument().addDocumentListener(
+                new DocumentListener() {
+                    public void changedUpdate(DocumentEvent e) {
+                        newFilter(searchText.getText());
+                    }
+                    public void insertUpdate(DocumentEvent e) {
+                        newFilter(searchText.getText());
+                    }
+                    public void removeUpdate(DocumentEvent e) {
+                        newFilter(searchText.getText());
+                    }
+                });
+        JSplitPane jsp3=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,panel,tabbedPane);
         jsp3.setDividerSize(1);
         JSplitPane jsp5=new JSplitPane(JSplitPane.VERTICAL_SPLIT, jsp3,splitRunningProcessPane);
         jsp5.setDividerSize(1);
@@ -1146,12 +1191,12 @@ public class PunterGUI extends JPanel implements TaskObserver{
 					}
                 }
             }});
-        ProcessTableModel model=(ProcessTableModel) processTable.getModel();
+        ProcessTableModel tmpModel=(ProcessTableModel) processTable.getModel();
         List<ProcessData> pl = StaticDaoFacade.getInstance().getProcessList(AppSettings.getInstance().getUsername());
         for (ProcessData p : pl) {
         	final ArrayList<Object> newRequest = new ArrayList<Object>();
         	newRequest.add(p);
-        	model.insertRow(newRequest);
+        	tmpModel.insertRow(newRequest);
 		}
         if(processTable.getModel().getRowCount()>0)
             processTable.setRowSelectionInterval(0, 0);
@@ -1162,6 +1207,16 @@ public class PunterGUI extends JPanel implements TaskObserver{
         
         System.setOut( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.out), true));
 		System.setErr( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.err), true));
+    }
+    private void newFilter(String text) {
+        RowFilter<ProcessTableModel, Object> rf = null;
+        //If current expression doesn't parse, don't update.
+        try {
+            rf = RowFilter.regexFilter(text, 0);
+        } catch (java.util.regex.PatternSyntaxException e) {
+            return;
+        }
+        sorter.setRowFilter(rf);
     }
     public void createProcess(final ProcessData procDao) throws Exception{
 //		  System.out.println(procDao.getId()+" == "+procDao.getName());
@@ -1289,7 +1344,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         switch(e.getKeyCode()){
             case KeyEvent.VK_DELETE:
                 if(runningProcessTable.getSelectedRow() != -1){
-                	System.err.println("Delete Key Pressed.");
+//                	System.err.println("Delete Key Pressed.");
                 		ArrayList<Object> row=((RunningProcessTableModel)runningProcessTable.getModel()).getRow(runningProcessTable.convertRowIndexToModel(runningProcessTable.getSelectedRow()));
                 		if(((ProcessHistory)row.get(0)).getRunState().equals(RunState.COMPLETED))
                 		((RunningProcessTableModel)runningProcessTable.getModel()).deleteRow(runningProcessTable.getSelectedRow());
@@ -1539,7 +1594,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         }
     }
     
-    private void initColumnSizes4(JTable table) {
+    private void listColumnSizes(JTable table) {
     	ProcessTaskHistoryTableModel model = (ProcessTaskHistoryTableModel)table.getModel();
         TableColumn column = null;
         Component comp = null;
@@ -1569,8 +1624,16 @@ public class PunterGUI extends JPanel implements TaskObserver{
                                    + "headerWidth = " + headerWidth
                                    + "; cellWidth = " + cellWidth);
             }
-
-            column.setPreferredWidth(Math.max(headerWidth, cellWidth));
+            System.out.println("Column Width: "+(i+1)+ " : "+column.getPreferredWidth()+ " -- cellWidth : "+cellWidth);
+        }
+    }
+    private void initColumnSizes4(JTable table) {
+    	ProcessTaskHistoryTableModel model = (ProcessTaskHistoryTableModel)table.getModel();
+        TableColumn column = null;
+        int[] longValues = model.cellWidth;
+        for (int i = 0; i < 3; i++) {
+            column = table.getColumnModel().getColumn(i);
+            column.setPreferredWidth(longValues[i]);
         }
     }
     

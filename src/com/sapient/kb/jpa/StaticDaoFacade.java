@@ -12,7 +12,6 @@ import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
 import com.sapient.server.PunterSearch;
 
-
 public class StaticDaoFacade {
 	private static StaticDaoFacade sdf;
 	private PunterSearch stub;
@@ -34,12 +33,19 @@ public class StaticDaoFacade {
 	public void makeConnection(){
 		String host="localhost";
 		try {
-			if(AppSettings.getInstance().isMultiSearchEnable()){
-				try{
-				MultiCastServerLocator mcsl=new MultiCastServerLocator();
-				host=mcsl.LocateServerAddress();}catch (Exception e) {e.printStackTrace();}
+			Registry registry=null;
+			try{
+			registry= LocateRegistry.getRegistry(host);
+			}catch (Exception e) {
+				e.printStackTrace();
+				if(AppSettings.getInstance().isMultiSearchEnable()){
+					try{
+						MultiCastServerLocator mcsl=new MultiCastServerLocator();
+						host=mcsl.LocateServerAddress();
+						registry= LocateRegistry.getRegistry(host);	
+					}catch (Exception ee) {ee.printStackTrace();}
+				}
 			}
-			Registry registry = LocateRegistry.getRegistry(host);
 			stub = (PunterSearch) registry.lookup("PunterSearch");
 			stub.ping();
 		} catch (Exception e) {

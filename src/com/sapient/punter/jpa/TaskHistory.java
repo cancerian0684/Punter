@@ -27,6 +27,7 @@ public class TaskHistory implements Serializable{
 	private int sequence;
 	@Lob
 	@Basic(fetch=FetchType.EAGER)
+//	@Column(columnDefinition="blob(6M)")
 	private String logs;
 	private boolean status;
 	@ManyToOne
@@ -39,9 +40,6 @@ public class TaskHistory implements Serializable{
 	private RunState runState = RunState.NEW;
 	@Enumerated(EnumType.STRING)
 	private RunStatus runStatus = RunStatus.NOT_RUN;
-//	@Version
-//	@Column(name = "OPT_LOCK")
-//	private Long version;
 	public long getId() {
 		return id;
 	}

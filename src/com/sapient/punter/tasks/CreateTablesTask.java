@@ -25,9 +25,6 @@ public class CreateTablesTask extends Tasks {
 	public boolean run() {
 		boolean status=false;
 		try{
-			if(conURL.indexOf("por")!=-1){
-				throw new Exception("This task is not meant for Production DB's");
-			}
 //			String existingSQL=readFromFile("sql/daisyCreate.sql","\n");
 //			System.out.println(getCreateTableSql(existingSQL));
 			Class.forName("oracle.jdbc.driver.OracleDriver");

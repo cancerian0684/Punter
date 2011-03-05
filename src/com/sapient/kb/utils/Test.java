@@ -11,6 +11,7 @@ import com.itextpdf.text.pdf.PdfReader;
 
 public class Test {
 public static void main(String[] args) {
+	System.out.println(System.currentTimeMillis());
 	try {
 		PdfReader reader = new PdfReader("E:\\HDD Backup\\Munish's PC\\Documents\\Munish resume.pdf");
 //		reader.getNumberOfPages()
@@ -18,7 +19,7 @@ public static void main(String[] args) {
 	} catch (IOException e) {
 		e.printStackTrace();
 	}
-	String name="IndiaDen cancerian0684@gmail.com +91-8010106513 munish chandel dAISy Sapient Corp. munishc,mchandel,mchand";
+	String name="cancerian0684@gmail.com +91-8010106513 munish chandel dAISy Sapient Corp. munishc,mchandel,mchand";
 	StringTokenizer stk=new StringTokenizer(name, " ,");
 	Set<String> lines = new HashSet<String>(1000); 
 	while (stk.hasMoreTokens()) {
@@ -63,14 +64,6 @@ public static List<String> getPunterParsedSubText(String inText){
 			if(Character.isLetterOrDigit(curr))
 				sb.append(curr);
 		}
-		else if(!Character.isLowerCase(curr)&&Character.isLowerCase(prev)){ 
-//          System.err.println("boundary .. "+curr); 
-            if(sb.length()>0) 
-            wordsList.add(sb.toString()); 
-            sb.setLength(0); 
-            if(Character.isLetterOrDigit(curr)) 
-                    sb.append(curr); 
-		} 
 		else if(Character.isLetter(curr)&&!Character.isLetter(prev)){
 //			System.err.println("boundary .. "+curr);
 //			sb.append(' ');

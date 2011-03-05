@@ -49,10 +49,11 @@ public class ProcessHistory implements Serializable{
 	private RunState runState = RunState.NEW;
 	@Enumerated(EnumType.STRING)
 	private RunStatus runStatus = RunStatus.NOT_RUN;
-	/*@Version
-	@Column(name = "OPT_LOCK")
-	private Long version;*/
 	private boolean clearAlert=false;
+//	@Lob
+//	@Basic(fetch=FetchType.EAGER)
+//	@Column(columnDefinition="blob(6M)")
+//	private String xml;
 	public long getId() {
 		return id;
 	}

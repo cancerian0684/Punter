@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -25,6 +26,7 @@ import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.RunState;
 import com.sapient.punter.jpa.RunStatus;
 import com.sapient.punter.jpa.TaskHistory;
+import com.sapient.punter.utils.EmailService;
 import com.sapient.punter.utils.InputParamValue;
 import com.sapient.punter.utils.StringUtils;
 
@@ -41,7 +43,7 @@ private boolean stopOnTaskFailure=true;
 private boolean alwaysRaiseAlert=false;
 @InputParam
 private String comments;
-@InputParam(description="Any of ALL, INFO, WARNING, SEVERE")
+@InputParam(description="Any of FINE, INFO, WARNING, SEVERE")
 private String loggingLevel;
 @InputParam(description="Comma separated email List")
 private String emailsToNotify;
@@ -52,6 +54,7 @@ private String scheduleString;
 protected transient ProcessObserver po;
 private int lineBufferSize=1000;
 private Document logDocument;
+private Logger processLogger;
 public Document getLogDocument() {
 	return logDocument;
 }
@@ -71,7 +74,6 @@ public void beforeProcessStart(){
 				Element firstLine = root.getElement(0);
 				try
 				{
-//					System.err.println("removing");
 					remove(0, firstLine.getEndOffset());
 				}
 				catch(BadLocationException ble)
@@ -93,6 +95,34 @@ public void afterProcessFinish(){
 	}
 	po.update(ph);
 	po.processCompleted();
+	if(emailsToNotify!=null&&!emailsToNotify.isEmpty()){
+		if(emailsOnFailureOnly&&ph.getRunStatus()==RunStatus.SUCCESS)
+			return;
+		try{
+			if(processLogger!=null){
+				processLogger.log(Level.INFO,"Sending Task Report Mail to : "+emailsToNotify);
+			}
+			EmailService.getInstance().sendEMail("Punter Task : ["+ph.getRunStatus()+"] "+ph.getName(), emailsToNotify, ph.getTaskHistoryList().get(0).getLogs());
+			if(processLogger!=null){
+				processLogger.log(Level.INFO,"Mail Sen.");
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+private void setLoggingLevel(Logger processLogger){
+	if(loggingLevel==null){
+		return ;
+	}
+	if(loggingLevel.equalsIgnoreCase("info"))
+		processLogger.setLevel(Level.INFO);
+	else if(loggingLevel.equalsIgnoreCase("fine"))
+		processLogger.setLevel(Level.FINE);
+	else if(loggingLevel.equalsIgnoreCase("warning"))
+		processLogger.setLevel(Level.WARNING);
+	else if(loggingLevel.equalsIgnoreCase("severe"))
+		processLogger.setLevel(Level.SEVERE);
 }
 public void execute(){
 	substituteParams();
@@ -107,13 +137,16 @@ public void execute(){
 		task.setSessionMap(sessionMap);
 		task.setLogDocument(logDocument);
 		th.setRunState(RunState.RUNNING);
+		th.setRunStatus(RunStatus.RUNNING);
 		boolean status=false;
 		if(keepRunning){
 		try{
 			task.beforeTaskStart();
-			task.LOGGER.get().log(Level.INFO,"started executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
+			processLogger=task.LOGGER.get();
+			setLoggingLevel(processLogger);
+			processLogger.log(Level.INFO,"started executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
 			status=task.execute();
-			task.LOGGER.get().log(Level.INFO,"Finished executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
+			processLogger.log(Level.INFO,"Finished executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
 			if(stopOnTaskFailure){
 				keepRunning=status;
 			}
