@@ -26,4 +26,10 @@ public interface AppSettingsMBean {
 	public abstract void setTextAreaEditorLocation(Point textAreaEditorLocation);
 	public abstract Dimension getTextAreaEditorLastDim();
 	public abstract void setTextAreaEditorLastDim(Dimension textAreaEditorLastDim);
+	public abstract void setSmtpPassword(String smtpPassword);
+	public abstract void setSmtpUsername(String smtpUsername);
+	public abstract void setSmtpHost(String smtpHost);
+	public abstract String getSmtpUsername();
+	public abstract String getSmtpPassword();
+	public abstract String getSmtpHost();
 }

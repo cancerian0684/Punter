@@ -42,6 +42,9 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private int keystrokeFlush;
 	private int maxKeyStrokeDelay;
 	private int maxExecutorSize;
+	private String smtpHost;
+	private String smtpUsername;
+	private String smtpPassword;
 	private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);
@@ -52,6 +55,30 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		maxKeyStrokeDelay=200;
 		maxExecutorSize=2;
 		isNimbusLookNFeel=false;
+	}
+	@Override
+	public String getSmtpHost() {
+		return smtpHost;
+	}
+	@Override
+	public String getSmtpPassword() {
+		return smtpPassword;
+	}
+	@Override
+	public String getSmtpUsername() {
+		return smtpUsername;
+	}
+	@Override
+	public void setSmtpHost(String smtpHost) {
+		this.smtpHost = smtpHost;
+	}
+	@Override
+	public void setSmtpUsername(String smtpUsername) {
+		this.smtpUsername = smtpUsername;
+	}
+	@Override
+	public void setSmtpPassword(String smtpPassword) {
+		this.smtpPassword = smtpPassword;
 	}
 	@Override
 	public boolean isNimbusLookNFeel() {
