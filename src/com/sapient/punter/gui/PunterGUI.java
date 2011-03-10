@@ -68,7 +68,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.table.TableStringConverter;
 import javax.swing.text.PlainDocument;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -287,7 +289,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
         processTable.setShowGrid(true);
         processTable.setPreferredScrollableViewportSize(new Dimension(150, 300));
         processTable.setFillsViewportHeight(true);
-        processTable.setRowHeight(20);
+        processTable.setRowHeight(22);
+        processTable.setFont(new Font("Arial",Font.TRUETYPE_FONT,11));
+        processTable.setForeground(Color.BLUE);
+        processTable.getColumn("<html><b>My Process's").setCellRenderer(new ProcessTableRenderer());
         InputMap imap = processTable.getInputMap(JComponent.WHEN_FOCUSED);
 	    imap.put(KeyStroke.getKeyStroke("DELETE"), "table.delete");
 	    ActionMap amap = processTable.getActionMap();
@@ -1212,10 +1217,17 @@ public class PunterGUI extends JPanel implements TaskObserver{
         RowFilter<ProcessTableModel, Object> rf = null;
         //If current expression doesn't parse, don't update.
         try {
-            rf = RowFilter.regexFilter(text, 0);
+            rf = RowFilter.regexFilter(text.toLowerCase(), 0);
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }
+        sorter.setStringConverter(new TableStringConverter() {
+			@Override
+			public String toString(TableModel model, int row, int column) {
+				String tmp=(String) model.getValueAt(row, column);
+				return  tmp.toLowerCase();
+			}
+		});
         sorter.setRowFilter(rf);
     }
     public void createProcess(final ProcessData procDao) throws Exception{
@@ -1770,5 +1782,28 @@ public class PunterGUI extends JPanel implements TaskObserver{
                System.out.println("1111");
            }
         }
+    }
+	static class ProcessTableRenderer extends DefaultTableCellRenderer {
+		private static final Color successColor = new Color(51, 153, 51);
+		private static final Color failureColor = new Color(153, 51, 0);
+	
+	public ProcessTableRenderer() { super(); }
+	@Override
+	public Component getTableCellRendererComponent(JTable table,
+			Object value, boolean isSelected, boolean hasFocus, int row,
+			int column) {
+		if(value!=null){
+			if(value.toString().toLowerCase().contains("prod")){
+				setForeground(Color.red);
+			}
+			else
+				setForeground(Color.blue);
+		}
+		return super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+				row, column);
+	}
+	public void setValue(Object value) {
+	    setText((value.toString().isEmpty()) ? "---" : value.toString());
+	}
     }
 }
