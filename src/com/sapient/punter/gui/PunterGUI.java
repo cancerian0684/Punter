@@ -1135,7 +1135,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         c.weightx = 1.0;
         panel.add(searchText, c);
         
-        c.fill = GridBagConstraints.VERTICAL;
+        c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.weighty=1.0;
         c.gridx = 0;

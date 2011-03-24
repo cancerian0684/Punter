@@ -48,6 +48,7 @@ public class PunterSearchServer implements PunterSearch {
 			Runtime.getRuntime().exec("taskkill /IM RMIREGISTRY.EXE");
 			Thread.sleep(2000);
 			System.out.println("Starting the rmi registry");
+			//LocateRegistry.createRegistry(port)
 			final Process proc = Runtime.getRuntime().exec("rmiregistry");
 			Runtime.getRuntime().addShutdownHook(new Thread(){
 				@Override
