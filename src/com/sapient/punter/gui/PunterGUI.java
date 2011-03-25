@@ -824,7 +824,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
         JScrollPane scrollPane = new JScrollPane(taskTable);
         JTabbedPane tabbedPane = new JTabbedPane();
         //Set up column sizes.
-        initColumnSizes(taskTable);
+        if(AppSettings.getInstance().getObject("taskTable")!=null)
+			GUIUtils.initilializeTableColumns(taskTable, (int[]) AppSettings.getInstance().getObject("taskTable"));
+        else
+        	initColumnSizes(taskTable);
         initColumnSizes11(inputParamTable);
         initColumnSizes2(processTable);
         //Fiddle with the Sport column's cell editors/renderers.
@@ -981,6 +984,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         		AppSettings.getInstance().setObject("runningProcessTable", GUIUtils.getColumnWidth(runningProcessTable));
         		AppSettings.getInstance().setObject("processTaskHistoryTable", GUIUtils.getColumnWidth(processTaskHistoryTable));
         		AppSettings.getInstance().setObject("runningTaskTable", GUIUtils.getColumnWidth(runningTaskTable));
+        		AppSettings.getInstance().setObject("taskTable", GUIUtils.getColumnWidth(taskTable));
         	}
         });
         processPropertyTable=new JTable(new ProcessPropertyTableModel());
@@ -1065,8 +1069,9 @@ public class PunterGUI extends JPanel implements TaskObserver{
         processTaskAlertTable.setAutoCreateRowSorter(true);
         processTaskAlertTable.getTableHeader().setReorderingAllowed(false);
         processTaskAlertTable.getColumnModel().getColumn(0).setCellRenderer(dtcr);
+        if(AppSettings.getInstance().getObject("processTaskAlertTable")!=null)
+			GUIUtils.initilializeTableColumns(processTaskAlertTable, (int[]) AppSettings.getInstance().getObject("processTaskAlertTable"));
         JScrollPane processTaskALertPane = new JScrollPane(processTaskAlertTable);
-        
         JSplitPane jsp6=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,processAlertPane,processTaskALertPane);
         jsp6.setDividerSize(0);
         tabbedPane.addTab("My Alerts", null, jsp6,"My Workflow Alerts");
