@@ -17,14 +17,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -34,7 +30,6 @@ import java.util.Properties;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
 import javax.swing.InputMap;
 import javax.swing.JComboBox;
@@ -76,11 +71,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.beanutils.BeanUtils;
-
 import neoe.ne.EditPanel;
 
-import com.sapient.kb.jpa.Document;
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.executors.ProcessExecutor;
@@ -144,7 +136,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
         	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
         }
         header.setPreferredSize(new Dimension(30, 20));
-        initColumnSizesRunningProcessTable(runningProcessTable);
+        if(AppSettings.getInstance().getObject("runningProcessTable")!=null)
+			GUIUtils.initilializeTableColumns(runningProcessTable, (int[]) AppSettings.getInstance().getObject("runningProcessTable"));
+        else
+        	initColumnSizesRunningProcessTable(runningProcessTable);
         runningProcessTable.getColumn("<html><b>Completed").setCellRenderer(new ProgressRenderer(runningProcessTable));
         runningProcessTable.addKeyListener(new java.awt.event.KeyAdapter(){
          public void keyTyped(KeyEvent e){}
@@ -226,7 +221,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
         runningTaskTable.setRowHeight(26);
         runningTaskTable.setIntercellSpacing(new Dimension(0, 0));
         runningTaskTable.getColumnModel().getColumn(0).setCellRenderer(dtcr);
-        initColumnSizesRunningTaskTable(runningTaskTable);
+        if(AppSettings.getInstance().getObject("runningTaskTable")!=null)
+			GUIUtils.initilializeTableColumns(runningTaskTable, (int[]) AppSettings.getInstance().getObject("runningTaskTable"));
+        else
+        	initColumnSizesRunningTaskTable(runningTaskTable);
         header = runningTaskTable.getTableHeader();
         headerRenderer = header.getDefaultRenderer();
         if(headerRenderer instanceof JLabel){
@@ -970,12 +968,19 @@ public class PunterGUI extends JPanel implements TaskObserver{
         JSplitPane jsp4=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,processHistoryPane,processTaskHistoryPane);
         jsp4.setDividerSize(0);
         tabbedPane.addTab("Process History", null, jsp4,"Tasks Run History for selected Process");
-        initColumnSizes4(processTaskHistoryTable);
+        if(AppSettings.getInstance().getObject("processTaskHistoryTable")!=null)
+			GUIUtils.initilializeTableColumns(processTaskHistoryTable, (int[]) AppSettings.getInstance().getObject("processTaskHistoryTable"));
+        else
+        	initColumnSizes4(processTaskHistoryTable);
         Runtime.getRuntime().addShutdownHook(new Thread(){
         	@Override
         	public void run() {
         		super.run();
-        		listColumnSizes(processTaskHistoryTable);
+        		//saving states of all the Tables.
+        		AppSettings.getInstance().setObject("processTaskAlertTable", GUIUtils.getColumnWidth(processTaskAlertTable));
+        		AppSettings.getInstance().setObject("runningProcessTable", GUIUtils.getColumnWidth(runningProcessTable));
+        		AppSettings.getInstance().setObject("processTaskHistoryTable", GUIUtils.getColumnWidth(processTaskHistoryTable));
+        		AppSettings.getInstance().setObject("runningTaskTable", GUIUtils.getColumnWidth(runningTaskTable));
         	}
         });
         processPropertyTable=new JTable(new ProcessPropertyTableModel());

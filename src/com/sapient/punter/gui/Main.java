@@ -37,7 +37,6 @@ import com.sapient.punter.utils.Launcher;
 import com.sapient.punter.utils.StackWindow;
 
 public class Main{
-	
 	private static BufferedImage currentImage;
 	private static BufferedImage busyImage;
 	private static BufferedImage dsctImage;
@@ -103,7 +102,7 @@ private void createAndShowGUI() throws Exception {
 			KBFrame.setVisible(false); 
 			displayMsg("Punter has been minimized to System Tray",TrayIcon.MessageType.INFO);
 		}
-    });	 
+    });
     
     PunterGuiFrame=new JFrame("My Punter");
     PunterGuiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -171,23 +170,18 @@ private void createAndShowGUI() throws Exception {
 		        	lastAccessed.setExtendedState(Frame.NORMAL);
 		        	lastAccessed.setVisible(true);
 	        	}
-//	            System.out.println("Tray Icon - Mouse clicked!");                 
 	        }
 
 	        public void mouseEntered(MouseEvent e) {
-//	            System.out.println("Tray Icon - Mouse entered!");                 
 	        }
 
 	        public void mouseExited(MouseEvent e) {
-	         //   System.out.println("Tray Icon - Mouse exited!");                 
 	        }
 
 	        public void mousePressed(MouseEvent e) {
-	         //   System.out.println("Tray Icon - Mouse pressed!");                 
 	        }
 
 	        public void mouseReleased(MouseEvent e) {
-	       //     System.out.println("Tray Icon - Mouse released!");                 
 	        }
 	    };
 	    Runtime rt = Runtime.getRuntime();

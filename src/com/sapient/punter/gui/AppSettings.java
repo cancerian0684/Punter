@@ -12,6 +12,8 @@ import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jnlp.BasicService;
 import javax.jnlp.FileContents;
@@ -45,6 +47,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private String smtpHost;
 	private String smtpUsername;
 	private String smtpPassword;
+	private Map<String,Object> cache;
 	private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);
@@ -55,6 +58,14 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		maxKeyStrokeDelay=200;
 		maxExecutorSize=2;
 		isNimbusLookNFeel=false;
+		cache=new HashMap<String,Object>();
+	}
+	public Object getObject(String key){
+		if(cache==null)cache=new HashMap<String,Object>();
+		return cache.get(key);
+	}
+	public void setObject(String key, Object object){
+		cache.put(key, object);
 	}
 	@Override
 	public String getSmtpHost() {
@@ -229,17 +240,18 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 			  oos.flush();
 			  oos.close();
 		      }
-		   catch (Exception e) { e.printStackTrace();
+		   catch (Exception e) { 
+			  System.err.println("Error : "+e.getMessage());
 		   	  try{
 			   	  FileOutputStream fout = new FileOutputStream("punter.dat");
 			      ObjectOutputStream oos = new ObjectOutputStream(fout);
 			      oos.writeObject(appSettings);
 			      oos.close();
+			      System.err.println("Saved in Punter.dat instead.");
 		   	  }catch (Exception ee) {
 		   		  ee.printStackTrace();
 			}
 		   }
-
 	}
 	private static void loadState(){
 		try {
@@ -254,8 +266,8 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 			  appSettings =  (AppSettings) ois.readObject();
 			  ois.close();
 		      }
- 			catch(FileNotFoundException fnfe) {
- 			try {
+			catch(FileNotFoundException fnfe) {
+			try {
 			  PersistenceService ps; 
 			  BasicService bs; 
 			  ps = (PersistenceService)ServiceManager.lookup("javax.jnlp.PersistenceService"); 
@@ -269,7 +281,6 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 			} catch(IOException ioe) {
 				ioe.printStackTrace();
 			} catch (UnavailableServiceException e) {
-				e.printStackTrace();
 				 try {
 					    FileInputStream fin = new FileInputStream("punter.dat");
 					    ObjectInputStream ois = new ObjectInputStream(fin);
@@ -282,12 +293,23 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 					   }
 			}
 			 appSettings=new AppSettings();
- 			} 
- 			 catch (Exception ex) { 
+			} 
+			catch (UnavailableServiceException e) {
+				 try {
+					    FileInputStream fin = new FileInputStream("punter.dat");
+					    ObjectInputStream ois = new ObjectInputStream(fin);
+					    appSettings =  (AppSettings) ois.readObject();
+					    ois.close();
+					    System.out.println("Settings loaded succesfully.");
+					    }
+					   catch (Exception ee) { ee.printStackTrace();
+					   appSettings=new AppSettings();
+					   }
+			}
+			 catch (Exception ex) { 
 				   ex.printStackTrace(); 
 				   appSettings=new AppSettings();
 			   }
- 			
 	}
 	public String getUsername() {
 		return username;
