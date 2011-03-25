@@ -37,6 +37,8 @@ import com.sapient.punter.utils.Launcher;
 import com.sapient.punter.utils.StackWindow;
 
 public class Main{
+	
+	private static BufferedImage currentImage;
 	private static BufferedImage busyImage;
 	private static BufferedImage dsctImage;
 	private static BufferedImage idleImage;
@@ -47,17 +49,25 @@ public class Main{
 	private static Logger logger = Logger.getLogger(Main.class.getName());
 	private Timer timer=new Timer(2000,new ActionListener(){
 		public void actionPerformed(ActionEvent e) {
+			setAppropriateTrayIcon();
+		}
+
+		private void setAppropriateTrayIcon() {
+			BufferedImage requiredImage=null;
 			if (isBusy()){
-				trayIcon.setImage(busyImage);
-				PunterGuiFrame.setIconImage(busyImage);
-				KBFrame.setIconImage(busyImage);
+				requiredImage=busyImage;
+				
 			}else if(!isConnected()){
-				trayIcon.setImage(dsctImage);
+				requiredImage=dsctImage;
 			}
-			else{
-				PunterGuiFrame.setIconImage(idleImage);
-				KBFrame.setIconImage(idleImage);
-				trayIcon.setImage(idleImage);
+			else {
+				requiredImage=idleImage;
+			}
+			if(currentImage!=requiredImage){
+				currentImage=requiredImage;
+				trayIcon.setImage(currentImage);
+				PunterGuiFrame.setIconImage(currentImage);
+				KBFrame.setIconImage(currentImage);
 			}
 		}});
 	public Main() {
