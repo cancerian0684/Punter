@@ -110,6 +110,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private final Timer timer;
     private DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
     private static Properties taskProps=new Properties();
+	private JSplitPane jsp3;
+	private JSplitPane jsp;
     static{
     	try {
 			taskProps.load(PunterGUI.class.getClassLoader().getResourceAsStream("resources/tasks.properties"));
@@ -833,9 +835,11 @@ public class PunterGUI extends JPanel implements TaskObserver{
         //Fiddle with the Sport column's cell editors/renderers.
 //        setUpSportColumn(taskTable, taskTable.getColumnModel().getColumn(2));
         JSplitPane jsp2=new JSplitPane(JSplitPane.VERTICAL_SPLIT,new JScrollPane(inputParamTable),new JScrollPane(outputParamTable));
-        JSplitPane jsp=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane,jsp2);
+        jsp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane,jsp2);
         
         jsp.setDividerLocation(0.4);
+        if(AppSettings.getInstance().getObject("jspLocation")!=null)
+        	jsp.setDividerLocation(((Integer)AppSettings.getInstance().getObject("jspLocation")));
         //Add the scroll pane to this panel.
         processTable.setAutoscrolls(true);
         ListSelectionModel listSelectionModel = processTable.getSelectionModel();
@@ -980,11 +984,14 @@ public class PunterGUI extends JPanel implements TaskObserver{
         	public void run() {
         		super.run();
         		//saving states of all the Tables.
+        		System.out.println("Divider Location :"+jsp3.getDividerLocation()+" - "+jsp3.getDividerSize());
         		AppSettings.getInstance().setObject("processTaskAlertTable", GUIUtils.getColumnWidth(processTaskAlertTable));
         		AppSettings.getInstance().setObject("runningProcessTable", GUIUtils.getColumnWidth(runningProcessTable));
         		AppSettings.getInstance().setObject("processTaskHistoryTable", GUIUtils.getColumnWidth(processTaskHistoryTable));
         		AppSettings.getInstance().setObject("runningTaskTable", GUIUtils.getColumnWidth(runningTaskTable));
         		AppSettings.getInstance().setObject("taskTable", GUIUtils.getColumnWidth(taskTable));
+        		AppSettings.getInstance().setObject("jsp3Location", jsp3.getDividerLocation());
+        		AppSettings.getInstance().setObject("jspLocation", jsp.getDividerLocation());
         	}
         });
         processPropertyTable=new JTable(new ProcessPropertyTableModel());
@@ -1164,8 +1171,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
                         newFilter(searchText.getText());
                     }
                 });
-        JSplitPane jsp3=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,panel,tabbedPane);
+        jsp3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,panel,tabbedPane);
         jsp3.setDividerSize(1);
+        if(AppSettings.getInstance().getObject("jsp3Location")!=null)
+        	jsp3.setDividerLocation(((Integer)AppSettings.getInstance().getObject("jsp3Location")));
         JSplitPane jsp5=new JSplitPane(JSplitPane.VERTICAL_SPLIT, jsp3,splitRunningProcessPane);
         jsp5.setDividerSize(1);
         add(jsp5);
