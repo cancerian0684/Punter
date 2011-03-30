@@ -33,7 +33,7 @@ import com.sapient.punter.utils.OutputParamValue;
 		}
         private Object[][] data = {        };
 
-        public final Object[] longValues = {"Jan", "Kathy1234567123452345"};
+        public final static int[] width = {60,126};
 
         public int getColumnCount() {
             return columnNames.length;

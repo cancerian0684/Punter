@@ -752,7 +752,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		        	  }
 			}
 	      });
-        inputParamTable = new JTable(new InputParamTableModel()){
+        final InputParamTableModel inputParamTableModel = new InputParamTableModel();
+		inputParamTable = new JTable(inputParamTableModel){
 
 	         public boolean editCellAt(final int row,final int column, java.util.EventObject e) {
 //	        	 column=convertColumnIndexToModel(column);
@@ -797,7 +798,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         outputParamTable.setPreferredScrollableViewportSize(new Dimension(250, 150));
         outputParamTable.setFillsViewportHeight(true);
         outputParamTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-        initColumnSizes1(outputParamTable);
+        initColumnSizesOutputParamTable();
         ListSelectionModel rowSM = taskTable.getSelectionModel();
         rowSM.addListSelectionListener(new ListSelectionListener() {
         	public void valueChanged(ListSelectionEvent e) {
@@ -810,18 +811,18 @@ public class PunterGUI extends JPanel implements TaskObserver{
         			if(t.getInputParams()!=null){
         			inputParamTable.setModel(new InputParamTableModel(t));
         			inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
-        			initColumnSizes11(inputParamTable);
+        			initColumnSizesInputParamTable();
         			}else{        				
         				inputParamTable.setModel(new InputParamTableModel());
         				inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
-        				initColumnSizes11(inputParamTable);
+        				initColumnSizesInputParamTable();
         			}
         			if(t.getOutputParams()!=null){
         			outputParamTable.setModel(new OutputParamTableModel(t));
-        			initColumnSizes1(outputParamTable);
+        			initColumnSizesOutputParamTable();
         			}else{
         				outputParamTable.setModel(new OutputParamTableModel());
-        				initColumnSizes1(outputParamTable);
+        				initColumnSizesOutputParamTable();
         			}
         		}
         	}
@@ -838,7 +839,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			GUIUtils.initilializeTableColumns(processTable, (int[]) AppSettings.getInstance().getObject("processTable"));
         else
         	GUIUtils.initilializeTableColumns(processTable, model.width);
-        initColumnSizes11(inputParamTable);
+        initColumnSizesInputParamTable();
         //Fiddle with the Sport column's cell editors/renderers.
 //        setUpSportColumn(taskTable, taskTable.getColumnModel().getColumn(2));
         JSplitPane jsp2=new JSplitPane(JSplitPane.VERTICAL_SPLIT,new JScrollPane(inputParamTable),new JScrollPane(outputParamTable));
@@ -893,8 +894,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
                     }else{
                     	inputParamTable.setModel(new InputParamTableModel());
                     	outputParamTable.setModel(new OutputParamTableModel());
-                    	initColumnSizes11(inputParamTable);
-                    	initColumnSizes1(outputParamTable);
+                    	initColumnSizesInputParamTable();
+                    	initColumnSizesOutputParamTable();
                     }
                     
                     //populate process properties
@@ -999,6 +1000,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
         		AppSettings.getInstance().setObject("runningTaskTable", GUIUtils.getColumnWidth(runningTaskTable));
         		AppSettings.getInstance().setObject("taskTable", GUIUtils.getColumnWidth(taskTable));
         		AppSettings.getInstance().setObject("processTable", GUIUtils.getColumnWidth(processTable));
+        		AppSettings.getInstance().setObject("outputParamTable", GUIUtils.getColumnWidth(outputParamTable));
+        		AppSettings.getInstance().setObject("inputParamTable", GUIUtils.getColumnWidth(inputParamTable));
         		AppSettings.getInstance().setObject("processPropertyTable", GUIUtils.getColumnWidth(processPropertyTable));
         		AppSettings.getInstance().setObject("jsp3Location", jsp3.getDividerLocation());
         		AppSettings.getInstance().setObject("jspLocation", jsp.getDividerLocation());
@@ -1401,73 +1404,18 @@ public class PunterGUI extends JPanel implements TaskObserver{
     }
     
     
-    private void initColumnSizes1(JTable table) {
-    	OutputParamTableModel model = (OutputParamTableModel)table.getModel();
-        TableColumn column = null;
-        Component comp = null;
-        int headerWidth = 0;
-        int cellWidth = 0;
-        Object[] longValues = model.longValues;
-        TableCellRenderer headerRenderer =
-            table.getTableHeader().getDefaultRenderer();
-
-        for (int i = 0; i < 2; i++) {
-            column = table.getColumnModel().getColumn(i);
-
-            comp = headerRenderer.getTableCellRendererComponent(
-                                 null, column.getHeaderValue(),
-                                 false, false, 0, 0);
-            headerWidth = comp.getPreferredSize().width;
-
-            comp = table.getDefaultRenderer(model.getColumnClass(i)).
-                             getTableCellRendererComponent(
-                                 table, longValues[i],
-                                 false, false, 0, i);
-            cellWidth = comp.getPreferredSize().width;
-
-            if (DEBUG) {
-                System.out.println("Initializing width of column "
-                                   + i + ". "
-                                   + "headerWidth = " + headerWidth
-                                   + "; cellWidth = " + cellWidth);
-            }
-
-            column.setPreferredWidth(Math.max(headerWidth, cellWidth));
-        }
+    private void initColumnSizesOutputParamTable() {
+    	if(AppSettings.getInstance().getObject("outputParamTable")!=null)
+			GUIUtils.initilializeTableColumns(outputParamTable, (int[]) AppSettings.getInstance().getObject("outputParamTable"));
+        else
+        	GUIUtils.initilializeTableColumns(outputParamTable, OutputParamTableModel.width);
     }
-    private void initColumnSizes11(JTable table) {
-    	InputParamTableModel model = (InputParamTableModel)table.getModel();
-        TableColumn column = null;
-        Component comp = null;
-        int headerWidth = 0;
-        int cellWidth = 0;
-        Object[] longValues = model.longValues;
-        TableCellRenderer headerRenderer =
-            table.getTableHeader().getDefaultRenderer();
-
-        for (int i = 0; i < 2; i++) {
-            column = table.getColumnModel().getColumn(i);
-
-            comp = headerRenderer.getTableCellRendererComponent(
-                                 null, column.getHeaderValue(),
-                                 false, false, 0, 0);
-            headerWidth = comp.getPreferredSize().width;
-
-            comp = table.getDefaultRenderer(model.getColumnClass(i)).
-                             getTableCellRendererComponent(
-                                 table, longValues[i],
-                                 false, false, 0, i);
-            cellWidth = comp.getPreferredSize().width;
-
-            if (DEBUG) {
-                System.out.println("Initializing width of column "
-                                   + i + ". "
-                                   + "headerWidth = " + headerWidth
-                                   + "; cellWidth = " + cellWidth);
-            }
-
-            column.setPreferredWidth(Math.max(headerWidth, cellWidth));
-        }
+    
+    private void initColumnSizesInputParamTable() {
+    	if(AppSettings.getInstance().getObject("inputParamTable")!=null)
+			GUIUtils.initilializeTableColumns(inputParamTable, (int[]) AppSettings.getInstance().getObject("inputParamTable"));
+        else
+        	GUIUtils.initilializeTableColumns(inputParamTable, InputParamTableModel.width);
     }
     
     public void setUpSportColumn(JTable table,
