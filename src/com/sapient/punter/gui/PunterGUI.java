@@ -123,7 +123,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
     public PunterGUI() throws Exception {
         super(new GridLayout(1,0));
         dtcr.setHorizontalAlignment(SwingConstants.CENTER);
-        runningProcessTable=new JTable(new RunningProcessTableModel());
+        final RunningProcessTableModel runningProcessTableModel = new RunningProcessTableModel();
+		runningProcessTable=new JTable(runningProcessTableModel);
         runningProcessTable.setShowGrid(false);
         runningProcessTable.setPreferredScrollableViewportSize(new Dimension(370, 160));
         runningProcessTable.setFillsViewportHeight(true);
@@ -141,7 +142,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         if(AppSettings.getInstance().getObject("runningProcessTable")!=null)
 			GUIUtils.initilializeTableColumns(runningProcessTable, (int[]) AppSettings.getInstance().getObject("runningProcessTable"));
         else
-        	initColumnSizesRunningProcessTable(runningProcessTable);
+        	GUIUtils.initilializeTableColumns(runningProcessTable, runningProcessTableModel.width);
         runningProcessTable.getColumn("<html><b>Completed").setCellRenderer(new ProgressRenderer(runningProcessTable));
         runningProcessTable.addKeyListener(new java.awt.event.KeyAdapter(){
          public void keyTyped(KeyEvent e){}
@@ -178,7 +179,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
         	}
         });
         
-        runningTaskTable=new JTable(new RunningTaskTableModel()){
+        final RunningTaskTableModel runningTaskTableModel = new RunningTaskTableModel();
+		runningTaskTable=new JTable(runningTaskTableModel){
 
 	         public boolean editCellAt(int row, int column, java.util.EventObject e) {
 	        	 column=convertColumnIndexToModel(column);
@@ -226,7 +228,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         if(AppSettings.getInstance().getObject("runningTaskTable")!=null)
 			GUIUtils.initilializeTableColumns(runningTaskTable, (int[]) AppSettings.getInstance().getObject("runningTaskTable"));
         else
-        	initColumnSizesRunningTaskTable(runningTaskTable);
+        	GUIUtils.initilializeTableColumns(runningTaskTable, runningTaskTableModel.width);
         header = runningTaskTable.getTableHeader();
         headerRenderer = header.getDefaultRenderer();
         if(headerRenderer instanceof JLabel){
@@ -292,6 +294,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         processTable.setRowHeight(22);
         processTable.setFont(new Font("Arial",Font.TRUETYPE_FONT,11));
         processTable.setForeground(Color.BLUE);
+//        processTable.setTableHeader(null);
         processTable.getColumn("<html><b>My Process's").setCellRenderer(new ProcessTableRenderer());
         InputMap imap = processTable.getInputMap(JComponent.WHEN_FOCUSED);
 	    imap.put(KeyStroke.getKeyStroke("DELETE"), "table.delete");
@@ -450,7 +453,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	    	 public void exportDone(JComponent c, Transferable t, int action) {
             }
 	    });
-        taskTable = new JTable(new TaskTableModel());
+        final TaskTableModel taskTableModel = new TaskTableModel();
+		taskTable = new JTable(taskTableModel);
         taskTable.setShowGrid(true);
         taskTable.setShowVerticalLines(false);
         taskTable.setPreferredScrollableViewportSize(new Dimension(500, 200));
@@ -829,9 +833,12 @@ public class PunterGUI extends JPanel implements TaskObserver{
         if(AppSettings.getInstance().getObject("taskTable")!=null)
 			GUIUtils.initilializeTableColumns(taskTable, (int[]) AppSettings.getInstance().getObject("taskTable"));
         else
-        	initColumnSizes(taskTable);
+        	GUIUtils.initilializeTableColumns(taskTable, taskTableModel.width);
+        if(AppSettings.getInstance().getObject("processTable")!=null)
+			GUIUtils.initilializeTableColumns(processTable, (int[]) AppSettings.getInstance().getObject("processTable"));
+        else
+        	GUIUtils.initilializeTableColumns(processTable, model.width);
         initColumnSizes11(inputParamTable);
-        initColumnSizes2(processTable);
         //Fiddle with the Sport column's cell editors/renderers.
 //        setUpSportColumn(taskTable, taskTable.getColumnModel().getColumn(2));
         JSplitPane jsp2=new JSplitPane(JSplitPane.VERTICAL_SPLIT,new JScrollPane(inputParamTable),new JScrollPane(outputParamTable));
@@ -926,7 +933,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
         header.setPreferredSize(new Dimension(30, 20));
         processHistoryTable.getColumn("<html><b>Run ID").setCellRenderer(new ProcessHistoryTableRenderer());
         
-        processTaskHistoryTable=new JTable(new ProcessTaskHistoryTableModel()){
+        final ProcessTaskHistoryTableModel processTaskHistoryTableModel = new ProcessTaskHistoryTableModel();
+		processTaskHistoryTable=new JTable(processTaskHistoryTableModel){
 	         public boolean editCellAt(int row, int column, java.util.EventObject e) {
 	        	 column=convertColumnIndexToModel(column);
 	    		 	if(isEditing()) {
@@ -978,7 +986,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         if(AppSettings.getInstance().getObject("processTaskHistoryTable")!=null)
 			GUIUtils.initilializeTableColumns(processTaskHistoryTable, (int[]) AppSettings.getInstance().getObject("processTaskHistoryTable"));
         else
-        	initColumnSizes4(processTaskHistoryTable);
+        	GUIUtils.initilializeTableColumns(processTaskHistoryTable, processTaskHistoryTableModel.width);
         Runtime.getRuntime().addShutdownHook(new Thread(){
         	@Override
         	public void run() {
@@ -990,12 +998,14 @@ public class PunterGUI extends JPanel implements TaskObserver{
         		AppSettings.getInstance().setObject("processTaskHistoryTable", GUIUtils.getColumnWidth(processTaskHistoryTable));
         		AppSettings.getInstance().setObject("runningTaskTable", GUIUtils.getColumnWidth(runningTaskTable));
         		AppSettings.getInstance().setObject("taskTable", GUIUtils.getColumnWidth(taskTable));
+        		AppSettings.getInstance().setObject("processTable", GUIUtils.getColumnWidth(processTable));
+        		AppSettings.getInstance().setObject("processPropertyTable", GUIUtils.getColumnWidth(processPropertyTable));
         		AppSettings.getInstance().setObject("jsp3Location", jsp3.getDividerLocation());
         		AppSettings.getInstance().setObject("jspLocation", jsp.getDividerLocation());
         	}
         });
-        processPropertyTable=new JTable(new ProcessPropertyTableModel());
-        initColumnSizes5(processPropertyTable);
+        final ProcessPropertyTableModel processPropertyTableModel = new ProcessPropertyTableModel();
+		processPropertyTable=new JTable(processPropertyTableModel);
         processPropertyTable.setShowGrid(true);
         processPropertyTable.setPreferredScrollableViewportSize(new Dimension(400, 300));
         processPropertyTable.setFillsViewportHeight(true);
@@ -1004,6 +1014,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
         processPropertyTable.getColumn("<html><b>Property").setMaxWidth(200);
         processPropertyTable.getColumn("<html><b>Property").setPreferredWidth(150);
         processPropertyTable.getColumn("<html><b>Value").setCellRenderer(new ProcessPropertyTableRenderer());
+        if(AppSettings.getInstance().getObject("processPropertyTable")!=null)
+			GUIUtils.initilializeTableColumns(processPropertyTable, (int[]) AppSettings.getInstance().getObject("processPropertyTable"));
+        else
+        	GUIUtils.initilializeTableColumns(processPropertyTable, processPropertyTableModel.width);
         JScrollPane processPropertyPane = new JScrollPane(processPropertyTable);
         tabbedPane.addTab("Process Property", null, processPropertyPane,"Properties for selected Process");
         
@@ -1385,142 +1399,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
                 break;
         }
     }
-    private void initColumnSizesRunningProcessTable(JTable table) {
-    	RunningProcessTableModel model = (RunningProcessTableModel)table.getModel();
-        TableColumn column = null;
-        Component comp = null;
-        int headerWidth = 0;
-        int cellWidth = 0;
-        Object[] longValues = model.longValues;
-        TableCellRenderer headerRenderer =
-            table.getTableHeader().getDefaultRenderer();
-
-        for (int i = 0; i < 4; i++) {
-            column = table.getColumnModel().getColumn(i);
-
-            comp = headerRenderer.getTableCellRendererComponent(
-                                 null, column.getHeaderValue(),
-                                 false, false, 0, 0);
-            headerWidth = comp.getPreferredSize().width;
-
-            comp = table.getDefaultRenderer(model.getColumnClass(i)).
-                             getTableCellRendererComponent(
-                                 table, longValues[i],
-                                 false, false, 0, i);
-            cellWidth = comp.getPreferredSize().width;
-
-            if (DEBUG) {
-                System.out.println("Initializing width of column "
-                                   + i + ". "
-                                   + "headerWidth = " + headerWidth
-                                   + "; cellWidth = " + cellWidth);
-            }
-
-            column.setPreferredWidth(Math.max(headerWidth, cellWidth));
-        }
-    }
-    private void initColumnSizesRunningTaskTable(JTable table) {
-    	RunningTaskTableModel model = (RunningTaskTableModel)table.getModel();
-        TableColumn column = null;
-        Component comp = null;
-        int headerWidth = 0;
-        int cellWidth = 0;
-        Object[] longValues = model.longValues;
-        TableCellRenderer headerRenderer = table.getTableHeader().getDefaultRenderer();
-
-        for (int i = 0; i < longValues.length; i++) {
-            column = table.getColumnModel().getColumn(i);
-
-            comp = headerRenderer.getTableCellRendererComponent(
-                                 null, column.getHeaderValue(),
-                                 false, false, 0, 0);
-            headerWidth = comp.getPreferredSize().width;
-
-            comp = table.getDefaultRenderer(model.getColumnClass(i)).
-                             getTableCellRendererComponent(
-                                 table, longValues[i],
-                                 false, false, 0, i);
-            cellWidth = comp.getPreferredSize().width;
-
-            if (DEBUG) {
-                System.out.println("Initializing width of column "
-                                   + i + ". "
-                                   + "headerWidth = " + headerWidth
-                                   + "; cellWidth = " + cellWidth);
-            }
-
-            column.setPreferredWidth(Math.max(headerWidth, cellWidth));
-        }
-    }
-    private void initColumnSizes(JTable table) {
-    	TaskTableModel model = (TaskTableModel)table.getModel();
-        TableColumn column = null;
-        Component comp = null;
-        int headerWidth = 0;
-        int cellWidth = 0;
-        Object[] longValues = model.longValues;
-        TableCellRenderer headerRenderer =
-            table.getTableHeader().getDefaultRenderer();
-
-        for (int i = 0; i < 3; i++) {
-            column = table.getColumnModel().getColumn(i);
-
-            comp = headerRenderer.getTableCellRendererComponent(
-                                 null, column.getHeaderValue(),
-                                 false, false, 0, 0);
-            headerWidth = comp.getPreferredSize().width;
-
-            comp = table.getDefaultRenderer(model.getColumnClass(i)).
-                             getTableCellRendererComponent(
-                                 table, longValues[i],
-                                 false, false, 0, i);
-            cellWidth = comp.getPreferredSize().width;
-
-            if (DEBUG) {
-                System.out.println("Initializing width of column "
-                                   + i + ". "
-                                   + "headerWidth = " + headerWidth
-                                   + "; cellWidth = " + cellWidth);
-            }
-
-            column.setPreferredWidth(Math.max(headerWidth, cellWidth));
-        }
-    }
     
-    private void initColumnSizes2(JTable table) {
-    	ProcessTableModel model = (ProcessTableModel)table.getModel();
-        TableColumn column = null;
-        Component comp = null;
-        int headerWidth = 0;
-        int cellWidth = 0;
-        Object[] longValues = model.longValues;
-        TableCellRenderer headerRenderer =
-            table.getTableHeader().getDefaultRenderer();
-
-        for (int i = 0; i < 1; i++) {
-            column = table.getColumnModel().getColumn(i);
-
-            comp = headerRenderer.getTableCellRendererComponent(
-                                 null, column.getHeaderValue(),
-                                 false, false, 0, 0);
-            headerWidth = comp.getPreferredSize().width;
-
-            comp = table.getDefaultRenderer(model.getColumnClass(i)).
-                             getTableCellRendererComponent(
-                                 table, longValues[i],
-                                 false, false, 0, i);
-            cellWidth = comp.getPreferredSize().width;
-
-            if (DEBUG) {
-                System.out.println("Initializing width of column "
-                                   + i + ". "
-                                   + "headerWidth = " + headerWidth
-                                   + "; cellWidth = " + cellWidth);
-            }
-
-            column.setPreferredWidth(Math.max(headerWidth, cellWidth));
-        }
-    }
     
     private void initColumnSizes1(JTable table) {
     	OutputParamTableModel model = (OutputParamTableModel)table.getModel();
@@ -1590,86 +1469,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
             column.setPreferredWidth(Math.max(headerWidth, cellWidth));
         }
     }
-    private void initColumnSizes5(JTable table) {
-    	ProcessPropertyTableModel model = (ProcessPropertyTableModel)table.getModel();
-        TableColumn column = null;
-        Component comp = null;
-        int headerWidth = 0;
-        int cellWidth = 0;
-        Object[] longValues = model.longValues;
-        TableCellRenderer headerRenderer =
-            table.getTableHeader().getDefaultRenderer();
-
-        for (int i = 0; i < 2; i++) {
-            column = table.getColumnModel().getColumn(i);
-
-            comp = headerRenderer.getTableCellRendererComponent(
-                                 null, column.getHeaderValue(),
-                                 false, false, 0, 0);
-            headerWidth = comp.getPreferredSize().width;
-
-            comp = table.getDefaultRenderer(model.getColumnClass(i)).
-                             getTableCellRendererComponent(
-                                 table, longValues[i],
-                                 false, false, 0, i);
-            cellWidth = comp.getPreferredSize().width;
-
-            if (DEBUG) {
-                System.out.println("Initializing width of column "
-                                   + i + ". "
-                                   + "headerWidth = " + headerWidth
-                                   + "; cellWidth = " + cellWidth);
-            }
-
-            column.setPreferredWidth(Math.max(headerWidth, cellWidth));
-        }
-    }
     
-    private void listColumnSizes(JTable table) {
-    	ProcessTaskHistoryTableModel model = (ProcessTaskHistoryTableModel)table.getModel();
-        TableColumn column = null;
-        Component comp = null;
-        int headerWidth = 0;
-        int cellWidth = 0;
-        Object[] longValues = model.longValues;
-        TableCellRenderer headerRenderer =
-            table.getTableHeader().getDefaultRenderer();
-
-        for (int i = 0; i < 3; i++) {
-            column = table.getColumnModel().getColumn(i);
-
-            comp = headerRenderer.getTableCellRendererComponent(
-                                 null, column.getHeaderValue(),
-                                 false, false, 0, 0);
-            headerWidth = comp.getPreferredSize().width;
-
-            comp = table.getDefaultRenderer(model.getColumnClass(i)).
-                             getTableCellRendererComponent(
-                                 table, longValues[i],
-                                 false, false, 0, i);
-            cellWidth = comp.getPreferredSize().width;
-
-            if (DEBUG) {
-                System.out.println("Initializing width of column "
-                                   + i + ". "
-                                   + "headerWidth = " + headerWidth
-                                   + "; cellWidth = " + cellWidth);
-            }
-            System.out.println("Column Width: "+(i+1)+ " : "+column.getPreferredWidth()+ " -- cellWidth : "+cellWidth);
-        }
-    }
-    private void initColumnSizes4(JTable table) {
-    	ProcessTaskHistoryTableModel model = (ProcessTaskHistoryTableModel)table.getModel();
-        TableColumn column = null;
-        int[] longValues = model.cellWidth;
-        for (int i = 0; i < 3; i++) {
-            column = table.getColumnModel().getColumn(i);
-            column.setPreferredWidth(longValues[i]);
-        }
-    }
-    
-    
-
     public void setUpSportColumn(JTable table,
                                  TableColumn sportColumn) {
         //Set up the editor for the sport cells.

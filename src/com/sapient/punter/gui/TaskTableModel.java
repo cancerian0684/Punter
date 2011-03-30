@@ -10,7 +10,7 @@ import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.TaskData;
  
 public class TaskTableModel extends AbstractTableModel {
-	public final Object[] longValues = {new Integer(5), "Kathy123", "None of the above a,jbskjkjas jsahfk",new Boolean(true)};
+	public final int[]width={45,74,225,46};
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          

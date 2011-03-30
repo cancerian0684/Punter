@@ -10,7 +10,7 @@ import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.ProcessData;
  
 public class ProcessTableModel extends AbstractTableModel {
-	public final Object[] longValues = {"Kathy123sdljflksdflksdfl"};
+	public final int[]width={116};
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          

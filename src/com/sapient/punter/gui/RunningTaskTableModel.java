@@ -9,7 +9,7 @@ import com.sapient.punter.jpa.RunStatus;
 import com.sapient.punter.jpa.TaskHistory;
 
 public class RunningTaskTableModel extends AbstractTableModel {
-	public final Object[] longValues = {new Integer(3),"Kaflksdfl","12345678"};
+	public final int[] width = {15,304,32};
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
