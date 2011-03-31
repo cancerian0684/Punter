@@ -1,19 +1,27 @@
 package com.sapient.punter.tasks;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.sql.CallableStatement;
+import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
+
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
@@ -30,9 +38,10 @@ public class SelectQueryTask extends Tasks {
 	private String password;
 	@InputParam(required = true,description="select * from dual")
 	private String query;
-	
+	@InputParam(required = true,description="File Name")
 	@OutputParam
-	private String queryOutput;
+	private String outFileName;
+	
 	public static void main(String[] args) {
 		SelectQueryTask sqt=new SelectQueryTask();
 		sqt.run();
@@ -43,98 +52,109 @@ public class SelectQueryTask extends Tasks {
 		try{
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			Connection conn = DriverManager.getConnection(conURL, username, password);
-//			Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1", "AISDB4", "Welcome1");
+	//		Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1", "AISDB4", "Welcome1");
 			conn.setReadOnly(true);
 			Scanner stk = new Scanner(query).useDelimiter("\r\n|\n\r|\r|\n");
+			String sheetName="Sheet";
+			Workbook wb = new HSSFWorkbook();
 		    while (stk.hasNext()) {
 				String token = stk.next().trim();
+				if(token.startsWith("--")){
+					sheetName=token;
+					continue;
+				}
+				Sheet sheet = wb.createSheet(sheetName);
 				if(!token.isEmpty()){
 					Statement s = conn.createStatement();
 					s.setQueryTimeout(2*60);
 					ResultSet rs=s.executeQuery(token);
-					ResultSetMetaData metaData = rs.getMetaData();
-					int columns=metaData.getColumnCount();
-					List<String> columnNames=new ArrayList<String>();
-					String out="";
-					for (int i = 1; i <= columns; i++) {
-						columnNames.add(metaData.getColumnName(i));
-						out+=metaData.getColumnName(i)+"\t";
-					}
-//					System.out.println(out);
-					LOGGER.get().log(Level.INFO, out);
-					rs.setFetchSize(20);
-					while(rs.next()){
-						out="";
-						for (int i = 1; i <= columns; i++) {
-							out+=rs.getString(i)+"\t";
-						}
-						LOGGER.get().log(Level.INFO, out);
-					}
+					createXLSFile(rs,sheet,wb);
 					s.close();
 					LOGGER.get().log(Level.INFO, "\n-------------------------************-------------------------\n");
 				}
 		    }
 			conn.close();
+			if(outFileName!=null&&!outFileName.isEmpty()){
+				LOGGER.get().log(Level.INFO, "Writing Query output to XLS File : "+outFileName);
+				FileOutputStream fileOut = new FileOutputStream(outFileName);
+			    wb.write(fileOut);
+			    fileOut.close();
+			}
 			status=true;
 		}catch (Exception e) {
 			status=false;
 			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
 		}
-		 return status;
-	}
-	public static String getCreateTableSql(String existingSQL){
-		StringBuilder resultedSQL=new StringBuilder();
-		int len1=existingSQL.indexOf('"');
-		resultedSQL.append(existingSQL.substring(0, len1));
-		resultedSQL.append(existingSQL.substring(existingSQL.indexOf('.')+1, existingSQL.indexOf('(')));
-		resultedSQL.append(returnBraketData(existingSQL.substring(existingSQL.indexOf('(')-1)));
-		return resultedSQL.toString();
-	}
-	public static String returnBraketData(String in){
-		int j=0;
-		StringBuilder sb=new StringBuilder();
-		for(int i=0;i<in.length();i++){
-			switch(in.charAt(i)){
-			case '(':
-				j++;
-				sb.append(in.charAt(i));
-				break;
-			case ')':
-				j--;
-				sb.append(in.charAt(i));
-				if(j==0){
-					return sb.toString();
-				}
-				break;
-			default:
-				sb.append(in.charAt(i));
-			}
-			
+	 return status;
+	 }
+	
+	public void createXLSFile(ResultSet rs, Sheet sheet, Workbook wb) throws Exception{
+	    ResultSetMetaData metaData = rs.getMetaData();
+		int columns=metaData.getColumnCount();
+		List<String> columnNames=new ArrayList<String>();
+		String out="";
+		Row row = sheet.createRow((short)0);
+		for (int i = 1; i <= columns; i++) {
+			columnNames.add(metaData.getColumnName(i));
+//			System.out.println(metaData.getColumnTypeName(i)+ " - "+metaData.getColumnName(i));
+			out+=metaData.getColumnName(i)+"\t";
+			Cell cell=row.createCell(i-1);
+			cell.setCellValue(metaData.getColumnName(i));
+			cell.setCellStyle(getHeaderDataCellStyle( (HSSFWorkbook) wb));
 		}
-		return "";
-	}
-	public static String readFromFile(String filename,String separator) {
-		BufferedReader bufferedReader = null;
-		try {
-			bufferedReader = new BufferedReader(new FileReader(filename));
-			StringBuilder sb=new StringBuilder();
-			String line = "";
-			while ((line = bufferedReader.readLine()) != null) {
-				sb.append(line+separator);
+		LOGGER.get().log(Level.INFO, out);
+		rs.setFetchSize(20);
+		int rowCount=0;
+		while(rs.next()){
+			out="";
+			rowCount++;
+			row = sheet.createRow((short)rowCount);
+			for (int i = 1; i <= columns; i++) {
+				out+=rs.getString(i)+"\t";
+				setAppropriateCellValue(rs, i, row, metaData,wb);
 			}
-			return sb.toString();
-		} catch (FileNotFoundException ex) {
-			ex.printStackTrace();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			try {
-				if (bufferedReader != null)
-					bufferedReader.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
+			LOGGER.get().log(Level.INFO, out);
 		}
-		return null;
+		rs.close();
+	}
+	public void setAppropriateCellValue(ResultSet rs,int column,Row row, ResultSetMetaData metaData, Workbook wb) throws Exception{
+		Cell cell=row.createCell(column-1);
+		CreationHelper createHelper = wb.getCreationHelper();
+		CellStyle cellStyle = wb.createCellStyle();
+		int columnType=metaData.getColumnType(column);
+		if(rs.getObject(column)!=null)
+		switch (columnType) {
+		case 12:
+			cell.setCellValue(rs.getString(column));
+			break;
+		case Types.INTEGER:
+		case Types.NUMERIC:
+			cell.setCellValue(rs.getDouble(column));
+			break;
+		case Types.DATE:
+		case Types.TIMESTAMP:
+			cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-mmm-yyyy"));
+			cell.setCellStyle(cellStyle);
+			cell.setCellValue(rs.getDate(column));
+			break;
+		default:
+			cell.setCellValue(rs.getString(column));
+			break;
+		}
+	}
+	public HSSFCellStyle getHeaderDataCellStyle(HSSFWorkbook wb) {
+		HSSFFont font = wb.createFont();
+		font.setFontHeightInPoints((short) 10);
+		font.setFontName("Frutiger 45 Light");
+		HSSFCellStyle headerDataCellStyle=wb.createCellStyle();
+		headerDataCellStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
+		headerDataCellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+		headerDataCellStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
+		headerDataCellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
+		headerDataCellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+		headerDataCellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+		headerDataCellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+		headerDataCellStyle.setFont(font);
+		return headerDataCellStyle;
 	}
 }	
