@@ -25,11 +25,13 @@ public class GUIUtils {
 	    }
 		table.setDefaultRenderer(Integer.class, dcr);
         JTableHeader header = table.getTableHeader();
-        TableCellRenderer headerRenderer = header.getDefaultRenderer();
-        if(headerRenderer instanceof JLabel){
-       	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
+        if(header!=null){
+	        TableCellRenderer headerRenderer = header.getDefaultRenderer();
+	        if(headerRenderer instanceof JLabel){
+	       	((JLabel)headerRenderer).setHorizontalAlignment(JLabel.CENTER);
+	        }
+	        header.setPreferredSize(new Dimension(30, 25));
         }
-        header.setPreferredSize(new Dimension(30, 25));
         TableColumn column = null;
         for (int i = 0; i < size.length; i++) {
             column = table.getColumnModel().getColumn(i);

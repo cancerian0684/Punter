@@ -274,6 +274,7 @@ public class PunterKB extends JPanel{
                            	doc.setExt(".txt");
                        	doc.setDateCreated(new Date());
                        	doc.setDateUpdated(new Date());
+                       	doc.setCategory(categoryComboBox.getSelectedItem().toString());
                        	doc=docService.saveDocument(doc);
                        	System.err.println("Document added : "+f.getName());
                        }
@@ -329,7 +330,7 @@ public class PunterKB extends JPanel{
                    {
                 	   System.err.println("Import possible .. html");
                    try {
-                   	 DataFlavor []dfs={new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16")};
+                   	   DataFlavor []dfs={new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16")};
                        InputStream in =(InputStream) t.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
                        File f=File.createTempFile("test",".html");
                        FileOutputStream fo=new FileOutputStream(f);
@@ -519,6 +520,7 @@ public class PunterKB extends JPanel{
  	        	  Document doc = null;
 				try {
 					doc = docService.createDocument(docService.getUsername());
+					doc.setCategory(categoryComboBox.getSelectedItem().toString());
 				} catch (RemoteException e1) {
 					e1.printStackTrace();
 				}
