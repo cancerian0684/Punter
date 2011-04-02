@@ -4,19 +4,12 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
 import java.util.Scanner;
-import java.util.StringTokenizer;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import javax.swing.JLabel;
@@ -26,13 +19,11 @@ import javax.swing.JTextField;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UIKeyboardInteractive;
 import com.jcraft.jsch.UserInfo;
 import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 
 @PunterTask(author="munishc",name="SCPFromTask",description="SCP remote file to Local machine.",documentation="com/sapient/punter/tasks/docs/SCPFromTask.html")
@@ -70,79 +61,85 @@ public class SCPFromTask extends Tasks {
 	      session.connect();
 //	      session.connect(30000);   // making a connection with timeout.
 	      LOGGER.get().log(Level.INFO, "Connected to Shell.");
-	      
-	      // exec 'scp -f rfile' remotely
-	      String command="scp -f "+remoteFile;
-	      Channel channel=session.openChannel("exec");
-	      ((ChannelExec)channel).setCommand(command);
-
-	      // get I/O streams for remote scp
-	      OutputStream out=channel.getOutputStream();
-	      InputStream in=channel.getInputStream();
-
-	      channel.connect();
-
-	      byte[] buf=new byte[1024];
-
-	      // send '\0'
-	      buf[0]=0; out.write(buf, 0, 1); out.flush();
-
-	      while(true){
-		int c=checkAck(in);
-	        if(c!='C'){
-		  break;
-		}
-
-	        // read '0644 '
-	        in.read(buf, 0, 5);
-
-	        long filesize=0L;
-	        while(true){
-	          if(in.read(buf, 0, 1)<0){
-	            // error
-	            break; 
-	          }
-	          if(buf[0]==' ')break;
-	          filesize=filesize*10L+(long)(buf[0]-'0');
-	        }
-
-	        String file=null;
-	        for(int i=0;;i++){
-	          in.read(buf, i, 1);
-	          if(buf[i]==(byte)0x0a){
-	            file=new String(buf, 0, i);
-	            break;
-	  	  }
-	        }
-	        LOGGER.get().log(Level.INFO, "filesize="+filesize+", file="+file+ " ["+remoteFile+"]");
-	        // send '\0'
-	        buf[0]=0; out.write(buf, 0, 1); out.flush();
-
-	        // read a content of lfile
-	        fos=new FileOutputStream(prefix==null ? localFile : prefix+file);
-	        int foo;
-	        while(true){
-	          if(buf.length<filesize) foo=buf.length;
-		  else foo=(int)filesize;
-	          foo=in.read(buf, 0, foo);
-	          if(foo<0){
-	            // error 
-	            break;
-	          }
-	          fos.write(buf, 0, foo);
-	          filesize-=foo;
-	          if(filesize==0L) break;
-	        }
-	        fos.close();
-	        fos=null;
-
-		if(checkAck(in)!=0){
-			LOGGER.get().log(Level.SEVERE, "Unknown Technical Failure while retrieving the file.");
-			throw new Exception("Unknown Technical Failure while retrieving the file.");
+	      int fileCounter=0;
+	      Scanner stk = new Scanner(remoteFile).useDelimiter("\r\n|\n\r|\r|\n|;|,");
+		      while(stk.hasNext()){
+		      String currfile = stk.next().trim();
+		      if(currfile.startsWith("#"))
+		    	  continue;
+		      fileCounter++;
+		      // exec 'scp -f rfile' remotely
+		      String command="scp -f "+currfile;
+		      Channel channel=session.openChannel("exec");
+		      ((ChannelExec)channel).setCommand(command);
+	
+		      // get I/O streams for remote scp
+		      OutputStream out=channel.getOutputStream();
+		      InputStream in=channel.getInputStream();
+	
+		      channel.connect();
+	
+		      byte[] buf=new byte[1024];
+	
+		      // send '\0'
+		      buf[0]=0; out.write(buf, 0, 1); out.flush();
+	
+		      while(true){
+		    	  int c=checkAck(in);
+		    	  	if(c!='C'){
+		    	  		break;
+		    	}
+		        // read '0644 '
+		        in.read(buf, 0, 5);
+	
+		        long filesize=0L;
+		        while(true){
+		          if(in.read(buf, 0, 1)<0){
+		            // error
+		            break; 
+		          }
+		          if(buf[0]==' ')break;
+		          filesize=filesize*10L+(long)(buf[0]-'0');
+		        }
+	
+		        String file=null;
+		        for(int i=0;;i++){
+		          in.read(buf, i, 1);
+		          if(buf[i]==(byte)0x0a){
+		            file=new String(buf, 0, i);
+		            break;
+		          }
+		        }
+		        LOGGER.get().log(Level.INFO, fileCounter+".) filesize="+filesize+", file="+file+ " ["+currfile+"]");
+		        // send '\0'
+		        buf[0]=0; out.write(buf, 0, 1); out.flush();
+	
+		        // read a content of lfile
+		        fos=new FileOutputStream(prefix==null ? localFile : prefix+file);
+		        int foo;
+		        while(true){
+		          if(buf.length<filesize) foo=buf.length;
+		          else foo=(int)filesize;
+		          foo=in.read(buf, 0, foo);
+		          if(foo<0){
+		            // error 
+		            break;
+		          }
+		          fos.write(buf, 0, foo);
+		          filesize-=foo;
+		          if(filesize==0L) break;
+		        }
+		        fos.close();
+		        fos=null;
+	
+		        if(checkAck(in)!=0){
+		        	LOGGER.get().log(Level.SEVERE, "Unknown Technical Failure while retrieving the file.");
+		        	throw new Exception("Unknown Technical Failure while retrieving the file.");
+		        }
+		      // send '\0'
+		      buf[0]=0; out.write(buf, 0, 1); out.flush();
+		      }
 		  }
-	      // send '\0'
-	      buf[0]=0; out.write(buf, 0, 1); out.flush();
-	      }
 	      LOGGER.get().log(Level.INFO, "Disconnecting from the session.");
 	      session.disconnect();
 	      status=true;
@@ -172,11 +169,10 @@ public class SCPFromTask extends Tasks {
 	      }
 	      while(c!='\n');
 	      if(b==1){ // error
-	    	  
-		System.out.print(sb.toString());
+	    	  LOGGER.get().log(Level.SEVERE, "Error occurred."+sb.toString());
 	      }
 	      if(b==2){ // fatal error
-		System.out.print(sb.toString());
+	    	  LOGGER.get().log(Level.SEVERE, "Fatal Error occurred."+sb.toString());
 	      }
 	    }
 	    return b;
