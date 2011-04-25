@@ -16,6 +16,7 @@ import javax.persistence.TableGenerator;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
@@ -36,6 +37,7 @@ import com.sapient.punter.utils.OutputParamValue;
     "inputParams",
     "outputParams"
 })
+@XmlRootElement
 public class TaskData implements Serializable{
 	/**
 	 * 

@@ -68,8 +68,10 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.table.TableStringConverter;
 import javax.swing.text.PlainDocument;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
 
 import neoe.ne.EditPanel;
 
@@ -330,27 +332,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	    processTable.setDragEnabled(true);
 	    processTable.setTransferHandler(new TransferHandler(){
 	    	public boolean canImport(TransferHandler.TransferSupport support) {
-          		 try{
-                   if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                   
-                   }else{
-                  	 DataFlavor []dfs=support.getDataFlavors();
-                  	 System.out.println("\n\nTotal MimeTypes Supported by this operation :"+dfs.length);
-                  	 for(DataFlavor df:dfs){
-                  		 System.out.println(df.getMimeType());
-                  	 }
-                  	 return false;
-                   }
-                   boolean copySupported = (COPY & support.getSourceDropActions()) == COPY;
-                   if (!copySupported) {
-                       return false;
-                   }
-                   support.setDropAction(COPY);
-                   return true;
-          		 }catch(Exception e){
-          			 e.printStackTrace();
-          			 return false;
-          		 }
+          		 return checkImportPossible(support);
               }
 	    	public boolean importData(TransferHandler.TransferSupport support) {
                 if (!canImport(support)) {
@@ -495,6 +477,109 @@ public class PunterGUI extends JPanel implements TaskObserver{
 						tableModel.deleteRows(selectedRowsData);
 	                }
 			}});
+	    
+	    taskTable.setDragEnabled(true);
+	    taskTable.setTransferHandler(new TransferHandler(){
+	    	public boolean canImport(TransferHandler.TransferSupport support) {
+         		 return checkImportPossible(support);
+             }
+	    	public boolean importData(TransferHandler.TransferSupport support) {
+               if (!canImport(support)) {
+                   return false;
+               }
+               System.err.println("Import possible");
+               try{
+               Transferable t = support.getTransferable();
+               if(t.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
+               {
+            	   System.err.println("Import possible .. file");
+               try {
+                   java.util.List<File> l =(java.util.List<File>)t.getTransferData(DataFlavor.javaFileListFlavor);
+                   JAXBContext context = JAXBContext.newInstance(TaskData.class);
+     		      	Unmarshaller unmarshaller = context.createUnmarshaller();
+                   for (File f : l) {
+                   	System.err.println(f.getName());
+                   	JAXBElement<TaskData> root = unmarshaller.unmarshal(new StreamSource(new FileReader(f)),TaskData.class);
+                   	TaskData taskData=root.getValue();
+                   	ProcessData procDao=(ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
+                   	taskData.setProcess(procDao);
+                   	taskData=StaticDaoFacade.getInstance().createTask(taskData);
+                   	procDao.getTaskList().add(taskData);
+                   	StaticDaoFacade.getInstance().saveProcess(procDao);
+                   	TaskTableModel model=(TaskTableModel) taskTable.getModel();
+  	        	    final ArrayList<Object> newRequest = new ArrayList<Object>();
+  	              	newRequest.add(taskData);
+  	              	model.insertRow(newRequest);
+                   }
+                   return true;
+               } catch (UnsupportedFlavorException e) {
+                   return false;
+               } catch (IOException e) {
+                   return false;
+               }
+              }
+              else{
+               	System.err.println("Data Flavors not supported yet :");
+               	DataFlavor dfs[]=t.getTransferDataFlavors();
+               	for(DataFlavor df:dfs){
+               		System.err.println(df.getMimeType());
+               	}
+              }
+              }catch(Exception e){
+              		e.printStackTrace();
+              }
+              return false;
+           }
+	    	 public int getSourceActions(JComponent c) {
+               return MOVE;
+            }
+	    	 protected Transferable createTransferable(JComponent c) {
+	    		  final DataFlavor flavors[] = {DataFlavor.javaFileListFlavor};
+                 JTable table = (JTable)c;
+                 int []selectedRows=table.getSelectedRows();
+                 try{
+                 JAXBContext context = JAXBContext.newInstance(TaskData.class);
+                 Marshaller marshaller = context.createMarshaller();
+                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                 File temp=new File("Temp");
+            	 temp.mkdir();
+            	 temp.deleteOnExit();
+            	 final List<File> files=new java.util.ArrayList<File>();
+                 for (int i : selectedRows) {
+               	  TaskData procDao=(TaskData) ((TaskTableModel) taskTable.getModel()).getRow(taskTable.convertRowIndexToModel(i)).get(0);
+       			  File file = new File(temp,procDao.getDescription()+".xml");
+	  		          FileWriter fw = new FileWriter(file);
+	  		          marshaller.marshal(procDao,fw);
+	  		          fw.close();
+	  		          files.add(file);
+                 }
+                 if(files.size()>0){
+	                 Transferable transferable = new Transferable() {
+                     public Object getTransferData(DataFlavor flavor) {
+                         if (flavor.equals(DataFlavor.javaFileListFlavor)) {
+                             return files;
+                         }
+                         return null;
+                       }
+                     public DataFlavor[] getTransferDataFlavors() {
+                       return flavors;
+                     }
+                     public boolean isDataFlavorSupported(
+                         DataFlavor flavor) {
+                       return flavor.equals(
+                           DataFlavor.javaFileListFlavor);
+                     }
+                   };
+                   return transferable;
+                   }
+                 }catch (Exception e) {
+               	  e.printStackTrace();
+				}
+               return null;
+	    	 }
+	    	 public void exportDone(JComponent c, Transferable t, int action) {
+           }
+	    });
         final JMenuItem addTaskMenu,taskDocsMenu;
 		final JPopupMenu popupTask = new JPopupMenu();
 		addTaskMenu = new JMenuItem("Add Task");
@@ -1156,7 +1241,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         tabbedPane.addTab("App Logs", null, new JScrollPane(appLogArea),"Application Wide Logging");
         JPanel panel=new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        final JTextField searchText=new JTextField("*");
+        final JTextField searchText=new JTextField("");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
@@ -1418,7 +1503,31 @@ public class PunterGUI extends JPanel implements TaskObserver{
         sportColumn.setCellRenderer(renderer);
     }
 
-    static class DefaultStringRenderer extends DefaultTableCellRenderer {
+    private boolean checkImportPossible(TransferHandler.TransferSupport support) {
+		try{
+		   if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+		   
+		   }else{
+		  	 DataFlavor []dfs=support.getDataFlavors();
+		  	 System.out.println("\n\nTotal MimeTypes Supported by this operation :"+dfs.length);
+		  	 for(DataFlavor df:dfs){
+		  		 System.out.println(df.getMimeType());
+		  	 }
+		  	 return false;
+		   }
+		   boolean copySupported = (TransferHandler.COPY & support.getSourceDropActions()) == TransferHandler.COPY;
+		   if (!copySupported) {
+		       return false;
+		   }
+		   support.setDropAction(TransferHandler.COPY);
+		   return true;
+		 }catch(Exception e){
+			 e.printStackTrace();
+			 return false;
+		 }
+	}
+
+	static class DefaultStringRenderer extends DefaultTableCellRenderer {
     	
     	public DefaultStringRenderer() { super(); }
     	@Override
