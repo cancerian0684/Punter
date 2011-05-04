@@ -496,7 +496,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
                try {
                    java.util.List<File> l =(java.util.List<File>)t.getTransferData(DataFlavor.javaFileListFlavor);
                    JAXBContext context = JAXBContext.newInstance(TaskData.class);
-     		      	Unmarshaller unmarshaller = context.createUnmarshaller();
+     		       Unmarshaller unmarshaller = context.createUnmarshaller();
                    for (File f : l) {
                    	System.err.println(f.getName());
                    	JAXBElement<TaskData> root = unmarshaller.unmarshal(new StreamSource(new FileReader(f)),TaskData.class);
@@ -504,6 +504,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
                    	ProcessData procDao=(ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
                    	taskData.setProcess(procDao);
                    	taskData=StaticDaoFacade.getInstance().createTask(taskData);
+                   	if(procDao.getTaskList()==null)
+                   		procDao.setTaskList(new ArrayList<TaskData>());
                    	procDao.getTaskList().add(taskData);
                    	StaticDaoFacade.getInstance().saveProcess(procDao);
                    	TaskTableModel model=(TaskTableModel) taskTable.getModel();
