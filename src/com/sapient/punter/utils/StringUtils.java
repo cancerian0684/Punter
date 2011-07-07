@@ -116,4 +116,14 @@ public class StringUtils {
     	t.printStackTrace(pw);
     	return sw.toString();
     }
+    
+    public static String getElapsedTimeInString(long elapsedTime) {       
+        String format = String.format("%%0%dd", 2);  
+        elapsedTime = elapsedTime / 1000;  
+        String seconds = String.format(format, elapsedTime % 60);  
+        String minutes = String.format(format, (elapsedTime % 3600) / 60);  
+        String hours = String.format(format, elapsedTime / 3600);  
+        String time =  hours + ":" + minutes + ":" + seconds;  
+        return time;  
+    } 
 }

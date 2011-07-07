@@ -114,6 +114,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private static Properties taskProps=new Properties();
 	private JSplitPane jsp3;
 	private JSplitPane jsp;
+	private JSplitPane jsp6;
     static{
     	try {
 			taskProps.load(PunterGUI.class.getClassLoader().getResourceAsStream("resources/tasks.properties"));
@@ -496,7 +497,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
                try {
                    java.util.List<File> l =(java.util.List<File>)t.getTransferData(DataFlavor.javaFileListFlavor);
                    JAXBContext context = JAXBContext.newInstance(TaskData.class);
-     		       Unmarshaller unmarshaller = context.createUnmarshaller();
+     		      	Unmarshaller unmarshaller = context.createUnmarshaller();
                    for (File f : l) {
                    	System.err.println(f.getName());
                    	JAXBElement<TaskData> root = unmarshaller.unmarshal(new StreamSource(new FileReader(f)),TaskData.class);
@@ -504,8 +505,9 @@ public class PunterGUI extends JPanel implements TaskObserver{
                    	ProcessData procDao=(ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
                    	taskData.setProcess(procDao);
                    	taskData=StaticDaoFacade.getInstance().createTask(taskData);
-                   	if(procDao.getTaskList()==null)
+                   	if(procDao.getTaskList()==null){
                    		procDao.setTaskList(new ArrayList<TaskData>());
+                   	}
                    	procDao.getTaskList().add(taskData);
                    	StaticDaoFacade.getInstance().saveProcess(procDao);
                    	TaskTableModel model=(TaskTableModel) taskTable.getModel();
@@ -1090,6 +1092,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         		AppSettings.getInstance().setObject("inputParamTable", GUIUtils.getColumnWidth(inputParamTable));
         		AppSettings.getInstance().setObject("processPropertyTable", GUIUtils.getColumnWidth(processPropertyTable));
         		AppSettings.getInstance().setObject("jsp3Location", jsp3.getDividerLocation());
+        		AppSettings.getInstance().setObject("jsp6Location", jsp6.getDividerLocation());
         		AppSettings.getInstance().setObject("jspLocation", jsp.getDividerLocation());
         	}
         });
@@ -1180,8 +1183,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
         if(AppSettings.getInstance().getObject("processTaskAlertTable")!=null)
 			GUIUtils.initilializeTableColumns(processTaskAlertTable, (int[]) AppSettings.getInstance().getObject("processTaskAlertTable"));
         JScrollPane processTaskALertPane = new JScrollPane(processTaskAlertTable);
-        JSplitPane jsp6=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,processAlertPane,processTaskALertPane);
-        jsp6.setDividerSize(0);
+        jsp6 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,processAlertPane,processTaskALertPane);
+        jsp6.setDividerSize(1);
+        if(AppSettings.getInstance().getObject("jsp6Location")!=null)
+        	jsp6.setDividerLocation(((Integer)AppSettings.getInstance().getObject("jsp6Location")));
         tabbedPane.addTab("My Alerts", null, jsp6,"My Workflow Alerts");
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent evt) {

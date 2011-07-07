@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
+import com.sapient.punter.utils.StringUtils;
 
 @PunterTask(author="munishc",name="DBCleanupTask",documentation="com/sapient/punter/tasks/docs/DBCleanupTask.html") 
 public class DBCleanupTask extends Tasks {
@@ -34,9 +35,9 @@ public class DBCleanupTask extends Tasks {
 				throw new Exception("This task is not meant for Production DB's");
 			}
 			Connection conn = DriverManager.getConnection(conURL, username, password);
-			System.out.println("Connected to DB");
+			LOGGER.get().log(Level.INFO, "Connected to DB");
 			Statement s = conn.createStatement();
-			s.setQueryTimeout(2*60);
+			s.setQueryTimeout(3*60);
 //			s.executeUpdate(readFromFile("sql/test.sql","\n"));
 			ResultSet rs=s.executeQuery(readFromFile("sql/drop.sql"," "));
 			int i=0;
@@ -50,7 +51,7 @@ public class DBCleanupTask extends Tasks {
 				dropStatement.close();
 				}catch (Exception e) {
 //					e.printStackTrace();
-					LOGGER.get().log(Level.WARNING, ""+i+" "+sql+" Failed",e);
+					LOGGER.get().log(Level.WARNING, ""+i+" "+sql+" Failed" +StringUtils.getExceptionStackTrace(e));
 				}finally{
 					dropStatement.close();
 				}
@@ -61,10 +62,11 @@ public class DBCleanupTask extends Tasks {
 			cs.executeUpdate();
 			System.out.println("Database objects dropped successfully.");*/
 			conn.close();
+			LOGGER.get().log(Level.INFO, "Connection to DB Closed.");
 			status=true;
 		}catch (Exception e) {
 			status=false;
-			LOGGER.get().log(Level.SEVERE, e.getMessage());
+			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
 		}
 		 return status;
 	}

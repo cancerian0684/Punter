@@ -16,7 +16,7 @@ public class RunningTaskTableModel extends AbstractTableModel {
 
 	/** Holds the column names */         
 	private String [] columnNames = new String [] 
-                                  {"<html><b>Serial","<html><b>Task","<html><b>Status"};
+                                  {"<html><b>Seq.","<html><b>Task","<html><b>Status"};
 	private Class [] columnClasses = new Class[] 
                                    {Integer.class,String.class,RunStatus.class};
   
@@ -73,7 +73,7 @@ public class RunningTaskTableModel extends AbstractTableModel {
     case 0:
     	return th.getSequence();
     case 1:
-    	return th.getTask().getName();
+    	return th.getTask().getDescription();
     case 2:
     	return th.getRunStatus();
     }

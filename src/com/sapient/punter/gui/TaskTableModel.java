@@ -17,7 +17,7 @@ public class TaskTableModel extends AbstractTableModel {
 
 	/** Holds the column names */         
 	private String [] columnNames = new String [] 
-                                  {"<html><b>Sequence","<html><b>Task Name","<html><b>Description","<html><b>Active"};
+                                  {"<html><b>Seq.","<html><b>Task Name","<html><b>Description","<html><b>Active"};
 	private Class [] columnClasses = new Class[] 
                                    {Integer.class,String.class,String.class,Boolean.class};
   

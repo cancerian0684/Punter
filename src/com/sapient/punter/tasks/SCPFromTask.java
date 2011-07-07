@@ -4,12 +4,19 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
 import java.util.Scanner;
+import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import javax.swing.JLabel;
@@ -19,12 +26,15 @@ import javax.swing.JTextField;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UIKeyboardInteractive;
 import com.jcraft.jsch.UserInfo;
 import com.sapient.punter.annotations.InputParam;
+import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
+import com.sapient.punter.utils.StringUtils;
 
 @PunterTask(author="munishc",name="SCPFromTask",description="SCP remote file to Local machine.",documentation="com/sapient/punter/tasks/docs/SCPFromTask.html")
 public class SCPFromTask extends Tasks {
@@ -38,7 +48,8 @@ public class SCPFromTask extends Tasks {
 	private String remoteFile;
 	@InputParam(required = true,description="Target Dir/File name")
 	private String localFile;
-
+	@InputParam(required = true,description="Overwrite Local File .. defaults true")
+	private boolean overwrite=true;
 	@Override
 	public boolean run() {
 		boolean status=false;
@@ -65,7 +76,7 @@ public class SCPFromTask extends Tasks {
 	      Scanner stk = new Scanner(remoteFile).useDelimiter("\r\n|\n\r|\r|\n|;|,");
 		      while(stk.hasNext()){
 		      String currfile = stk.next().trim();
-		      if(currfile.startsWith("#"))
+		      if(currfile.startsWith("#")||currfile.isEmpty())
 		    	  continue;
 		      fileCounter++;
 		      // exec 'scp -f rfile' remotely
@@ -115,6 +126,9 @@ public class SCPFromTask extends Tasks {
 		        buf[0]=0; out.write(buf, 0, 1); out.flush();
 	
 		        // read a content of lfile
+		        File fout=new File(prefix==null ? localFile : prefix+file);
+//		        if(!fout.exists()||(fout.exists()&&overwrite))
+//		        {	
 		        fos=new FileOutputStream(prefix==null ? localFile : prefix+file);
 		        int foo;
 		        while(true){
@@ -131,13 +145,15 @@ public class SCPFromTask extends Tasks {
 		        }
 		        fos.close();
 		        fos=null;
-	
 		        if(checkAck(in)!=0){
 		        	LOGGER.get().log(Level.SEVERE, "Unknown Technical Failure while retrieving the file.");
 		        	throw new Exception("Unknown Technical Failure while retrieving the file.");
 		        }
-		      // send '\0'
-		      buf[0]=0; out.write(buf, 0, 1); out.flush();
+		        // send '\0'
+		        buf[0]=0; out.write(buf, 0, 1); out.flush();
+//		        }else{
+//		        	break;
+//		        }
 		      }
 		  }
 	      LOGGER.get().log(Level.INFO, "Disconnecting from the session.");
@@ -145,7 +161,7 @@ public class SCPFromTask extends Tasks {
 	      status=true;
 	    }
 	    catch(Exception e){
-	      LOGGER.get().log(Level.SEVERE, "Exception occurred."+e.getMessage());
+	      LOGGER.get().log(Level.SEVERE, "Exception occurred. \n"+StringUtils.getExceptionStackTrace(e));
 	      try{if(fos!=null)fos.close();}catch(Exception ee){}
 	      status=false;
 	    }

@@ -15,7 +15,7 @@ public class ProcessTaskHistoryTableModel extends AbstractTableModel {
 
 	/** Holds the column names */         
 	private String [] columnNames = new String [] 
-                                  {"<html><b>Serial","<html><b>TaskDao","<html><b>Status"};
+                                  {"<html><b>Seq.","<html><b>Task","<html><b>Status"};
 	private Class [] columnClasses = new Class[] 
                                    {Integer.class,String.class,RunStatus.class};
   

@@ -59,17 +59,24 @@ public class SelectQueryTask extends Tasks {
 			Workbook wb = new HSSFWorkbook();
 		    while (stk.hasNext()) {
 				String token = stk.next().trim();
+				if(token.trim().isEmpty())
+					continue;
 				if(token.startsWith("--")){
 					sheetName=token;
 					continue;
 				}
+				LOGGER.get().log(Level.INFO, sheetName);
 				Sheet sheet = wb.createSheet(sheetName);
 				if(!token.isEmpty()){
 					Statement s = conn.createStatement();
 					s.setQueryTimeout(2*60);
 					ResultSet rs=s.executeQuery(token);
-					createXLSFile(rs,sheet,wb);
+					int columns = createXLSFile(rs,sheet,wb);
 					s.close();
+					LOGGER.get().log(Level.FINE, "Resizing Excel Columns.");
+					for(int i=0;i<columns;i++){
+						sheet.autoSizeColumn(i);
+					}
 					LOGGER.get().log(Level.INFO, "\n-------------------------************-------------------------\n");
 				}
 		    }
@@ -88,7 +95,7 @@ public class SelectQueryTask extends Tasks {
 	 return status;
 	 }
 	
-	public void createXLSFile(ResultSet rs, Sheet sheet, Workbook wb) throws Exception{
+	public int createXLSFile(ResultSet rs, Sheet sheet, Workbook wb) throws Exception{
 	    ResultSetMetaData metaData = rs.getMetaData();
 		int columns=metaData.getColumnCount();
 		List<String> columnNames=new ArrayList<String>();
@@ -116,6 +123,7 @@ public class SelectQueryTask extends Tasks {
 			LOGGER.get().log(Level.INFO, out);
 		}
 		rs.close();
+		return columns;
 	}
 	public void setAppropriateCellValue(ResultSet rs,int column,Row row, ResultSetMetaData metaData, Workbook wb) throws Exception{
 		Cell cell=row.createCell(column-1);

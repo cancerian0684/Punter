@@ -49,6 +49,8 @@ private String loggingLevel;
 private String emailsToNotify;
 @InputParam
 private boolean emailsOnFailureOnly;
+@InputParam
+private boolean doVariableSubstitution=false;
 @InputParam(description="<html>provide cron4j formatted scheduling string<br>13 * * jan-jun,sep-dec mon-fri,sat")
 private String scheduleString;
 protected transient ProcessObserver po;
@@ -102,9 +104,13 @@ public void afterProcessFinish(){
 			if(processLogger!=null){
 				processLogger.log(Level.INFO,"Sending Task Report Mail to : "+emailsToNotify);
 			}
-			EmailService.getInstance().sendEMail("Punter Task : ["+ph.getRunStatus()+"] "+ph.getName(), emailsToNotify, ph.getTaskHistoryList().get(0).getLogs());
+			StringBuilder processLogs=new StringBuilder(10000);
+			for (TaskHistory th : ph.getTaskHistoryList()) {
+				processLogs.append(th.getLogs()+"\r\n");
+			}
+			EmailService.getInstance().sendEMail("Punter Task : ["+ph.getRunStatus()+"] "+ph.getName(), emailsToNotify, processLogs.toString());
 			if(processLogger!=null){
-				processLogger.log(Level.INFO,"Mail Sen.");
+				processLogger.log(Level.INFO,"Mail Sent.");
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -136,6 +142,7 @@ public void execute(){
 		task.setTaskDao(th.getTask());
 		task.setSessionMap(sessionMap);
 		task.setLogDocument(logDocument);
+		task.setDoVariableSubstitution(doVariableSubstitution);
 		th.setRunState(RunState.RUNNING);
 		th.setRunStatus(RunStatus.RUNNING);
 		boolean status=false;
@@ -144,9 +151,9 @@ public void execute(){
 			task.beforeTaskStart();
 			processLogger=task.LOGGER.get();
 			setLoggingLevel(processLogger);
-			processLogger.log(Level.INFO,"started executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
+			processLogger.log(Level.FINE,"started executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
 			status=task.execute();
-			processLogger.log(Level.INFO,"Finished executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
+			processLogger.log(Level.FINE,"Finished executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
 			if(stopOnTaskFailure){
 				keepRunning=status;
 			}
@@ -159,7 +166,7 @@ public void execute(){
 				keepRunning=false;
 			}
 			task.LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
-			task.LOGGER.get().log(Level.INFO,"Finished executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
+			task.LOGGER.get().log(Level.FINE,"Finished executing task.."+task.getTaskDao().getSequence()+" - "+task.getTaskDao().getName());
 		}finally{
 			task.afterTaskFinish();
 		}
@@ -214,7 +221,7 @@ public static HashMap<String,InputParamValue> listInputParams(){
 private void substituteParams() {
 	Field[] fields = getClass().getDeclaredFields();
 	for (Field field : fields) {
-		if(field.isAnnotationPresent(InputParam.class)){
+		if(field.isAnnotationPresent(InputParam.class) && (inputParams.get(field.getName())!=null)){
 			try {
 				field.setAccessible(true);
 				String fieldValue=inputParams.get(field.getName()).getValue();

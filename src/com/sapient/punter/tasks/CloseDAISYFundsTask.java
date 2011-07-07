@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
+import com.sapient.punter.utils.StringUtils;
 
 @PunterTask(author="munishc",name="CloseDAISYFundsTask",description="Close Out DAISY Funds.",documentation="com/sapient/punter/tasks/docs/TextSamplerDemoHelp.html")
 public class CloseDAISYFundsTask extends Tasks {
@@ -55,9 +56,11 @@ public class CloseDAISYFundsTask extends Tasks {
 				}
 		      }
 		      conn.close();
+		      LOGGER.get().log(Level.INFO, "Connection to DB Closed.");
 			status=true;
 		}catch (Exception e) {
 			e.printStackTrace();
+			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
 		}finally{
 			
 		}

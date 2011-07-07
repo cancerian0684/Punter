@@ -27,6 +27,7 @@ import com.jcraft.jsch.UserInfo;
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
+import com.sapient.punter.utils.StringUtils;
 
 @PunterTask(author="munishc",name="ShellScriptTask",description="Runs Script in Bash Shell",documentation="com/sapient/punter/tasks/docs/ShellScriptTask.html")
 public class ShellScriptTask extends Tasks {
@@ -86,7 +87,7 @@ public class ShellScriptTask extends Tasks {
 //	      channel.setInputStream(pipeIn);
 	      channel.setInputStream(pipeIn);
 	      ((ChannelShell)channel).setPtyType("vt102");
-	      channel.connect(3*1000);
+	      channel.connect(5*1000);
 	      
 	      MyThread t=new MyThread(in,LOGGER.get());
 	      t.setDaemon(true);
@@ -141,11 +142,10 @@ public class ShellScriptTask extends Tasks {
 	      TimeUnit.SECONDS.sleep(3);
 	      session.disconnect();
 	      channel.disconnect();
-	      System.out.println("Disconnected");
-	    
-		status=true;
+	      LOGGER.get().log(Level.INFO, "Disconnected from Channel.");
+	      status=true;
 		}catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
 		}
 		return status;
 	}

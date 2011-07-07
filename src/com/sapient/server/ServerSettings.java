@@ -113,44 +113,37 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 		System.err.println("Stopping system.");
 		System.exit(0);
 	}
-
 	@Override
 	public void setMaxResultsToDisplay(int maxResults) {
-		this.maxResultsToDisplay = maxResults;
-
+		this.maxResultsToDisplay=maxResults;
+		
 	}
-
 	@Override
 	public int getMaxResultsToDisplay() {
-		if (maxResultsToDisplay < 5)
-			maxResultsToDisplay = 7;
+		if(maxResultsToDisplay<5)
+			maxResultsToDisplay=7;
 		return maxResultsToDisplay;
 	}
-
 	@Override
 	public void optimizeIndex() {
 		LuceneIndexDao.getInstance().optimizeIndex();
 	}
-
 	@Override
 	public int getMaxProcessHistory() {
-		if (maxProcessHistory <= 5)
-			maxProcessHistory = 30;
+		if(maxProcessHistory<=5)
+			maxProcessHistory=5;
 		return maxProcessHistory;
 	}
-
 	@Override
 	public void setMaxProcessHistory(int maxProcessHistory) {
 		this.maxProcessHistory = maxProcessHistory;
 	}
-
 	@Override
 	public int getMaxProcessAlerts() {
-		if (maxProcessAlerts <= 5)
-			maxProcessAlerts = 30;
+		if(maxProcessAlerts<=5)
+			maxProcessAlerts=30;
 		return maxProcessAlerts;
 	}
-
 	@Override
 	public void setMaxProcessAlerts(int maxProcessAlerts) {
 		this.maxProcessAlerts = maxProcessAlerts;

@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
+import com.sapient.punter.utils.StringUtils;
 
 @PunterTask(author="munishc",name="GenTableDDLTask",documentation="com/sapient/punter/tasks/docs/GenTableDDLTask.html") 
 public class GenTableDDLTask extends Tasks {
@@ -34,7 +35,7 @@ public class GenTableDDLTask extends Tasks {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			Connection conn = DriverManager.getConnection(conURL, username, password);
 			conn.setReadOnly(true);
-			System.out.println("Connected to DB");
+			LOGGER.get().log(Level.INFO, "Connected to DB");
 			Statement s = conn.createStatement();
 			s.setQueryTimeout(2*60);
 			tableDDLString="";
@@ -66,10 +67,11 @@ public class GenTableDDLTask extends Tasks {
 			}
 			s.close();
 			conn.close();
+			LOGGER.get().log(Level.INFO, "Connection to DB Closed.");
 			status=true;
 		}catch (Exception e) {
 			status=false;
-			LOGGER.get().log(Level.SEVERE, e.getMessage());
+			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
 		}
 		 return status;
 	}

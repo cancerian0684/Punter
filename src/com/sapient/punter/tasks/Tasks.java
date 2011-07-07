@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
@@ -37,6 +39,10 @@ public abstract class Tasks implements Serializable{
 	private transient Level loggingLevel=Level.FINE;
 	private StringBuilder strLogger;
 	private Document logDocument;
+	private boolean doVariableSubstitution=false;
+	public void setDoVariableSubstitution(boolean doVariableSubstitution) {
+		this.doVariableSubstitution = doVariableSubstitution;
+	}
 	public static final ThreadLocal<Logger> LOGGER = new ThreadLocal<Logger>() {
 		@Override
 		protected Logger initialValue() {
@@ -153,6 +159,9 @@ public abstract class Tasks implements Serializable{
 							fieldValue=fieldValue.substring(1);
 							fieldValue=(String) getSessionObject(fieldValue);
 						}
+						if(doVariableSubstitution && fieldValue.contains("#{")){
+							fieldValue=substituteVariables(fieldValue, sessionMap);
+						}
 						if(field.getType().getSimpleName().equals("String")){
 							field.set(this, fieldValue);
 						}else if(field.getType().getSimpleName().equals("int")){
@@ -203,6 +212,11 @@ public abstract class Tasks implements Serializable{
 			}
 		}
 	}
+	
+	protected void loadSessionVariables(Map<String, String> variableMap){
+		sessionMap.putAll(variableMap);
+	}
+	
 	public void afterTaskFinish(){
 		LOGGER.get().removeHandler(mHandler);
 		LOGGER.get().removeHandler(cHandler);
@@ -218,6 +232,39 @@ public abstract class Tasks implements Serializable{
 		substituteResult();
 		return status;
 	}
+	
+	private static String substituteVariables(String inputString,Map<String, Object> variables) {
+		List<String> vars = getVariablesFromString(inputString);
+		for (String string : vars) {
+			inputString=inputString.replace("#{"+string+"}", variables.get(string).toString());
+		}
+		System.out.println(vars.toString());
+		return inputString;
+	}
+
+	private static List<String> getVariablesFromString(String test) {
+		char prevChar = ' ';
+		String var = "";
+		List<String> vars = new ArrayList<String>();
+		boolean found = false;
+		for (int i = 0; i < test.length(); i++) {
+			char ch = test.charAt(i);
+			if (ch == '{' && prevChar == '#') {
+				var = "";
+				found = true;
+			} else if (ch == '}') {
+				found = false;
+				if (!var.isEmpty())
+					vars.add(var);
+				var = "";
+			} else if (found) {
+				var += ch;
+			}
+			prevChar = ch;
+		}
+		return vars;
+	}
+	
 	public void setOutputParams(HashMap<String,OutputParamValue> outputParams) {
 		this.outputParams = outputParams;
 	}

@@ -1,7 +1,6 @@
 package com.sapient.punter.gui;
 
 import java.awt.AWTException;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.MenuItem;
@@ -15,20 +14,14 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JSeparator;
-import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.UIManager;
-
-import org.apache.derby.drda.NetworkServerControl;
 
 import com.sapient.kb.gui.PunterKB;
 import com.sapient.kb.jpa.StaticDaoFacade;
@@ -85,7 +78,7 @@ private void createAndShowGUI() throws Exception {
 	}else{
 		AppSettings.getInstance().setUsername(System.getProperty("user.name"));		
 	}
-	KBFrame=new JFrame("Punter KB");
+	KBFrame=new JFrame("Knowledge Base");
 	JFrame.setDefaultLookAndFeelDecorated(true);
 	KBFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     KBFrame.setContentPane(new PunterKB());
@@ -100,11 +93,11 @@ private void createAndShowGUI() throws Exception {
 		 }
 		public void windowClosing(WindowEvent e) {
 			KBFrame.setVisible(false); 
-			displayMsg("Punter has been minimized to System Tray",TrayIcon.MessageType.INFO);
+			displayMsg("Personal Assistant has been minimized to System Tray",TrayIcon.MessageType.INFO);
 		}
     });
     
-    PunterGuiFrame=new JFrame("My Punter");
+    PunterGuiFrame=new JFrame("My Personal Assistant");
     PunterGuiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     PunterGuiFrame.setContentPane(new PunterGUI());
     
@@ -115,7 +108,7 @@ private void createAndShowGUI() throws Exception {
 	        		public void windowClosing(WindowEvent e) {
 	        			//setVisible(false);
 	        			PunterGuiFrame.dispose(); 
-	        			displayMsg("Punter has been minimized to System Tray",TrayIcon.MessageType.INFO);
+	        			displayMsg("Assistant has been minimized to System Tray",TrayIcon.MessageType.INFO);
 	        		}
 	        });	 
     PunterGuiFrame.pack();
@@ -194,7 +187,7 @@ private void createAndShowGUI() throws Exception {
 
 	    ActionListener exitListener = new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
-	            int option=JOptionPane.showConfirmDialog(PunterGuiFrame,"Exit Punter?","Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
+	            int option=JOptionPane.showConfirmDialog(PunterGuiFrame,"Exit My Assistant?","Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
     			if(option==JOptionPane.OK_OPTION)
     			{
     				AppSettings.getInstance().KBFrameLocation=KBFrame.getLocation();
@@ -208,7 +201,7 @@ private void createAndShowGUI() throws Exception {
 	    };
 	            
 	    PopupMenu popup = new PopupMenu();
-	    MenuItem openPunterMenuItem = new MenuItem("My Punter");
+	    MenuItem openPunterMenuItem = new MenuItem("My Assistant");
 	    openPunterMenuItem.setFont(new Font("Tahoma", Font.BOLD, 12));
 	    openPunterMenuItem.addActionListener(new ActionListener(){
 			@Override
@@ -219,7 +212,7 @@ private void createAndShowGUI() throws Exception {
 			}});
 	    popup.add(openPunterMenuItem);
 	    
-	    openPunterMenuItem = new MenuItem("My KB");
+	    openPunterMenuItem = new MenuItem("Knowledge Base");
 	    openPunterMenuItem.setFont(new Font("Tahoma", Font.BOLD, 12));
 	    openPunterMenuItem.addActionListener(new ActionListener(){
 			@Override
@@ -230,13 +223,13 @@ private void createAndShowGUI() throws Exception {
 			}});
 	    popup.add(openPunterMenuItem);
 	   
-//	    popup.add(new JSeparator());
-	    MenuItem defaultItem = new MenuItem("Exit Punter");
+	    popup.addSeparator();
+	    MenuItem defaultItem = new MenuItem("Exit");
 	    defaultItem.addActionListener(exitListener);
 	    popup.add(defaultItem);
 
-	    trayIcon = new TrayIcon(idleImage, "My Punter", popup);
-	    trayIcon.setToolTip("My Punter started.\nSapient Corp Pvt. Ltd.");
+	    trayIcon = new TrayIcon(idleImage, "My Assistant", popup);
+	    trayIcon.setToolTip("My Assistant started.\nSapient Corp Pvt. Ltd.");
 	    trayIcon.setImageAutoSize(true);
 	   
 	    ActionListener actionListener = new ActionListener() {
@@ -254,8 +247,8 @@ private void createAndShowGUI() throws Exception {
 
 	    try {
 	        tray.add(trayIcon);
-	        trayIcon.displayMessage("My Punter", 
-		            "Double click here to launch the Punter.",
+	        trayIcon.displayMessage("My Assistant", 
+		            "Double click here to launch the Assistant.",
 		            TrayIcon.MessageType.INFO);
 	    } catch (AWTException e) {
 	    	logger.log(Level.WARNING, "TrayIcon could not be added.");
@@ -286,7 +279,7 @@ public static boolean isConnected(){
 }
 public static void displayMsg(String msg,TrayIcon.MessageType msgType){
 	if(trayIcon!=null){
-		trayIcon.displayMessage("My Punter", msg,msgType);
+		trayIcon.displayMessage("My Assistant", msg,msgType);
 	}
 }
 public static void main(String[] args) {
