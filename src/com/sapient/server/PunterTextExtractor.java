@@ -39,7 +39,7 @@ public class PunterTextExtractor {
 			text.append(doc.getText(0, doc.getLength()));
 		}
 		else if(ext.equalsIgnoreCase(".html")||ext.equalsIgnoreCase(".htm")){
-			Source source = new Source(new StringReader(new String(contents)));
+			Source source = new Source(new StringReader(new String(contents,"UTF-16")));
 			TextExtractor te=new TextExtractor(source);
 			text.append(te.toString());
 		}

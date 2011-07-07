@@ -70,7 +70,7 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
    * @return <b>Object</b> the value at the specified cell.
    */
   public Object getValueAt(int row, int col) {
-    ArrayList colArrayList = (ArrayList) data.get(row);
+    ArrayList<?> colArrayList = (ArrayList<?>) data.get(row);
     return colArrayList.get(col);
   }
 
@@ -80,7 +80,7 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
    * @param <b>col </b> column number  
    * @return <b> Class </b> the class for the specified column.  
    */
-  public Class getColumnClass(int col) {
+  public Class<?> getColumnClass(int col) {
     return columnClasses[col];
   }
 
@@ -93,7 +93,7 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
    * @return <b> Class </b> the class for the specified column.    
    */
   public void setValueAt( Object obj, int row, int col ) {
-    ArrayList colArrayList = (ArrayList)data.get(row);
+    ArrayList<Object> colArrayList = (ArrayList<Object>)data.get(row);
     colArrayList.set( col, obj);
     try{
     	ProcessData p=(ProcessData) colArrayList.get(2);
@@ -127,10 +127,10 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
     return (ArrayList) data.get(0);
   }*/
   
-  public synchronized ArrayList insertRow( ArrayList newrow ) {
+  public synchronized ArrayList<?> insertRow( ArrayList<?> newrow ) {
 	    data.add(newrow);
 	    super.fireTableRowsInserted(data.size()-1,data.size()-1);
-	    return (ArrayList) data.get(data.size()-1);
+	    return (ArrayList<?>) data.get(data.size()-1);
 	  }
 
   /**
@@ -171,8 +171,8 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
    * Returns the values at the specified row as a ArrayList.
    * @param <b>row </b> row number
    */
-  public ArrayList getRow(int row) {
-    return (ArrayList) data.get(row);
+  public ArrayList<?> getRow(int row) {
+    return (ArrayList<?>) data.get(row);
   }
 
   /**
@@ -181,7 +181,7 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
    * @param <b>ArrayList </b> row data
    * @param <b>row </b> row number   
    */
-  public void updateRow( ArrayList updatedRow, int row ) {
+  public void updateRow( ArrayList<?> updatedRow, int row ) {
     data.set( row, updatedRow);
     super.fireTableDataChanged();
   }
@@ -196,7 +196,7 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
    * Clears the table data.
    */
   public void clearTable() {
-    data = new ArrayList();
+    data = new ArrayList<Object>();
     super.fireTableDataChanged();
   }
   public boolean isCellEditable(int row, int col) {
