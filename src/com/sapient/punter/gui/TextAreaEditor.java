@@ -1,15 +1,20 @@
 package com.sapient.punter.gui;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import javax.swing.*;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 
 public class TextAreaEditor extends JDialog {
-   JTextArea _resultArea = new JTextArea(10,20);
-   EditorListener listener;
-   private static TextAreaEditor instance;
-   JFrame parent;
+	UndoableTextArea _resultArea = new UndoableTextArea(10,10);
+	EditorListener listener;
+	private static TextAreaEditor instance;
+	JFrame parent;
+	String originalText;
    public static TextAreaEditor getInstance(String text,EditorListener listener,JFrame parent){
 	   if(instance==null){
 		   instance=new TextAreaEditor(parent,true);
@@ -17,6 +22,7 @@ public class TextAreaEditor extends JDialog {
 	   instance.registerListener(listener);
 	   instance.setText(text);
 	   instance.setVisible(true);
+	   instance._resultArea.createUndoMananger();
 	   return instance;
    }
    public void registerListener(EditorListener listener){
@@ -24,6 +30,7 @@ public class TextAreaEditor extends JDialog {
    }
    public void setText(String text){
 	   _resultArea.setText(text);
+	   this.originalText=text;
    }
     //====================================================== constructor
     public TextAreaEditor(JFrame parent,boolean modal) {
@@ -46,32 +53,41 @@ public class TextAreaEditor extends JDialog {
         c.gridx = 0;
         c.gridy = 1;
         c.gridwidth = 1;
-        JButton btnSave=new JButton("Save");
-        btnSave.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(listener!=null){
-					listener.save(_resultArea.getText());
-					_resultArea.setText("");
-					listener=null;
-					AppSettings.getInstance().setTextAreaEditorLocation(instance.getLocation());
-					AppSettings.getInstance().setTextAreaEditorLastDim(instance.getSize());
-					dispose();
-				}
-			}
-		});
-        add(btnSave,c);
         
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weighty = 0.01;
         c.gridx = 1;
         c.gridy = 1;
         c.gridwidth = 1;
-        JButton btnCancel=new JButton("Cancel");
-        btnCancel.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+        this.setTitle("Input");
+        setLocation(AppSettings.getInstance().getTextAreaEditorLocation());
+        setPreferredSize(AppSettings.getInstance().getTextAreaEditorLastDim());
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.pack();
+        this.addWindowListener(new WindowAdapter() {
+    		public void windowClosing(WindowEvent e) {
+    			if (originalText.equals(_resultArea.getText())) {
+    				cancelTransaction();
+    				return;
+				}
+    			int option=JOptionPane.showConfirmDialog(TextAreaEditor.this,"Do you want to Save Contents ?","Confirm Save ?", JOptionPane.OK_CANCEL_OPTION);
+     			if(option==JOptionPane.OK_OPTION)
+     			{
+     				if(listener!=null){
+    					listener.save(_resultArea.getText());
+    					_resultArea.setText("");
+    					_resultArea.removeUndoMananger();
+    					listener=null;
+    					AppSettings.getInstance().setTextAreaEditorLocation(instance.getLocation());
+    					AppSettings.getInstance().setTextAreaEditorLastDim(instance.getSize());
+    					dispose();
+     				}
+     			}else {
+     				cancelTransaction();
+     			}	
+    		}
+
+			private void cancelTransaction() {
 				listener=null;
 				_resultArea.setText("");
 				AppSettings.getInstance().setTextAreaEditorLocation(instance.getLocation());
@@ -79,12 +95,6 @@ public class TextAreaEditor extends JDialog {
 				dispose();
 			}
 		});
-        add(btnCancel,c);
-        this.setTitle("Input");
-        setLocation(AppSettings.getInstance().getTextAreaEditorLocation());
-        setPreferredSize(AppSettings.getInstance().getTextAreaEditorLastDim());
-        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.pack();
     }
     
     public static void main(String[] args) {

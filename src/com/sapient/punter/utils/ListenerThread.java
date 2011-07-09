@@ -35,7 +35,7 @@ public class ListenerThread extends Thread {
             	iStream.close();
             }
             else
-            Launcher.go(className);
+            Launcher.invokeMethod(className);
          }
       } catch (IOException e) {
          e.printStackTrace();
