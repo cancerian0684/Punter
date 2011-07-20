@@ -289,18 +289,22 @@ public class PunterKB extends JPanel{
                    {
                 	   System.err.println("Import possible .. rtf");
                    try {
+                	   String docName = JOptionPane.showInputDialog("Enter Document Name : ","Test");
                    	   DataFlavor []dfs={new DataFlavor("text/rtf; class=java.io.InputStream")};
                     //	df.s
                        InputStream in =(InputStream) t.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
 //                    //  System.out.println(out);
-                       File f=File.createTempFile("test",".doc");
+                       File f=File.createTempFile("test",".rtf");
                        FileOutputStream fo=new FileOutputStream(f);
                        copy(in, fo);
                     //  fo.write(out.getBytes());
                        fo.close();
                        Document doc=new Document();
                    		doc.setAuthor(AppSettings.getInstance().getUsername());
-                   		doc.setTitle(f.getName());
+                   		if(docName!=null&&!docName.isEmpty())
+							doc.setTitle(docName);
+						else
+							doc.setTitle(f.getName());
                    		doc.setContent(getBytesFromFile(f));
                    	doc.setExt(getExtension(f));
                    	if(getExtension(f)==null||getExtension(f).isEmpty())
