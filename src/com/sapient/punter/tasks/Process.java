@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +19,7 @@ import javax.swing.text.PlainDocument;
 
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.annotations.InputParam;
+import com.sapient.punter.gui.AppSettings;
 import com.sapient.punter.gui.ProcessObserver;
 import com.sapient.punter.gui.TaskObserver;
 import com.sapient.punter.jpa.ProcessHistory;
@@ -31,64 +31,64 @@ import com.sapient.punter.utils.InputParamValue;
 import com.sapient.punter.utils.StringUtils;
 
 public class Process implements Serializable{
-private List<Tasks> taskList=new ArrayList<Tasks>();
-private Map sessionMap=new HashMap<String, Object>();
-private transient TaskObserver ts;
-private boolean failed=false;
-private HashMap<String, InputParamValue> inputParams;
-private ProcessHistory ph;
-@InputParam(description="Stop process on task failure")
-private boolean stopOnTaskFailure=true;
-@InputParam(description="Always raise alert for the task")
-private boolean alwaysRaiseAlert=false;
-@InputParam
-private String comments;
-@InputParam(description="Any of FINE, INFO, WARNING, SEVERE")
-private String loggingLevel;
-@InputParam(description="Comma separated email List")
-private String emailsToNotify;
-@InputParam
-private boolean emailsOnFailureOnly;
-@InputParam
-private boolean doVariableSubstitution=false;
-@InputParam(description="<html>provide cron4j formatted scheduling string<br>13 * * jan-jun,sep-dec mon-fri,sat")
-private String scheduleString;
-protected transient ProcessObserver po;
-private int lineBufferSize=1000;
-private Document logDocument;
-private Logger processLogger;
-public Document getLogDocument() {
-	return logDocument;
-}
-public Process() {
-}
-public void addObserver(ProcessObserver po){
-	this.po=po;
-}
+	private List<Tasks> taskList = new ArrayList<Tasks>();
+	private Map sessionMap = new HashMap<String, Object>();
+	private transient TaskObserver ts;
+	private boolean failed = false;
+	private HashMap<String, InputParamValue> inputParams;
+	private ProcessHistory ph;
+	@InputParam(description = "Stop process on task failure")
+	private boolean stopOnTaskFailure = true;
+	@InputParam(description = "Always raise alert for the task")
+	private boolean alwaysRaiseAlert = false;
+	@InputParam
+	private String comments;
+	@InputParam(description = "Any of FINE, INFO, WARNING, SEVERE")
+	private String loggingLevel;
+	@InputParam(description = "Comma separated email List")
+	private String emailsToNotify;
+	@InputParam
+	private boolean emailsOnFailureOnly;
+	@InputParam
+	private boolean doVariableSubstitution = false;
+	@InputParam(description = "<html>provide cron4j formatted scheduling string<br>13 * * jan-jun,sep-dec mon-fri,sat")
+	private String scheduleString;
+	protected transient ProcessObserver po;
+	private int lineBufferSize = 1000;
+	private Document logDocument;
+	private Logger processLogger;
 
-public void beforeProcessStart(){
-	logDocument=new PlainDocument(){
-		protected void insertUpdate(DefaultDocumentEvent chng, AttributeSet attr) {
-			super.insertUpdate(chng, attr);
-			Element root = getDefaultRootElement();
-			while (root.getElementCount() > lineBufferSize)
-			{
-				Element firstLine = root.getElement(0);
-				try
-				{
-					remove(0, firstLine.getEndOffset());
+	public Document getLogDocument() {
+		return logDocument;
+	}
+
+	public Process() {
+	}
+
+	public void addObserver(ProcessObserver po) {
+		this.po = po;
+	}
+
+	public void beforeProcessStart() {
+		sessionMap.putAll(AppSettings.getInstance().getSessionMap());
+		logDocument = new PlainDocument() {
+			protected void insertUpdate(DefaultDocumentEvent chng, AttributeSet attr) {
+				super.insertUpdate(chng, attr);
+				Element root = getDefaultRootElement();
+				while (root.getElementCount() > lineBufferSize) {
+					Element firstLine = root.getElement(0);
+					try {
+						remove(0, firstLine.getEndOffset());
+					} catch (BadLocationException ble) {
+						System.out.println(ble + " = " + lineBufferSize);
+					}
 				}
-				catch(BadLocationException ble)
-				{
-					System.out.println(ble+" = "+lineBufferSize);
-				}
-			}
+			};
 		};
-	};
-//	System.err.println("Emails to notify : "+emailsToNotify);
-	ph.setRunState(RunState.RUNNING);
-	po.update(ph);
-}
+		// System.err.println("Emails to notify : "+emailsToNotify);
+		ph.setRunState(RunState.RUNNING);
+		po.update(ph);
+	}
 public void afterProcessFinish(){
 	try{
 		StaticDaoFacade.getInstance().saveProcessHistory(ph);

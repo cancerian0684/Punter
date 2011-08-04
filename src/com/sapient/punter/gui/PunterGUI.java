@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -26,6 +27,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.AbstractAction;
@@ -45,10 +47,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -63,9 +65,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import javax.swing.table.TableStringConverter;
 import javax.swing.text.PlainDocument;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -116,6 +116,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	private JSplitPane jsp3;
 	private JSplitPane jsp;
 	private JSplitPane jsp6;
+	private JTextArea jTextArea;
     static{
     	try {
 			taskProps.load(PunterGUI.class.getClassLoader().getResourceAsStream("resources/tasks.properties"));
@@ -1096,6 +1097,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         		AppSettings.getInstance().setObject("jsp3Location", jsp3.getDividerLocation());
         		AppSettings.getInstance().setObject("jsp6Location", jsp6.getDividerLocation());
         		AppSettings.getInstance().setObject("jspLocation", jsp.getDividerLocation());
+				AppSettings.getInstance().setObject("appProperties", jTextArea.getText());
         	}
         });
         final ProcessPropertyTableModel processPropertyTableModel = new ProcessPropertyTableModel();
@@ -1190,26 +1192,43 @@ public class PunterGUI extends JPanel implements TaskObserver{
         if(AppSettings.getInstance().getObject("jsp6Location")!=null)
         	jsp6.setDividerLocation(((Integer)AppSettings.getInstance().getObject("jsp6Location")));
         tabbedPane.addTab("My Alerts", null, jsp6,"My Workflow Alerts");
-        tabbedPane.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent evt) {
-                JTabbedPane pane = (JTabbedPane)evt.getSource();
-                int sel = pane.getSelectedIndex();
-                if(sel==3){
-                	((ProcessTaskHistoryTableModel)processTaskAlertTable.getModel()).clearTable();
-                	ProcessAlertTableModel phtmodel=(ProcessAlertTableModel) processAlertTable.getModel();
-      	            List<ProcessHistory> phl = StaticDaoFacade.getInstance().getMySortedProcessHistoryList(AppSettings.getInstance().getUsername());
-      	            phtmodel.clearTable();
-	      	        for (ProcessHistory ph : phl) {
-	      	          	final ArrayList<Object> newRequest = new ArrayList<Object>();
-	      	          	newRequest.add(ph);
-	      	          	phtmodel.insertRow(newRequest);
-      	  		}
-      	        if(phtmodel.getRowCount()>0){
-      	        	processAlertTable.setRowSelectionInterval(0, 0);
-      	        }
-                }
-            }
-        });
+		tabbedPane.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent evt) {
+				JTabbedPane pane = (JTabbedPane) evt.getSource();
+				int sel = pane.getSelectedIndex();
+				if (sel == 3) {
+					((ProcessTaskHistoryTableModel) processTaskAlertTable.getModel()).clearTable();
+					ProcessAlertTableModel phtmodel = (ProcessAlertTableModel) processAlertTable.getModel();
+					List<ProcessHistory> phl = StaticDaoFacade.getInstance().getMySortedProcessHistoryList(
+							AppSettings.getInstance().getUsername());
+					phtmodel.clearTable();
+					for (ProcessHistory ph : phl) {
+						final ArrayList<Object> newRequest = new ArrayList<Object>();
+						newRequest.add(ph);
+						phtmodel.insertRow(newRequest);
+					}
+					if (phtmodel.getRowCount() > 0) {
+						processAlertTable.setRowSelectionInterval(0, 0);
+					}
+				} else if (sel == 5) {
+					// System.out.println("Selected 5");
+					Object props = AppSettings.getInstance().getObject("appProperties");
+					if (props != null)
+						jTextArea.setText((String) props);
+				} else {
+					String string = jTextArea.getText();
+					Properties properties = new Properties();
+					try {
+						properties.load(new ByteArrayInputStream(string.getBytes()));
+						AppSettings.getInstance().setSessionMap((Map) properties);
+						// System.err.println("Properties Loaded to the System.");
+					} catch (IOException e) {
+						System.err.println("Error Loading properties into the system.");
+						e.printStackTrace();
+					}
+				}
+			}
+		});
         ListSelectionModel PATSelectionModel = processAlertTable.getSelectionModel();
         PATSelectionModel.addListSelectionListener(new ListSelectionListener(){
 			@Override
@@ -1248,14 +1267,16 @@ public class PunterGUI extends JPanel implements TaskObserver{
         appLogArea=new TextAreaFIFO();
         appLogArea.setEditable(false);
         tabbedPane.addTab("App Logs", null, new JScrollPane(appLogArea),"Application Wide Logging");
+		jTextArea = new JTextArea();
+		tabbedPane.addTab("App Props", null, new JScrollPane(jTextArea), "Application Wide Properties");
         JPanel panel=new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        final JTextField searchText=new JTextField("");
+        final JTextField searchTextField=new JTextField("");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
         c.weightx = 1.0;
-        panel.add(searchText, c);
+        panel.add(searchTextField, c);
         
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
@@ -1264,18 +1285,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         c.gridy = 1;
         panel.add(listPane,c);
         
-        searchText.getDocument().addDocumentListener(
-                new DocumentListener() {
-                    public void changedUpdate(DocumentEvent e) {
-                    	tableSearchFilter.applyFilter(sorter,searchText.getText());
-                    }
-                    public void insertUpdate(DocumentEvent e) {
-                    	tableSearchFilter.applyFilter(sorter,searchText.getText());
-                    }
-                    public void removeUpdate(DocumentEvent e) {
-                    	tableSearchFilter.applyFilter(sorter,searchText.getText());
-                    }
-                });
+		searchTextField.getDocument().addDocumentListener(getDocumentListener(searchTextField));
         jsp3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,panel,tabbedPane);
         jsp3.setDividerSize(1);
         if(AppSettings.getInstance().getObject("jsp3Location")!=null)
@@ -1331,9 +1341,27 @@ public class PunterGUI extends JPanel implements TaskObserver{
         ScheduledJobPicker sjp= new ScheduledJobPicker();
         sjp.setGuiReference(this);
         
-        System.setOut( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.out), true));
-		System.setErr( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.err), true));
+        setErrAndOutStreamToLogDocument();
     }
+
+	private void setErrAndOutStreamToLogDocument() {
+		System.setOut( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.out), true));
+		System.setErr( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.err), true));
+	}
+
+	private DocumentListener getDocumentListener(final JTextField searchTextField) {
+		return new DocumentListener() {
+		    public void changedUpdate(DocumentEvent e) {
+		    	tableSearchFilter.applyFilter(sorter, searchTextField.getText());
+		    }
+		    public void insertUpdate(DocumentEvent e) {
+		    	tableSearchFilter.applyFilter(sorter, searchTextField.getText());
+		    }
+		    public void removeUpdate(DocumentEvent e) {
+		    	tableSearchFilter.applyFilter(sorter, searchTextField.getText());
+		    }
+		};
+	}
     
     public void createProcess(final ProcessData procDao) throws Exception{
 		  List<TaskData> ptl = StaticDaoFacade.getInstance().getSortedTasksByProcessId(procDao.getId());

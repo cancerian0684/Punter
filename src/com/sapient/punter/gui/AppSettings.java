@@ -48,6 +48,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private String smtpUsername;
 	private String smtpPassword;
 	private Map<String,Object> cache;
+	private Map<String, String> sessionMap;
 	private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);
@@ -59,8 +60,18 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		maxExecutorSize=2;
 		isNimbusLookNFeel=false;
 		cache=new HashMap<String,Object>();
+		sessionMap = new HashMap<String, String>();
 	}
-	public Object getObject(String key){
+
+	public Map<String, String> getSessionMap() {
+		return sessionMap == null ? new HashMap<String, String>() : sessionMap;
+	}
+
+	public void setSessionMap(Map<String, String> sessionMap) {
+		this.sessionMap = sessionMap;
+	}
+
+	public Object getObject(String key) {
 		if(cache==null)cache=new HashMap<String,Object>();
 		return cache.get(key);
 	}
