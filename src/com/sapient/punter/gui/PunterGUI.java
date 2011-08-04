@@ -1332,11 +1332,18 @@ public class PunterGUI extends JPanel implements TaskObserver{
         System.setOut( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.out), true));
 		System.setErr( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.err), true));
     }
-    private void newFilter(String text) {
+    public void newFilter(String text) {
         RowFilter<ProcessTableModel, Object> rf = null;
         //If current expression doesn't parse, don't update.
         try {
             rf = RowFilter.regexFilter(text.toLowerCase(), 0);
+            String[] tokens = text.toLowerCase().split("[\\s;,]");
+            List<RowFilter<Object,Object>> filters = new ArrayList<RowFilter<Object,Object>>(tokens.length);
+            for (int i = 0; i < tokens.length; i++) {
+				String string = tokens[i];
+				filters.add(RowFilter.regexFilter(string));
+			}
+            rf = RowFilter.andFilter(filters);
         } catch (java.util.regex.PatternSyntaxException e) {
             return;
         }
