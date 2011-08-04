@@ -97,6 +97,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private final JTable taskTable;
     private final JTable processPropertyTable;
     private TableRowSorter<ProcessTableModel> sorter;
+    private TableSearchFilter tableSearchFilter;
     private final JTable processTable;
     private final JTable inputParamTable;
     private final JTable outputParamTable;
@@ -125,6 +126,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     
     public PunterGUI() throws Exception {
         super(new GridLayout(1,0));
+        tableSearchFilter=new TableSearchFilter();
         dtcr.setHorizontalAlignment(SwingConstants.CENTER);
         final RunningProcessTableModel runningProcessTableModel = new RunningProcessTableModel();
 		runningProcessTable=new JTable(runningProcessTableModel);
@@ -1265,13 +1267,13 @@ public class PunterGUI extends JPanel implements TaskObserver{
         searchText.getDocument().addDocumentListener(
                 new DocumentListener() {
                     public void changedUpdate(DocumentEvent e) {
-                        newFilter(searchText.getText());
+                    	tableSearchFilter.applyFilter(sorter,searchText.getText());
                     }
                     public void insertUpdate(DocumentEvent e) {
-                        newFilter(searchText.getText());
+                    	tableSearchFilter.applyFilter(sorter,searchText.getText());
                     }
                     public void removeUpdate(DocumentEvent e) {
-                        newFilter(searchText.getText());
+                    	tableSearchFilter.applyFilter(sorter,searchText.getText());
                     }
                 });
         jsp3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,panel,tabbedPane);
@@ -1332,30 +1334,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         System.setOut( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.out), true));
 		System.setErr( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.err), true));
     }
-    public void newFilter(String text) {
-        RowFilter<ProcessTableModel, Object> rf = null;
-        //If current expression doesn't parse, don't update.
-        try {
-            rf = RowFilter.regexFilter(text.toLowerCase(), 0);
-            String[] tokens = text.toLowerCase().split("[\\s;,]");
-            List<RowFilter<Object,Object>> filters = new ArrayList<RowFilter<Object,Object>>(tokens.length);
-            for (int i = 0; i < tokens.length; i++) {
-				String string = tokens[i];
-				filters.add(RowFilter.regexFilter(string));
-			}
-            rf = RowFilter.andFilter(filters);
-        } catch (java.util.regex.PatternSyntaxException e) {
-            return;
-        }
-        sorter.setStringConverter(new TableStringConverter() {
-			@Override
-			public String toString(TableModel model, int row, int column) {
-				String tmp=(String) model.getValueAt(row, column);
-				return  tmp.toLowerCase();
-			}
-		});
-        sorter.setRowFilter(rf);
-    }
+    
     public void createProcess(final ProcessData procDao) throws Exception{
 		  List<TaskData> ptl = StaticDaoFacade.getInstance().getSortedTasksByProcessId(procDao.getId());
 		  final List<TaskHistory> thList=new ArrayList<TaskHistory>(10);
