@@ -1216,11 +1216,13 @@ public class PunterGUI extends JPanel implements TaskObserver{
 					if (props != null)
 						jTextArea.setText((String) props);
 				} else {
+					// leave the prop tab
 					String string = jTextArea.getText();
 					Properties properties = new Properties();
 					try {
 						properties.load(new ByteArrayInputStream(string.getBytes()));
 						AppSettings.getInstance().setSessionMap((Map) properties);
+						AppSettings.getInstance().setObject("appProperties", string);
 						// System.err.println("Properties Loaded to the System.");
 					} catch (IOException e) {
 						System.err.println("Error Loading properties into the system.");

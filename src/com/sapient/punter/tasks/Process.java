@@ -50,7 +50,7 @@ public class Process implements Serializable{
 	@InputParam
 	private boolean emailsOnFailureOnly;
 	@InputParam
-	private boolean doVariableSubstitution = false;
+	private boolean doVariableSubstitution = true;
 	@InputParam(description = "<html>provide cron4j formatted scheduling string<br>13 * * jan-jun,sep-dec mon-fri,sat")
 	private String scheduleString;
 	protected transient ProcessObserver po;

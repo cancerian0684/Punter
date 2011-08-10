@@ -58,7 +58,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		keystrokeFlush=5;
 		maxKeyStrokeDelay=200;
 		maxExecutorSize=2;
-		isNimbusLookNFeel=false;
+		isNimbusLookNFeel = true;
 		cache=new HashMap<String,Object>();
 		sessionMap = new HashMap<String, String>();
 	}
