@@ -1,0 +1,11 @@
+svnadmin dump D:\svn_projects\ | svndumpfilter --drop-empty-revs --renumber-revs include /Punter/trunk/ > d:\project-punter.dump
+
+svnadmin create D:\project-punter-import
+
+svn mkdir file:///d:/project-punter-import/Punter/ -m "Folder created for import"
+
+svnadmin load D:\project-punter-import < d:\project-punter.dump
+
+svnsync init https://punter.googlecode.com/svn/ file:///d:/project-punter-import/
+
+svnsync sync https://punter.googlecode.com/svn/
