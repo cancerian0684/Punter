@@ -229,12 +229,16 @@ public abstract class Tasks implements Serializable{
 		return status;
 	}
 	
-	private static String substituteVariables(String inputString,Map<String, Object> variables) {
+	private String substituteVariables(String inputString, Map<String, Object> variables) {
 		List<String> vars = getVariablesFromString(inputString);
 		for (String string : vars) {
-			inputString=inputString.replace("#{"+string+"}", variables.get(string).toString());
+			String variable = "#{"+string+"}";
+			if (null == variables.get(string)) {
+				throw new RuntimeException("Variable Binding not Found :" + variable + " TaskName : " + taskDao.getName());
+			}
+			String variableBinding = variables.get(string).toString();
+			inputString=inputString.replace(variable, variableBinding);
 		}
-		System.out.println(vars.toString());
 		return inputString;
 	}
 

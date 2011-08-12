@@ -114,8 +114,7 @@ private void createAndShowGUI() throws Exception {
     PunterGuiFrame.pack();
     if(AppSettings.getInstance().PunterGuiFrameLocation!=null)
     PunterGuiFrame.setLocation(AppSettings.getInstance().PunterGuiFrameLocation);
-    Thread.UncaughtExceptionHandler handler =
-         new StackWindow("Unhandled Exception", 500, 400);
+		Thread.UncaughtExceptionHandler handler = new StackWindow("Unhandled Exception", 500, 400);
        Thread.setDefaultUncaughtExceptionHandler(handler);
        
       /* 

@@ -2,6 +2,7 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 	version="2.0" xmlns="http://java.sun.com/xml/ns/persistence">
 	<persistence-unit name="punter" transaction-type="RESOURCE_LOCAL">
+	<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>com.sapient.punter.jpa.TaskData</class>
     <class>com.sapient.punter.jpa.ProcessData</class>
     <class>com.sapient.punter.jpa.ProcessHistory</class>

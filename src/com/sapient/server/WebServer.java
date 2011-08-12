@@ -1,7 +1,17 @@
 package com.sapient.server;
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Date;
+import java.util.Properties;
+import java.util.Vector;
 class WebServer implements HttpConstants {
 
     /* static class data/methods */
@@ -40,7 +50,7 @@ class WebServer implements HttpConstants {
 
     /* load www-server.properties from java.home */
     static void loadProps() throws IOException {
-            props.load(WebServer.class.getClassLoader().getResourceAsStream("resources/www-server.properties"));
+		props.load(WebServer.class.getClassLoader().getResourceAsStream("resources/www-server.properties"));
             String r = props.getProperty("root");
             if (r != null) {
                 root = new File(r);
