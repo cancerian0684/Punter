@@ -1138,6 +1138,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         processAlertTable.getTableHeader().setReorderingAllowed(false);
         processAlertTable.getColumn("<html><b>Run ID").setPreferredWidth(250);
         processAlertTable.getColumn("<html><b>Clear Alert").setPreferredWidth(100);
+        processAlertTable.getColumn("<html><b>Run ID").setCellRenderer(new ProcessAlertTableRenderer());
         JScrollPane processAlertPane = new JScrollPane(processAlertTable);
         
         processTaskAlertTable=new JTable(new ProcessTaskHistoryTableModel()){
@@ -1606,6 +1607,37 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			Object value, boolean isSelected, boolean hasFocus, int row,
 			int column) {
 		ProcessHistory ph = (ProcessHistory) ((ProcessHistoryTableModel)table.getModel()).getRow(table.convertRowIndexToModel(row)).get(0);
+		if(ph.getRunStatus().equals(RunStatus.FAILURE)){
+			setBackground(failureColor);
+			setForeground(Color.WHITE);
+		}else if(ph.getRunStatus().equals(RunStatus.SUCCESS)){
+			setBackground(successColor);
+			setForeground(Color.WHITE);
+		}else if(ph.getRunStatus().equals(RunStatus.NOT_RUN)){
+			setBackground(Color.GRAY);
+			setForeground(Color.BLACK);
+		}else{
+			setBackground(Color.WHITE);
+			setForeground(Color.BLACK);
+		}
+		
+		return super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+				row, column);
+	}
+	public void setValue(Object value) {
+	    setText((value.toString().isEmpty()) ? "---" : value.toString());
+	}
+    }
+	static class ProcessAlertTableRenderer extends DefaultTableCellRenderer {
+		private static final Color successColor = new Color(51, 153, 51);
+		private static final Color failureColor = new Color(153, 51, 0);
+	
+	public ProcessAlertTableRenderer() { super(); }
+	@Override
+	public Component getTableCellRendererComponent(JTable table,
+			Object value, boolean isSelected, boolean hasFocus, int row,
+			int column) {
+		ProcessHistory ph = (ProcessHistory) ((ProcessAlertTableModel)table.getModel()).getRow(table.convertRowIndexToModel(row)).get(0);
 		if(ph.getRunStatus().equals(RunStatus.FAILURE)){
 			setBackground(failureColor);
 			setForeground(Color.WHITE);

@@ -274,7 +274,7 @@ public class PunterKB extends JPanel{
                            	doc.setExt(".txt");
                        	doc.setDateCreated(new Date());
                        	doc.setDateUpdated(new Date());
-                       	doc.setCategory(categoryComboBox.getSelectedItem().toString());
+                       	doc.setCategory(getSelectedcategory());
                        	doc=docService.saveDocument(doc);
                        	System.err.println("Document added : "+f.getName());
                        }
@@ -306,6 +306,7 @@ public class PunterKB extends JPanel{
 						else
 							doc.setTitle(f.getName());
                    		doc.setContent(getBytesFromFile(f));
+                   		doc.setCategory(getSelectedcategory());
                    	doc.setExt(getExtension(f));
                    	if(getExtension(f)==null||getExtension(f).isEmpty())
                        	doc.setExt(".txt");
@@ -354,6 +355,7 @@ public class PunterKB extends JPanel{
 								doc.setExt(".txt");
 							doc.setDateCreated(new Date());
 							doc.setDateUpdated(new Date());
+							doc.setCategory(getSelectedcategory());
 							doc = docService.saveDocument(doc);
 							System.err.println("Document added : test");
 							return true;
@@ -539,7 +541,7 @@ public class PunterKB extends JPanel{
  	        	  Document doc = null;
 				try {
 					doc = docService.createDocument(docService.getUsername());
-					doc.setCategory(categoryComboBox.getSelectedItem().toString());
+					doc.setCategory(getSelectedcategory());
 				} catch (RemoteException e1) {
 					e1.printStackTrace();
 				}
@@ -715,7 +717,7 @@ public class PunterKB extends JPanel{
 				System.out.println(query);
 				try {
 					final DocumentTableModel ttm=((DocumentTableModel)searchResultTable.getModel());
-					final List<Document> docs = docService.getDocList(query,categoryComboBox.getSelectedItem().toString(),toggleButton.isSelected(),andOrToggleButton.isSelected(),AppSettings.getInstance().getMaxResults());
+					final List<Document> docs = docService.getDocList(query,getSelectedcategory(),toggleButton.isSelected(),andOrToggleButton.isSelected(),AppSettings.getInstance().getMaxResults());
 					 javax.swing.SwingUtilities.invokeLater(new Runnable() {
 				            public void run() {
 				            	try{
@@ -745,6 +747,9 @@ public class PunterKB extends JPanel{
 	}
 	private void updateSearchResult() {
 		pdq.put(searchTextField.getText(), AppSettings.getInstance().getMaxKeyStrokeDelay());
+	}
+	String getSelectedcategory() {
+		return categoryComboBox.getSelectedItem().toString();
 	}
 	public static File createZipFromDocument(Document doc){
 		try {

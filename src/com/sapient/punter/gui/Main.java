@@ -270,6 +270,7 @@ public static boolean isConnected(){
 		logger.log(Level.WARNING, "connection to server lost.");
 		try{
 			StaticDaoFacade.getInstance().makeConnection();
+			logger.log(Level.WARNING, "connection to server restored.");
 		}catch (Exception ee) {
 			// TODO: handle exception
 		}
@@ -278,7 +279,7 @@ public static boolean isConnected(){
 }
 public static void displayMsg(String msg,TrayIcon.MessageType msgType){
 	if(trayIcon!=null){
-		trayIcon.displayMessage("My Assistant", msg,msgType);
+		trayIcon.displayMessage("My Punter", msg,msgType);
 	}
 }
 public static void main(String[] args) {

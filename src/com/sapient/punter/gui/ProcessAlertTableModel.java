@@ -5,11 +5,8 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.apache.commons.beanutils.BeanUtils;
-
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.jpa.ProcessHistory;
-import com.sapient.punter.jpa.TaskData;
  
 public class ProcessAlertTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflsdfl",Boolean.FALSE};
@@ -75,7 +72,7 @@ public class ProcessAlertTableModel extends AbstractTableModel {
     ProcessHistory ph=(ProcessHistory) colArrayList.get(0);
     switch(col){
     case 0:
-    	return ""+ph.getId()+" - "+ph.getName()+"  [ "+sdf.format(ph.getStartTime())+" ]"+" "+ph.getRunStatus().toString().charAt(0);
+    	return "<html>"+ph.getId()+"-"+ph.getName()+"<sup>"+sdf.format(ph.getStartTime())+"</sup></html>";
     case 1:
     	ph=(ProcessHistory) colArrayList.get(0);
     	return ph.isClearAlert();
