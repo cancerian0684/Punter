@@ -1,4 +1,6 @@
 package com.sapient.kb.jpa;
+
+import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -26,6 +28,14 @@ public class StaticDaoFacade {
 	}
 	public void ping() throws RemoteException  {
 		stub.ping();
+	}
+
+	public InetAddress getServerHostAddress() throws RemoteException {
+		return stub.getServerHostAddress();
+	}
+
+	public long getWebServerPort() throws RemoteException {
+		return stub.getWebServerPort();
 	}
 	private StaticDaoFacade() {
 		makeConnection();

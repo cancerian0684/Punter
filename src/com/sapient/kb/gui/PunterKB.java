@@ -7,7 +7,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
@@ -532,7 +536,7 @@ public class PunterKB extends JPanel{
          c.gridy = 1;
          add(new JScrollPane(searchResultTable), c);
 
-         final JMenuItem addProcessMenu,openDocMenu,deleteDocMenu,docTagsMenu,reindexDocsMenu;
+		final JMenuItem addProcessMenu, openDocMenu, deleteDocMenu, docTagsMenu, reindexDocsMenu, copyURL;
  		 final JPopupMenu popupProcess = new JPopupMenu();
  		 addProcessMenu = new JMenuItem("Add");
  		 addProcessMenu.addActionListener(new ActionListener() {
@@ -640,6 +644,33 @@ public class PunterKB extends JPanel{
  		});
  		popupProcess.add(reindexDocsMenu);
  		reindexDocsMenu.setEnabled(false);
+
+		copyURL = new JMenuItem("Copy URL");
+		copyURL.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					DocumentTableModel dtm = (DocumentTableModel)searchResultTable.getModel();
+	 				Document doc=(Document)dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+					String url = "http://" + docService.getServerHostAddress().getHostName() + ":"
+							+ docService.getWebServerPort()
+							+ "/" + doc.getId();
+					System.out.println(url);
+					StringSelection stringSelection = new StringSelection(url);
+					Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+					clipboard.setContents(stringSelection, new ClipboardOwner() {
+						@Override
+						public void lostOwnership(Clipboard clipboard, Transferable contents) {
+							// TODO Auto-generated method stub
+
+						}
+					});
+
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		popupProcess.add(copyURL);
  		searchResultTable.addMouseListener(new MouseAdapter() {
  	          //JPopupMenu popup;
  	          public void mousePressed(MouseEvent e) {

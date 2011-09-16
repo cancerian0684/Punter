@@ -33,6 +33,7 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 	private int maxResultsToDisplay = 10;
 	private int maxProcessHistory = 5;
 	private int maxProcessAlerts = 30;
+	private int webServerPort = 8080;
 
 	public static synchronized ServerSettingsMBean getInstance() {
 		if (instance == null) {
@@ -47,10 +48,8 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 			sdf = StaticDaoFacade.getInstance();
 			MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 			try {
-				mbs.registerMBean(instance, new ObjectName(
-						"punter.log.mbean:type=Punter-ServerSettings"));
-				System.err
-						.println("ServerSettings registered with MBean Server.");
+				mbs.registerMBean(instance, new ObjectName("punter.log.mbean:type=Punter-ServerSettings"));
+				System.err.println("ServerSettings registered with MBean Server.");
 			} catch (MBeanRegistrationException e) {
 				e.printStackTrace();
 			} catch (MalformedObjectNameException e) {
@@ -123,6 +122,18 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 		if(maxResultsToDisplay<5)
 			maxResultsToDisplay=7;
 		return maxResultsToDisplay;
+	}
+
+	@Override
+	public int getWebServerPort() {
+		if (webServerPort < 100)
+			webServerPort = 8080;
+		return webServerPort;
+	}
+
+	@Override
+	public void setWebServerPort(int webServerPort) {
+		this.webServerPort = webServerPort;
 	}
 	@Override
 	public void optimizeIndex() {

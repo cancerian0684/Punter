@@ -313,5 +313,20 @@ public class PunterSearchServer implements PunterSearch {
 		}
 		return null;
 	}
+
+	@Override
+	public InetAddress getServerHostAddress() throws RemoteException {
+		try {
+			return InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			throw new RemoteException("Server Exception", e);
+		}
+	}
+
+	@Override
+	public long getWebServerPort() {
+		return ServerSettings.getInstance().getWebServerPort();
+	}
 	
 }

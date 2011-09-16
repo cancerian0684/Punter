@@ -103,7 +103,7 @@ class WebServer implements HttpConstants {
     }
 
     public static void main(String[] a) throws Exception {
-		int port = 8080;
+		int port = ServerSettings.getInstance().getWebServerPort();
         if (a.length > 0) {
             port = Integer.parseInt(a[0]);
         }
@@ -294,7 +294,7 @@ outerloop:
 					System.out.println("Opening up the file.." + doc.getTitle());
 					File temp = new File("Temp");
 					temp.mkdir();
-					File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
+					File nf = new File(temp, "" + doc.getId() + doc.getExt());
 					try {
 						if (!nf.exists()) {
 							FileOutputStream fos = new FileOutputStream(nf);
