@@ -1,4 +1,5 @@
 package com.sapient.server;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -9,11 +10,17 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Vector;
-class WebServer implements HttpConstants {
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import com.sapient.kb.jpa.Attachment;
+import com.sapient.kb.jpa.Document;
+import com.sapient.kb.jpa.StaticDaoFacade;
+class WebServer implements HttpConstants {
     /* static class data/methods */
 
     /* print to stdout */
@@ -50,7 +57,7 @@ class WebServer implements HttpConstants {
 
     /* load www-server.properties from java.home */
     static void loadProps() throws IOException {
-		props.load(WebServer.class.getClassLoader().getResourceAsStream("resources/www-server.properties"));
+            props.load(WebServer.class.getClassLoader().getResourceAsStream("resources/www-server.properties"));
             String r = props.getProperty("root");
             if (r != null) {
                 root = new File(r);
@@ -96,7 +103,7 @@ class WebServer implements HttpConstants {
     }
 
     public static void main(String[] a) throws Exception {
-        int port = 8080;
+		int port = 8080;
         if (a.length > 0) {
             port = Integer.parseInt(a[0]);
         }
@@ -271,6 +278,36 @@ outerloop:
                     targ = ind;
                 }
             }
+			// Special Document
+			if (isLong(fname)) {
+				// if the requested resource is a document.
+				StaticDaoFacade docService = StaticDaoFacade.getInstance();
+				Document doc = new Document();
+				doc.setId(Long.parseLong(targ.getName()));
+				doc = docService.getDocument(doc);
+				// Punter Doc
+				if (doc.getExt().isEmpty()) {
+					targ = createZipFromDocument(doc);
+				}
+				// System Doc
+				else {
+					System.out.println("Opening up the file.." + doc.getTitle());
+					File temp = new File("Temp");
+					temp.mkdir();
+					File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
+					try {
+						if (!nf.exists()) {
+							FileOutputStream fos = new FileOutputStream(nf);
+							fos.write(doc.getContent());
+							fos.close();
+						}
+						targ = nf;
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+
             boolean OK = printHeaders(targ, ps);
             if (doingGet) {
                 if (OK) {
@@ -284,10 +321,18 @@ outerloop:
         }
     }
 
+	boolean isLong(String number) {
+		try {
+			Long.parseLong(number);
+			return true;
+		} catch (Exception e) {
+		}
+		return false;
+	}
     boolean printHeaders(File targ, PrintStream ps) throws IOException {
         boolean ret = false;
         int rCode = 0;
-        if (!targ.exists()) {
+		if (!targ.exists()) {
             rCode = HTTP_NOT_FOUND;
             ps.print("HTTP/1.0 " + HTTP_NOT_FOUND + " not found");
             ps.write(EOL);
@@ -322,6 +367,10 @@ outerloop:
                 }
                 ps.print("Content-type: " + ct);
                 ps.write(EOL);
+				if (!ct.equalsIgnoreCase("text/html")) {
+					ps.print("Content-disposition: attachment; filename=" + name);
+					ps.write(EOL);
+				}
             } else {
                 ps.print("Content-type: text/html");
                 ps.write(EOL);
@@ -343,9 +392,9 @@ outerloop:
         if (targ.isDirectory()) {
             listDirectory(targ, ps);
             return;
-        } else {
+		} else if (targ.isFile()) {
             is = new FileInputStream(targ.getAbsolutePath());
-        }
+		}
 
         try {
             int n;
@@ -366,6 +415,40 @@ outerloop:
     static void setSuffix(String k, String v) {
         map.put(k, v);
     }
+
+	public static File createZipFromDocument(Document doc) {
+		try {
+			// These are the files to include in the ZIP file
+			Collection<Attachment> attchs = doc.getAttachments();
+			// Create a buffer for reading the files
+			byte[] buf = new byte[1024];
+			// Create the ZIP file
+			String outFilename = doc.getId() + ".zip";
+			File tmpDir = new File("Temp");
+			if (!tmpDir.exists())
+				tmpDir.mkdirs();
+			File resultFile = new File(tmpDir, outFilename);
+			ZipOutputStream out = new ZipOutputStream(new FileOutputStream(resultFile));
+
+			out.putNextEntry(new ZipEntry(doc.getId() + ".htm"));
+			// Transfer bytes from the file to the ZIP file
+			out.write(doc.getContent());
+			// Complete the entry
+			out.closeEntry();
+			// Compress the files
+			for (Attachment attch : attchs) {
+				out.putNextEntry(new ZipEntry(attch.getId() + attch.getExt()));
+				out.write(attch.getContent());
+				out.closeEntry();
+			}
+			// Complete the ZIP file
+			out.close();
+			return resultFile;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
     static void fillMap() {
         setSuffix("", "content/unknown");
@@ -389,6 +472,9 @@ outerloop:
         setSuffix(".c++", "text/plain");
         setSuffix(".h", "text/plain");
         setSuffix(".pl", "text/plain");
+		setSuffix(".pdf", "application/pdf");
+		setSuffix(".chm", "application/x-chm");
+		setSuffix(".doc", "application/msword");
         setSuffix(".txt", "text/plain");
         setSuffix(".java", "text/plain");
         setSuffix(".jnlp", "application/x-java-jnlp-file");

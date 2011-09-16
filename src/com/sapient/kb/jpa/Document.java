@@ -50,7 +50,7 @@ public class Document implements Serializable{
 	private String author;
 	@Lob
 	@Basic(fetch = FetchType.EAGER)
-	@Column(columnDefinition="blob(5M)",table = "DOCUMENT_LOB")
+	@Column(columnDefinition = "blob(15M)", table = "DOCUMENT_LOB")
 	private byte[] content;
 	private String md5;
 	@Transient
