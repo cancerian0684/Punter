@@ -1271,6 +1271,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         appLogArea.setEditable(false);
         tabbedPane.addTab("App Logs", null, new JScrollPane(appLogArea),"Application Wide Logging");
 		jTextArea = new JTextArea();
+		jTextArea.setText((String) AppSettings.getInstance().getObject("appProperties"));
 		tabbedPane.addTab("App Props", null, new JScrollPane(jTextArea), "Application Wide Properties");
         JPanel panel=new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
