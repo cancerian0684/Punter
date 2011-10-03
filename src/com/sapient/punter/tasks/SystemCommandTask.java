@@ -29,10 +29,10 @@ public class SystemCommandTask extends Tasks {
 
     private boolean startOutputAndErrorReadThreads(InputStream processOutputStream, InputStream processErrorStream) throws Exception {
         StringBuffer commandOutputBuffer = new StringBuffer();
-        AsynchronousStreamReader asynchronousCommandOutputReaderThread = new AsynchronousStreamReader(processOutputStream, commandOutputBuffer, new myLogger(LOGGER.get()), "OUTPUT");
+        AsynchronousStreamReader asynchronousCommandOutputReaderThread = new AsynchronousStreamReader(processOutputStream, commandOutputBuffer, new MyLogger(LOGGER.get()), "OUTPUT");
         asynchronousCommandOutputReaderThread.start();
         StringBuffer commandErrorBuffer = new StringBuffer();
-        AsynchronousStreamReader asynchronousCommandErrorReaderThread = new AsynchronousStreamReader(processErrorStream, commandErrorBuffer, new myLogger(LOGGER.get()), "ERROR");
+        AsynchronousStreamReader asynchronousCommandErrorReaderThread = new AsynchronousStreamReader(processErrorStream, commandErrorBuffer, new MyLogger(LOGGER.get()), "ERROR");
         asynchronousCommandErrorReaderThread.start();
         asynchronousCommandOutputReaderThread.join();
         asynchronousCommandErrorReaderThread.join();

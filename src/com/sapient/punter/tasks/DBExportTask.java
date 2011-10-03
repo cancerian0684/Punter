@@ -40,11 +40,11 @@ public class DBExportTask extends Tasks {
 	private static boolean startOutputAndErrorReadThreads(InputStream processOut, InputStream processErr) throws Exception
 	{
 		StringBuffer fCmdOutput = new StringBuffer();
-		AsynchronousStreamReader fCmdOutputThread = new AsynchronousStreamReader(processOut, fCmdOutput, new myLogger(LOGGER.get()), "OUTPUT");
+		AsynchronousStreamReader fCmdOutputThread = new AsynchronousStreamReader(processOut, fCmdOutput, new MyLogger(LOGGER.get()), "OUTPUT");
 		fCmdOutputThread.start();
 		
 		StringBuffer fCmdError = new StringBuffer();
-		AsynchronousStreamReader fCmdErrorThread = new AsynchronousStreamReader(processErr, fCmdError, new myLogger(LOGGER.get()), "ERROR");
+		AsynchronousStreamReader fCmdErrorThread = new AsynchronousStreamReader(processErr, fCmdError, new MyLogger(LOGGER.get()), "ERROR");
 		fCmdErrorThread.start();
 		fCmdOutputThread.join();
 		fCmdErrorThread.join();
