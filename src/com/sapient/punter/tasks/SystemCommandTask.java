@@ -11,15 +11,15 @@ public class SystemCommandTask extends Tasks {
     @InputParam(required = true, description = "imp 'DAISY4/Welcome1@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1523)(HOST=xldn2738dor.ldn.swissbank.com)))(CONNECT_DATA=(SERVICE_NAME=DELSHRD1)))' fromuser=AIS1 touser=DAISY2 ignore=y log=C:\\import_daisy.log file=#{dumpFile}")
     private String systemCommand;
     @InputParam(required = false, description = "Import terminated successfully")
-    private String shouldContainMsg;
+    private String successMessage;
 
     @Override
     public boolean run() {
         boolean status;
         try {
-            java.lang.Process p = Runtime.getRuntime().exec(systemCommand);
-            status = startOutputAndErrorReadThreads(p.getInputStream(), p.getErrorStream());
-            p.waitFor();
+            java.lang.Process process = Runtime.getRuntime().exec(systemCommand);
+            status = startOutputAndErrorReadThreads(process.getInputStream(), process.getErrorStream());
+            process.waitFor();
         } catch (Exception e) {
             status = false;
             LOGGER.get().log(Level.SEVERE, e.getMessage());
@@ -27,15 +27,15 @@ public class SystemCommandTask extends Tasks {
         return status;
     }
 
-    private boolean startOutputAndErrorReadThreads(InputStream processOut, InputStream processErr) throws Exception {
-        StringBuffer fCmdOutput = new StringBuffer();
-        AsyncStreamReader fCmdOutputThread = new AsyncStreamReader(processOut, fCmdOutput, new myLogger(LOGGER.get()), "OUTPUT");
-        fCmdOutputThread.start();
-        StringBuffer fCmdError = new StringBuffer();
-        AsyncStreamReader fCmdErrorThread = new AsyncStreamReader(processErr, fCmdError, new myLogger(LOGGER.get()), "ERROR");
-        fCmdErrorThread.start();
-        fCmdOutputThread.join();
-        fCmdErrorThread.join();
-        return fCmdError.toString().contains(shouldContainMsg) || fCmdOutput.toString().contains(shouldContainMsg);
+    private boolean startOutputAndErrorReadThreads(InputStream processOutputStream, InputStream processErrorStream) throws Exception {
+        StringBuffer commandOutputBuffer = new StringBuffer();
+        AsynchronousStreamReader asynchronousCommandOutputReaderThread = new AsynchronousStreamReader(processOutputStream, commandOutputBuffer, new myLogger(LOGGER.get()), "OUTPUT");
+        asynchronousCommandOutputReaderThread.start();
+        StringBuffer commandErrorBuffer = new StringBuffer();
+        AsynchronousStreamReader asynchronousCommandErrorReaderThread = new AsynchronousStreamReader(processErrorStream, commandErrorBuffer, new myLogger(LOGGER.get()), "ERROR");
+        asynchronousCommandErrorReaderThread.start();
+        asynchronousCommandOutputReaderThread.join();
+        asynchronousCommandErrorReaderThread.join();
+        return commandErrorBuffer.toString().contains(successMessage) || commandOutputBuffer.toString().contains(successMessage);
     }
 }
