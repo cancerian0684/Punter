@@ -10,22 +10,26 @@ public class Launcher {
 	public void launch(String className) {
 		System.out.println("Trying to launch:" + className);
 		existingService=new ServiceSearcher(socketPort);
-		if (existingService.isAlreadyRunning()) {
-			Object[] options = { "Replace Instance", "Cancel Launch" };
-			int userChoice = JOptionPane.showOptionDialog(null, "An instance of this program already running. Want to ?", "Instance Found !",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-			System.out.println("found running service");
-			if (userChoice == JOptionPane.YES_OPTION) {
-				existingService.kill();
-			} else {
-				existingService.disconnect();
-				System.exit(0);
-			}
-		} 
-		startNewInstance(className);
+		if (existingService.isAlreadyRunning()){
+            cancelLaunchOrKillAlreadyRunningClient();
+        }
+        startNewInstance(className);
 	}
 
-	private void startNewInstance(String className) {
+    private void cancelLaunchOrKillAlreadyRunningClient() {
+        Object[] options = { "Replace Instance", "Cancel Launch" };
+        int userChoice = JOptionPane.showOptionDialog(null, "An instance of this program already running. Want to ?", "Instance Found !",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        System.out.println("found running service");
+        if (userChoice == JOptionPane.YES_OPTION) {
+            existingService.kill();
+        } else {
+            existingService.disconnect();
+            System.exit(0);
+        }
+    }
+
+    private void startNewInstance(String className) {
 		System.out.println("Starting new service");
 		Launcher.invokeMethod(className);
 		Thread listener = new ListenerThread();

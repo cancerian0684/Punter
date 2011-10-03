@@ -1,5 +1,7 @@
 package com.sapient.server;
 
+import com.sapient.punter.gui.SingleInstanceFileLock;
+
 import java.io.File;
 import java.net.InetAddress;
 import java.net.URI;
@@ -9,8 +11,11 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class Main {
+    static SingleInstanceFileLock singleInstanceFileLock=new SingleInstanceFileLock();
 	public static void main(String args[]) {
 		try {
+            if(singleInstanceFileLock.checkIfAlreadyRunning())
+                System.exit(1);
 			String codebaseURI = new File("bin/").toURL().toURI().toString();
 			System.out.println("Codebase is :" + codebaseURI);
 			System.setProperty("java.rmi.server.codebase", codebaseURI);

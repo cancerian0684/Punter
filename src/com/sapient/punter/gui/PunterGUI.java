@@ -73,6 +73,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
+import com.sapient.punter.jpa.*;
 import neoe.ne.EditPanel;
 
 import com.sapient.kb.jpa.StaticDaoFacade;
@@ -80,12 +81,6 @@ import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.executors.ProcessExecutor;
 import com.sapient.punter.executors.ScheduledJobPicker;
 import com.sapient.punter.gui.TextAreaEditor.EditorListener;
-import com.sapient.punter.jpa.ProcessData;
-import com.sapient.punter.jpa.ProcessHistory;
-import com.sapient.punter.jpa.RunState;
-import com.sapient.punter.jpa.RunStatus;
-import com.sapient.punter.jpa.TaskData;
-import com.sapient.punter.jpa.TaskHistory;
 import com.sapient.punter.tasks.Tasks;
 import com.sapient.punter.utils.ConsoleOutputStream;
 import com.sapient.punter.utils.InputParamValue;
@@ -1367,26 +1362,13 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		};
 	}
     
-    public void createProcess(final ProcessData procDao) throws Exception{
-		  List<TaskData> ptl = StaticDaoFacade.getInstance().getSortedTasksByProcessId(procDao.getId());
-		  final List<TaskHistory> thList=new ArrayList<TaskHistory>(10);
-		  final ProcessHistory ph=new ProcessHistory();
-		  ph.setName(procDao.getName());
-		  ph.setStartTime(new Date());
-		  ph.setProcess(procDao);
-		  ph.setTaskHistoryList(thList);
-		  for (TaskData taskDao : ptl) {
-			TaskHistory th = new TaskHistory();
-			th.setTask(taskDao);
-			th.setProcessHistory(ph);
-			th.setSequence(taskDao.getSequence());
-			thList.add(th);
-		  }
-		  Thread t=new Thread(){
+    public void createProcess(final ProcessData processData) throws Exception{
+        final ProcessHistory processHistory = ProcessHistoryBuilder.build(processData);
+		Thread thread=new Thread(){
 			@Override
 			public void run() {
 			try{
-    		  final ProcessHistory ph1 = StaticDaoFacade.getInstance().createProcessHistory(ph);
+    		  final ProcessHistory ph1 = StaticDaoFacade.getInstance().createProcessHistory(processHistory);
     		  final ArrayList<Object> newRequest = new ArrayList<Object>();
   	          newRequest.add(ph1);
 				
@@ -1395,12 +1377,12 @@ public class PunterGUI extends JPanel implements TaskObserver{
             	try{
             		if(processTable.getSelectedRow()!=-1){
             		ProcessData pd=(ProcessData) ((ProcessTableModel)processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
-            		if(pd.getId()==procDao.getId()){
+            		if(pd.getId()==processData.getId()){
             			((ProcessHistoryTableModel)processHistoryTable.getModel()).insertRowAtBeginning(newRequest);
             			processHistoryTable.setRowSelectionInterval(0, 0);
             		}
             		}
-            		final com.sapient.punter.tasks.Process process=com.sapient.punter.tasks.Process.getProcess(procDao.getInputParams(),ph1);
+            		final com.sapient.punter.tasks.Process process=com.sapient.punter.tasks.Process.getProcess(processData.getInputParams(),ph1);
             		process.setTaskObservable(PunterGUI.this);
             		// Adding row to running process table model
             		final RunningProcessTableModel rptm=(RunningProcessTableModel) runningProcessTable.getModel();
@@ -1435,7 +1417,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 			}
 			}  
 		  };
-		  t.start();
+		  thread.start();
     }
     public void runProcess(com.sapient.punter.tasks.Process process){
     	ProcessExecutor.getInstance().submitProcess(process);

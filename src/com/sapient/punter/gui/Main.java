@@ -39,6 +39,7 @@ public class Main{
 	public static JFrame PunterGuiFrame;
 	public static JFrame lastAccessed;
 	private static Logger logger = Logger.getLogger(Main.class.getName());
+    private SingleInstanceFileLock singleInstanceFileLock=new SingleInstanceFileLock();
 	private Timer timer=new Timer(2000,new ActionListener(){
 		public void actionPerformed(ActionEvent e) {
 			setAppropriateTrayIcon();
@@ -72,12 +73,7 @@ public class Main{
 	}
 
 private void createAndShowGUI() throws Exception {
-	String response = JOptionPane.showInputDialog("Enter NT Logon ID",System.getProperty("user.name"));
-	if(!response.isEmpty()){
-		AppSettings.getInstance().setUsername(response.trim());
-	}else{
-		AppSettings.getInstance().setUsername(System.getProperty("user.name"));		
-	}
+    this.getAndSetUsername();
 	KBFrame=new JFrame("Knowledge Base");
 	JFrame.setDefaultLookAndFeelDecorated(true);
 	KBFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -259,7 +255,16 @@ private void createAndShowGUI() throws Exception {
 
 	}
 }
-public static boolean isBusy(){
+
+    private void getAndSetUsername() {
+        String username = AppSettings.getInstance().getUsername();
+        if(username==null||username.isEmpty()){
+            username = JOptionPane.showInputDialog("Enter NT Logon ID", System.getProperty("user.name"));
+        }
+        AppSettings.getInstance().setUsername(username);
+    }
+
+    public static boolean isBusy(){
 	return ProcessExecutor.getInstance().isActive();
 }
 public static boolean isConnected(){
