@@ -1,3 +1,4 @@
+/*
 package com.sapient.punter.tasks;
 
 import java.util.logging.Level;
@@ -34,4 +35,4 @@ public class ChatTask extends Tasks {
 		}
 		return status;
 	}
-}
+}*/

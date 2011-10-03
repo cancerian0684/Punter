@@ -1,11 +1,11 @@
-2011-09-16 14:49:38.223 GMT : Apache Derby Network Server - 10.5.3.0 - (802917) started and ready to accept connections on port 1527
-2011-09-16 14:49:38.746 GMT : Log Connections changed to on.
-2011-09-16 14:49:38.747 GMT : Connection number: 2.
-2011-09-16 14:49:57.394 GMT : Connection number: 3.
+2011-10-03 18:20:59.502 GMT : Apache Derby Network Server - 10.5.3.0 - (802917) started and ready to accept connections on port 1527
+2011-10-03 18:20:59.598 GMT : Log Connections changed to on.
+2011-10-03 18:20:59.599 GMT : Connection number: 2.
+2011-10-03 18:21:42.379 GMT : Connection number: 3.
 ----------------------------------------------------------------
-2011-09-16 14:49:57.527 GMT:
- Booting Derby version The Apache Software Foundation - Apache Derby - 10.5.3.0 - (802917): instance a816c00e-0132-72b6-d849-00000000002e
-on database directory D:\workspace\Punter\punterDB  
+2011-10-03 18:21:42.622 GMT:
+ Booting Derby version The Apache Software Foundation - Apache Derby - 10.5.3.0 - (802917): instance a816c00e-0132-cb04-73b1-00000000002e
+on database directory E:\workspace\Punter\punterDB  
 
 Database Class Loader started - derby.database.classpath=''
-2011-09-16 14:49:58.607 GMT Thread[DRDAConnThread_4,5,derby.daemons] (DATABASE = punterDB), (DRDAID = {3}), Apache Derby Network Server connected to database punterDB;create=true
+2011-10-03 18:21:44.119 GMT Thread[DRDAConnThread_4,5,derby.daemons] (DATABASE = punterDB), (DRDAID = {3}), Apache Derby Network Server connected to database punterDB;create=true
