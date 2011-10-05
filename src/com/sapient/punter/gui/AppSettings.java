@@ -49,6 +49,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private String smtpPassword;
 	private Map<String,Object> cache;
 	private Map<String, String> sessionMap;
+    private boolean schedulerRunning=true;
 	private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);
@@ -59,6 +60,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		maxKeyStrokeDelay=200;
 		maxExecutorSize=2;
 		isNimbusLookNFeel = true;
+        schedulerRunning=true;
 		cache=new HashMap<String,Object>();
 		sessionMap = new HashMap<String, String>();
 	}
@@ -322,10 +324,22 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 				   appSettings=new AppSettings();
 			   }
 	}
-	public String getUsername() {
+	@Override
+    public String getUsername() {
 		return username;
 	}
-	public void setUsername(String username) {
+	@Override
+    public void setUsername(String username) {
 		this.username = username;
 	}
+
+    @Override
+    public boolean isSchedulerRunning() {
+        return schedulerRunning;
+    }
+
+    @Override
+    public void setSchedulerRunning(boolean schedulerRunning) {
+        this.schedulerRunning = schedulerRunning;
+    }
 }

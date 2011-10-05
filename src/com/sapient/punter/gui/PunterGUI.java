@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,13 +72,13 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
+import com.sapient.punter.executors.PunterJobScheduler;
 import com.sapient.punter.jpa.*;
 import neoe.ne.EditPanel;
 
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.executors.ProcessExecutor;
-import com.sapient.punter.executors.ScheduledJobPicker;
 import com.sapient.punter.gui.TextAreaEditor.EditorListener;
 import com.sapient.punter.tasks.Tasks;
 import com.sapient.punter.utils.ConsoleOutputStream;
@@ -112,6 +111,9 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	private JSplitPane jsp;
 	private JSplitPane jsp6;
 	private JTextArea jTextArea;
+    private PunterJobScheduler punterJobScheduler;
+    private boolean schedulerRunning=false;
+
     static{
     	try {
 			taskProps.load(PunterGUI.class.getClassLoader().getResourceAsStream("resources/tasks.properties"));
@@ -1079,6 +1081,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         	public void run() {
         		super.run();
         		//saving states of all the Tables.
+                stopPunterJobScheduler();
         		System.out.println("Divider Location :"+jsp3.getDividerLocation()+" - "+jsp3.getDividerSize());
         		AppSettings.getInstance().setObject("processTaskAlertTable", GUIUtils.getColumnWidth(processTaskAlertTable));
         		AppSettings.getInstance().setObject("runningProcessTable", GUIUtils.getColumnWidth(runningProcessTable));
@@ -1335,15 +1338,31 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		}
         if(processTable.getModel().getRowCount()>0)
             processTable.setRowSelectionInterval(0, 0);
-         
-        //create scheduled job picker
-        ScheduledJobPicker sjp= new ScheduledJobPicker();
-        sjp.setGuiReference(this);
-        
+        if(AppSettings.getInstance().isSchedulerRunning()){
+            startPunterJobScheduler();
+        }
         setErrAndOutStreamToLogDocument();
     }
 
-	private void setErrAndOutStreamToLogDocument() {
+    private void startPunterJobScheduler() {
+        if(!schedulerRunning){
+            synchronized (this){
+                punterJobScheduler = new PunterJobScheduler();
+                punterJobScheduler.setGuiReference(this);
+                punterJobScheduler.start();
+                schedulerRunning=true;
+            }
+        }
+    }
+
+    private void stopPunterJobScheduler(){
+        if(schedulerRunning){
+        punterJobScheduler.stop();
+        }
+        schedulerRunning=false;
+    }
+
+    private void setErrAndOutStreamToLogDocument() {
 		System.setOut( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.out), true));
 		System.setErr( new PrintStream(new ConsoleOutputStream (appLogArea.getDocument(), System.err), true));
 	}

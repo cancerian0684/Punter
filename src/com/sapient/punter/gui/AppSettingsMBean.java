@@ -32,4 +32,12 @@ public interface AppSettingsMBean {
 	public abstract String getSmtpUsername();
 	public abstract String getSmtpPassword();
 	public abstract String getSmtpHost();
+
+    boolean isSchedulerRunning();
+
+    void setSchedulerRunning(boolean schedulerRunning);
+
+    String getUsername();
+
+    void setUsername(String username);
 }

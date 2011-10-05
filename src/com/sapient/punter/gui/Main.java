@@ -182,7 +182,7 @@ private void createAndShowGUI() throws Exception {
 
 	    ActionListener exitListener = new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
-	            int option=JOptionPane.showConfirmDialog(PunterGuiFrame,"Exit My Assistant?","Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
+	            int option=JOptionPane.showConfirmDialog(PunterGuiFrame,"Exit Punter?","Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
     			if(option==JOptionPane.OK_OPTION)
     			{
     				AppSettings.getInstance().KBFrameLocation=KBFrame.getLocation();
