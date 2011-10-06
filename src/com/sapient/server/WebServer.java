@@ -170,7 +170,7 @@ class Worker extends WebServer implements HttpConstants, Runnable {
                 }
             }
             try {
-                handleClient();
+                handleClient(this);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -190,18 +190,18 @@ class Worker extends WebServer implements HttpConstants, Runnable {
         }
     }
 
-    void handleClient() throws IOException {
-        InputStream is = new BufferedInputStream(s.getInputStream());
-        PrintStream ps = new PrintStream(s.getOutputStream());
+    static void handleClient(Worker worker) throws IOException {
+        InputStream is = new BufferedInputStream(worker.s.getInputStream());
+        PrintStream ps = new PrintStream(worker.s.getOutputStream());
         /* we will only block in read for this many milliseconds
          * before we fail with java.io.InterruptedIOException,
          * at which point we will abandon the connection.
          */
-        s.setSoTimeout(WebServer.timeout);
-        s.setTcpNoDelay(true);
+        worker.s.setSoTimeout(WebServer.timeout);
+        worker.s.setTcpNoDelay(true);
         /* zero out the buffer from last time */
         for (int i = 0; i < BUF_SIZE; i++) {
-            buf[i] = 0;
+            worker.buf[i] = 0;
         }
         try {
             /* We only support HTTP GET/HEAD, and don't
@@ -213,7 +213,7 @@ class Worker extends WebServer implements HttpConstants, Runnable {
 
 outerloop:
             while (nread < BUF_SIZE) {
-                r = is.read(buf, nread, BUF_SIZE - nread);
+                r = is.read(worker.buf, nread, BUF_SIZE - nread);
                 if (r == -1) {
                     /* EOF */
                     return;
@@ -221,7 +221,7 @@ outerloop:
                 int i = nread;
                 nread += r;
                 for (; i < nread; i++) {
-                    if (buf[i] == (byte)'\n' || buf[i] == (byte)'\r') {
+                    if (worker.buf[i] == (byte)'\n' || worker.buf[i] == (byte)'\r') {
                         /* read one line */
                         break outerloop;
                     }
@@ -232,27 +232,27 @@ outerloop:
             boolean doingGet;
             /* beginning of file name */
             int index;
-            if (buf[0] == (byte)'G' &&
-                buf[1] == (byte)'E' &&
-                buf[2] == (byte)'T' &&
-                buf[3] == (byte)' ') {
+            if (worker.buf[0] == (byte)'G' &&
+                worker.buf[1] == (byte)'E' &&
+                worker.buf[2] == (byte)'T' &&
+                worker.buf[3] == (byte)' ') {
                 doingGet = true;
                 index = 4;
-            } else if (buf[0] == (byte)'H' &&
-                       buf[1] == (byte)'E' &&
-                       buf[2] == (byte)'A' &&
-                       buf[3] == (byte)'D' &&
-                       buf[4] == (byte)' ') {
+            } else if (worker.buf[0] == (byte)'H' &&
+                       worker.buf[1] == (byte)'E' &&
+                       worker.buf[2] == (byte)'A' &&
+                       worker.buf[3] == (byte)'D' &&
+                       worker.buf[4] == (byte)' ') {
                 doingGet = false;
                 index = 5;
             } else {
                 /* we don't support this method */
                 ps.print("HTTP/1.0 " + HTTP_BAD_METHOD +
                            " unsupported method type: ");
-                ps.write(buf, 0, 5);
+                ps.write(worker.buf, 0, 5);
                 ps.write(EOL);
                 ps.flush();
-                s.close();
+                worker.s.close();
                 return;
             }
 
@@ -262,11 +262,11 @@ outerloop:
              * extract "/foo/bar.html"
              */
             for (i = index; i < nread; i++) {
-                if (buf[i] == (byte)' ') {
+                if (worker.buf[i] == (byte)' ') {
                     break;
                 }
             }
-            String fname = (new String(buf, 0, index,
+            String fname = (new String(worker.buf, 0, index,
                       i-index)).replace('/', File.separatorChar);
             if (fname.startsWith(File.separator)) {
                 fname = fname.substring(1);
@@ -279,45 +279,25 @@ outerloop:
                 }
             }
 			// Special Document
-			if (isLong(fname)) {
+			if (worker.isLong(fname)) {
 				// if the requested resource is a document.
 				StaticDaoFacade docService = StaticDaoFacade.getInstance();
 				Document doc = new Document();
 				doc.setId(Long.parseLong(targ.getName()));
 				doc = docService.getDocument(doc);
-				// Punter Doc
-				if (doc.getExt().isEmpty()) {
-					targ = createZipFromDocument(doc);
-				}
-				// System Doc
-				else {
-					System.out.println("Opening up the file.." + doc.getTitle());
-					File temp = new File("Temp");
-					temp.mkdir();
-					File nf = new File(temp, "" + doc.getId() + doc.getExt());
-					try {
-						if (!nf.exists()) {
-							FileOutputStream fos = new FileOutputStream(nf);
-							fos.write(doc.getContent());
-							fos.close();
-						}
-						targ = nf;
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-				}
+                targ=PunterWebDocumentHandler.process(doc);
 			}
 
-            boolean OK = printHeaders(targ, ps);
+            boolean OK = worker.printHeaders(targ, ps);
             if (doingGet) {
                 if (OK) {
-                    sendFile(targ, ps);
+                    worker.sendFile(targ, ps);
                 } else {
-                    send404(targ, ps);
+                    worker.send404(targ, ps);
                 }
             }
         } finally {
-            s.close();
+            worker.s.close();
         }
     }
 

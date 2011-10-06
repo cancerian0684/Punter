@@ -24,6 +24,10 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
+import static com.sapient.kb.jpa.Document.DocumentType.EXTERNAL_DOC;
+import static com.sapient.kb.jpa.Document.DocumentType.PUNTER_DOC_WITHOUT_ATTACHMENT;
+import static com.sapient.kb.jpa.Document.DocumentType.PUNTER_DOC_WITH_ATTACHMENT;
+
 @Entity
 @Table(name="DOCUMENT")
 @TableGenerator(name="seqGen",table="ID_GEN",pkColumnName="GEN_KEY",valueColumnName="GEN_VALUE",pkColumnValue="SEQ_ID",allocationSize=1)
@@ -68,6 +72,7 @@ public class Document implements Serializable{
 	@Version
 	@Column(name = "OPT_LOCK")
 	private Long version;
+    public static enum DocumentType{PUNTER_DOC_WITHOUT_ATTACHMENT,PUNTER_DOC_WITH_ATTACHMENT,EXTERNAL_DOC}
 	public long getId() {
 		return id;
 	}
@@ -197,7 +202,15 @@ public class Document implements Serializable{
 	public int getLength(){
 		return content.length;
 	}
-	
+    @Transient
+	public DocumentType getDocumentType(){
+        if(getExt().isEmpty() && getAttachments().size()>0)
+            return PUNTER_DOC_WITH_ATTACHMENT;
+        else if(getExt().isEmpty() && getAttachments().size()==0)
+            return PUNTER_DOC_WITHOUT_ATTACHMENT;
+        else
+            return EXTERNAL_DOC;
+    }
 	/*@Override
 	public String toString() {
 		String attSize = getRelatedDocs()!=null?""+getRelatedDocs().size():"";
