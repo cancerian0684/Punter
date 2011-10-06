@@ -36,6 +36,6 @@ public class SystemCommandTask extends Tasks {
         asynchronousCommandErrorReaderThread.start();
         asynchronousCommandOutputReaderThread.join();
         asynchronousCommandErrorReaderThread.join();
-        return commandErrorBuffer.toString().contains(successMessage) || commandOutputBuffer.toString().contains(successMessage);
+        return successMessage == null || successMessage.isEmpty() || commandErrorBuffer.toString().contains(successMessage) || commandOutputBuffer.toString().contains(successMessage);
     }
 }

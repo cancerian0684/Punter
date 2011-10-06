@@ -1,12 +1,6 @@
 package com.sapient.punter.gui;
 
-import java.awt.AWTException;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -46,7 +40,7 @@ public class Main{
 		}
 
 		private void setAppropriateTrayIcon() {
-			BufferedImage requiredImage=null;
+			BufferedImage requiredImage;
 			if (isBusy()){
 				requiredImage=busyImage;
 				
@@ -63,7 +57,9 @@ public class Main{
 				KBFrame.setIconImage(currentImage);
 			}
 		}});
-	public Main() {
+    private PunterGUI punterGUI;
+
+    public Main() {
 		try {
 			createAndShowGUI();
 			timer.start();
@@ -95,7 +91,8 @@ private void createAndShowGUI() throws Exception {
     
     PunterGuiFrame=new JFrame("My Personal Assistant");
     PunterGuiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-    PunterGuiFrame.setContentPane(new PunterGUI());
+    punterGUI = new PunterGUI();
+    PunterGuiFrame.setContentPane(punterGUI);
     
     PunterGuiFrame.addWindowListener(new java.awt.event.WindowAdapter() {
 	        		public void windowIconified(WindowEvent e) {
@@ -194,11 +191,11 @@ private void createAndShowGUI() throws Exception {
     			}
 	        }
 	    };
-	            
-	    PopupMenu popup = new PopupMenu();
-	    MenuItem openPunterMenuItem = new MenuItem("My Assistant");
-	    openPunterMenuItem.setFont(new Font("Tahoma", Font.BOLD, 12));
-	    openPunterMenuItem.addActionListener(new ActionListener(){
+
+        PopupMenu popup = new PopupMenu();
+        MenuItem openPunterMenuItem = new MenuItem("My Assistant");
+        openPunterMenuItem.setFont(new Font("Tahoma", Font.BOLD, 12));
+        openPunterMenuItem.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				PunterGuiFrame.setExtendedState(Frame.NORMAL);
@@ -218,7 +215,28 @@ private void createAndShowGUI() throws Exception {
 			}});
 	    popup.add(openPunterMenuItem);
 	   
-	    popup.addSeparator();
+        final MenuItem schedulerMenuItem =new MenuItem("Stop Scheduler");
+        schedulerMenuItem.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        schedulerMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //To change body of implemented methods use File | Settings | File Templates.
+                if (AppSettings.getInstance().isSchedulerRunning()) {
+                    punterGUI.stopPunterJobScheduler();
+                    AppSettings.getInstance().setSchedulerRunning(false);
+                    schedulerMenuItem.setLabel("Start Scheduler");
+                    logger.log(Level.INFO, "PunterJobScheduler Stopped");
+                } else {
+                    punterGUI.startPunterJobScheduler();
+                    AppSettings.getInstance().setSchedulerRunning(true);
+                    schedulerMenuItem.setLabel("Stop Scheduler");
+                    logger.log(Level.INFO, "PunterJobScheduler Started");
+                }
+            }
+        });
+        popup.add(schedulerMenuItem);
+
+        popup.addSeparator();
 	    MenuItem defaultItem = new MenuItem("Exit");
 	    defaultItem.addActionListener(exitListener);
 	    popup.add(defaultItem);

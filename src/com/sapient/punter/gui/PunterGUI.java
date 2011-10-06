@@ -105,7 +105,6 @@ public class PunterGUI extends JPanel implements TaskObserver{
     private TextAreaFIFO procLogArea;
     private int selectedRow=-1;
     private final Timer timer;
-    private DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
     private static Properties taskProps=new Properties();
 	private JSplitPane jsp3;
 	private JSplitPane jsp;
@@ -125,6 +124,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
     public PunterGUI() throws Exception {
         super(new GridLayout(1,0));
         tableSearchFilter=new TableSearchFilter();
+        DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
         dtcr.setHorizontalAlignment(SwingConstants.CENTER);
         final RunningProcessTableModel runningProcessTableModel = new RunningProcessTableModel();
 		runningProcessTable=new JTable(runningProcessTableModel);
@@ -1344,7 +1344,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         setErrAndOutStreamToLogDocument();
     }
 
-    private void startPunterJobScheduler() {
+    public void startPunterJobScheduler() {
         if(!schedulerRunning){
             synchronized (this){
                 punterJobScheduler = new PunterJobScheduler();
@@ -1355,7 +1355,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         }
     }
 
-    private void stopPunterJobScheduler(){
+    public void stopPunterJobScheduler(){
         if(schedulerRunning){
         punterJobScheduler.stop();
         }
