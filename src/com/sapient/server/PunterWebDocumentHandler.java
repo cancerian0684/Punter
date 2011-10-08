@@ -1,7 +1,9 @@
 package com.sapient.server;
 
+import com.sapient.LocalTemporaryFileUtils;
 import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -9,6 +11,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import static com.sapient.LocalTemporaryFileUtils.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,62 +25,21 @@ public enum PunterWebDocumentHandler {
     EXTERNAL_DOC_HANDLER(Document.DocumentType.EXTERNAL_DOC) {
         @Override
         public File handle(Document document) throws IOException {
-            return extractFileFromDocument(document, new File("" + document.getId() + document.getExt()));
+            return write(document.getContent(), new File("" + document.getId() + document.getExt()));
         }
     },
     PUNTER_DOC_WITH_ATTACHMENT_HANDLER(Document.DocumentType.PUNTER_DOC_WITH_ATTACHMENT) {
         @Override
         public File handle(Document document) throws IOException {
-            return createZipFromDocument(document);
+            return createZipFile(document);
         }
     },
     PUNTER_DOC_WITHOUT_ATTACHMENT_HANDLER(Document.DocumentType.PUNTER_DOC_WITHOUT_ATTACHMENT) {
         @Override
         public File handle(Document document) throws IOException {
-            return extractFileFromDocument(document, new File("" + document.getId() + ".html"));
+            return write(document.getContent(), new File("" + document.getId() + ".html"));
         }
     };
-
-    public static File createZipFromDocument(Document doc) throws IOException {
-        // These are the files to include in the ZIP file
-        Collection<Attachment> attachments = doc.getAttachments();
-        // Create a buffer for reading the files
-        byte[] buf = new byte[1024];
-        // Create the ZIP file
-        String outFilename = doc.getId() + ".zip";
-        File tmpDir = new File("Temp");
-        if (!tmpDir.exists())
-            tmpDir.mkdirs();
-        File resultFile = new File(tmpDir, outFilename);
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(resultFile));
-
-        out.putNextEntry(new ZipEntry(doc.getId() + ".htm"));
-        // Transfer bytes from the file to the ZIP file
-        out.write(doc.getContent());
-        // Complete the entry
-        out.closeEntry();
-        // Compress the files
-        for (Attachment attachment : attachments) {
-            out.putNextEntry(new ZipEntry(attachment.getId() + attachment.getExt()));
-            out.write(attachment.getContent());
-            out.closeEntry();
-        }
-        // Complete the ZIP file
-        out.close();
-        return resultFile;
-    }
-
-    private static File extractFileFromDocument(Document document, File nf) throws IOException {
-        File temp = new File("Temp");
-        temp.mkdir();
-        nf = new File(temp, nf.getName());
-        if (!nf.exists()) {
-            FileOutputStream fos = new FileOutputStream(nf);
-            fos.write(document.getContent());
-            fos.close();
-        }
-        return nf;
-    }
 
     private Document.DocumentType documentType;
 
@@ -96,6 +59,6 @@ public enum PunterWebDocumentHandler {
                 return punterWebDocumentHandler.handle(document);
             }
         }
-        throw new RuntimeException("handler for this type of document not implemented.");
+        throw new RuntimeException("File handler for this type of document not implemented yet.");
     }
 }

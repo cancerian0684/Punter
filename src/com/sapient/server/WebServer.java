@@ -271,29 +271,29 @@ outerloop:
             if (fname.startsWith(File.separator)) {
                 fname = fname.substring(1);
             }
-            File targ = new File(WebServer.root, fname);
-            if (targ.isDirectory()) {
-                File ind = new File(targ, "index.html");
+            File targetFile = new File(WebServer.root, fname);
+            if (targetFile.isDirectory()) {
+                File ind = new File(targetFile, "index.html");
                 if (ind.exists()) {
-                    targ = ind;
+                    targetFile = ind;
                 }
             }
 			// Special Document
 			if (worker.isLong(fname)) {
-				// if the requested resource is a document.
-				StaticDaoFacade docService = StaticDaoFacade.getInstance();
-				Document doc = new Document();
-				doc.setId(Long.parseLong(targ.getName()));
-				doc = docService.getDocument(doc);
-                targ=PunterWebDocumentHandler.process(doc);
-			}
+                // if the requested resource is a document.
+                StaticDaoFacade docService = StaticDaoFacade.getInstance();
+                Document doc = new Document();
+                doc.setId(Long.parseLong(targetFile.getName()));
+                doc = docService.getDocument(doc);
+                targetFile = PunterWebDocumentHandler.process(doc);
+            }
 
-            boolean OK = worker.printHeaders(targ, ps);
+            boolean OK = worker.printHeaders(targetFile, ps);
             if (doingGet) {
                 if (OK) {
-                    worker.sendFile(targ, ps);
+                    worker.sendFile(targetFile, ps);
                 } else {
-                    worker.send404(targ, ps);
+                    worker.send404(targetFile, ps);
                 }
             }
         } finally {

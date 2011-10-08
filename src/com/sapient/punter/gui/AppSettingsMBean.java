@@ -40,4 +40,8 @@ public interface AppSettingsMBean {
     String getUsername();
 
     void setUsername(String username);
+
+    String getTempDirectory();
+
+    void setTempDirectory(String tempDirectory);
 }

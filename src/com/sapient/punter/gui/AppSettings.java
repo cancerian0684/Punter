@@ -50,6 +50,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private Map<String,Object> cache;
 	private Map<String, String> sessionMap;
     private boolean schedulerRunning=true;
+    private String tempDirectory;
 	private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);
@@ -63,6 +64,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
         schedulerRunning=true;
 		cache=new HashMap<String,Object>();
 		sessionMap = new HashMap<String, String>();
+        tempDirectory="Temp";
 	}
 
 	public Map<String, String> getSessionMap() {
@@ -341,5 +343,15 @@ public class AppSettings implements Serializable, AppSettingsMBean{
     @Override
     public void setSchedulerRunning(boolean schedulerRunning) {
         this.schedulerRunning = schedulerRunning;
+    }
+
+    @Override
+    public String getTempDirectory() {
+        return tempDirectory == null ? "Temp" : tempDirectory;
+    }
+
+    @Override
+    public void setTempDirectory(String tempDirectory) {
+        this.tempDirectory = tempDirectory;
     }
 }
