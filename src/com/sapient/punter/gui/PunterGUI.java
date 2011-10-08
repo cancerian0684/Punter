@@ -74,6 +74,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import com.sapient.punter.executors.PunterJobScheduler;
 import com.sapient.punter.jpa.*;
+import jedi.functional.Filter;
+import jedi.functional.FunctionalPrimitives;
 import neoe.ne.EditPanel;
 
 import com.sapient.kb.jpa.StaticDaoFacade;
@@ -85,6 +87,8 @@ import com.sapient.punter.utils.ConsoleOutputStream;
 import com.sapient.punter.utils.InputParamValue;
 import com.sapient.punter.utils.OutputParamValue;
 import com.sapient.punter.utils.TextAreaFIFO;
+
+import static jedi.functional.FunctionalPrimitives.select;
 
 public class PunterGUI extends JPanel implements TaskObserver{
     private boolean DEBUG = false;
@@ -351,17 +355,17 @@ public class PunterGUI extends JPanel implements TaskObserver{
       		      	Unmarshaller unmarshaller = context.createUnmarshaller();
                     for (File f : l) {
                     	System.err.println(f.getName());
-                    	ProcessData procDao = (ProcessData)unmarshaller.unmarshal(new FileReader(f));
-    		            procDao.setUsername(AppSettings.getInstance().getUsername());
-    		            List<TaskData> tl = procDao.getTaskList();
+                    	ProcessData processData = (ProcessData)unmarshaller.unmarshal(new FileReader(f));
+    		            processData.setUsername(AppSettings.getInstance().getUsername());
+    		            List<TaskData> tl = processData.getTaskList();
     		            for (TaskData taskData : tl) {
-							taskData.setProcess(procDao);
+							taskData.setProcess(processData);
 						}
-    		            procDao=StaticDaoFacade.getInstance().createProcess(procDao);
+    		            processData=StaticDaoFacade.getInstance().createProcess(processData);
     		            ArrayList<Object> newrow=new ArrayList<Object>();
-    		            newrow.add(procDao);
+    		            newrow.add(processData);
     		            ((ProcessTableModel) processTable.getModel()).insertRow(newrow);
-                    	System.err.println("Process added : "+procDao.getName());
+                    	System.err.println("Process added : " +processData.getName());
                     }
                     return true;
                 } catch (UnsupportedFlavorException e) {
@@ -968,6 +972,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	      	        }
       	        	//populate task table
                     List<TaskData> taskList=StaticDaoFacade.getInstance().getProcessTasksById(procId);
+                    taskList=select(taskList, ActiveTaskFilter(AppSettings.getInstance().isShowActiveTasks()));
                     ProcessData process = StaticDaoFacade.getInstance().getProcess(procId);
                     TaskTableModel model=(TaskTableModel) taskTable.getModel();
                     model.clearTable();
@@ -1342,6 +1347,15 @@ public class PunterGUI extends JPanel implements TaskObserver{
             startPunterJobScheduler();
         }
         setErrAndOutStreamToLogDocument();
+    }
+
+    private Filter<TaskData> ActiveTaskFilter(final boolean activeOnly) {
+        return new Filter<TaskData>() {
+            @Override
+            public Boolean execute(TaskData taskData) {
+                return taskData.isActive()==activeOnly||taskData.isActive()==true;
+            }
+        };
     }
 
     public void startPunterJobScheduler() {

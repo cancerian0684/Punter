@@ -51,7 +51,9 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private Map<String, String> sessionMap;
     private boolean schedulerRunning=true;
     private String tempDirectory;
-	private AppSettings(){
+    private boolean showActiveTasks;
+
+    private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);
 		TextAreaEditorLocation=new Point(0, 0);
@@ -65,6 +67,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		cache=new HashMap<String,Object>();
 		sessionMap = new HashMap<String, String>();
         tempDirectory="Temp";
+        showActiveTasks=true;
 	}
 
 	public Map<String, String> getSessionMap() {
@@ -354,4 +357,14 @@ public class AppSettings implements Serializable, AppSettingsMBean{
     public void setTempDirectory(String tempDirectory) {
         this.tempDirectory = tempDirectory;
     }
+
+    @Override
+    public boolean isShowActiveTasks() {
+        return showActiveTasks;
+    }
+
+    @Override
+    public void setShowActiveTasks(boolean showActiveTasks){
+        this.showActiveTasks = showActiveTasks;
+}
 }

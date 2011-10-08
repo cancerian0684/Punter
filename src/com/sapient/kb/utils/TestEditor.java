@@ -1,13 +1,10 @@
 package com.sapient.kb.utils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
-
-import org.apache.commons.lang3.time.StopWatch;
 
 import com.hexidec.ekit.EkitCore;
 import com.sapient.punter.utils.Stopwatch;
@@ -28,10 +25,10 @@ public class TestEditor extends JFrame{
 
         //try retrieve data from file
            try {
-           props.load(TestEditor.class.getClassLoader().getResourceAsStream("resources/stopwords"));
-           System.out.println(props.getProperty("stopwords"));
+           props.load(TestEditor.class.getClassLoader().getResourceAsStream("resources/stopwords.properties"));
+           System.out.println(props.getProperty("stopwords.properties"));
            
-           Scanner scanner = new Scanner(TestEditor.class.getClassLoader().getResourceAsStream("resources/stopwords"));
+           Scanner scanner = new Scanner(TestEditor.class.getClassLoader().getResourceAsStream("resources/stopwords.properties"));
            while (scanner.hasNextLine()) {
                String line = scanner.nextLine();
                System.out.println(line);

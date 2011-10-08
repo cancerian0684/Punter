@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jedi-core">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jedi-core-3.0.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -24,10 +24,8 @@ import org.apache.derby.drda.NetworkServerControl;
 
 import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
-import com.sapient.kb.utils.TestEditor;
 import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
-import com.sapient.punter.jpa.RunStatus;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
 import com.sapient.punter.utils.InputParamValue;
@@ -75,7 +73,7 @@ public class StaticDaoFacade {
 	    
   public List<String> getCategories(){
 	List<String> categories=new ArrayList<String>(20);
-	Scanner scanner = new Scanner(TestEditor.class.getClassLoader().getResourceAsStream("resources/categories"));
+	Scanner scanner = new Scanner(StaticDaoFacade.class.getClassLoader().getResourceAsStream("resources/categories.properties"));
     while (scanner.hasNextLine()) {
         String line = scanner.nextLine();
         StringTokenizer stk=new StringTokenizer(line, ",");

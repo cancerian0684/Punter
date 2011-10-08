@@ -396,6 +396,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="jedi-core" level="project" />
   </component>
 </module>
 

@@ -44,4 +44,8 @@ public interface AppSettingsMBean {
     String getTempDirectory();
 
     void setTempDirectory(String tempDirectory);
+
+    boolean isShowActiveTasks();
+
+    void setShowActiveTasks(boolean showActiveTasks);
 }

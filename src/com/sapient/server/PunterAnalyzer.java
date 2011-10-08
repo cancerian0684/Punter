@@ -22,7 +22,7 @@ public class PunterAnalyzer extends Analyzer {
 	static
 	{
 		 STOP_WORDS=new ArrayList<String>(100);
-		 Scanner scanner = new Scanner(TestEditor.class.getClassLoader().getResourceAsStream("resources/stopwords"));
+		 Scanner scanner = new Scanner(TestEditor.class.getClassLoader().getResourceAsStream("resources/stopwords.properties"));
          while (scanner.hasNextLine()) {
              String line = scanner.nextLine();
              StringTokenizer stk=new StringTokenizer(line, ",");
