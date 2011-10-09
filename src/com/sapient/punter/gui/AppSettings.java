@@ -49,7 +49,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private String smtpPassword;
 	private Map<String,Object> cache;
 	private Map<String, String> sessionMap;
-    private boolean schedulerRunning=true;
+    private boolean schedulerEnabled =true;
     private String tempDirectory;
     private boolean showActiveTasks;
 
@@ -63,7 +63,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		maxKeyStrokeDelay=200;
 		maxExecutorSize=2;
 		isNimbusLookNFeel = true;
-        schedulerRunning=true;
+        schedulerEnabled =true;
 		cache=new HashMap<String,Object>();
 		sessionMap = new HashMap<String, String>();
         tempDirectory="Temp";
@@ -339,13 +339,13 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	}
 
     @Override
-    public boolean isSchedulerRunning() {
-        return schedulerRunning;
+    public boolean isSchedulerEnabled() {
+        return schedulerEnabled;
     }
 
     @Override
-    public void setSchedulerRunning(boolean schedulerRunning) {
-        this.schedulerRunning = schedulerRunning;
+    public void setSchedulerEnabled(boolean schedulerEnabled) {
+        this.schedulerEnabled = schedulerEnabled;
     }
 
     @Override

@@ -1342,7 +1342,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		}
         if(processTable.getModel().getRowCount()>0)
             processTable.setRowSelectionInterval(0, 0);
-        if(AppSettings.getInstance().isSchedulerRunning()){
+        if(AppSettings.getInstance().isSchedulerEnabled()){
             startPunterJobScheduler();
         }
         setErrAndOutStreamToLogDocument();

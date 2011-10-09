@@ -33,9 +33,9 @@ public interface AppSettingsMBean {
 	public abstract String getSmtpPassword();
 	public abstract String getSmtpHost();
 
-    boolean isSchedulerRunning();
+    boolean isSchedulerEnabled();
 
-    void setSchedulerRunning(boolean schedulerRunning);
+    void setSchedulerEnabled(boolean schedulerRunning);
 
     String getUsername();
 

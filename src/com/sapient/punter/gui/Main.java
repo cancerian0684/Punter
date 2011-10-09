@@ -85,7 +85,7 @@ private void createAndShowGUI() throws Exception {
 		 }
 		public void windowClosing(WindowEvent e) {
 			KBFrame.setVisible(false); 
-			displayMsg("Personal Assistant has been minimized to System Tray",TrayIcon.MessageType.INFO);
+//			displayMsg("Personal Assistant has been minimized to System Tray",TrayIcon.MessageType.INFO);
 		}
     });
     
@@ -101,7 +101,7 @@ private void createAndShowGUI() throws Exception {
 	        		public void windowClosing(WindowEvent e) {
 	        			//setVisible(false);
 	        			PunterGuiFrame.dispose(); 
-	        			displayMsg("Assistant has been minimized to System Tray",TrayIcon.MessageType.INFO);
+//	        			displayMsg("Assistant has been minimized to System Tray",TrayIcon.MessageType.INFO);
 	        		}
 	        });	 
     PunterGuiFrame.pack();
@@ -215,20 +215,20 @@ private void createAndShowGUI() throws Exception {
 			}});
 	    popup.add(openPunterMenuItem);
 	   
-        final MenuItem schedulerMenuItem =new MenuItem("Stop Scheduler");
+        final MenuItem schedulerMenuItem =new MenuItem(AppSettings.getInstance().isSchedulerEnabled()?"Stop Scheduler":"Start Scheduler");
         schedulerMenuItem.setFont(new Font("Tahoma", Font.PLAIN, 12));
         schedulerMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //To change body of implemented methods use File | Settings | File Templates.
-                if (AppSettings.getInstance().isSchedulerRunning()) {
+                if (AppSettings.getInstance().isSchedulerEnabled()) {
                     punterGUI.stopPunterJobScheduler();
-                    AppSettings.getInstance().setSchedulerRunning(false);
+                    AppSettings.getInstance().setSchedulerEnabled(false);
                     schedulerMenuItem.setLabel("Start Scheduler");
                     logger.log(Level.INFO, "PunterJobScheduler Stopped");
                 } else {
                     punterGUI.startPunterJobScheduler();
-                    AppSettings.getInstance().setSchedulerRunning(true);
+                    AppSettings.getInstance().setSchedulerEnabled(true);
                     schedulerMenuItem.setLabel("Stop Scheduler");
                     logger.log(Level.INFO, "PunterJobScheduler Started");
                 }
