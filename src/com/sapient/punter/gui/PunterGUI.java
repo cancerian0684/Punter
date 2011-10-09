@@ -75,7 +75,6 @@ import javax.xml.transform.stream.StreamSource;
 import com.sapient.punter.executors.PunterJobScheduler;
 import com.sapient.punter.jpa.*;
 import jedi.functional.Filter;
-import jedi.functional.FunctionalPrimitives;
 import neoe.ne.EditPanel;
 
 import com.sapient.kb.jpa.StaticDaoFacade;
@@ -138,7 +137,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         runningProcessTable.setAutoCreateRowSorter(true);
         runningProcessTable.setRowHeight(20);
         runningProcessTable.setIntercellSpacing(new Dimension(0, 0));
-        runningProcessTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        runningProcessTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         runningProcessTable.setFont(new Font("Courier New",Font.TRUETYPE_FONT,12));
         JTableHeader header = runningProcessTable.getTableHeader();
         TableCellRenderer headerRenderer = header.getDefaultRenderer();
@@ -155,7 +154,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
          public void keyTyped(KeyEvent e){}
           public void keyPressed(KeyEvent e)        
           {
-            doKeyPressed(e);
+            doOnKeyPressed(e);
           }
         });
         ListSelectionModel runningProcessTableSM = runningProcessTable.getSelectionModel();
@@ -164,10 +163,10 @@ public class PunterGUI extends JPanel implements TaskObserver{
         		ListSelectionModel lsm = (ListSelectionModel)e.getSource();
         		if (lsm.isSelectionEmpty()) {
         		} else {
-        			int selectedRow = lsm.getMinSelectionIndex();
+        			int firstSelectedRow = lsm.getMinSelectionIndex();
         			//allowing sorting and all
-        			selectedRow=runningProcessTable.convertRowIndexToModel(selectedRow);
-        			ProcessHistory ph=(ProcessHistory) ((RunningProcessTableModel) runningProcessTable.getModel()).getRow(selectedRow).get(0);
+        			firstSelectedRow=runningProcessTable.convertRowIndexToModel(firstSelectedRow);
+        			ProcessHistory ph=(ProcessHistory) ((RunningProcessTableModel) runningProcessTable.getModel()).getRow(firstSelectedRow).get(0);
         			if(!ph.getRunState().equals(RunState.NEW)){
         			List<TaskHistory> thList = ph.getTaskHistoryList();
         			procLogArea.setDocument(ph.getLogDocument());
@@ -295,7 +294,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         };*/
         processTable.setRowSorter(sorter);
         processTable.setShowGrid(true);
-        processTable.setPreferredScrollableViewportSize(new Dimension(150, 300));
+        processTable.setPreferredScrollableViewportSize(new Dimension(250, 300));
         processTable.setFillsViewportHeight(true);
         processTable.setRowHeight(22);
         processTable.setFont(new Font("Arial",Font.TRUETYPE_FONT,11));
@@ -1495,13 +1494,19 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		}
 	}
     
-    private void doKeyPressed(KeyEvent e) {
+    private void doOnKeyPressed(KeyEvent e) {
         switch(e.getKeyCode()){
             case KeyEvent.VK_DELETE:
                 if(runningProcessTable.getSelectedRow() != -1){
-                		ArrayList row=((RunningProcessTableModel)runningProcessTable.getModel()).getRow(runningProcessTable.convertRowIndexToModel(runningProcessTable.getSelectedRow()));
-                		if(((ProcessHistory)row.get(0)).getRunState().equals(RunState.COMPLETED))
-                		((RunningProcessTableModel)runningProcessTable.getModel()).deleteRow(runningProcessTable.getSelectedRow());
+                    int[] userSelectedRows = runningProcessTable.getSelectedRows();
+                    List<Long> rowsToDelete=new ArrayList<Long>();
+                    for (int row : userSelectedRows) {
+                        int rowModelIndex = runningProcessTable.convertRowIndexToModel(row);
+                        ArrayList process=((RunningProcessTableModel)runningProcessTable.getModel()).getRow(rowModelIndex);
+                        if(((ProcessHistory)process.get(0)).getRunState().equals(RunState.COMPLETED))
+                            rowsToDelete.add(((ProcessHistory) process.get(0)).getId());
+                    }
+                    ((RunningProcessTableModel)runningProcessTable.getModel()).deleteRowNumbers(rowsToDelete);
                     break;
                 }
             default:
