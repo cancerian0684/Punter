@@ -2,17 +2,7 @@ package com.sapient.server;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -493,7 +483,7 @@ public  List<TaskData> getProcessTasksById(long pid) throws UnknownHostException
 		for (TaskData task : taskList) {
 			System.out.println(task.getSequence()+" -- "+task.getName());
 		}
-	    return taskList;
+	    return taskList==null? Collections.EMPTY_LIST:taskList;
 	}finally{
 		em.close();
 	}
@@ -581,7 +571,7 @@ public void deleteStaleHistory(int days){
 public List<ProcessHistory> getMySortedProcessHistoryList(String username) {
 	EntityManager em = emf.createEntityManager();
 	try{
-	Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.username = :username AND ph.clearAlert=0 order by ph.startTime desc");
+	Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.username = :username AND ph.clearAlert=false order by ph.startTime desc");
     q.setHint("eclipselink.refresh", "true");
     q.setParameter("username", username);
 //    q.setParameter("runStatus", RunStatus.SUCCESS);

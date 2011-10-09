@@ -30,7 +30,7 @@ public class StaticDaoFacade {
 		stub.ping();
 	}
 
-	public InetAddress getServerHostAddress() throws RemoteException {
+	public InetAddress getServerHostAddress() throws Exception {
 		return stub.getServerHostAddress();
 	}
 

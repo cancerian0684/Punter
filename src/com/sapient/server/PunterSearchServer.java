@@ -83,219 +83,111 @@ public class PunterSearchServer implements PunterSearch {
 	}
 
 	@Override
-	public void removeTask(TaskData task) throws RemoteException {
-		try {
+	public void removeTask(TaskData task) throws Exception {
 			sdf.removeTask(task);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
-	public void removeProcess(ProcessData proc) throws RemoteException {
-		try {
-			sdf.removeProcess(proc);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public void removeProcess(ProcessData processData) throws Exception {
+			sdf.removeProcess(processData);
 	}
 
 	@Override
-	public TaskData createTask(TaskData task) throws RemoteException {
-		try {
+	public TaskData createTask(TaskData task) throws Exception {
 			return sdf.createTask(task);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	@Override
-	public ProcessData createProcess(ProcessData proc) throws RemoteException {
-		try {
+	public ProcessData createProcess(ProcessData proc) throws Exception {
 			return sdf.createProcess(proc);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return proc;
 	}
 
 	@Override
-	public ProcessHistory createProcessHistory(ProcessHistory ph)
-			throws RemoteException {
-		try {
+	public ProcessHistory createProcessHistory(ProcessHistory ph) throws Exception {
 			return sdf.createProcessHistory(ph);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	@Override
-	public TaskHistory createTaskHistory(TaskHistory th) throws RemoteException {
-		try {
+	public TaskHistory createTaskHistory(TaskHistory th) throws Exception {
 			return sdf.createTaskHistory(th);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	@Override
-	public void saveTaskHistory(TaskHistory t) throws RemoteException {
-		try {
+	public void saveTaskHistory(TaskHistory t) throws Exception {
 			sdf.saveTaskHistory(t);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
-	public void saveProcessHistory(ProcessHistory procHistory)
-			throws RemoteException {
-			try {
+	public void saveProcessHistory(ProcessHistory procHistory) throws Exception {
 				sdf.saveProcessHistory(procHistory);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}		
 	}
 
 	@Override
-	public TaskData saveTask(TaskData t) throws RemoteException {
-		try {
+	public TaskData saveTask(TaskData t) throws Exception {
 			return sdf.saveTask(t);
-		} catch (Exception e) {
-			throw new RemoteException("", e);
-		}
 	}
 
 	@Override
-	public ProcessData saveProcess(ProcessData p) throws RemoteException {
-		try {
+	public ProcessData saveProcess(ProcessData p) throws Exception {
 			return sdf.saveProcess(p);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RemoteException("", e);
-		}
 	}
 
 	@Override
-	public void listTask(long id) throws RemoteException {
-		try {
+	public void listTask(long id) throws Exception {
 			sdf.listTask(id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
 	}
 
 	@Override
-	public List<ProcessData> getScheduledProcessList(String username) throws RemoteException {
-		try {
+	public List<ProcessData> getScheduledProcessList(String username) throws Exception {
 			return sdf.getScheduledProcessList(username);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return Collections.EMPTY_LIST;
 	}
 
 	@Override
-	public List<ProcessData> getProcessList(String username) throws RemoteException {
-		try {
+	public List<ProcessData> getProcessList(String username) throws Exception {
 			return sdf.getProcessList(username);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RemoteException("", e);
-		}
 	}
 
 	@Override
-	public ProcessData getProcess(long id) throws RemoteException {
-		try {
+	public ProcessData getProcess(long id) throws Exception {
 			return sdf.getProcess(id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	@Override
-	public TaskHistory getTaskDao(TaskHistory td) throws RemoteException {
-		try {
+	public TaskHistory getTaskDao(TaskHistory td) throws Exception {
 			return sdf.getTaskDao(td);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	@Override
 	public List<ProcessHistory> getProcessHistoryListForProcessId(long id)
-			throws RemoteException {
-		try {
+            throws Exception {
 			return sdf.getProcessHistoryListForProcessId(id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	@Override
 	public List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id)
-			throws RemoteException {
-		try {
+            throws Exception {
 			return sdf.getSortedProcessHistoryListForProcessId(id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	@Override
-	public ProcessHistory getProcessHistoryById(long id) throws RemoteException {
-		try {
+	public ProcessHistory getProcessHistoryById(long id) throws Exception {
 			return sdf.getProcessHistoryById(id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	@Override
-	public List<TaskData> getProcessTasksById(long pid) throws RemoteException {
-		try {
+	public List<TaskData> getProcessTasksById(long pid) throws Exception {
 			return sdf.getProcessTasksById(pid);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return Collections.EMPTY_LIST;
 	}
 
 	@Override
 	public List<TaskData> getSortedTasksByProcessId(long pid)
-			throws RemoteException {
-		try {
+            throws Exception {
 			return sdf.getSortedTasksByProcessId(pid);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	@Override
-	public List<TaskData> getProcessTasks(long pid) throws RemoteException {
-		try {
+	public List<TaskData> getProcessTasks(long pid) throws Exception {
 			return sdf.getProcessTasks(pid);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	@Override
@@ -306,22 +198,12 @@ public class PunterSearchServer implements PunterSearch {
 	@Override
 	public List<ProcessHistory> getMySortedProcessHistoryList(String username)
 			throws RemoteException {
-		try {
 			return sdf.getMySortedProcessHistoryList(username);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	@Override
-	public InetAddress getServerHostAddress() throws RemoteException {
-		try {
+	public InetAddress getServerHostAddress() throws RemoteException, UnknownHostException {
 			return InetAddress.getLocalHost();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			throw new RemoteException("Server Exception", e);
-		}
 	}
 
 	@Override

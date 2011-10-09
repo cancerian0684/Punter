@@ -665,7 +665,7 @@ public class PunterKB extends JPanel{
 						}
 					});
 
-				} catch (RemoteException e1) {
+				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
 			}
