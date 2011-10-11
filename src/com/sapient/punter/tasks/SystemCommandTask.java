@@ -17,6 +17,7 @@ public class SystemCommandTask extends Tasks {
     public boolean run() {
         boolean status;
         try {
+            LOGGER.get().log(Level.INFO, systemCommand);
             java.lang.Process process = Runtime.getRuntime().exec(systemCommand);
             status = startOutputAndErrorReadThreads(process.getInputStream(), process.getErrorStream());
             process.waitFor();

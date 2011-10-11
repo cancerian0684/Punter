@@ -242,7 +242,7 @@ private void createAndShowGUI() throws Exception {
 	    popup.add(defaultItem);
 
 	    trayIcon = new TrayIcon(idleImage, "My Assistant", popup);
-	    trayIcon.setToolTip("My Assistant started.\nSapient Corp Pvt. Ltd.");
+	    trayIcon.setToolTip("My Assistant started.");
 	    trayIcon.setImageAutoSize(true);
 	   
 	    ActionListener actionListener = new ActionListener() {
