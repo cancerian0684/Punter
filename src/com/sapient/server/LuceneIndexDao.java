@@ -332,11 +332,8 @@ public class LuceneIndexDao {
 			if (!ireader.isCurrent()) {
 				System.out.println("Refreshing IndexSearcher version to :"+ ireader.getCurrentVersion(FSDirectory));
 				refreshIsearcher();
-			} else {
-//				 System.err.println("Index not modified yet.");
 			}
-//			System.out.print(sw.getElapsedTime()+" ");
-			sw.reset();
+            sw.reset();
 			/*System.err.println("Listing all the terms ");
 			TermEnum terms = ireader.terms(new Term("content", ""));
 			while(terms.next())
