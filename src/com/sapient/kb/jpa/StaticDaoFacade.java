@@ -69,7 +69,7 @@ public class StaticDaoFacade {
 	} catch (RemoteException e) {
 		e.printStackTrace();
 	}
-	return null;
+	return Collections.emptyList();
   }
   public void updateAccessCounter(Document doc) throws RemoteException{
 	  stub.updateAccessCounter(doc);

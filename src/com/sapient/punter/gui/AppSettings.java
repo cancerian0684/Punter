@@ -227,7 +227,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 			}});
 			MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 			try {
-				mbs.registerMBean(appSettings,new ObjectName("punter.log.mbean:type=Punter-AppSettings"));
+				mbs.registerMBean(appSettings,new ObjectName("punter.client.mbeans:type=PunterSettings"));
 				System.err.println("AppSettings registered with MBean Server.");
 			} catch (MBeanRegistrationException e) {
 				e.printStackTrace();

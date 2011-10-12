@@ -48,7 +48,7 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 			sdf = StaticDaoFacade.getInstance();
 			MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 			try {
-				mbs.registerMBean(instance, new ObjectName("punter.log.mbean:type=Punter-ServerSettings"));
+				mbs.registerMBean(instance, new ObjectName("punter.server.mbeans:type=ServerSettings"));
 				System.err.println("ServerSettings registered with MBean Server.");
 			} catch (MBeanRegistrationException e) {
 				e.printStackTrace();
