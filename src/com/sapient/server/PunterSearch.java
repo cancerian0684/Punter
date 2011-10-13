@@ -25,8 +25,7 @@ public interface PunterSearch extends Remote {
 
 	Document createDocument(String author) throws RemoteException;
 
-	List<Document> getDocList(SearchQuery searchQuery)
-			throws RemoteException;
+	List<Document> getDocList(SearchQuery searchQuery) throws RemoteException;
 
 	Document saveDocument(Document doc) throws RemoteException;
 
