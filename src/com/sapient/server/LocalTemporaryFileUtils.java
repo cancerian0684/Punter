@@ -1,4 +1,4 @@
-package com.sapient;
+package com.sapient.server;
 
 import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;

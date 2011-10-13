@@ -1,18 +1,11 @@
 package com.sapient.server;
 
-import com.sapient.LocalTemporaryFileUtils;
-import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
-import org.apache.commons.io.IOUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-import static com.sapient.LocalTemporaryFileUtils.*;
+import static com.sapient.server.LocalTemporaryFileUtils.*;
 
 /**
  * Created by IntelliJ IDEA.
