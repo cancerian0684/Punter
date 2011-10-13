@@ -77,7 +77,7 @@ public class PunterKB extends JPanel {
     private PunterDelayedQueueHandlerThread<SearchQuery> punterDelayedQueueHandlerThread;
     {
         try {
-            docService.getDocList("", "", false, false, 1);
+            docService.getDocList(new SearchQuery.SearchQueryBuilder().query("").build());
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -103,14 +103,8 @@ public class PunterKB extends JPanel {
         punterDelayedQueueHandlerThread = new PunterDelayedQueueHandlerThread<SearchQuery>(new PunterDelayedQueueHandlerThread.PunterDelayedQueueListener<SearchQuery>() {
             @Override
             public void process(SearchQuery query) {
-                final List<Document> docs;
                 try {
-                    docs = docService.getDocList(query.getQuery(), query.getCategory(), query.isSpecialText(), query.isAndFilter(), query.getMaxResults());
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            populateDocumentsInTable((DocumentTableModel) searchResultTable.getModel(), docs);
-                        }
-                    });
+                    populateDocumentsInTable((DocumentTableModel) searchResultTable.getModel(), docService.getDocList(query));
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -751,17 +745,17 @@ public class PunterKB extends JPanel {
         col.setPreferredWidth(width);
     }
 
-    private void populateDocumentsInTable(DocumentTableModel searchResultTableModel, List<Document> docs) {
-        try {
-            searchResultTableModel.clearTable();
-            for (Document doc : docs) {
-                ArrayList<Document> docList = new ArrayList<Document>();
-                docList.add(doc);
-                searchResultTableModel.insertRow(docList);
+    private void populateDocumentsInTable(final DocumentTableModel searchResultTableModel, final List<Document> docs) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                searchResultTableModel.clearTable();
+                for (Document doc : docs) {
+                    ArrayList<Document> docList = new ArrayList<Document>();
+                    docList.add(doc);
+                    searchResultTableModel.insertRow(docList);
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     private void updateSearchResult() {

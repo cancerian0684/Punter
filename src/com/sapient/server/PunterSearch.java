@@ -6,6 +6,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import com.sapient.kb.gui.SearchQuery;
 import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
 import com.sapient.punter.jpa.ProcessData;
@@ -24,7 +25,7 @@ public interface PunterSearch extends Remote {
 
 	Document createDocument(String author) throws RemoteException;
 
-	List<Document> getDocList(String q, String category, boolean isSpclTxt, boolean isAND, int maxResults)
+	List<Document> getDocList(SearchQuery searchQuery)
 			throws RemoteException;
 
 	Document saveDocument(Document doc) throws RemoteException;

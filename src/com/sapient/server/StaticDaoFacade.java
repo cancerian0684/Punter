@@ -10,6 +10,7 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 
+import com.sapient.kb.gui.SearchQuery;
 import org.apache.derby.drda.NetworkServerControl;
 
 import com.sapient.kb.jpa.Attachment;
@@ -99,9 +100,9 @@ public class StaticDaoFacade {
 	    em.close();
 	    return doc;
   }
-  public List<Document> getDocList(String q,String category,boolean isSpclTxt,boolean isAND,int maxResults){
+  public List<Document> getDocList(SearchQuery query){
 	   long t1=System.currentTimeMillis();
-	   List<Document> result = LuceneIndexDao.getInstance().search(q, category,isSpclTxt,isAND,0, maxResults);
+	   List<Document> result = LuceneIndexDao.getInstance().search(query.getQuery(), query.getCategory(),query.isSpecialText(),query.isAndFilter(),0, query.getMaxResults());
 	   long t2=System.currentTimeMillis();
 	   System.err.println("time consumed : "+(t2-t1));
 	   return result;

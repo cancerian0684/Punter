@@ -11,6 +11,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Collections;
 import java.util.List;
 
+import com.sapient.kb.gui.SearchQuery;
 import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
 import com.sapient.punter.jpa.ProcessData;
@@ -37,9 +38,8 @@ public class PunterSearchServer implements PunterSearch {
 	}
 
 	@Override
-	public List<Document> getDocList(String q, String category,
-			boolean isSpclTxt, boolean isAND,int maxResults) {
-		return sdf.getDocList(q, category, isSpclTxt, isAND, maxResults);
+	public List<Document> getDocList(SearchQuery query) {
+		return sdf.getDocList(query);
 	}
 
 	@Override

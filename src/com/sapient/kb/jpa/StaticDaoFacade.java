@@ -7,6 +7,7 @@ import java.rmi.registry.Registry;
 import java.util.Collections;
 import java.util.List;
 
+import com.sapient.kb.gui.SearchQuery;
 import com.sapient.punter.gui.AppSettings;
 import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
@@ -77,8 +78,8 @@ public class StaticDaoFacade {
   public Document createDocument(String author) throws RemoteException{
 	  return stub.createDocument(author);
   }
-  public List<Document> getDocList(String q,String category,boolean isSpclTxt,boolean isAND,int maxResults) throws RemoteException{
-	  return stub.getDocList(q, category, isSpclTxt, isAND, maxResults);
+  public List<Document> getDocList(SearchQuery searchQuery) throws RemoteException{
+	  return stub.getDocList(searchQuery);
   }
   public Document saveDocument(Document doc) throws RemoteException{
 	  return stub.saveDocument(doc);
