@@ -1139,7 +1139,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
         }
         processAlertTable.getTableHeader().setReorderingAllowed(false);
         processAlertTable.getColumn("<html><b>Run ID").setPreferredWidth(250);
-        processAlertTable.getColumn("<html><b>Clear Alert").setPreferredWidth(100);
+        processAlertTable.getColumn("<html><b>Clear").setPreferredWidth(100);
         processAlertTable.getColumn("<html><b>Run ID").setCellRenderer(new ProcessAlertTableRenderer());
         JScrollPane processAlertPane = new JScrollPane(processAlertTable);
         
