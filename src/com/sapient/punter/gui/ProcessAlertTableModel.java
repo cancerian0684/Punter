@@ -17,7 +17,7 @@ public class ProcessAlertTableModel extends AbstractTableModel {
 
 	/** Holds the column names */         
 	private String [] columnNames = new String [] 
-                                  {"<html><b>Run ID","<html><b>Clear Alert"};
+                                  {"<html><b>Run ID","<html><b>Clear"};
 	private Class [] columnClasses = new Class[] 
                                    {String.class,Boolean.class};
   

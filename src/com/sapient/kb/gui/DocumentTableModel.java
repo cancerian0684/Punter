@@ -16,7 +16,7 @@ public class DocumentTableModel extends AbstractTableModel {
 
 	/** Holds the column names */         
 	private String [] columnNames = new String [] 
-                                  {"<html><b>Id","<html><b>Document Name","<html><b>Category"};
+                                  {"<html><b>ID","<html><b>Document Name","<html><b>Category"};
 	private Class [] columnClasses = new Class[] 
                                    {String.class,String.class,String.class};
   

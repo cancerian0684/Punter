@@ -70,13 +70,11 @@ public class PunterKB extends JPanel {
     private JTextField searchTextField;
     private JTable searchResultTable;
     private JComboBox categoryComboBox;
-    private PunterDelayQueue<SearchQuery> pdq;
     private JToggleButton toggleButton = new JToggleButton("<html>E</html>");
     private JToggleButton andOrToggleButton = new JToggleButton("O");
     private static final List<String> categories = StaticDaoFacade.getInstance().getCategories();
     private static StaticDaoFacade docService = StaticDaoFacade.getInstance();
     private PunterDelayedQueueHandlerThread<SearchQuery> punterDelayedQueueHandlerThread;
-
     {
         try {
             docService.getDocList("", "", false, false, 1);
@@ -95,16 +93,13 @@ public class PunterKB extends JPanel {
                     public void changedUpdate(DocumentEvent e) {
                         updateSearchResult();
                     }
-
                     public void insertUpdate(DocumentEvent e) {
                         updateSearchResult();
                     }
-
                     public void removeUpdate(DocumentEvent e) {
                         updateSearchResult();
                     }
                 });
-        pdq = new PunterDelayQueue<SearchQuery>();
         punterDelayedQueueHandlerThread = new PunterDelayedQueueHandlerThread<SearchQuery>(new PunterDelayedQueueHandlerThread.PunterDelayedQueueListener<SearchQuery>() {
             @Override
             public void process(SearchQuery query) {
@@ -295,7 +290,7 @@ public class PunterKB extends JPanel {
                                     doc.setExt(".txt");
                                 doc.setDateCreated(new Date());
                                 doc.setDateUpdated(new Date());
-                                doc.setCategory(getSelectedcategory());
+                                doc.setCategory(getSelectedCategory());
                                 doc = docService.saveDocument(doc);
                                 System.err.println("Document added : " + f.getName());
                             }
@@ -325,7 +320,7 @@ public class PunterKB extends JPanel {
                             else
                                 doc.setTitle(f.getName());
                             doc.setContent(getBytesFromFile(f));
-                            doc.setCategory(getSelectedcategory());
+                            doc.setCategory(getSelectedCategory());
                             doc.setExt(getExtension(f));
                             if (getExtension(f) == null || getExtension(f).isEmpty())
                                 doc.setExt(".txt");
@@ -372,7 +367,7 @@ public class PunterKB extends JPanel {
                                 doc.setExt(".txt");
                             doc.setDateCreated(new Date());
                             doc.setDateUpdated(new Date());
-                            doc.setCategory(getSelectedcategory());
+                            doc.setCategory(getSelectedCategory());
                             doc = docService.saveDocument(doc);
                             System.err.println("Document added : test");
                             return true;
@@ -561,7 +556,7 @@ public class PunterKB extends JPanel {
                 Document doc = null;
                 try {
                     doc = docService.createDocument(docService.getUsername());
-                    doc.setCategory(getSelectedcategory());
+                    doc.setCategory(getSelectedCategory());
                 } catch (RemoteException e1) {
                     e1.printStackTrace();
                 }
@@ -770,11 +765,10 @@ public class PunterKB extends JPanel {
     }
 
     private void updateSearchResult() {
-        SearchQuery searchQuery = new SearchQuery.SearchQueryBuilder().query(searchTextField.getText()).category(getSelectedcategory()).specialText(toggleButton.isSelected()).andFilter(andOrToggleButton.isSelected()).maxResults(AppSettings.getInstance().getMaxResults()).build();
-        punterDelayedQueueHandlerThread.put(searchQuery);
+        punterDelayedQueueHandlerThread.put(new SearchQuery.SearchQueryBuilder().query(searchTextField.getText()).category(getSelectedCategory()).specialText(toggleButton.isSelected()).andFilter(andOrToggleButton.isSelected()).maxResults(AppSettings.getInstance().getMaxResults()).build());
     }
 
-    String getSelectedcategory() {
+    private String getSelectedCategory() {
         return categoryComboBox.getSelectedItem().toString();
     }
 
@@ -877,7 +871,7 @@ public class PunterKB extends JPanel {
 
     private static void createAndShowGUI() throws Exception {
         //Create and set up the window.
-        frame = new JFrame("Knowledge Base");
+        frame = new JFrame("Search");
         JFrame.setDefaultLookAndFeelDecorated(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);

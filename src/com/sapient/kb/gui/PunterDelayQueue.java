@@ -8,6 +8,12 @@ public class PunterDelayQueue<T> {
     private T element;
     private volatile long expiryTime = System.currentTimeMillis();
 
+    private int maxKeyStrokeToFlush;
+
+    public PunterDelayQueue(int maxKeyStrokeToFlush) {
+        this.maxKeyStrokeToFlush = maxKeyStrokeToFlush;
+    }
+
     public synchronized void put(T element, int delay) {
         this.element = element;
         this.expiryTime = System.currentTimeMillis() + delay;
@@ -16,7 +22,6 @@ public class PunterDelayQueue<T> {
 
     public synchronized T take() {
         T tmp = null;
-        int counter = AppSettings.getInstance().getKeyStrokeFlush();
         while (element == null || tmp == null || remainingTime() > 0) {
             try {
                 if (element == null)
@@ -24,8 +29,8 @@ public class PunterDelayQueue<T> {
                 else
                     wait(remainingTime());
                 tmp = element;
-                counter--;
-                if (counter < 0 && tmp != null) {
+                maxKeyStrokeToFlush--;
+                if (maxKeyStrokeToFlush < 0 && tmp != null) {
                     break;
                 }
             } catch (Exception e) {
@@ -43,7 +48,7 @@ public class PunterDelayQueue<T> {
     }
 
     public static void main(String[] args) {
-        final PunterDelayQueue<String> pdq = new PunterDelayQueue<String>();
+        final PunterDelayQueue<String> pdq = new PunterDelayQueue<String>(AppSettings.getInstance().getKeyStrokeFlush());
         Thread producer = new Thread(new Runnable() {
             @Override
             public void run() {

@@ -12,7 +12,7 @@ public class PunterDelayedQueueHandlerThread <T> extends Thread {
 
     PunterDelayedQueueHandlerThread(PunterDelayedQueueListener punterDelayedQueueListener) {
         this.punterDelayedQueueListener = punterDelayedQueueListener;
-        this.punterDelayQueue = new PunterDelayQueue<T>();
+        this.punterDelayQueue = new PunterDelayQueue<T>(AppSettings.getInstance().getKeyStrokeFlush());
         setPriority(Thread.MIN_PRIORITY);
 		setDaemon(true);
 		start();

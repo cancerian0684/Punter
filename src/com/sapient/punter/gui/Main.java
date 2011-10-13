@@ -70,7 +70,7 @@ public class Main{
 
 private void createAndShowGUI() throws Exception {
     this.getAndSetUsername();
-	KBFrame=new JFrame("Knowledge Base");
+	KBFrame=new JFrame("Search");
 	JFrame.setDefaultLookAndFeelDecorated(true);
 	KBFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     KBFrame.setContentPane(new PunterKB());
@@ -204,7 +204,7 @@ private void createAndShowGUI() throws Exception {
 			}});
 	    popup.add(openPunterMenuItem);
 	    
-	    openPunterMenuItem = new MenuItem("Knowledge Base");
+	    openPunterMenuItem = new MenuItem("Search");
 	    openPunterMenuItem.setFont(new Font("Tahoma", Font.BOLD, 12));
 	    openPunterMenuItem.addActionListener(new ActionListener(){
 			@Override
