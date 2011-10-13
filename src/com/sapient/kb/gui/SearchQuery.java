@@ -1,6 +1,8 @@
 package com.sapient.kb.gui;
 
-public class SearchQuery {
+import java.io.Serializable;
+
+public class SearchQuery implements Serializable{
     String query;
     String category;
     boolean specialText;
