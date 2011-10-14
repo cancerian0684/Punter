@@ -80,7 +80,7 @@ public class LuceneIndexDao {
 		}
 		return luceneIndexDao;
 	}
-	public static org.apache.lucene.document.Document Document(Document pDoc) {
+	public static org.apache.lucene.document.Document createLuceneDocument(Document pDoc) {
 		org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
 		doc.add(new Field("id",""+ pDoc.getId(), Field.Store.YES, Field.Index.NOT_ANALYZED));
 		doc.add(new Field("title", getPunterParsedText2(pDoc.getTitle()), Field.Store.NO, Field.Index.ANALYZED));
@@ -233,7 +233,7 @@ public class LuceneIndexDao {
 			Query query = parser.parse(QueryParser.escape(""+doc.getId()));
 			FSWriter.deleteDocuments(query);
 			FSWriter.expungeDeletes();
-			FSWriter.addDocument(Document(doc));
+			FSWriter.addDocument(createLuceneDocument(doc));
 			FSWriter.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
