@@ -1,14 +1,8 @@
 package com.sapient.server;
 
-import java.io.File;
 import java.net.InetAddress;
-import java.net.URI;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
-import java.util.Collections;
 import java.util.List;
 
 import com.sapient.kb.gui.SearchQuery;
@@ -21,9 +15,11 @@ import com.sapient.punter.jpa.TaskHistory;
 
 public class PunterSearchServer implements PunterSearch {
 	private StaticDaoFacade sdf;
+    private SessionFacade sessionFacade;
 
 	public PunterSearchServer() {
 		sdf = StaticDaoFacade.getInstance();
+        sessionFacade = SessionFacade.getInstance();
 	}
 
 
@@ -210,5 +206,25 @@ public class PunterSearchServer implements PunterSearch {
 	public long getWebServerPort() {
 		return ServerSettings.getInstance().getWebServerPort();
 	}
-	
+
+    @Override
+    public String connect(String sessionId) throws RemoteException {
+        return sessionFacade.getSession(sessionId).getSessionId();
+    }
+
+    @Override
+    public void disconnect(String sessionId) throws RemoteException {
+        sessionFacade.removeSession(sessionId);
+    }
+
+    @Override
+    public void sendMessage(String sessionId, PunterMessage punterMessage) throws RemoteException, InterruptedException {
+        sessionFacade.sendMessage(sessionId,punterMessage);
+    }
+
+    @Override
+    public PunterMessage getMessage(String sessionId) throws InterruptedException,RemoteException {
+        return sessionFacade.getMessage(sessionId);
+    }
+
 }

@@ -15,75 +15,83 @@ import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
 
 public interface PunterSearch extends Remote {
-	InetAddress getServerHostAddress() throws RemoteException, UnknownHostException;
+    InetAddress getServerHostAddress() throws RemoteException, UnknownHostException;
 
-	long getWebServerPort() throws RemoteException;
+    long getWebServerPort() throws RemoteException;
 
-	void ping() throws RemoteException;
+    String connect(String sessionId) throws RemoteException;
 
-	void updateAccessCounter(Document doc) throws RemoteException;
+    void disconnect(String sessionId) throws RemoteException;
 
-	Document createDocument(String author) throws RemoteException;
+    void ping() throws RemoteException;
 
-	List<Document> getDocList(SearchQuery searchQuery) throws RemoteException;
+    void updateAccessCounter(Document doc) throws RemoteException;
 
-	Document saveDocument(Document doc) throws RemoteException;
+    Document createDocument(String author) throws RemoteException;
 
-	Attachment saveAttachment(Attachment attach) throws RemoteException;
+    List<Document> getDocList(SearchQuery searchQuery) throws RemoteException;
 
-	Document getDocument(Document doc) throws RemoteException;
+    Document saveDocument(Document doc) throws RemoteException;
 
-	boolean deleteAttachment(Attachment attch) throws RemoteException;
+    Attachment saveAttachment(Attachment attach) throws RemoteException;
 
-	boolean deleteDocument(Document attch) throws RemoteException;
+    Document getDocument(Document doc) throws RemoteException;
 
-	void rebuildIndex() throws RemoteException;
+    boolean deleteAttachment(Attachment attch) throws RemoteException;
 
-	List<String> getCategories() throws RemoteException;
+    boolean deleteDocument(Document attch) throws RemoteException;
 
-	void removeTask(TaskData task) throws Exception;
+    void rebuildIndex() throws RemoteException;
 
-	void removeProcess(ProcessData proc) throws Exception;
+    List<String> getCategories() throws RemoteException;
 
-	TaskData createTask(TaskData task) throws Exception;
+    void removeTask(TaskData task) throws Exception;
 
-	ProcessData createProcess(ProcessData proc) throws Exception;
+    void removeProcess(ProcessData proc) throws Exception;
 
-	ProcessHistory createProcessHistory(ProcessHistory ph) throws Exception;
+    TaskData createTask(TaskData task) throws Exception;
 
-	TaskHistory createTaskHistory(TaskHistory th) throws Exception;
+    ProcessData createProcess(ProcessData proc) throws Exception;
 
-	void saveTaskHistory(TaskHistory t) throws Exception;
+    ProcessHistory createProcessHistory(ProcessHistory ph) throws Exception;
 
-	void saveProcessHistory(ProcessHistory procHistory) throws Exception;
+    TaskHistory createTaskHistory(TaskHistory th) throws Exception;
 
-	TaskData saveTask(TaskData t) throws Exception;
+    void saveTaskHistory(TaskHistory t) throws Exception;
 
-	ProcessData saveProcess(ProcessData p) throws Exception;
+    void saveProcessHistory(ProcessHistory procHistory) throws Exception;
 
-	void listTask(long id) throws Exception;
+    TaskData saveTask(TaskData t) throws Exception;
 
-	List<ProcessData> getScheduledProcessList(String username) throws Exception;
+    ProcessData saveProcess(ProcessData p) throws Exception;
 
-	List<ProcessData> getProcessList(String username) throws Exception;
+    void listTask(long id) throws Exception;
 
-	ProcessData getProcess(long id) throws Exception;
+    List<ProcessData> getScheduledProcessList(String username) throws Exception;
 
-	TaskHistory getTaskDao(TaskHistory td) throws Exception;
+    List<ProcessData> getProcessList(String username) throws Exception;
 
-	List<ProcessHistory> getProcessHistoryListForProcessId(long id) throws Exception;
+    ProcessData getProcess(long id) throws Exception;
 
-	List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id) throws Exception;
+    TaskHistory getTaskDao(TaskHistory td) throws Exception;
 
-	public List<ProcessHistory> getMySortedProcessHistoryList(String username) throws RemoteException;
+    List<ProcessHistory> getProcessHistoryListForProcessId(long id) throws Exception;
 
-	ProcessHistory getProcessHistoryById(long id) throws Exception;
+    List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id) throws Exception;
 
-	List<TaskData> getProcessTasksById(long pid) throws Exception;
+    public List<ProcessHistory> getMySortedProcessHistoryList(String username) throws RemoteException;
 
-	List<TaskData> getSortedTasksByProcessId(long pid) throws Exception;
+    ProcessHistory getProcessHistoryById(long id) throws Exception;
 
-	List<TaskData> getProcessTasks(long pid) throws Exception;
+    List<TaskData> getProcessTasksById(long pid) throws Exception;
 
-	void deleteTeam() throws RemoteException;
+    List<TaskData> getSortedTasksByProcessId(long pid) throws Exception;
+
+    List<TaskData> getProcessTasks(long pid) throws Exception;
+
+    void deleteTeam() throws RemoteException;
+
+    void sendMessage(String sessionId, PunterMessage punterMessage) throws RemoteException, InterruptedException;
+
+    PunterMessage getMessage(String sessionId) throws InterruptedException,RemoteException;
 }

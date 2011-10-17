@@ -227,7 +227,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 			}});
 			MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 			try {
-				mbs.registerMBean(appSettings,new ObjectName("punter.client.mbeans:type=PunterSettings"));
+				mbs.registerMBean(appSettings,new ObjectName("PunterClient:type=ClientSettings"));
 				System.err.println("AppSettings registered with MBean Server.");
 			} catch (MBeanRegistrationException e) {
 				e.printStackTrace();
@@ -244,7 +244,6 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		return appSettings;
 	}
 	private static void saveState(){
-		  System.out.println("serializing the settings.");
 		  AppSettingsMBean appSettings=AppSettings.getInstance();
 		  try {
 			  PersistenceService ps; 
