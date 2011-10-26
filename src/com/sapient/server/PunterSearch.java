@@ -23,7 +23,7 @@ public interface PunterSearch extends Remote {
 
     void disconnect(String sessionId) throws RemoteException;
 
-    void ping() throws RemoteException;
+    void ping(String sessionId) throws RemoteException;
 
     void updateAccessCounter(Document doc) throws RemoteException;
 
@@ -92,6 +92,8 @@ public interface PunterSearch extends Remote {
     void deleteTeam() throws RemoteException;
 
     void sendMessage(String sessionId, PunterMessage punterMessage) throws RemoteException, InterruptedException;
+
+    void sendMessage(String sessionId, PunterMessage punterMessage,String topic) throws RemoteException, InterruptedException;
 
     PunterMessage getMessage(String sessionId) throws InterruptedException,RemoteException;
 }

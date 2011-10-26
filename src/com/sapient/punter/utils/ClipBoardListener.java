@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.io.IOException;
 
-class BoardListener extends Thread implements ClipboardOwner {
+class ClipBoardListener extends Thread implements ClipboardOwner {
     Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
 
     public void run() {
@@ -56,7 +56,7 @@ class BoardListener extends Thread implements ClipboardOwner {
     }
 
     public static void main(String[] args) {
-        BoardListener b = new BoardListener();
+        ClipBoardListener b = new ClipBoardListener();
         b.start();
     }
 }

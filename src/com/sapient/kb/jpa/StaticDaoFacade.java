@@ -6,6 +6,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.sapient.kb.gui.SearchQuery;
 import com.sapient.punter.gui.AppSettings;
@@ -13,316 +14,381 @@ import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
+import com.sapient.server.PunterMessage;
 import com.sapient.server.PunterSearch;
 
 public class StaticDaoFacade {
-	private static StaticDaoFacade sdf;
-	private PunterSearch stub;
-	public String getUsername(){
-		return AppSettings.getInstance().getUsername();
-	}
-	public static StaticDaoFacade getInstance(){
-		if(sdf==null){
-			sdf=new StaticDaoFacade();
-		}
-		return sdf;
-	}
-	public void ping() throws RemoteException  {
-		stub.ping();
-	}
+    private static StaticDaoFacade sdf;
+    private PunterSearch stub;
 
-	public InetAddress getServerHostAddress() throws Exception {
-		return stub.getServerHostAddress();
-	}
+    public String getSessionId() {
+        return sessionId;
+    }
 
-	public long getWebServerPort() throws RemoteException {
-		return stub.getWebServerPort();
-	}
-	private StaticDaoFacade() {
-		makeConnection();
-	}
-	public void makeConnection(){
-		String host="localhost";
-		try {
-			Registry registry=null;
-			try{
-			registry= LocateRegistry.getRegistry(host);
-			}catch (Exception e) {
-				e.printStackTrace();
-				if(AppSettings.getInstance().isMultiSearchEnable()){
-					try{
-						MultiCastServerLocator mcsl=new MultiCastServerLocator();
-						host=mcsl.LocateServerAddress();
-						registry= LocateRegistry.getRegistry(host);	
-					}catch (Exception ee) {ee.printStackTrace();}
-				}
-			}
-			stub = (PunterSearch) registry.lookup("PunterSearch");
-			stub.ping();
-		} catch (Exception e) {
-			System.err.println("Client exception: " + e.toString());
+    private String sessionId;
+
+    public String getUsername() {
+        return AppSettings.getInstance().getUsername();
+    }
+
+    public void messageProcessor() {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        PunterMessage message = getMessage();
+                        process(message);
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        thread.setDaemon(true);
+        thread.setPriority(Thread.MIN_PRIORITY);
+        thread.start();
+    }
+
+    private void process(PunterMessage message) {
+        System.out.println("Got the message from server : " + message);
+    }
+
+    public PunterMessage getMessage() throws InterruptedException, RemoteException {
+        return stub.getMessage(getSessionId());
+    }
+
+    public static StaticDaoFacade getInstance() {
+        if (sdf == null) {
+            sdf = new StaticDaoFacade();
+        }
+        return sdf;
+    }
+
+    public void ping() throws RemoteException {
+        stub.ping(getSessionId());
+        try {
+            sendMessageToPeer(new PunterMessage());
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    public InetAddress getServerHostAddress() throws Exception {
+        return stub.getServerHostAddress();
+    }
+
+    public long getWebServerPort() throws RemoteException {
+        return stub.getWebServerPort();
+    }
+
+    private StaticDaoFacade() {
+        makeConnection();
+        messageProcessor();
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public void makeConnection() {
+        String host = "localhost";
+        try {
+            Registry registry = null;
+            try {
+                registry = LocateRegistry.getRegistry(host);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (AppSettings.getInstance().isMultiSearchEnable()) {
+                    try {
+                        MultiCastServerLocator mcsl = new MultiCastServerLocator();
+                        host = mcsl.LocateServerAddress();
+                        registry = LocateRegistry.getRegistry(host);
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+            }
+            stub = (PunterSearch) registry.lookup("PunterSearch");
+            if (getSessionId() == null) {
+                setSessionId(stub.connect(getUsername()));
+            }
+            stub.ping(getSessionId());
+        } catch (Exception e) {
+            System.err.println("Client exception: " + e.toString());
 //			e.printStackTrace();
-		}
-	}
-  public List<String> getCategories(){
-	  try {
-		return stub.getCategories();
-	} catch (RemoteException e) {
-		e.printStackTrace();
-	}
-	return Collections.emptyList();
-  }
-  public void updateAccessCounter(Document doc) throws RemoteException{
-	  stub.updateAccessCounter(doc);
-  }
-  public Document createDocument(String author) throws RemoteException{
-	  return stub.createDocument(author);
-  }
-  public List<Document> getDocList(SearchQuery searchQuery) throws RemoteException{
-	  return stub.getDocList(searchQuery);
-  }
-  public Document saveDocument(Document doc) throws RemoteException{
-	  return stub.saveDocument(doc);
-  }
-  public Attachment saveAttachment(Attachment attach) throws RemoteException{
-	  return stub.saveAttachment(attach);
-  }
-  public Document getDocument(Document doc) throws RemoteException{
-	  return stub.getDocument(doc);
-  }
-	public boolean deleteAttachment(Attachment attch) throws RemoteException {
-		return stub.deleteAttachment(attch);
-	}
-	public boolean deleteDocument(Document attch) throws RemoteException {
-		return stub.deleteDocument(attch);
-	}
-	public void rebuildIndex() throws RemoteException{
-		stub.rebuildIndex();
-	}
+        }
+    }
 
-	public void removeTask(TaskData task)  {
-		try {
-			stub.removeTask(task);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public List<String> getCategories() {
+        try {
+            return stub.getCategories();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
+    }
 
-	
-	public void removeProcess(ProcessData proc)  {
-		try {
-			stub.removeProcess(proc);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public void updateAccessCounter(Document doc) throws RemoteException {
+        stub.updateAccessCounter(doc);
+    }
 
-	
-	public TaskData createTask(TaskData task)  {
-		try {
-			return stub.createTask(task);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    public Document createDocument(String author) throws RemoteException {
+        return stub.createDocument(author);
+    }
 
-	
-	public ProcessData createProcess(ProcessData proc)  {
-		try {
-			return stub.createProcess(proc);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return proc;
-	}
+    public List<Document> getDocList(SearchQuery searchQuery) throws RemoteException {
+        return stub.getDocList(searchQuery);
+    }
 
-	
-	public ProcessHistory createProcessHistory(ProcessHistory ph)
-			 {
-		try {
-			return stub.createProcessHistory(ph);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    public Document saveDocument(Document doc) throws RemoteException {
+        return stub.saveDocument(doc);
+    }
 
-	
-	public TaskHistory createTaskHistory(TaskHistory th)  {
-		try {
-			return stub.createTaskHistory(th);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    public Attachment saveAttachment(Attachment attach) throws RemoteException {
+        return stub.saveAttachment(attach);
+    }
 
-	
-	public void saveTaskHistory(TaskHistory t)  {
-		try {
-			stub.saveTaskHistory(t);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public Document getDocument(Document doc) throws RemoteException {
+        return stub.getDocument(doc);
+    }
 
-	
-	public void saveProcessHistory(ProcessHistory procHistory)
-			 {
-			try {
-				stub.saveProcessHistory(procHistory);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}		
-	}
+    public boolean deleteAttachment(Attachment attch) throws RemoteException {
+        return stub.deleteAttachment(attch);
+    }
 
-	
-	public TaskData saveTask(TaskData t) throws Exception  {
-		try {
-			return stub.saveTask(t);
-		} catch (Exception e) {
-			throw e;
-		}
-	}
+    public boolean deleteDocument(Document attch) throws RemoteException {
+        return stub.deleteDocument(attch);
+    }
 
-	
-	public ProcessData saveProcess(ProcessData p)  {
-		try {
-			return stub.saveProcess(p);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    public void rebuildIndex() throws RemoteException {
+        stub.rebuildIndex();
+    }
 
-	
-	public void listTask(long id)  {
-		try {
-			stub.listTask(id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-	}
+    public void removeTask(TaskData task) {
+        try {
+            stub.removeTask(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	
-	public List<ProcessData> getScheduledProcessList(String username)  {
-		try {
-			return stub.getScheduledProcessList(username);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return Collections.EMPTY_LIST;
-	}
 
-	
-	public List<ProcessData> getProcessList(String username) throws Exception  {
-		try {
-			return stub.getProcessList(username);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
-	}
+    public void removeProcess(ProcessData proc) {
+        try {
+            stub.removeProcess(proc);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	
-	public ProcessData getProcess(long id)  {
-		try {
-			return stub.getProcess(id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 
-	
-	public TaskHistory getTaskDao(TaskHistory td)  {
-		try {
-			return stub.getTaskDao(td);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    public TaskData createTask(TaskData task) {
+        try {
+            return stub.createTask(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	
-	public List<ProcessHistory> getProcessHistoryListForProcessId(long id)
-			 {
-		try {
-			return stub.getProcessHistoryListForProcessId(id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 
-	
-	public List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id)
-	{
-		try {
-			return stub.getSortedProcessHistoryListForProcessId(id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public List<ProcessHistory> getMySortedProcessHistoryList(String username)
-	{
-		try {
-			return stub.getMySortedProcessHistoryList(username);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    public ProcessData createProcess(ProcessData proc) {
+        try {
+            return stub.createProcess(proc);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return proc;
+    }
 
-	
-	public ProcessHistory getProcessHistoryById(long id)  {
-		try {
-			return stub.getProcessHistoryById(id);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 
-	
-	public List<TaskData> getProcessTasksById(long pid)  {
-		try {
-			return stub.getProcessTasksById(pid);
-		}  catch (Exception e) {
-			e.printStackTrace();
-		}
-		return Collections.EMPTY_LIST;
-	}
+    public ProcessHistory createProcessHistory(ProcessHistory ph) {
+        try {
+            return stub.createProcessHistory(ph);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	
-	public List<TaskData> getSortedTasksByProcessId(long pid)
-			 {
-		try {
-			return stub.getSortedTasksByProcessId(pid);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return Collections.EMPTY_LIST;
-	}
-	
-	public List<TaskData> getProcessTasks(long pid)  {
-		try {
-			return stub.getProcessTasks(pid);
-		}  catch (Exception e) {
-			e.printStackTrace();
-		}
-		return Collections.EMPTY_LIST;
-	}
-	
-	public void deleteTeam()  {
-		try {
-			stub.deleteTeam();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
+
+    public TaskHistory createTaskHistory(TaskHistory th) {
+        try {
+            return stub.createTaskHistory(th);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public void saveTaskHistory(TaskHistory t) {
+        try {
+            stub.saveTaskHistory(t);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void saveProcessHistory(ProcessHistory procHistory) {
+        try {
+            stub.saveProcessHistory(procHistory);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public TaskData saveTask(TaskData t) throws Exception {
+        try {
+            return stub.saveTask(t);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+
+    public ProcessData saveProcess(ProcessData p) {
+        try {
+            return stub.saveProcess(p);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public void listTask(long id) {
+        try {
+            stub.listTask(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public List<ProcessData> getScheduledProcessList(String username) {
+        try {
+            return stub.getScheduledProcessList(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+
+    public List<ProcessData> getProcessList(String username) throws Exception {
+        try {
+            return stub.getProcessList(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+
+    public ProcessData getProcess(long id) {
+        try {
+            return stub.getProcess(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public TaskHistory getTaskDao(TaskHistory td) {
+        try {
+            return stub.getTaskDao(td);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public List<ProcessHistory> getProcessHistoryListForProcessId(long id) {
+        try {
+            return stub.getProcessHistoryListForProcessId(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id) {
+        try {
+            return stub.getSortedProcessHistoryListForProcessId(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<ProcessHistory> getMySortedProcessHistoryList(String username) {
+        try {
+            return stub.getMySortedProcessHistoryList(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public ProcessHistory getProcessHistoryById(long id) {
+        try {
+            return stub.getProcessHistoryById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public List<TaskData> getProcessTasksById(long pid) {
+        try {
+            return stub.getProcessTasksById(pid);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+
+    public List<TaskData> getSortedTasksByProcessId(long pid) {
+        try {
+            return stub.getSortedTasksByProcessId(pid);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    public List<TaskData> getProcessTasks(long pid) {
+        try {
+            return stub.getProcessTasks(pid);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    public void disconnect() {
+        try {
+            stub.disconnect(getSessionId());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMessageToPeer(PunterMessage punterMessage) throws InterruptedException, RemoteException {
+        stub.sendMessage(getSessionId(), punterMessage, getUsername());
+    }
 }

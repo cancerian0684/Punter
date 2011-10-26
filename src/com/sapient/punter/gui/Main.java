@@ -172,6 +172,7 @@ private void createAndShowGUI() throws Exception {
 	    Runtime rt = Runtime.getRuntime();
 	    rt.addShutdownHook(new Thread() {
 	      public void run() {
+                 StaticDaoFacade.getInstance().disconnect();
 	    	timer.stop();
 	    	logger.log(Level.INFO, "Exiting...");
 	      }

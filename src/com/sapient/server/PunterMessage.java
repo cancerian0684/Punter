@@ -1,4 +1,6 @@
 package com.sapient.server;
 
-public class PunterMessage {
+import java.io.Serializable;
+
+public class PunterMessage implements Serializable{
 }
