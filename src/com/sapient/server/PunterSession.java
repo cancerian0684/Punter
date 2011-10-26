@@ -5,9 +5,10 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class PunterSession implements Comparable<PunterSession>{
-    public PunterSession(String sessionId) {
+public class PunterSession implements Comparable<String> {
+    public PunterSession(String sessionId, String username) {
         this.sessionId = sessionId;
+        this.username = username;
         this.sessionMap.put("queue", new LinkedBlockingQueue<PunterMessage>());
     }
 
@@ -15,15 +16,20 @@ public class PunterSession implements Comparable<PunterSession>{
         return sessionId;
     }
 
-    String sessionId;
-    Map<String,Object> sessionMap=new HashMap<String, Object>();
+    public String getUsername() {
+        return username;
+    }
 
-    Object getSession(String key){
+    String username;
+    String sessionId;
+    Map<String, Object> sessionMap = new HashMap<String, Object>();
+
+    Object getObject(String key) {
         return sessionMap.get(key);
     }
 
     @Override
-    public int compareTo(PunterSession o) {
-        return o.getSessionId().compareTo(sessionId);
+    public int compareTo(String o) {
+        return o.compareTo(sessionId);
     }
 }

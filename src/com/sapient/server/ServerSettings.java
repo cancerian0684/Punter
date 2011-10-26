@@ -34,8 +34,9 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 	private int maxProcessHistory = 5;
 	private int maxProcessAlerts = 30;
 	private int webServerPort = 8080;
+    private String tempDirectory;
 
-	public static synchronized ServerSettingsMBean getInstance() {
+    public static synchronized ServerSettingsMBean getInstance() {
 		if (instance == null) {
 			loadState();
 			Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -71,22 +72,18 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 		try {
 			PersistenceService ps;
 			BasicService bs;
-			ps = (PersistenceService) ServiceManager
-					.lookup("javax.jnlp.PersistenceService");
-			bs = (BasicService) ServiceManager
-					.lookup("javax.jnlp.BasicService");
+			ps = (PersistenceService) ServiceManager.lookup("javax.jnlp.PersistenceService");
+			bs = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
 			URL codebase = bs.getCodeBase();
 			FileContents fc = ps.get(codebase);
-			ObjectOutputStream oos = new ObjectOutputStream(
-					fc.getOutputStream(true));
+			ObjectOutputStream oos = new ObjectOutputStream(fc.getOutputStream(true));
 			oos.writeObject(appSettings);
 			oos.flush();
 			oos.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			try {
-				FileOutputStream fout = new FileOutputStream(
-						"punter_server.dat");
+				FileOutputStream fout = new FileOutputStream("punter_server.dat");
 				ObjectOutputStream oos = new ObjectOutputStream(fout);
 				oos.writeObject(appSettings);
 				oos.close();
@@ -240,4 +237,14 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 	public void compressTables() {
 		StaticDaoFacade.getInstance().compressTables();
 	}
+
+    @Override
+    public String getTempDirectory() {
+        return tempDirectory == null ? "Temp" : tempDirectory;
+    }
+
+    @Override
+    public void setTempDirectory(String tempDirectory) {
+        this.tempDirectory = tempDirectory;
+    }
 }

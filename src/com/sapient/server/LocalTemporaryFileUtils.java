@@ -21,7 +21,7 @@ import java.util.zip.ZipOutputStream;
  * To change this template use File | Settings | File Templates.
  */
 public class LocalTemporaryFileUtils {
-    public static final File TEMP_DIRECTORY = new File(AppSettings.getInstance().getTempDirectory());
+    public static final File TEMP_DIRECTORY = new File(ServerSettings.getInstance().getTempDirectory());
 
     static {
         TEMP_DIRECTORY.mkdirs();
@@ -29,9 +29,7 @@ public class LocalTemporaryFileUtils {
 
     public static File write(byte[] contents, File file) throws IOException {
         file = new File(TEMP_DIRECTORY, file.getName());
-        if (!file.exists()) {
-            IOUtils.write(contents, new FileOutputStream(file));
-        }
+        IOUtils.write(contents, new FileOutputStream(file));
         return file;
     }
 

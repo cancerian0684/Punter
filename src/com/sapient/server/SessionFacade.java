@@ -1,13 +1,10 @@
 package com.sapient.server;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 
 public class SessionFacade {
-    List<PunterSession> sessionList = new ArrayList<PunterSession>(10);
+    Map<String,PunterSession> sessionMap =new HashMap<String, PunterSession>(10);
     private static SessionFacade instance;
 
     private SessionFacade() {
@@ -22,30 +19,20 @@ public class SessionFacade {
     }
 
     public void removeSession(String sessionId) {
-        PunterSession tempSession = new PunterSession(sessionId);
-        int index = Collections.binarySearch(sessionList, tempSession);
-        if (index != -1) {
-            sessionList.remove(index);
-        }
+        sessionMap.remove(sessionId);
     }
 
-    public PunterSession getSession(String sessionId) {
-        Collections.sort(sessionList);
-        PunterSession tempSession = new PunterSession(sessionId);
-        int index = Collections.binarySearch(sessionList, tempSession);
-        if (index == -1) {
-            sessionList.add(tempSession);
-            return tempSession;
-        }
-        return sessionList.get(index);
+    public String getSession(String username) {
+        PunterSession punterSession = new PunterSession(IdGenerator.getInstance().generateId(256), username);
+        sessionMap.put(punterSession.getSessionId(),punterSession);
+        return punterSession.getSessionId();
     }
 
     public PunterMessage getMessage(String sessionId) throws InterruptedException {
-         return ((BlockingQueue<PunterMessage>)getSession(sessionId).getSession("queue")).take();
+         return ((BlockingQueue<PunterMessage>)sessionMap.get(sessionId).getObject("queue")).take();
     }
 
     public void sendMessage(String sessionId,PunterMessage punterMessage) throws InterruptedException {
-         ((BlockingQueue<PunterMessage>)getSession(sessionId).getSession("queue")).offer(punterMessage);
+         ((BlockingQueue<PunterMessage>)sessionMap.get(sessionId).getObject("queue")).offer(punterMessage);
     }
-
 }

@@ -19,7 +19,7 @@ public interface PunterSearch extends Remote {
 
     long getWebServerPort() throws RemoteException;
 
-    String connect(String sessionId) throws RemoteException;
+    String connect(String username) throws RemoteException;
 
     void disconnect(String sessionId) throws RemoteException;
 

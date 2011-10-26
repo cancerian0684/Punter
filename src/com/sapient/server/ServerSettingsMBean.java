@@ -32,4 +32,8 @@ public interface ServerSettingsMBean {
 	public abstract void setWebServerPort(int webServerPort);
 
 	public abstract int getWebServerPort();
+
+    public String getTempDirectory();
+
+    public void setTempDirectory(String tempDirectory);
 }

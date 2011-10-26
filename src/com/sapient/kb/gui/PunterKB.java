@@ -147,12 +147,10 @@ public class PunterKB extends JPanel {
                                         temp.mkdir();
                                         File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
                                         try {
-                                            if (!nf.exists()) {
-                                                FileOutputStream fos = new FileOutputStream(nf);
-                                                fos.write(doc.getContent());
-                                                fos.close();
-                                                nf.deleteOnExit();
-                                            }
+                                            FileOutputStream fos = new FileOutputStream(nf);
+                                            fos.write(doc.getContent());
+                                            fos.close();
+                                            nf.deleteOnExit();
                                             Desktop.getDesktop().open(nf);
                                         } catch (IOException e1) {
                                             e1.printStackTrace();
@@ -410,11 +408,9 @@ public class PunterKB extends JPanel {
                             temp.mkdir();
                             File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
                             try {
-                                if (!nf.exists()) {
-                                    FileOutputStream fos = new FileOutputStream(nf);
-                                    fos.write(doc.getContent());
-                                    fos.close();
-                                }
+                                FileOutputStream fos = new FileOutputStream(nf);
+                                fos.write(doc.getContent());
+                                fos.close();
                                 files.add(nf);
                             } catch (IOException e1) {
                                 e1.printStackTrace();
@@ -575,12 +571,10 @@ public class PunterKB extends JPanel {
                                 temp.mkdir();
                                 File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
                                 try {
-                                    if (!nf.exists()) {
-                                        FileOutputStream fos = new FileOutputStream(nf);
-                                        fos.write(doc.getContent());
-                                        fos.close();
-                                        nf.deleteOnExit();
-                                    }
+                                    FileOutputStream fos = new FileOutputStream(nf);
+                                    fos.write(doc.getContent());
+                                    fos.close();
+                                    nf.deleteOnExit();
                                     Desktop.getDesktop().open(nf);
                                 } catch (IOException e1) {
                                     e1.printStackTrace();

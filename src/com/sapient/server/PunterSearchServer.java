@@ -14,63 +14,63 @@ import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
 
 public class PunterSearchServer implements PunterSearch {
-	private StaticDaoFacade sdf;
+	private StaticDaoFacade staticDaoFacade;
     private SessionFacade sessionFacade;
 
 	public PunterSearchServer() {
-		sdf = StaticDaoFacade.getInstance();
+		staticDaoFacade = StaticDaoFacade.getInstance();
         sessionFacade = SessionFacade.getInstance();
 	}
 
 
 	@Override
 	public void updateAccessCounter(Document doc) {
-		sdf.updateAccessCounter(doc);
+		staticDaoFacade.updateAccessCounter(doc);
 	}
 
 	@Override
 	public Document createDocument(String author) {
-		return sdf.createDocument(author);
+		return staticDaoFacade.createDocument(author);
 	}
 
 	@Override
 	public List<Document> getDocList(SearchQuery query) {
-		return sdf.getDocList(query);
+		return staticDaoFacade.getDocList(query);
 	}
 
 	@Override
 	public Document saveDocument(Document doc) {
-		return sdf.saveDocument(doc);
+		return staticDaoFacade.saveDocument(doc);
 	}
 
 	@Override
 	public Attachment saveAttachment(Attachment attach) {
-		return sdf.saveAttachment(attach);
+		return staticDaoFacade.saveAttachment(attach);
 	}
 
 	@Override
 	public Document getDocument(Document doc) {
-		return sdf.getDocument(doc);
+		return staticDaoFacade.getDocument(doc);
 	}
 
 	@Override
 	public boolean deleteAttachment(Attachment attch) {
-		return sdf.deleteAttachment(attch);
+		return staticDaoFacade.deleteAttachment(attch);
 	}
 
 	@Override
 	public boolean deleteDocument(Document attch) {
-		return sdf.deleteDocument(attch);
+		return staticDaoFacade.deleteDocument(attch);
 	}
 
 	@Override
 	public void rebuildIndex() {
-		sdf.rebuildIndex();
+		staticDaoFacade.rebuildIndex();
 	}
 
 	@Override
 	public List<String> getCategories() throws RemoteException {
-		return sdf.getCategories();
+		return staticDaoFacade.getCategories();
 	}
 
 	@Override
@@ -80,121 +80,121 @@ public class PunterSearchServer implements PunterSearch {
 
 	@Override
 	public void removeTask(TaskData task) throws Exception {
-			sdf.removeTask(task);
+			staticDaoFacade.removeTask(task);
 	}
 
 	@Override
 	public void removeProcess(ProcessData processData) throws Exception {
-			sdf.removeProcess(processData);
+			staticDaoFacade.removeProcess(processData);
 	}
 
 	@Override
 	public TaskData createTask(TaskData task) throws Exception {
-			return sdf.createTask(task);
+			return staticDaoFacade.createTask(task);
 	}
 
 	@Override
 	public ProcessData createProcess(ProcessData proc) throws Exception {
-			return sdf.createProcess(proc);
+			return staticDaoFacade.createProcess(proc);
 	}
 
 	@Override
 	public ProcessHistory createProcessHistory(ProcessHistory ph) throws Exception {
-			return sdf.createProcessHistory(ph);
+			return staticDaoFacade.createProcessHistory(ph);
 	}
 
 	@Override
 	public TaskHistory createTaskHistory(TaskHistory th) throws Exception {
-			return sdf.createTaskHistory(th);
+			return staticDaoFacade.createTaskHistory(th);
 	}
 
 	@Override
 	public void saveTaskHistory(TaskHistory t) throws Exception {
-			sdf.saveTaskHistory(t);
+			staticDaoFacade.saveTaskHistory(t);
 	}
 
 	@Override
 	public void saveProcessHistory(ProcessHistory procHistory) throws Exception {
-				sdf.saveProcessHistory(procHistory);
+				staticDaoFacade.saveProcessHistory(procHistory);
 	}
 
 	@Override
 	public TaskData saveTask(TaskData t) throws Exception {
-			return sdf.saveTask(t);
+			return staticDaoFacade.saveTask(t);
 	}
 
 	@Override
 	public ProcessData saveProcess(ProcessData p) throws Exception {
-			return sdf.saveProcess(p);
+			return staticDaoFacade.saveProcess(p);
 	}
 
 	@Override
 	public void listTask(long id) throws Exception {
-			sdf.listTask(id);
+			staticDaoFacade.listTask(id);
 	}
 
 	@Override
 	public List<ProcessData> getScheduledProcessList(String username) throws Exception {
-			return sdf.getScheduledProcessList(username);
+			return staticDaoFacade.getScheduledProcessList(username);
 	}
 
 	@Override
 	public List<ProcessData> getProcessList(String username) throws Exception {
-			return sdf.getProcessList(username);
+			return staticDaoFacade.getProcessList(username);
 	}
 
 	@Override
 	public ProcessData getProcess(long id) throws Exception {
-			return sdf.getProcess(id);
+			return staticDaoFacade.getProcess(id);
 	}
 
 	@Override
 	public TaskHistory getTaskDao(TaskHistory td) throws Exception {
-			return sdf.getTaskDao(td);
+			return staticDaoFacade.getTaskDao(td);
 	}
 
 	@Override
 	public List<ProcessHistory> getProcessHistoryListForProcessId(long id)
             throws Exception {
-			return sdf.getProcessHistoryListForProcessId(id);
+			return staticDaoFacade.getProcessHistoryListForProcessId(id);
 	}
 
 	@Override
 	public List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id)
             throws Exception {
-			return sdf.getSortedProcessHistoryListForProcessId(id);
+			return staticDaoFacade.getSortedProcessHistoryListForProcessId(id);
 	}
 
 	@Override
 	public ProcessHistory getProcessHistoryById(long id) throws Exception {
-			return sdf.getProcessHistoryById(id);
+			return staticDaoFacade.getProcessHistoryById(id);
 	}
 
 	@Override
 	public List<TaskData> getProcessTasksById(long pid) throws Exception {
-			return sdf.getProcessTasksById(pid);
+			return staticDaoFacade.getProcessTasksById(pid);
 	}
 
 	@Override
 	public List<TaskData> getSortedTasksByProcessId(long pid)
             throws Exception {
-			return sdf.getSortedTasksByProcessId(pid);
+			return staticDaoFacade.getSortedTasksByProcessId(pid);
 	}
 
 	@Override
 	public List<TaskData> getProcessTasks(long pid) throws Exception {
-			return sdf.getProcessTasks(pid);
+			return staticDaoFacade.getProcessTasks(pid);
 	}
 
 	@Override
 	public void deleteTeam() throws RemoteException {
-		sdf.deleteTeam();
+		staticDaoFacade.deleteTeam();
 	}
 
 	@Override
 	public List<ProcessHistory> getMySortedProcessHistoryList(String username)
 			throws RemoteException {
-			return sdf.getMySortedProcessHistoryList(username);
+			return staticDaoFacade.getMySortedProcessHistoryList(username);
 	}
 
 	@Override
@@ -208,8 +208,8 @@ public class PunterSearchServer implements PunterSearch {
 	}
 
     @Override
-    public String connect(String sessionId) throws RemoteException {
-        return sessionFacade.getSession(sessionId).getSessionId();
+    public String connect(String username) throws RemoteException {
+        return sessionFacade.getSession(username);
     }
 
     @Override
@@ -219,7 +219,7 @@ public class PunterSearchServer implements PunterSearch {
 
     @Override
     public void sendMessage(String sessionId, PunterMessage punterMessage) throws RemoteException, InterruptedException {
-        sessionFacade.sendMessage(sessionId,punterMessage);
+        sessionFacade.sendMessage(sessionId, punterMessage);
     }
 
     @Override
