@@ -43,7 +43,6 @@ public class StaticDaoFacade {
                     try {
                         PunterMessage message = getMessage();
                         process(message);
-                        TimeUnit.SECONDS.sleep(1);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } catch (RemoteException e) {
@@ -64,6 +63,7 @@ public class StaticDaoFacade {
 
     private void process(PunterMessage message) {
         System.out.println("Got generic message from server : " + message);
+        clipBoardListener.handleContent((ClipboardPunterMessage) message);
     }
 
     public PunterMessage getMessage() throws InterruptedException, RemoteException {
