@@ -59,7 +59,7 @@ public class ClipBoardListener extends Thread implements ClipboardOwner {
             } catch (IOException e2) {
                 e2.printStackTrace();
             } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             }
         }
     }
