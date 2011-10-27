@@ -14,12 +14,16 @@ import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
+import com.sapient.punter.utils.ClipBoardListener;
+import com.sapient.server.ClipboardPunterMessage;
 import com.sapient.server.PunterMessage;
 import com.sapient.server.PunterSearch;
 
 public class StaticDaoFacade {
     private static StaticDaoFacade sdf;
     private PunterSearch stub;
+    private ClipBoardListener clipBoardListener = new ClipBoardListener();
+
 
     public String getSessionId() {
         return sessionId;
@@ -53,8 +57,13 @@ public class StaticDaoFacade {
         thread.start();
     }
 
+    private void process(ClipboardPunterMessage message) {
+        System.out.println("Got Clipboard message from server : " + message);
+        clipBoardListener.handleContent(message);
+    }
+
     private void process(PunterMessage message) {
-        System.out.println("Got the message from server : " + message);
+        System.out.println("Got generic message from server : " + message);
     }
 
     public PunterMessage getMessage() throws InterruptedException, RemoteException {
@@ -70,11 +79,6 @@ public class StaticDaoFacade {
 
     public void ping() throws RemoteException {
         stub.ping(getSessionId());
-        try {
-            sendMessageToPeer(new PunterMessage());
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
     }
 
     public InetAddress getServerHostAddress() throws Exception {
@@ -88,6 +92,7 @@ public class StaticDaoFacade {
     private StaticDaoFacade() {
         makeConnection();
         messageProcessor();
+        clipBoardListener.start();
     }
 
     public void setSessionId(String sessionId) {

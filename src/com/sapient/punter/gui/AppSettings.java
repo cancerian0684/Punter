@@ -39,7 +39,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	public Point TextAreaEditorLocation;
 	private int maxResults;
 	private boolean isNimbusLookNFeel;
-	private boolean multiSearchEnable=false;
+	private boolean multiSearchEnable=true;
 	private String username;
 	private int keystrokeFlush;
 	private int maxKeyStrokeDelay;
