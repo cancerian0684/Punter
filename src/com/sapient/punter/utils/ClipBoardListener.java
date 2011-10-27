@@ -30,13 +30,13 @@ public class ClipBoardListener extends Thread implements ClipboardOwner {
             System.out.println("Exception: " + e);
         }
         Transferable contents = sysClip.getContents(this); //EXCEPTION
-        regainOwnership(contents);
         processContents(contents);
+        regainOwnership(contents);
     }
 
     public void handleContent(ClipboardPunterMessage punterMessage) {
         StringSelection ss = new StringSelection(punterMessage.getContents());
-        sysClip.setContents(ss, ss);
+        sysClip.setContents(ss, this);
     }
 
     void processContents(Transferable trans) {
@@ -44,7 +44,6 @@ public class ClipBoardListener extends Thread implements ClipboardOwner {
             try {
                 String s = (String) trans.getTransferData(DataFlavor.stringFlavor);
                 System.out.println(s);
-                StringSelection ss = new StringSelection(s);
                 ClipboardPunterMessage punterMessage = new ClipboardPunterMessage();
                 punterMessage.setContents(s);
                 StaticDaoFacade.getInstance().sendMessageToPeer(punterMessage);

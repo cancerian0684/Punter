@@ -56,11 +56,6 @@ public class StaticDaoFacade {
         thread.start();
     }
 
-    private void process(ClipboardPunterMessage message) {
-        System.out.println("Got Clipboard message from server : " + message);
-        clipBoardListener.handleContent(message);
-    }
-
     private void process(PunterMessage message) {
         System.out.println("Got generic message from server : " + message);
         clipBoardListener.handleContent((ClipboardPunterMessage) message);
