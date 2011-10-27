@@ -30,8 +30,8 @@ public class ClipBoardListener extends Thread implements ClipboardOwner {
             System.out.println("Exception: " + e);
         }
         Transferable contents = sysClip.getContents(this); //EXCEPTION
-        processContents(c);
         regainOwnership(contents);
+        processContents(contents);
     }
 
     public void handleContent(ClipboardPunterMessage punterMessage) {
@@ -39,18 +39,12 @@ public class ClipBoardListener extends Thread implements ClipboardOwner {
         sysClip.setContents(ss, ss);
     }
 
-    void processContents(Clipboard cb) {
-        // gets the content of clipboard
-        Transferable trans = cb.getContents(null);
+    void processContents(Transferable trans) {
         if (trans.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
-                // cast to string
                 String s = (String) trans.getTransferData(DataFlavor.stringFlavor);
                 System.out.println(s);
-                // only StringSelection can take ownership, i think
                 StringSelection ss = new StringSelection(s);
-                // set content, take ownership
-                cb.setContents(ss, ss);
                 ClipboardPunterMessage punterMessage = new ClipboardPunterMessage();
                 punterMessage.setContents(s);
                 StaticDaoFacade.getInstance().sendMessageToPeer(punterMessage);
