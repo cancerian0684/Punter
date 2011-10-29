@@ -13,15 +13,9 @@ public class ClipBoardListener extends Thread implements ClipboardOwner {
     public void run() {
         Transferable trans = sysClip.getContents(this);
         regainOwnership(trans);
-        /*System.out.println("Listening to board...");
-        try {
-            Thread.sleep(30000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }*/
     }
 
-    public void lostOwnership(Clipboard c, Transferable t) {
+    public void lostOwnership(Clipboard clipboard, Transferable transferable) {
         try {
             // sleep this thread so that other application is done with the Clipboard access.
             // otherwise an exception is thrown by the application.
@@ -29,20 +23,22 @@ public class ClipBoardListener extends Thread implements ClipboardOwner {
         } catch (Exception e) {
             System.out.println("Exception: " + e);
         }
-        Transferable contents = sysClip.getContents(this); //EXCEPTION
+        Transferable contents = sysClip.getContents(this);
         processContents(contents);
         regainOwnership(contents);
     }
 
     public void handleContent(ClipboardPunterMessage punterMessage) {
-        StringSelection ss = new StringSelection(punterMessage.getContents());
+        String contents = punterMessage.getContents();
+        System.out.println(contents);
+        StringSelection ss = new StringSelection(contents);
         sysClip.setContents(ss, this);
     }
 
-    void processContents(Transferable trans) {
-        if (trans.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+    void processContents(Transferable transferable) {
+        if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
-                String s = (String) trans.getTransferData(DataFlavor.stringFlavor);
+                String s = (String) transferable.getTransferData(DataFlavor.stringFlavor);
                 System.out.println(s);
                 ClipboardPunterMessage punterMessage = new ClipboardPunterMessage();
                 punterMessage.setContents(s);
@@ -57,8 +53,8 @@ public class ClipBoardListener extends Thread implements ClipboardOwner {
         }
     }
 
-    void regainOwnership(Transferable t) {
-        sysClip.setContents(t, this);
+    void regainOwnership(Transferable transferable) {
+        sysClip.setContents(transferable, this);
     }
 
     public static void main(String[] args) {

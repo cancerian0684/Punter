@@ -19,23 +19,22 @@ public class TopicHandler {
         return instance;
     }
 
-    public void subscribe(PunterSession punterSession, String queue) {
+    public synchronized void subscribe(PunterSession punterSession, String queue) {
         if (topicSessionMap.get(queue) == null) {
             topicSessionMap.put(queue, new ArrayList<PunterSession>());
         }
         topicSessionMap.get(queue).add(punterSession);
     }
 
-    public void unSubscribe(PunterSession punterSession, String queue) {
+    public synchronized void unSubscribe(PunterSession punterSession, String queue) {
         topicSessionMap.get(queue).remove(punterSession);
     }
 
-    public void publishMessage(String sessionId, PunterMessage punterMessage, String topic) {
+    public synchronized void publishMessage(String sessionId, PunterMessage punterMessage, String topic) {
         ArrayList<PunterSession> arrayList = topicSessionMap.get(topic);
         for (PunterSession punterSession : arrayList) {
             if (!punterSession.getSessionId().equalsIgnoreCase(sessionId))
                 ((BlockingQueue<PunterMessage>) punterSession.getObject("queue")).offer(punterMessage);
         }
     }
-
 }
