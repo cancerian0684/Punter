@@ -231,11 +231,12 @@ public class PunterKB extends JPanel {
         searchResultTable.setTransferHandler(new TransferHandler() {
             DataFlavor Linux = new DataFlavor("text/uri-list;class=java.io.Reader");
             DataFlavor Windows = DataFlavor.javaFileListFlavor;
+            DataFlavor rtfDataFlavor = new DataFlavor("text/rtf; class=java.io.InputStream");
+            DataFlavor htmlDataFlavor = new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16");
 
             public boolean canImport(TransferHandler.TransferSupport support) {
                 try {
-                    if (support.isDataFlavorSupported(Linux) || support.isDataFlavorSupported(Windows) || support.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream")) || support.isDataFlavorSupported(new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16"))) {
-
+                    if (support.isDataFlavorSupported(Linux) || support.isDataFlavorSupported(Windows) || support.isDataFlavorSupported(rtfDataFlavor) || support.isDataFlavorSupported(htmlDataFlavor)) {
                     } else {
                         DataFlavor[] dfs = support.getDataFlavors();
                         System.out.println("\n\nTotal MimeTypes Supported by this operation :" + dfs.length);
@@ -467,10 +468,8 @@ public class PunterKB extends JPanel {
                             return flavors;
                         }
 
-                        public boolean isDataFlavorSupported(
-                                DataFlavor flavor) {
-                            return flavor.equals(
-                                    DataFlavor.javaFileListFlavor);
+                        public boolean isDataFlavorSupported(DataFlavor flavor) {
+                            return flavor.equals(Windows) || flavor.equals(Linux);
                         }
                     };
                     return transferable;
