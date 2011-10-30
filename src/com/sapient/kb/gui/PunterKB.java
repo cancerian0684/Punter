@@ -24,11 +24,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -74,7 +72,9 @@ public class PunterKB extends JPanel {
     private JToggleButton andOrToggleButton = new JToggleButton("O");
     private static final List<String> categories = StaticDaoFacade.getInstance().getCategories();
     private static StaticDaoFacade docService = StaticDaoFacade.getInstance();
+
     private PunterDelayedQueueHandlerThread<SearchQuery> punterDelayedQueueHandlerThread;
+
     {
         try {
             docService.getDocList(new SearchQuery.SearchQueryBuilder().query("").build());
@@ -83,7 +83,7 @@ public class PunterKB extends JPanel {
         }
     }
 
-    public PunterKB() {
+    public PunterKB() throws ClassNotFoundException {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         searchTextField = new JTextField(20);
@@ -93,9 +93,11 @@ public class PunterKB extends JPanel {
                     public void changedUpdate(DocumentEvent e) {
                         updateSearchResult();
                     }
+
                     public void insertUpdate(DocumentEvent e) {
                         updateSearchResult();
                     }
+
                     public void removeUpdate(DocumentEvent e) {
                         updateSearchResult();
                     }
@@ -227,9 +229,12 @@ public class PunterKB extends JPanel {
             }
         }
         searchResultTable.setTransferHandler(new TransferHandler() {
+            DataFlavor Linux = new DataFlavor("text/uri-list;class=java.io.Reader");
+            DataFlavor Windows = DataFlavor.javaFileListFlavor;
+
             public boolean canImport(TransferHandler.TransferSupport support) {
                 try {
-                    if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor) || support.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream")) || support.isDataFlavorSupported(new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16"))) {
+                    if (support.isDataFlavorSupported(Linux) || support.isDataFlavorSupported(Windows) || support.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream")) || support.isDataFlavorSupported(new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16"))) {
 
                     } else {
                         DataFlavor[] dfs = support.getDataFlavors();
@@ -266,25 +271,48 @@ public class PunterKB extends JPanel {
                 }
                 System.err.println("Import possible");
                 try {
-                    Transferable t = support.getTransferable();
-                    if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    Transferable transferable = support.getTransferable();
+                    if (transferable.isDataFlavorSupported(Linux)) {
+                        String data = (String) transferable.getTransferData(Linux);
+                        for (StringTokenizer st = new StringTokenizer(data, "\r\n"); st.hasMoreTokens(); ) {
+                            String token = st.nextToken().trim();
+                            if (token.startsWith("#") || token.isEmpty()) {
+                                // comment line, by RFC 2483
+                                continue;
+                            }
+                            File file = new File(new URI(token));
+                            System.err.println(file.getName());
+                            Document doc = new Document();
+                            doc.setAuthor(AppSettings.getInstance().getUsername());
+                            doc.setTitle(file.getName());
+                            doc.setContent(getBytesFromFile(file));
+                            doc.setExt(getExtension(file));
+                            if (getExtension(file) == null || getExtension(file).isEmpty())
+                                doc.setExt(".txt");
+                            doc.setDateCreated(new Date());
+                            doc.setDateUpdated(new Date());
+                            doc.setCategory(getSelectedCategory());
+                            doc = docService.saveDocument(doc);
+                            System.err.println("Document added : " + file.getName());
+                        }
+                    } else if (transferable.isDataFlavorSupported(Windows)) {
                         System.err.println("Import possible .. file");
                         try {
-                            java.util.List<File> l = (java.util.List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
-                            for (File f : l) {
-                                System.err.println(f.getName());
+                            java.util.List<File> l = (java.util.List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                            for (File file : l) {
+                                System.err.println(file.getName());
                                 Document doc = new Document();
                                 doc.setAuthor(AppSettings.getInstance().getUsername());
-                                doc.setTitle(f.getName());
-                                doc.setContent(getBytesFromFile(f));
-                                doc.setExt(getExtension(f));
-                                if (getExtension(f) == null || getExtension(f).isEmpty())
+                                doc.setTitle(file.getName());
+                                doc.setContent(getBytesFromFile(file));
+                                doc.setExt(getExtension(file));
+                                if (getExtension(file) == null || getExtension(file).isEmpty())
                                     doc.setExt(".txt");
                                 doc.setDateCreated(new Date());
                                 doc.setDateUpdated(new Date());
                                 doc.setCategory(getSelectedCategory());
                                 doc = docService.saveDocument(doc);
-                                System.err.println("Document added : " + f.getName());
+                                System.err.println("Document added : " + file.getName());
                             }
                             return true;
                         } catch (UnsupportedFlavorException e) {
@@ -292,13 +320,13 @@ public class PunterKB extends JPanel {
                         } catch (IOException e) {
                             return false;
                         }
-                    } else if (t.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream"))) {
+                    } else if (transferable.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream"))) {
                         System.err.println("Import possible .. rtf");
                         try {
                             String docName = JOptionPane.showInputDialog("Enter Document Name : ", "Test");
                             DataFlavor[] dfs = {new DataFlavor("text/rtf; class=java.io.InputStream")};
                             //	df.s
-                            InputStream in = (InputStream) t.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
+                            InputStream in = (InputStream) transferable.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
 //                    //  System.out.println(out);
                             File f = File.createTempFile("test", ".rtf");
                             FileOutputStream fo = new FileOutputStream(f);
@@ -336,11 +364,11 @@ public class PunterKB extends JPanel {
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
                         }
-                    } else if (t.isDataFlavorSupported(new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16"))) {
+                    } else if (transferable.isDataFlavorSupported(new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16"))) {
                         System.err.println("Import possible .. html");
                         try {
                             DataFlavor[] dfs = {new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16")};
-                            InputStream in = (InputStream) t.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
+                            InputStream in = (InputStream) transferable.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
                             File f = File.createTempFile("test", ".html");
                             FileOutputStream fo = new FileOutputStream(f);
                             copy(in, fo);
@@ -372,7 +400,7 @@ public class PunterKB extends JPanel {
                         }
                     } else {
                         System.err.println("Data Flavors not supported yet :");
-                        DataFlavor dfs[] = t.getTransferDataFlavors();
+                        DataFlavor dfs[] = transferable.getTransferDataFlavors();
                         for (DataFlavor df : dfs) {
                             System.err.println(df.getMimeType());
                         }
@@ -388,7 +416,7 @@ public class PunterKB extends JPanel {
             }
 
             protected Transferable createTransferable(JComponent c) {
-                final DataFlavor flavors[] = {DataFlavor.javaFileListFlavor/*,uriListFlavor*/};
+                final DataFlavor flavors[] = {Windows, Linux};
                 JTable table = (JTable) c;
                 int[] selectedRows = table.getSelectedRows();
                 final List<File> files = new java.util.ArrayList<File>();
@@ -423,9 +451,14 @@ public class PunterKB extends JPanel {
                 if (files.size() > 0) {
                     Transferable transferable = new Transferable() {
                         public Object getTransferData(DataFlavor flavor) {
-                            if (flavor.equals(DataFlavor.javaFileListFlavor)) {
+                            if (flavor.equals(Windows)) {
                                 return files;
-
+                            } else if (flavor.equals(Linux)) {
+                                String data = "";
+                                for (File file : files) {
+                                    data += file.toURI() + "\r\n";
+                                }
+                                return data;
                             }
                             return null;
                         }
