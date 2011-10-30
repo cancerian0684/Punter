@@ -2,11 +2,8 @@ package com.sapient.punter.tasks;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import com.sapient.punter.annotations.InputParam;
@@ -14,7 +11,7 @@ import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="EchoTask",description="Load process properties into the system.",documentation="com/sapient/punter/tasks/docs/TextSamplerDemoHelp.html")
+@PunterTask(author="munishc",name="EchoTask",description="Load process properties into the system.",documentation= "docs/docs/TextSamplerDemoHelp.html")
 public class DeclareVariableTask extends Tasks {
 	private static final long serialVersionUID = 1L;
 

@@ -4,17 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.Date;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="CloseDAISYFundsTask",description="Close Out DAISY Funds.",documentation="com/sapient/punter/tasks/docs/TextSamplerDemoHelp.html")
+@PunterTask(author="munishc",name="CloseDAISYFundsTask",description="Close Out DAISY Funds.",documentation= "docs/docs/TextSamplerDemoHelp.html")
 public class CloseDAISYFundsTask extends Tasks {
 	@InputParam(required = true,description="jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1") 
 	private String conURL;

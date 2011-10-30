@@ -16,7 +16,7 @@ import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="GenTableDDLTask",documentation="com/sapient/punter/tasks/docs/GenTableDDLTask.html") 
+@PunterTask(author="munishc",name="GenTableDDLTask",documentation= "docs/docs/GenTableDDLTask.html")
 public class GenTableDDLTask extends Tasks {
 	@InputParam(required = true,description="jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1") 
 	private String conURL;

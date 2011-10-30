@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.PunterTask;
 
-@PunterTask(author="sharmban",name="UpdateSedolTask",description="Updates Sedol for Fund in AISDB and DAISY",documentation="com/sapient/punter/tasks/docs/TextSamplerDemoHelp.html")
+@PunterTask(author="sharmban",name="UpdateSedolTask",description="Updates Sedol for Fund in AISDB and DAISY",documentation= "docs/docs/TextSamplerDemoHelp.html")
 public class UpdateSedolTask extends Tasks{
 	private Connection dAISyQADBConnection = null;
 	@InputParam(required = true,description="jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1")

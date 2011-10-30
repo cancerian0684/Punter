@@ -13,7 +13,7 @@ import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 
-@PunterTask(author="munishc",name="CopyTableDataTask",description="Copie's Select Queries resultset to target Table.",documentation="com/sapient/punter/tasks/docs/CopyTableDataTask.html")
+@PunterTask(author="munishc",name="CopyTableDataTask",description="Copie's Select Queries resultset to target Table.",documentation= "docs/docs/CopyTableDataTask.html")
 public class CopyTableDataTask extends Tasks {
 	@InputParam(required = true,description="Enter source DB URL Connection.")
 	private String sourceDbURL;

@@ -6,7 +6,7 @@ import com.sapient.punter.annotations.PunterTask;
 import java.io.InputStream;
 import java.util.logging.Level;
 
-@PunterTask(author = "munishc", name = "SystemCommandTask", documentation = "com/sapient/punter/tasks/docs/SystemCommandTask.html")
+@PunterTask(author = "munishc", name = "SystemCommandTask", documentation = "docs/docs/SystemCommandTask.html")
 public class SystemCommandTask extends Tasks {
     @InputParam(required = true, description = "imp 'DAISY4/Welcome1@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1523)(HOST=xldn2738dor.ldn.swissbank.com)))(CONNECT_DATA=(SERVICE_NAME=DELSHRD1)))' fromuser=AIS1 touser=DAISY2 ignore=y log=C:\\import_daisy.log file=#{dumpFile}")
     public String systemCommand;

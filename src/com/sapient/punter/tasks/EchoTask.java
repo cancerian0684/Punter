@@ -8,7 +8,7 @@ import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 
-@PunterTask(author="munishc",name="EchoTask",description="Echo's the input data to SOP",documentation="com/sapient/punter/tasks/docs/TextSamplerDemoHelp.html")
+@PunterTask(author="munishc",name="EchoTask",description="Echo's the input data to SOP",documentation= "docs/docs/TextSamplerDemoHelp.html")
 public class EchoTask extends Tasks {
 	@InputParam(required = true,description="enter your name here")
 	private String name;

@@ -2,7 +2,6 @@ package com.sapient.punter.tasks;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +38,7 @@ import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="SVNCommitHistoryTask",description="Takes out SVN Commit history.",documentation="com/sapient/punter/tasks/docs/TextSamplerDemoHelp.html")
+@PunterTask(author="munishc",name="SVNCommitHistoryTask",description="Takes out SVN Commit history.",documentation= "docs/docs/TextSamplerDemoHelp.html")
 public class SVNCommitHistoryTask extends Tasks {
 	@InputParam(required = true,description="Line separated Project Names")
 	private String projectNames;

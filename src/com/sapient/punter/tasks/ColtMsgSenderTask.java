@@ -1,9 +1,6 @@
 package com.sapient.punter.tasks;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import org.apache.http.HttpEntity;
@@ -19,7 +16,7 @@ import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="ColtMsgSenderTask",description="Echo's the input data to SOP",documentation="com/sapient/punter/tasks/docs/TextSamplerDemoHelp.html")
+@PunterTask(author="munishc",name="ColtMsgSenderTask",description="Echo's the input data to SOP",documentation= "docs/docs/TextSamplerDemoHelp.html")
 public class ColtMsgSenderTask extends Tasks {
 	@InputParam(required = true,description="enter your name here")
 	private String server;

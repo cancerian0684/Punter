@@ -4,12 +4,10 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.ByteArrayOutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
-import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -29,7 +27,7 @@ import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="ShellScriptTask",description="Runs Script in Bash Shell",documentation="com/sapient/punter/tasks/docs/ShellScriptTask.html")
+@PunterTask(author="munishc",name="ShellScriptTask",description="Runs Script in Bash Shell",documentation= "docs/docs/ShellScriptTask.html")
 public class ShellScriptTask extends Tasks {
 	@InputParam(required = true,description="Hostname of Unix machine")
 	private String hostname;

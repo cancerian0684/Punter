@@ -2,10 +2,8 @@ package com.sapient.punter.tasks;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -13,11 +11,10 @@ import java.sql.Statement;
 import java.util.logging.Level;
 
 import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="DBCleanupTask",documentation="com/sapient/punter/tasks/docs/DBCleanupTask.html") 
+@PunterTask(author="munishc",name="DBCleanupTask",documentation= "docs/docs/DBCleanupTask.html")
 public class DBCleanupTask extends Tasks {
 	@InputParam(required = true,description="jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1") 
 	private String conURL;

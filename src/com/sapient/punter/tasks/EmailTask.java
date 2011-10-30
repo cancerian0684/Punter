@@ -8,7 +8,7 @@ import com.sapient.punter.utils.EmailService;
 import com.sapient.punter.utils.EmailServiceWithAuth;
 import com.sapient.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="EmailTask",description="Email Task",documentation="com/sapient/punter/tasks/docs/EmailTask.html")
+@PunterTask(author="munishc",name="EmailTask",description="Email Task",documentation= "docs/docs/EmailTask.html")
 public class EmailTask extends Tasks {
 	@InputParam(required = true,description="comma separated to addresses") 
 	private String toAddress;

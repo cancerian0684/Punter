@@ -9,7 +9,7 @@ import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 
-@PunterTask(author="munishc",name="DBExportTask",documentation="com/sapient/punter/tasks/docs/DBExportTask.html") 
+@PunterTask(author="munishc",name="DBExportTask",documentation= "docs/docs/DBExportTask.html")
 public class DBExportTask extends Tasks {
 	@InputParam(required = true,description="Get expCommand help from DBExport Task.") 
 	private String expCommand;

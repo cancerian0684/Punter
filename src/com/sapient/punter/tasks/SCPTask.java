@@ -4,18 +4,11 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.util.Scanner;
-import java.util.StringTokenizer;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import javax.swing.JLabel;
@@ -25,16 +18,14 @@ import javax.swing.JTextField;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UIKeyboardInteractive;
 import com.jcraft.jsch.UserInfo;
 import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.OutputParam;
 import com.sapient.punter.annotations.PunterTask;
 
-@PunterTask(author="munishc",name="SCPTask",description="SCP File to remote machine.",documentation="com/sapient/punter/tasks/docs/SCPTask.html")
+@PunterTask(author="munishc",name="SCPTask",description="SCP File to remote machine.",documentation= "docs/docs/SCPTask.html")
 public class SCPTask extends Tasks {
 	@InputParam(required = true,description="Hostname of Unix machine")
 	private String hostname;

@@ -11,7 +11,7 @@ import com.sapient.punter.annotations.InputParam;
 import com.sapient.punter.annotations.PunterTask;
 import com.sapient.punter.utils.StringUtils;
 
-@PunterTask(author = "munishc", name = "CreateTablesTask", documentation = "com/sapient/punter/tasks/docs/CreateTablesTask.html")
+@PunterTask(author = "munishc", name = "CreateTablesTask", documentation = "docs/docs/CreateTablesTask.html")
 public class CreateTablesTask extends Tasks {
 	@InputParam(required = true, description = "comma delimited sql DDL script")
 	private String SQLScript;
