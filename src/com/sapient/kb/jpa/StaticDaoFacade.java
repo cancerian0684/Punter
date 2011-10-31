@@ -19,6 +19,8 @@ import com.sapient.server.ClipboardPunterMessage;
 import com.sapient.server.PunterMessage;
 import com.sapient.server.PunterSearch;
 
+import javax.swing.*;
+
 public class StaticDaoFacade {
     private static StaticDaoFacade sdf;
     private PunterSearch stub;
@@ -94,22 +96,22 @@ public class StaticDaoFacade {
     }
 
     public void makeConnection() {
-        String host = "localhost";
+        String defaultHost = "127.0.0.1";
+        if (AppSettings.getInstance().getServerHost() == null || AppSettings.getInstance().getServerHost().isEmpty()) {
+            if (AppSettings.getInstance().isMultiSearchEnable()) {
+                MultiCastServerLocator mcsl = new MultiCastServerLocator();
+                defaultHost = mcsl.LocateServerAddress();
+            }
+            defaultHost = JOptionPane.showInputDialog("Enter Server IP Address : ", defaultHost);
+            AppSettings.getInstance().setServerHost(defaultHost);
+        }
         try {
             Registry registry = null;
             try {
-                registry = LocateRegistry.getRegistry(host);
+                registry = LocateRegistry.getRegistry(AppSettings.getInstance().getServerHost());
             } catch (Exception e) {
                 e.printStackTrace();
-                if (AppSettings.getInstance().isMultiSearchEnable()) {
-                    try {
-                        MultiCastServerLocator mcsl = new MultiCastServerLocator();
-                        host = mcsl.LocateServerAddress();
-                        registry = LocateRegistry.getRegistry(host);
-                    } catch (Exception ee) {
-                        ee.printStackTrace();
-                    }
-                }
+                AppSettings.getInstance().setServerHost(null);
             }
             stub = (PunterSearch) registry.lookup("PunterSearch");
             if (getSessionId() == null) {
@@ -118,6 +120,7 @@ public class StaticDaoFacade {
             stub.ping(getSessionId());
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
+            AppSettings.getInstance().setServerHost(null);
 //			e.printStackTrace();
         }
     }

@@ -7,7 +7,7 @@ import java.net.MulticastSocket;
 
 public class MultiCastResponder {
 	private static MultiCastResponder mcr;
-	private volatile boolean keepRunning=false;
+	private volatile boolean keepRunning=true;
 	public static MultiCastResponder getInstance(){
 		if(mcr==null){
 			try {

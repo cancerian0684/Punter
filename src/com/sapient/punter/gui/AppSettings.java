@@ -53,6 +53,18 @@ public class AppSettings implements Serializable, AppSettingsMBean{
     private String tempDirectory;
     private boolean showActiveTasks;
 
+    @Override
+    public String getServerHost() {
+        return serverHost;
+    }
+
+    @Override
+    public void setServerHost(String serverHost) {
+        this.serverHost = serverHost;
+    }
+
+    private String serverHost;
+
     private AppSettings(){
 		KBFrameLocation=new Point(0, 0);
 		PunterGuiFrameLocation=new Point(0, 0);

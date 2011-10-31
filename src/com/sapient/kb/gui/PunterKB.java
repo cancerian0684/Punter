@@ -1,48 +1,22 @@
 package com.sapient.kb.gui;
 
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.*;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -69,8 +43,27 @@ public class PunterKB extends JPanel {
     private static final List<String> categories = StaticDaoFacade.getInstance().getCategories();
     private static StaticDaoFacade docService = StaticDaoFacade.getInstance();
 
-    private PunterDelayedQueueHandlerThread<SearchQuery> punterDelayedQueueHandlerThread;
+    private DataFlavor Linux = new DataFlavor("text/uri-list;class=java.io.Reader");
+    private DataFlavor Windows = DataFlavor.javaFileListFlavor;
+    private DataFlavor rtfDataFlavor = new DataFlavor("text/rtf; class=java.io.InputStream");
+    private DataFlavor htmlDataFlavor = new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16");
 
+    public void registerKeyBindings() {
+//        KeyStroke.getKeyStroke("F2")
+//        KeyStroke escapeKey = KeyStroke.getKeyStroke("ESCAPE");
+        KeyStroke pasteKey = KeyStroke.getKeyStroke("F2");
+//        KeyStroke pasteKey = KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK);
+        searchResultTable.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(pasteKey, "pasteKeyEvent");
+        searchResultTable.getActionMap().put("pasteKeyEvent", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("CTRL+V got called.");
+                getContentsFromTransferrable(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null));
+            }
+        });
+    }
+
+    private PunterDelayedQueueHandlerThread<SearchQuery> punterDelayedQueueHandlerThread;
     {
         try {
             docService.getDocList(new SearchQuery.SearchQueryBuilder().query("").build());
@@ -225,11 +218,6 @@ public class PunterKB extends JPanel {
             }
         }
         searchResultTable.setTransferHandler(new TransferHandler() {
-            DataFlavor Linux = new DataFlavor("text/uri-list;class=java.io.Reader");
-            DataFlavor Windows = DataFlavor.javaFileListFlavor;
-            DataFlavor rtfDataFlavor = new DataFlavor("text/rtf; class=java.io.InputStream");
-            DataFlavor htmlDataFlavor = new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16");
-
             public boolean canImport(TransferHandler.TransferSupport support) {
                 try {
                     if (support.isDataFlavorSupported(Linux) || support.isDataFlavorSupported(Windows) || support.isDataFlavorSupported(rtfDataFlavor) || support.isDataFlavorSupported(htmlDataFlavor)) {
@@ -263,150 +251,16 @@ public class PunterKB extends JPanel {
 
             @SuppressWarnings("unchecked")
             public boolean importData(TransferHandler.TransferSupport support) {
+                return importContentsIntoSystem(support);
+            }
+
+            private boolean importContentsIntoSystem(TransferSupport support) {
                 if (!canImport(support)) {
                     return false;
                 }
                 System.err.println("Import possible");
-                try {
-                    Transferable transferable = support.getTransferable();
-                    if (transferable.isDataFlavorSupported(Linux)) {
-//                        String data = (String) transferable.getTransferData(Linux);
-                        String data = IOUtils.toString((InputStreamReader) transferable.getTransferData(Linux));
-                        for (StringTokenizer st = new StringTokenizer(data, "\r\n"); st.hasMoreTokens(); ) {
-                            String token = st.nextToken().trim();
-                            if (token.startsWith("#") || token.isEmpty()) {
-                                // comment line, by RFC 2483
-                                continue;
-                            }
-                            File file = new File(new URI(token));
-                            System.err.println(file.getName());
-                            Document doc = new Document();
-                            doc.setAuthor(AppSettings.getInstance().getUsername());
-                            doc.setTitle(file.getName());
-                            doc.setContent(getBytesFromFile(file));
-                            doc.setExt(getExtension(file));
-                            if (getExtension(file) == null || getExtension(file).isEmpty())
-                                doc.setExt(".txt");
-                            doc.setDateCreated(new Date());
-                            doc.setDateUpdated(new Date());
-                            doc.setCategory(getSelectedCategory());
-                            doc = docService.saveDocument(doc);
-                            System.err.println("Document added : " + file.getName());
-                        }
-                    } else if (transferable.isDataFlavorSupported(Windows)) {
-                        System.err.println("Import possible .. file");
-                        try {
-                            java.util.List<File> l = (java.util.List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-                            for (File file : l) {
-                                System.err.println(file.getName());
-                                Document doc = new Document();
-                                doc.setAuthor(AppSettings.getInstance().getUsername());
-                                doc.setTitle(file.getName());
-                                doc.setContent(getBytesFromFile(file));
-                                doc.setExt(getExtension(file));
-                                if (getExtension(file) == null || getExtension(file).isEmpty())
-                                    doc.setExt(".txt");
-                                doc.setDateCreated(new Date());
-                                doc.setDateUpdated(new Date());
-                                doc.setCategory(getSelectedCategory());
-                                doc = docService.saveDocument(doc);
-                                System.err.println("Document added : " + file.getName());
-                            }
-                            return true;
-                        } catch (UnsupportedFlavorException e) {
-                            return false;
-                        } catch (IOException e) {
-                            return false;
-                        }
-                    } else if (transferable.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream"))) {
-                        System.err.println("Import possible .. rtf");
-                        try {
-                            String docName = JOptionPane.showInputDialog("Enter Document Name : ", "Test");
-                            DataFlavor[] dfs = {new DataFlavor("text/rtf; class=java.io.InputStream")};
-                            //	df.s
-                            InputStream in = (InputStream) transferable.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
-//                    //  System.out.println(out);
-                            File f = File.createTempFile("test", ".rtf");
-                            FileOutputStream fo = new FileOutputStream(f);
-                            copy(in, fo);
-                            //  fo.write(out.getBytes());
-                            fo.close();
-                            Document doc = new Document();
-                            doc.setAuthor(AppSettings.getInstance().getUsername());
-                            if (docName != null && !docName.isEmpty())
-                                doc.setTitle(docName);
-                            else
-                                doc.setTitle(f.getName());
-                            doc.setContent(getBytesFromFile(f));
-                            doc.setCategory(getSelectedCategory());
-                            doc.setExt(getExtension(f));
-                            if (getExtension(f) == null || getExtension(f).isEmpty())
-                                doc.setExt(".txt");
-                            doc.setDateCreated(new Date());
-                            doc.setDateUpdated(new Date());
-                            doc = docService.saveDocument(doc);
-                            System.err.println("Document added : test");
-//                      fileListerWorker.getFileListQueue().add(f);
-//                       System.out.println(f.getAbsolutePath());
-                            /*for (File f : l) {
-                                fileListerWorker.getFileListQueue().add(f);
-                                System.err.println(f.getName());
-                            }*/
-                            return true;
-                        } catch (UnsupportedFlavorException e) {
-                            System.out.println("UnsupportedFlavorException");
-                            //  return false;
-                        } catch (IOException e) {
-                            System.out.println("IOException");
-                            //  return false;
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                    } else if (transferable.isDataFlavorSupported(new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16"))) {
-                        System.err.println("Import possible .. html");
-                        try {
-                            DataFlavor[] dfs = {new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16")};
-                            InputStream in = (InputStream) transferable.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
-                            File f = File.createTempFile("test", ".html");
-                            FileOutputStream fo = new FileOutputStream(f);
-                            copy(in, fo);
-                            fo.close();
-                            System.out.println(f.getAbsolutePath());
-                            Document doc = new Document();
-                            doc.setAuthor(AppSettings.getInstance().getUsername());
-                            String docName = JOptionPane.showInputDialog("Enter Document Name : ", "Test");
-                            if (docName != null && !docName.isEmpty())
-                                doc.setTitle(docName);
-                            else
-                                doc.setTitle(f.getName());
-                            doc.setContent(getBytesFromFile(f));
-                            doc.setExt(getExtension(f));
-                            if (getExtension(f) == null || getExtension(f).isEmpty())
-                                doc.setExt(".txt");
-                            doc.setDateCreated(new Date());
-                            doc.setDateUpdated(new Date());
-                            doc.setCategory(getSelectedCategory());
-                            doc = docService.saveDocument(doc);
-                            System.err.println("Document added : test");
-                            return true;
-                        } catch (UnsupportedFlavorException e) {
-                            System.out.println("UnsupportedFlavorException");
-                        } catch (IOException e) {
-                            System.out.println("IOException");
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        System.err.println("Data Flavors not supported yet :");
-                        DataFlavor dfs[] = transferable.getTransferDataFlavors();
-                        for (DataFlavor df : dfs) {
-                            System.err.println(df.getMimeType());
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return false;
+                Transferable transferable = support.getTransferable();
+                return getContentsFromTransferrable(transferable);
             }
 
             public int getSourceActions(JComponent c) {
@@ -567,7 +421,7 @@ public class PunterKB extends JPanel {
         c.gridy = 1;
         add(new JScrollPane(searchResultTable), c);
 
-        final JMenuItem addProcessMenu, openDocMenu, deleteDocMenu, docTagsMenu, reindexDocsMenu, copyURL;
+        final JMenuItem addProcessMenu, openDocMenu, deleteDocMenu, docTagsMenu, reindexDocsMenu, copyURL, pasteMenu;
         final JPopupMenu popupProcess = new JPopupMenu();
         addProcessMenu = new JMenuItem("Add");
         addProcessMenu.addActionListener(new ActionListener() {
@@ -657,6 +511,15 @@ public class PunterKB extends JPanel {
         });
         popupProcess.add(docTagsMenu);
 
+        pasteMenu = new JMenuItem("Paste");
+        pasteMenu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Paste ClipBoard Contents");
+               getContentsFromTransferrable(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null));
+            }
+        });
+        popupProcess.add(pasteMenu);
+
         reindexDocsMenu = new JMenuItem("Rebuild Indexes");
         reindexDocsMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -700,6 +563,7 @@ public class PunterKB extends JPanel {
             }
         });
         popupProcess.add(copyURL);
+        registerKeyBindings();
         searchResultTable.addMouseListener(new MouseAdapter() {
             //JPopupMenu popup;
             public void mousePressed(MouseEvent e) {
@@ -727,6 +591,148 @@ public class PunterKB extends JPanel {
                 }
             }
         });
+    }
+
+    private boolean getContentsFromTransferrable(Transferable transferable) {
+        try {
+            if (transferable.isDataFlavorSupported(Linux)) {
+//                        String data = (String) transferable.getTransferData(Linux);
+                String data = IOUtils.toString((InputStreamReader) transferable.getTransferData(Linux));
+                for (StringTokenizer st = new StringTokenizer(data, "\r\n"); st.hasMoreTokens(); ) {
+                    String token = st.nextToken().trim();
+                    if (token.startsWith("#") || token.isEmpty()) {
+                        // comment line, by RFC 2483
+                        continue;
+                    }
+                    File file = new File(new URI(token));
+                    System.err.println(file.getName());
+                    Document doc = new Document();
+                    doc.setAuthor(AppSettings.getInstance().getUsername());
+                    doc.setTitle(file.getName());
+                    doc.setContent(getBytesFromFile(file));
+                    doc.setExt(getExtension(file));
+                    if (getExtension(file) == null || getExtension(file).isEmpty())
+                        doc.setExt(".txt");
+                    doc.setDateCreated(new Date());
+                    doc.setDateUpdated(new Date());
+                    doc.setCategory(getSelectedCategory());
+                    doc = docService.saveDocument(doc);
+                    System.err.println("Document added : " + file.getName());
+                }
+            } else if (transferable.isDataFlavorSupported(Windows)) {
+                System.err.println("Import possible .. file");
+                try {
+                    List<File> l = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                    for (File file : l) {
+                        System.err.println(file.getName());
+                        Document doc = new Document();
+                        doc.setAuthor(AppSettings.getInstance().getUsername());
+                        doc.setTitle(file.getName());
+                        doc.setContent(getBytesFromFile(file));
+                        doc.setExt(getExtension(file));
+                        if (getExtension(file) == null || getExtension(file).isEmpty())
+                            doc.setExt(".txt");
+                        doc.setDateCreated(new Date());
+                        doc.setDateUpdated(new Date());
+                        doc.setCategory(getSelectedCategory());
+                        doc = docService.saveDocument(doc);
+                        System.err.println("Document added : " + file.getName());
+                    }
+                    return true;
+                } catch (UnsupportedFlavorException e) {
+                    return false;
+                } catch (IOException e) {
+                    return false;
+                }
+            } else if (transferable.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream"))) {
+                System.err.println("Import possible .. rtf");
+                try {
+                    String docName = JOptionPane.showInputDialog("Enter Document Name : ", "Test");
+                    DataFlavor[] dfs = {new DataFlavor("text/rtf; class=java.io.InputStream")};
+                    //	df.s
+                    InputStream in = (InputStream) transferable.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
+//                    //  System.out.println(out);
+                    File f = File.createTempFile("test", ".rtf");
+                    FileOutputStream fo = new FileOutputStream(f);
+                    copy(in, fo);
+                    //  fo.write(out.getBytes());
+                    fo.close();
+                    Document doc = new Document();
+                    doc.setAuthor(AppSettings.getInstance().getUsername());
+                    if (docName != null && !docName.isEmpty())
+                        doc.setTitle(docName);
+                    else
+                        doc.setTitle(f.getName());
+                    doc.setContent(getBytesFromFile(f));
+                    doc.setCategory(getSelectedCategory());
+                    doc.setExt(getExtension(f));
+                    if (getExtension(f) == null || getExtension(f).isEmpty())
+                        doc.setExt(".txt");
+                    doc.setDateCreated(new Date());
+                    doc.setDateUpdated(new Date());
+                    doc = docService.saveDocument(doc);
+                    System.err.println("Document added : test");
+//                      fileListerWorker.getFileListQueue().add(f);
+//                       System.out.println(f.getAbsolutePath());
+                    /*for (File f : l) {
+                        fileListerWorker.getFileListQueue().add(f);
+                        System.err.println(f.getName());
+                    }*/
+                    return true;
+                } catch (UnsupportedFlavorException e) {
+                    System.out.println("UnsupportedFlavorException");
+                    //  return false;
+                } catch (IOException e) {
+                    System.out.println("IOException");
+                    //  return false;
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            } else if (transferable.isDataFlavorSupported(new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16"))) {
+                System.err.println("Import possible .. html");
+                try {
+                    DataFlavor[] dfs = {new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16")};
+                    InputStream in = (InputStream) transferable.getTransferData(DataFlavor.selectBestTextFlavor(dfs));
+                    File f = File.createTempFile("test", ".html");
+                    FileOutputStream fo = new FileOutputStream(f);
+                    copy(in, fo);
+                    fo.close();
+                    System.out.println(f.getAbsolutePath());
+                    Document doc = new Document();
+                    doc.setAuthor(AppSettings.getInstance().getUsername());
+                    String docName = JOptionPane.showInputDialog("Enter Document Name : ", "Test");
+                    if (docName != null && !docName.isEmpty())
+                        doc.setTitle(docName);
+                    else
+                        doc.setTitle(f.getName());
+                    doc.setContent(getBytesFromFile(f));
+                    doc.setExt(getExtension(f));
+                    if (getExtension(f) == null || getExtension(f).isEmpty())
+                        doc.setExt(".txt");
+                    doc.setDateCreated(new Date());
+                    doc.setDateUpdated(new Date());
+                    doc.setCategory(getSelectedCategory());
+                    doc = docService.saveDocument(doc);
+                    System.err.println("Document added : test");
+                    return true;
+                } catch (UnsupportedFlavorException e) {
+                    System.out.println("UnsupportedFlavorException");
+                } catch (IOException e) {
+                    System.out.println("IOException");
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.err.println("Data Flavors not supported yet :");
+                DataFlavor dfs[] = transferable.getTransferDataFlavors();
+                for (DataFlavor df : dfs) {
+                    System.err.println(df.getMimeType());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public void packColumns(JTable table, int margin) {

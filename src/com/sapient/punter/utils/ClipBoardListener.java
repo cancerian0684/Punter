@@ -11,8 +11,8 @@ public class ClipBoardListener extends Thread implements ClipboardOwner {
     Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
 
     public void run() {
-        Transferable trans = sysClip.getContents(this);
-        regainOwnership(trans);
+        Transferable transferable = sysClip.getContents(this);
+        regainOwnership(transferable);
     }
 
     public void lostOwnership(Clipboard clipboard, Transferable transferable) {

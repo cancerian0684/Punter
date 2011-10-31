@@ -1,5 +1,7 @@
 package com.sapient.punter.utils;
 
+import com.sapient.punter.gui.AppSettings;
+
 import java.awt.EventQueue;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -48,9 +50,9 @@ public class StackWindow extends JFrame implements Thread.UncaughtExceptionHandl
 				textArea.setText(sw.toString());
 
 				final String localhost = "";
-				final String mailhost = "namail.corp.adobe.com";
-				final String mailuser = "munishc@adobe.com";
-				final String email_notify = "munishc@adobe.com";
+				final String mailhost = AppSettings.getInstance().getSmtpHost();
+				final String mailuser = AppSettings.getInstance().getSmtpUsername();
+				final String email_notify = "munish.chandel@ubs.com";
 				new Thread() {
 					@Override
 					public void run() {

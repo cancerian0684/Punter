@@ -48,4 +48,8 @@ public interface AppSettingsMBean {
     boolean isShowActiveTasks();
 
     void setShowActiveTasks(boolean showActiveTasks);
+
+    String getServerHost();
+
+    void setServerHost(String serverHost);
 }
