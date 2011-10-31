@@ -18,12 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.*;
@@ -62,6 +57,7 @@ import com.sapient.kb.jpa.Document;
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.gui.AppSettings;
 import com.sapient.punter.gui.Main;
+import org.apache.commons.io.IOUtils;
 
 public class PunterKB extends JPanel {
     private static JFrame frame;
@@ -274,7 +270,8 @@ public class PunterKB extends JPanel {
                 try {
                     Transferable transferable = support.getTransferable();
                     if (transferable.isDataFlavorSupported(Linux)) {
-                        String data = (String) transferable.getTransferData(Linux);
+//                        String data = (String) transferable.getTransferData(Linux);
+                        String data = IOUtils.toString((InputStreamReader) transferable.getTransferData(Linux));
                         for (StringTokenizer st = new StringTokenizer(data, "\r\n"); st.hasMoreTokens(); ) {
                             String token = st.nextToken().trim();
                             if (token.startsWith("#") || token.isEmpty()) {
@@ -459,7 +456,8 @@ public class PunterKB extends JPanel {
                                 for (File file : files) {
                                     data += file.toURI() + "\r\n";
                                 }
-                                return data;
+//                              return data;
+                                return new InputStreamReader(IOUtils.toInputStream(data));
                             }
                             return null;
                         }
