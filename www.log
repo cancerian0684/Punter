@@ -1,1 +1,4 @@
 From 0:0:0:0:0:0:0:1: GET E:\workspace\Punter\.\index.html-->200
+From 0:0:0:0:0:0:0:1: GET E:\workspace\Punter\.\favicon.ico-->404
+From 192.168.241.1: GET E:\workspace\Punter\.\punter.jnlp-->200
+From 127.0.0.1: GET E:\workspace\Punter\.\punter.jnlp-->200

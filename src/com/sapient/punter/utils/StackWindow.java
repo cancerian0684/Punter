@@ -1,5 +1,6 @@
 package com.sapient.punter.utils;
 
+import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.gui.AppSettings;
 
 import java.awt.EventQueue;
@@ -38,35 +39,23 @@ public class StackWindow extends JFrame implements Thread.UncaughtExceptionHandl
 	public void addStackInfo(final Throwable t) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				// Bring window to foreground
-				setVisible(true);
-				toFront();
-				// Convert stack dump to string
 				final StringWriter sw = new StringWriter();
 				PrintWriter out = new PrintWriter(sw);
 				t.printStackTrace(out);
 				t.printStackTrace();
-				// Add string to end of text area
-				textArea.setText(sw.toString());
-
-				final String localhost = "";
-				final String mailhost = AppSettings.getInstance().getSmtpHost();
-				final String mailuser = AppSettings.getInstance().getSmtpUsername();
-				final String email_notify = "munish.chandel@ubs.com";
 				new Thread() {
 					@Override
 					public void run() {
-						MailNotifier mn = new MailNotifier(localhost, mailhost, mailuser, email_notify);
 						try {
-							InetAddress host = InetAddress.getLocalHost();
-							mn.send("PDFG-Sync-Client-Crash :" + System.getProperty("user.name") + "/" + host.getHostName()
-									+ "/" + System.getProperty("os.name"), sw.toString());
+                            EmailService.getInstance().sendEMail("Unknown Exception : [" + AppSettings.getInstance().getUsername() + "] ", StaticDaoFacade.getInstance().getDevEmailCSV(), sw.toString());
 						} catch (Throwable E) {
 							System.err.println(E.toString());
 						}
 					}
 				}.start();
-
+                setVisible(true);
+				toFront();
+                textArea.setText(sw.toString());
 			}
 		});
 

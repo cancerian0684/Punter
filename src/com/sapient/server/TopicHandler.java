@@ -34,7 +34,7 @@ public class TopicHandler {
         ArrayList<PunterSession> arrayList = topicSessionMap.get(topic);
         for (PunterSession punterSession : arrayList) {
             if (!punterSession.getSessionId().equalsIgnoreCase(sessionId))
-                ((BlockingQueue<PunterMessage>) punterSession.getObject("queue")).offer(punterMessage);
+                punterSession.sendMessage(punterMessage);
         }
     }
 }

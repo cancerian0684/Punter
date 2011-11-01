@@ -6,11 +6,16 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class PunterSession implements Comparable<String> {
+    String username;
+    String sessionId;
+    BlockingQueue<PunterMessage> myQueue;
+    long lastAccessed;
+    long age;
+
     public PunterSession(String sessionId, String username) {
         this.sessionId = sessionId;
         this.username = username;
         this.myQueue = new LinkedBlockingQueue<PunterMessage>();
-        this.sessionMap.put("queue", new LinkedBlockingQueue<PunterMessage>());
         this.age = 1000 * 60 * 10; //10 minutes
         this.lastAccessed = System.currentTimeMillis();
     }
@@ -23,15 +28,11 @@ public class PunterSession implements Comparable<String> {
         return username;
     }
 
-    String username;
-    String sessionId;
-    Map<String, Object> sessionMap = new HashMap<String, Object>();
-    BlockingQueue<PunterMessage> myQueue;
-    long lastAccessed;
-    long age;
-
-    Object getObject(String key) {
-        return sessionMap.get(key);
+    public void sendMessage(PunterMessage punterMessage){
+        myQueue.offer(punterMessage);
+    }
+    PunterMessage getMessage() throws InterruptedException {
+        return myQueue.take();
     }
 
     @Override

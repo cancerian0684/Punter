@@ -1,5 +1,8 @@
 package com.sapient.server;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public interface ServerSettingsMBean {
 	public void refreshIndexes();
 
@@ -36,4 +39,14 @@ public interface ServerSettingsMBean {
     public String getTempDirectory();
 
     public void setTempDirectory(String tempDirectory);
+
+    String getDevEmailCSV();
+
+    void setDevEmailCSV(String devEmailCSV);
+
+    void restartAllClient();
+
+    InetAddress getServerHostAddress() throws UnknownHostException;
+
+    String getJNLPURL() throws UnknownHostException;
 }

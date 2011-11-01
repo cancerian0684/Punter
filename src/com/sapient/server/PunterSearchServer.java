@@ -54,6 +54,11 @@ public class PunterSearchServer implements PunterSearch {
     }
 
     @Override
+    public String getDevEmailCSV() throws RemoteException {
+        return ServerSettings.getInstance().getDevEmailCSV();
+    }
+
+    @Override
     public boolean deleteAttachment(Attachment attch) {
         return staticDaoFacade.deleteAttachment(attch);
     }
@@ -208,6 +213,11 @@ public class PunterSearchServer implements PunterSearch {
     }
 
     @Override
+    public String getJNLPURL() throws UnknownHostException, RemoteException {
+        return "http://"+getServerHostAddress().getHostAddress()+":"+getWebServerPort()+"/punter.jnlp";
+    }
+
+    @Override
     public String connect(String username) throws RemoteException {
         return sessionFacade.getSession(username);
     }
@@ -225,6 +235,11 @@ public class PunterSearchServer implements PunterSearch {
     @Override
     public void sendMessage(String sessionId, PunterMessage punterMessage, String topic) throws RemoteException, InterruptedException {
         sessionFacade.sendMessage(sessionId, punterMessage, topic);
+    }
+
+    @Override
+    public void sendMessageToAll(String sessionId, PunterMessage punterMessage) throws RemoteException, InterruptedException {
+        sessionFacade.sendMessageToAll(sessionId, punterMessage);
     }
 
     @Override

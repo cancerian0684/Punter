@@ -1,7 +1,7 @@
 package com.sapient.server;
 
-import java.util.*;
-import java.util.concurrent.BlockingQueue;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SessionFacade {
     Map<String, PunterSession> sessionMap = new HashMap<String, PunterSession>(10);
@@ -34,15 +34,19 @@ public class SessionFacade {
     }
 
     public PunterMessage getMessage(String sessionId) throws InterruptedException {
-        return ((BlockingQueue<PunterMessage>) sessionMap.get(sessionId).getObject("queue")).take();
+        return sessionMap.get(sessionId).getMessage();
     }
 
     public void sendMessage(String sessionId, PunterMessage punterMessage) throws InterruptedException {
-        ((BlockingQueue<PunterMessage>) sessionMap.get(sessionId).getObject("queue")).offer(punterMessage);
+         sessionMap.get(sessionId).sendMessage(punterMessage);
     }
 
     public void sendMessage(String sessionId, PunterMessage punterMessage, String topic) {
-        topicHandler.publishMessage(sessionId,punterMessage, topic);
+        topicHandler.publishMessage(sessionId, punterMessage, topic);
+    }
+
+     public void sendMessageToAll(String senderSessionId, PunterMessage punterMessage) {
+        topicHandler.publishMessage(senderSessionId, punterMessage, "global");
     }
 
     public void ping(String sessionId) {

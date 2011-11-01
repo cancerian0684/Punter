@@ -255,7 +255,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		}
 		return appSettings;
 	}
-	private static void saveState(){
+	public static void saveState(){
 		  AppSettingsMBean appSettings=AppSettings.getInstance();
 		  try {
 			  PersistenceService ps; 

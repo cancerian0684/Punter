@@ -22,6 +22,7 @@ import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.executors.ProcessExecutor;
 import com.sapient.punter.utils.Launcher;
 import com.sapient.punter.utils.StackWindow;
+import org.omg.SendingContext.RunTime;
 
 public class Main{
 	private static BufferedImage currentImage;
@@ -193,6 +194,13 @@ private void createAndShowGUI() throws Exception {
 	        }
 	    };
 
+        ActionListener restartListener =new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                StaticDaoFacade.getInstance().restartClient();
+            }
+        };
+
         PopupMenu popup = new PopupMenu();
         MenuItem openPunterMenuItem = new MenuItem("My Assistant");
         openPunterMenuItem.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -236,6 +244,11 @@ private void createAndShowGUI() throws Exception {
             }
         });
         popup.add(schedulerMenuItem);
+
+        MenuItem restartItem = new MenuItem("Restart");
+        restartItem.addActionListener(restartListener);
+        popup.add(restartItem);
+
 
         popup.addSeparator();
 	    MenuItem defaultItem = new MenuItem("Exit");

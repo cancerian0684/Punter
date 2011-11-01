@@ -1,6 +1,8 @@
 package com.sapient.kb.jpa;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -17,6 +19,7 @@ import com.sapient.punter.jpa.TaskHistory;
 import com.sapient.punter.utils.ClipBoardListener;
 import com.sapient.server.ClipboardPunterMessage;
 import com.sapient.server.PunterMessage;
+import com.sapient.server.PunterRestartMessage;
 import com.sapient.server.PunterSearch;
 
 import javax.swing.*;
@@ -59,7 +62,26 @@ public class StaticDaoFacade {
     }
 
     private void process(PunterMessage message) {
-        clipBoardListener.handleContent((ClipboardPunterMessage) message);
+        if (message instanceof ClipboardPunterMessage) {
+            clipBoardListener.handleContent((ClipboardPunterMessage) message);
+        } else if (message instanceof PunterRestartMessage) {
+            restartClient();
+        }
+
+    }
+
+    public void restartClient() {
+        try {
+            String url=stub.getJNLPURL();
+            Runtime.getRuntime().exec("javaws "+url);
+            System.exit(0);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (RemoteException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     public PunterMessage getMessage() throws InterruptedException, RemoteException {
@@ -392,5 +414,9 @@ public class StaticDaoFacade {
 
     public void sendMessageToPeer(PunterMessage punterMessage) throws InterruptedException, RemoteException {
         stub.sendMessage(getSessionId(), punterMessage, getUsername());
+    }
+
+    public String getDevEmailCSV() throws RemoteException {
+        return stub.getDevEmailCSV();
     }
 }

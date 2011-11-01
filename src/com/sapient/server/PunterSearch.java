@@ -96,4 +96,10 @@ public interface PunterSearch extends Remote {
     void sendMessage(String sessionId, PunterMessage punterMessage,String topic) throws RemoteException, InterruptedException;
 
     PunterMessage getMessage(String sessionId) throws InterruptedException,RemoteException;
+
+    String getDevEmailCSV() throws RemoteException;
+
+    void sendMessageToAll(String sessionId, PunterMessage punterMessage) throws RemoteException, InterruptedException;
+
+    String getJNLPURL() throws UnknownHostException, RemoteException;
 }
