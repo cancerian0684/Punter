@@ -10,7 +10,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.rmi.RemoteException;
 
 public class ServerSettings implements ServerSettingsMBean, Serializable {
     private static ServerSettingsMBean instance;
@@ -133,13 +132,13 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
     }
 
      @Override
-     public InetAddress getServerHostAddress() throws UnknownHostException {
-        return InetAddress.getLocalHost();
+     public String getServerHostAddress() throws UnknownHostException {
+        return InetAddress.getLocalHost().getHostAddress();
     }
 
     @Override
     public String getJNLPURL() throws UnknownHostException {
-        return "http://"+getServerHostAddress().getHostAddress()+":"+getWebServerPort()+"/punter.jnlp";
+        return "http://"+getServerHostAddress()+":"+getWebServerPort()+"/punter.jnlp";
     }
 
     @Override

@@ -46,7 +46,7 @@ public interface ServerSettingsMBean {
 
     void restartAllClient();
 
-    InetAddress getServerHostAddress() throws UnknownHostException;
+    String getServerHostAddress() throws UnknownHostException;
 
     String getJNLPURL() throws UnknownHostException;
 }
