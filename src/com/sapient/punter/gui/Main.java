@@ -246,10 +246,6 @@ private void createAndShowGUI() throws Exception {
         });
         popup.add(schedulerMenuItem);
 
-        MenuItem restartItem = new MenuItem("Restart");
-        restartItem.addActionListener(restartListener);
-        popup.add(restartItem);
-
         MenuItem screenShotItem = new MenuItem("Capture Screen");
         screenShotItem.addActionListener(new ActionListener() {
             @Override
@@ -259,8 +255,12 @@ private void createAndShowGUI() throws Exception {
         });
         popup.add(screenShotItem);
 
-
         popup.addSeparator();
+
+        MenuItem restartItem = new MenuItem("Restart");
+        restartItem.addActionListener(restartListener);
+        popup.add(restartItem);
+
 	    MenuItem defaultItem = new MenuItem("Exit");
 	    defaultItem.addActionListener(exitListener);
 	    popup.add(defaultItem);
