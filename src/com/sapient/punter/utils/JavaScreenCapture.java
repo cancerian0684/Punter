@@ -24,7 +24,15 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
     private final JLabel cords; // set up GUI and register mouse event handlers
     private final ArrayList<Rectangle> rectangles = new ArrayList<Rectangle>();
     private boolean isNewRect = true;
-
+    private static JavaScreenCapture instance;
+    public static void captureScreenShot(){
+        if(instance==null){
+            instance=new JavaScreenCapture();
+            instance.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+            com.sun.awt.AWTUtilities.setWindowOpacity(instance, 0.3f);
+        }
+        instance.setVisible(true);
+    }
     public JavaScreenCapture() {
         super("Rectangle Drawer");
 
@@ -51,8 +59,7 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
         setSize(Toolkit.getDefaultToolkit().getScreenSize());
         setAlwaysOnTop(true);
         setUndecorated(true);
-        setVisible(true);
-
+//        setVisible(true);
     }
 
     // MouseListener event handlers // handle event when mouse released immediately after press
@@ -82,7 +89,7 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
         this.isNewRect = true;
 
         repaint();
-        System.exit(0);
+        dispose();
 
     }
 
@@ -176,13 +183,9 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
     public void captureScreen(Rectangle rectangle) {
         try {
             BufferedImage screenCapture = new Robot().createScreenCapture(rectangle);
-            // Save as JPEG
-//            File file = new File("e:/screencapture.jpg");
-//            ImageIO.write(screencapture, "jpg", file);
-
-            // Save as PNG
             File file = new File("e:/screencapture.png");
             ImageIO.write(screenCapture, "png", file);
+//            ImageIO.write(screencapture, "jpg", file);
             ImageSelection.copyImageToClipboard(screenCapture);
         } catch (AWTException e) {
             e.printStackTrace();
@@ -198,33 +201,3 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
     }
 }
 
-class ImageSelection implements Transferable {
-    private Image image;
-
-    public static void copyImageToClipboard(Image image) {
-        ImageSelection imageSelection = new ImageSelection(image);
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        toolkit.getSystemClipboard().setContents(imageSelection, null);
-    }
-
-    public ImageSelection(Image image) {
-        this.image = image;
-    }
-
-    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
-        if (flavor.equals(DataFlavor.imageFlavor) == false) {
-            throw new UnsupportedFlavorException(flavor);
-        }
-        return image;
-    }
-
-    public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return flavor.equals(DataFlavor.imageFlavor);
-    }
-
-    public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[]{
-                DataFlavor.imageFlavor
-        };
-    }
-}

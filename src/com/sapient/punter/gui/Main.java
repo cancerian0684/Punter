@@ -20,6 +20,7 @@ import javax.swing.UIManager;
 import com.sapient.kb.gui.PunterKB;
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.executors.ProcessExecutor;
+import com.sapient.punter.utils.JavaScreenCapture;
 import com.sapient.punter.utils.Launcher;
 import com.sapient.punter.utils.StackWindow;
 import org.omg.SendingContext.RunTime;
@@ -248,6 +249,15 @@ private void createAndShowGUI() throws Exception {
         MenuItem restartItem = new MenuItem("Restart");
         restartItem.addActionListener(restartListener);
         popup.add(restartItem);
+
+        MenuItem screenShotItem = new MenuItem("Capture Screen");
+        screenShotItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JavaScreenCapture.captureScreenShot();
+            }
+        });
+        popup.add(screenShotItem);
 
 
         popup.addSeparator();
