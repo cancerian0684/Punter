@@ -1,6 +1,9 @@
 package com.sapient.punter.utils;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -8,11 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 
 public class JavaScreenCapture extends JFrame implements MouseListener, MouseMotionListener {
 
@@ -59,27 +57,21 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
 
     // MouseListener event handlers // handle event when mouse released immediately after press
     public void mouseClicked(final MouseEvent event) {
-//        this.mousePosition.setText( "Clicked at [" + event.getX() + ", " + event.getY() + "]" );
-
-        repaint();
+//      this.mousePosition.setText( "Clicked at [" + event.getX() + ", " + event.getY() + "]" );
+//        repaint();
     }
 
     // handle event when mouse pressed
     public void mousePressed(final MouseEvent event) {
-
         this.mousePosition.setText("Pressed at [" + (this.x1 = event.getX()) + ", " + (this.y1 = event.getY()) + "]");
-
         this.recStart.setText("Start:  [" + this.x1 + ", " + this.y1 + "]");
-
         repaint();
     }
 
     // handle event when mouse released after dragging
     public void mouseReleased(final MouseEvent event) {
         this.mousePosition.setText("Released at [" + (this.x2 = event.getX()) + ", " + (this.y2 = event.getY()) + "]");
-
         this.recStop.setText("End:  [" + this.x2 + ", " + this.y2 + "]");
-
         Rectangle rectangle = getRectangleFromPoints();
         setVisible(false);
         captureScreen(rectangle);
@@ -182,29 +174,57 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
 
     }*/
     public void captureScreen(Rectangle rectangle) {
-        // capture the whole screen
         try {
-            BufferedImage screencapture = new Robot().createScreenCapture(rectangle);
-
+            BufferedImage screenCapture = new Robot().createScreenCapture(rectangle);
             // Save as JPEG
 //            File file = new File("e:/screencapture.jpg");
 //            ImageIO.write(screencapture, "jpg", file);
 
             // Save as PNG
             File file = new File("e:/screencapture.png");
-            ImageIO.write(screencapture, "png", file);
+            ImageIO.write(screenCapture, "png", file);
+            ImageSelection.copyImageToClipboard(screenCapture);
         } catch (AWTException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
     }
 
     public static void main(final String args[]) {
         JavaScreenCapture application = new JavaScreenCapture();
+        application.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
         com.sun.awt.AWTUtilities.setWindowOpacity(application, 0.4f);
-//        com.sun.awt.AWTUtilities.setWindowOpacity(application, 0.1f);
-        application.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
 
+class ImageSelection implements Transferable {
+    private Image image;
+
+    public static void copyImageToClipboard(Image image) {
+        ImageSelection imageSelection = new ImageSelection(image);
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        toolkit.getSystemClipboard().setContents(imageSelection, null);
+    }
+
+    public ImageSelection(Image image) {
+        this.image = image;
+    }
+
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+        if (flavor.equals(DataFlavor.imageFlavor) == false) {
+            throw new UnsupportedFlavorException(flavor);
+        }
+        return image;
+    }
+
+    public boolean isDataFlavorSupported(DataFlavor flavor) {
+        return flavor.equals(DataFlavor.imageFlavor);
+    }
+
+    public DataFlavor[] getTransferDataFlavors() {
+        return new DataFlavor[]{
+                DataFlavor.imageFlavor
+        };
+    }
+}
