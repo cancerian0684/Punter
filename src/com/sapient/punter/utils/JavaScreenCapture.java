@@ -25,14 +25,17 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
     private final ArrayList<Rectangle> rectangles = new ArrayList<Rectangle>();
     private boolean isNewRect = true;
     private static JavaScreenCapture instance;
-    public static void captureScreenShot(){
-        if(instance==null){
-            instance=new JavaScreenCapture();
+
+    public static void captureScreenShot() {
+        if (instance == null) {
+            instance = new JavaScreenCapture();
             instance.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
             com.sun.awt.AWTUtilities.setWindowOpacity(instance, 0.3f);
         }
+        instance.setAlwaysOnTop(true);
         instance.setVisible(true);
     }
+
     public JavaScreenCapture() {
         super("Rectangle Drawer");
 
@@ -70,8 +73,10 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
 
     // handle event when mouse pressed
     public void mousePressed(final MouseEvent event) {
-        this.mousePosition.setText("Pressed at [" + (this.x1 = event.getX()) + ", " + (this.y1 = event.getY()) + "]");
-        this.recStart.setText("Start:  [" + this.x1 + ", " + this.y1 + "]");
+        this.x1 = event.getX();
+        this.y1 = event.getY();
+//        this.mousePosition.setText("Pressed at [" + (this.x1 = event.getX()) + ", " + (this.y1 = event.getY()) + "]");
+//        this.recStart.setText("Start:  [" + this.x1 + ", " + this.y1 + "]");
         repaint();
     }
 
@@ -81,13 +86,11 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
         this.recStop.setText("End:  [" + this.x2 + ", " + this.y2 + "]");
         Rectangle rectangle = getRectangleFromPoints();
         setVisible(false);
-        captureScreen(rectangle);
-
+        if (rectangle.getWidth() > 0 && rectangle.getHeight() > 0)
+            captureScreen(rectangle);
         this.rectangles.add(rectangle);
-
         this.w = this.h = this.x1 = this.y1 = this.x2 = this.y2 = 0;
         this.isNewRect = true;
-
         repaint();
         dispose();
 
@@ -147,12 +150,12 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
 
     public void paint(Graphics g) {
         super.paint(g); // clear the frame surface
-        g.drawString("Start Rec Here", x1, y1);
-        g.drawString("End Rec Here", x2, y2);
+        g.drawString("Start", x1, y1);
+        g.drawString("  End", x2, y2);
 
         g.drawRect(rx, ry, w, h);
 
-        cords.setText("w = " + w + ", h = " + h);
+//        cords.setText("w = " + w + ", h = " + h);
     }
 
 
@@ -183,21 +186,19 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
     public void captureScreen(Rectangle rectangle) {
         try {
             BufferedImage screenCapture = new Robot().createScreenCapture(rectangle);
-            File file = new File("e:/screencapture.png");
-            ImageIO.write(screenCapture, "png", file);
+            /*File file = new File("e:/screencapture.png");
+            ImageIO.write(screenCapture, "png", file);*/
 //            ImageIO.write(screencapture, "jpg", file);
             ImageSelection.copyImageToClipboard(screenCapture);
         } catch (AWTException e) {
             e.printStackTrace();
-        } catch (IOException e) {
+        } /*catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     public static void main(final String args[]) {
-        JavaScreenCapture application = new JavaScreenCapture();
-        application.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-        com.sun.awt.AWTUtilities.setWindowOpacity(application, 0.4f);
+        JavaScreenCapture.captureScreenShot();
     }
 }
 
