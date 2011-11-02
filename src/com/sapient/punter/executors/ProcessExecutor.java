@@ -10,34 +10,37 @@ import com.sapient.punter.gui.AppSettings;
 
 public class ProcessExecutor {
 	private static ProcessExecutor processExecutor;
-	private ExecutorService executor;
-	public synchronized static ProcessExecutor getInstance(){
+    private ExecutorService executor;
+    private LinkedBlockingQueue<Runnable> workQueue;
+
+    public synchronized static ProcessExecutor getInstance(){
 		if(processExecutor==null){
 			processExecutor=new ProcessExecutor();
 		}
 		return processExecutor;
 	}
 	public ProcessExecutor() {
-		executor = new ThreadPoolExecutor(AppSettings.getInstance().getMaxExecutorSize(), AppSettings.getInstance().getMaxExecutorSize(),
+        workQueue = new LinkedBlockingQueue<Runnable>(10);
+        executor = new ThreadPoolExecutor(AppSettings.getInstance().getMaxExecutorSize(), AppSettings.getInstance().getMaxExecutorSize(),
                 0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>());
+                workQueue);
 	}
-	public void submitProcess(final com.sapient.punter.tasks.Process proc){
+	public void submitProcess(final com.sapient.punter.tasks.Process process){
 		executor.submit(new Runnable() {
 			@Override
 			public void run() {
-				proc.execute();
+				process.execute();
 			}
 		});
 	}
 	public boolean isActive(){
-		return ((ThreadPoolExecutor)executor).getActiveCount()>0;
+		return ((ThreadPoolExecutor)executor).getActiveCount()>0 && ((ThreadPoolExecutor)executor).getQueue().size()>0;
 		//getQueueSize>0 && getActiveCount>0
 	}
 	public void shutdown(){
 		try {
 			executor.shutdown();
-			executor.awaitTermination(5, TimeUnit.SECONDS);
+			executor.awaitTermination(2, TimeUnit.HOURS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

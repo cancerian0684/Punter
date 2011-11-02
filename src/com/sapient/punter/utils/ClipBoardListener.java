@@ -19,13 +19,13 @@ public class ClipBoardListener extends Thread implements ClipboardOwner {
         try {
             // sleep this thread so that other application is done with the Clipboard access.
             // otherwise an exception is thrown by the application.
-            this.sleep(50);
+            this.sleep(100);
+            Transferable contents = sysClip.getContents(this);
+            processContents(contents);
+            regainOwnership(contents);
         } catch (Exception e) {
             System.out.println("Exception: " + e);
         }
-        Transferable contents = sysClip.getContents(this);
-        processContents(contents);
-        regainOwnership(contents);
     }
 
     public void handleContent(ClipboardPunterMessage punterMessage) {
