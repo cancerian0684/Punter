@@ -19,7 +19,6 @@ import java.util.zip.ZipOutputStream;
 
 import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
-import com.sapient.kb.jpa.StaticDaoFacade;
 class WebServer implements HttpConstants {
     /* static class data/methods */
 

@@ -117,7 +117,7 @@ public class StaticDaoFacade {
         this.sessionId = sessionId;
     }
 
-    public void makeConnection() {
+    public synchronized void makeConnection() {
         String defaultHost = "127.0.0.1";
         if (AppSettings.getInstance().getServerHost() == null || AppSettings.getInstance().getServerHost().isEmpty()) {
             if (AppSettings.getInstance().isMultiSearchEnable()) {
@@ -142,7 +142,7 @@ public class StaticDaoFacade {
             stub.ping(getSessionId());
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
-            AppSettings.getInstance().setServerHost(null);
+//            AppSettings.getInstance().setServerHost(null);
 //			e.printStackTrace();
         }
     }
