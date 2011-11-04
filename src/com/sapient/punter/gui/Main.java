@@ -35,7 +35,7 @@ public class Main{
 	public static JFrame PunterGuiFrame;
 	public static JFrame lastAccessed;
 	private static Logger logger = Logger.getLogger(Main.class.getName());
-    private SingleInstanceFileLock singleInstanceFileLock=new SingleInstanceFileLock();
+    private SingleInstanceFileLock singleInstanceFileLock=new SingleInstanceFileLock("PunterClient.lock");
 	private Timer timer=new Timer(2000,new ActionListener(){
 		public void actionPerformed(ActionEvent e) {
 			setAppropriateTrayIcon();

@@ -595,31 +595,7 @@ public class PunterKB extends JPanel {
 
     private boolean getContentsFromTransferrable(Transferable transferable) {
         try {
-            if (transferable.isDataFlavorSupported(Linux)) {
-//                        String data = (String) transferable.getTransferData(Linux);
-                String data = IOUtils.toString((InputStreamReader) transferable.getTransferData(Linux));
-                for (StringTokenizer st = new StringTokenizer(data, "\r\n"); st.hasMoreTokens(); ) {
-                    String token = st.nextToken().trim();
-                    if (token.startsWith("#") || token.isEmpty()) {
-                        // comment line, by RFC 2483
-                        continue;
-                    }
-                    File file = new File(new URI(token));
-                    System.err.println(file.getName());
-                    Document doc = new Document();
-                    doc.setAuthor(AppSettings.getInstance().getUsername());
-                    doc.setTitle(file.getName());
-                    doc.setContent(getBytesFromFile(file));
-                    doc.setExt(getExtension(file));
-                    if (getExtension(file) == null || getExtension(file).isEmpty())
-                        doc.setExt(".txt");
-                    doc.setDateCreated(new Date());
-                    doc.setDateUpdated(new Date());
-                    doc.setCategory(getSelectedCategory());
-                    doc = docService.saveDocument(doc);
-                    System.err.println("Document added : " + file.getName());
-                }
-            } else if (transferable.isDataFlavorSupported(Windows)) {
+            if (transferable.isDataFlavorSupported(Windows)) {
                 System.err.println("Import possible .. file");
                 try {
                     List<File> l = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
@@ -644,7 +620,9 @@ public class PunterKB extends JPanel {
                 } catch (IOException e) {
                     return false;
                 }
-            } else if (transferable.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream"))) {
+            }
+
+            else if (transferable.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream"))) {
                 System.err.println("Import possible .. rtf");
                 try {
                     String docName = JOptionPane.showInputDialog("Enter Document Name : ", "Test");
@@ -722,7 +700,33 @@ public class PunterKB extends JPanel {
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-            } else {
+            }
+            else if (transferable.isDataFlavorSupported(Linux)) {
+//                        String data = (String) transferable.getTransferData(Linux);
+                String data = IOUtils.toString((InputStreamReader) transferable.getTransferData(Linux));
+                for (StringTokenizer st = new StringTokenizer(data, "\r\n"); st.hasMoreTokens(); ) {
+                    String token = st.nextToken().trim();
+                    if (token.startsWith("#") || token.isEmpty()) {
+                        // comment line, by RFC 2483
+                        continue;
+                    }
+                    File file = new File(new URI(token));
+                    System.err.println(file.getName());
+                    Document doc = new Document();
+                    doc.setAuthor(AppSettings.getInstance().getUsername());
+                    doc.setTitle(file.getName());
+                    doc.setContent(getBytesFromFile(file));
+                    doc.setExt(getExtension(file));
+                    if (getExtension(file) == null || getExtension(file).isEmpty())
+                        doc.setExt(".txt");
+                    doc.setDateCreated(new Date());
+                    doc.setDateUpdated(new Date());
+                    doc.setCategory(getSelectedCategory());
+                    doc = docService.saveDocument(doc);
+                    System.err.println("Document added : " + file.getName());
+                }
+            }
+            else {
                 System.err.println("Data Flavors not supported yet :");
                 DataFlavor dfs[] = transferable.getTransferDataFlavors();
                 for (DataFlavor df : dfs) {

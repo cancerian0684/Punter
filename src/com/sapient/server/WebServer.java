@@ -454,6 +454,7 @@ outerloop:
 		setSuffix(".pdf", "application/pdf");
 		setSuffix(".chm", "application/x-chm");
 		setSuffix(".doc", "application/msword");
+		setSuffix(".rtf", "application/msword");
         setSuffix(".txt", "text/plain");
         setSuffix(".java", "text/plain");
         setSuffix(".jnlp", "application/x-java-jnlp-file");
