@@ -49,4 +49,8 @@ public interface ServerSettingsMBean {
     String getServerHostAddress() throws UnknownHostException;
 
     String getJNLPURL() throws UnknownHostException;
+
+    int getMaxWebServerThread();
+
+    void setMaxWebServerThread(int maxWebServerThread);
 }

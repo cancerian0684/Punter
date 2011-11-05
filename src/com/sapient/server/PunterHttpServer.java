@@ -1,40 +1,61 @@
 package com.sapient.server;
 
-import com.sapient.kb.jpa.Attachment;
 import com.sapient.kb.jpa.Document;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.io.IOUtils;
+import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Date;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 public class PunterHttpServer {
     public static final String DATA = "/data/";
     public static String root = ".";
+    private final HttpServer server;
 
     public static void main(String[] args) throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(8090), 80);
-        server.createContext(DATA, new MyDataHandler());
-        server.setExecutor(Executors.newFixedThreadPool(5));
-        server.start();
+        PunterHttpServer httpServer = new PunterHttpServer();
     }
+    public void stop(){
+        server.stop(0);
+    }
+    PunterHttpServer() throws IOException {
+        server = HttpServer.create(new InetSocketAddress(ServerSettings.getInstance().getWebServerPort()), 0);
+        server.createContext(DATA, new MyDataHandler());
+        server.createContext("/file/", new MyFileHandler());
+        server.setExecutor(Executors.newFixedThreadPool(ServerSettings.getInstance().getMaxWebServerThread()));
+        server.start();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                server.stop(0);
+            }
+        });
+    }
+}
 
+class MyFileHandler implements HttpHandler {
+
+    @Override
+    public void handle(HttpExchange httpExchange) throws IOException {
+        InputStream inputStream = httpExchange.getRequestBody();
+        URI requestURI = httpExchange.getRequestURI();
+        String name = requestURI.toASCIIString().substring(requestURI.toASCIIString().lastIndexOf('/'));
+        IOUtils.copyLarge(inputStream, new FileOutputStream("e:/"+name));
+        httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+        httpExchange.getResponseBody().write(new String("File Received.").getBytes());
+        httpExchange.getResponseBody().close();
+        httpExchange.close();
+    }
 }
 
 class MyDataHandler implements HttpHandler {
-    public static final int HTTP_NOT_FOUND = 404;
-    public static final int HTTP_OK = 200;
-
     /* mapping of file extensions to content-types */
     static java.util.Hashtable map = new java.util.Hashtable();
     final static int BUF_SIZE = 2048;
@@ -57,16 +78,17 @@ class MyDataHandler implements HttpHandler {
         System.out.println("Request : " + httpExchange.getRemoteAddress() + " -> " + httpExchange.getRequestURI());
         if (httpExchange.getRequestMethod().equalsIgnoreCase("Get")) {
             File targetFile;
-            try{
-            targetFile = getFile(getFileNameFromURI(httpExchange), new File(PunterHttpServer.root, getFileNameFromURI(httpExchange)));
-            sendFile(httpExchange, targetFile);
-            }catch (Exception e){
+            try {
+                targetFile = getFile(getFileNameFromURI(httpExchange), new File(PunterHttpServer.root, getFileNameFromURI(httpExchange)));
+                sendFile(httpExchange, targetFile);
+            } catch (Exception e) {
                 e.printStackTrace();
                 send404(httpExchange);
             }
         } else {
             send404(httpExchange);
         }
+        httpExchange.close();
     }
 
     private String getFileNameFromURI(HttpExchange httpExchange) {
@@ -79,7 +101,7 @@ class MyDataHandler implements HttpHandler {
     }
 
     private void send404(HttpExchange httpExchange) throws IOException {
-        httpExchange.sendResponseHeaders(HTTP_NOT_FOUND, 0);
+        httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, 0);
         httpExchange.getResponseBody().close();
     }
 
@@ -99,7 +121,7 @@ class MyDataHandler implements HttpHandler {
         if (!ct.equalsIgnoreCase("text/html")) {
             responseHeaders.set("Content-Disposition", "attachment; filename=" + name);
         }
-        httpExchange.sendResponseHeaders(HTTP_OK, 0);
+        httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
         OutputStream outputStream = httpExchange.getResponseBody();
         IOUtils.copy(new FileInputStream(targetFile), outputStream);
         outputStream.close();
@@ -113,7 +135,6 @@ class MyDataHandler implements HttpHandler {
             }
         }// Special Document
         else if (isLong(fname)) {
-            // if the requested resource is a document.
             StaticDaoFacade docService = StaticDaoFacade.getInstance();
             Document doc = new Document();
             doc.setId(Long.parseLong(fname));
@@ -177,5 +198,4 @@ class MyDataHandler implements HttpHandler {
         }
         ps.println("<P><HR><BR><I>" + (new Date()) + "</I>");
     }
-
 }

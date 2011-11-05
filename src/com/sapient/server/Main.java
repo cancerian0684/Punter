@@ -45,10 +45,9 @@ public class Main {
 			System.err.println("RMI Server ready");
 			MultiCastResponder.getInstance();
 			ServerSettings.getInstance();
-			java.awt.Desktop.getDesktop().browse(new URI("http://localhost:8090/data/index.html"));
             PunterHttpServer.main(new String[]{});
-			WebServer.main(new String[]{});
-			System.err.println("Web Server ready");
+            java.awt.Desktop.getDesktop().browse(new URI("http://localhost:8080/data/index.html"));
+            System.err.println("Web Server ready");
 		} catch (Exception e) {
 			System.err.println("Server exception: " + e.toString());
 			e.printStackTrace();

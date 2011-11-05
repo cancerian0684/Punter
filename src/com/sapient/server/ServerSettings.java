@@ -18,6 +18,18 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
     private int maxProcessHistory = 5;
     private int maxProcessAlerts = 30;
     private int webServerPort = 8080;
+
+    @Override
+    public int getMaxWebServerThread() {
+        return maxWebServerThread < 1 ? 1 : maxWebServerThread;
+    }
+
+    @Override
+    public void setMaxWebServerThread(int maxWebServerThread) {
+        this.maxWebServerThread = maxWebServerThread;
+    }
+
+    private int maxWebServerThread = 5;
     private String tempDirectory;
 
     @Override
@@ -131,14 +143,14 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
         this.webServerPort = webServerPort;
     }
 
-     @Override
-     public String getServerHostAddress() throws UnknownHostException {
+    @Override
+    public String getServerHostAddress() throws UnknownHostException {
         return InetAddress.getLocalHost().getHostAddress();
     }
 
     @Override
     public String getJNLPURL() throws UnknownHostException {
-        return "http://"+getServerHostAddress()+":"+getWebServerPort()+"/punter.jnlp";
+        return "http://" + getServerHostAddress() + ":" + getWebServerPort() + "/punter.jnlp";
     }
 
     @Override
@@ -262,7 +274,7 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
     }
 
     @Override
-    public void restartAllClient(){
-        SessionFacade.getInstance().sendMessageToAll("",new PunterRestartMessage());
+    public void restartAllClient() {
+        SessionFacade.getInstance().sendMessageToAll("", new PunterRestartMessage());
     }
 }
