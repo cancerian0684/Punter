@@ -22,9 +22,11 @@ public class PunterHttpServer {
     public static void main(String[] args) throws IOException {
         PunterHttpServer httpServer = new PunterHttpServer();
     }
-    public void stop(){
+
+    public void stop() {
         server.stop(0);
     }
+
     PunterHttpServer() throws IOException {
         server = HttpServer.create(new InetSocketAddress(ServerSettings.getInstance().getWebServerPort()), 0);
         server.createContext(DATA, new MyDataHandler());
@@ -47,7 +49,7 @@ class MyFileHandler implements HttpHandler {
         InputStream inputStream = httpExchange.getRequestBody();
         URI requestURI = httpExchange.getRequestURI();
         String name = requestURI.toASCIIString().substring(requestURI.toASCIIString().lastIndexOf('/'));
-        IOUtils.copyLarge(inputStream, new FileOutputStream("e:/"+name));
+        IOUtils.copyLarge(inputStream, new FileOutputStream("e:/" + name));
         httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
         httpExchange.getResponseBody().write(new String("File Received.").getBytes());
         httpExchange.getResponseBody().close();
@@ -76,19 +78,15 @@ class MyDataHandler implements HttpHandler {
 
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Request : " + httpExchange.getRemoteAddress() + " -> " + httpExchange.getRequestURI());
-        if (httpExchange.getRequestMethod().equalsIgnoreCase("Get")) {
-            File targetFile;
-            try {
-                targetFile = getFile(getFileNameFromURI(httpExchange), new File(PunterHttpServer.root, getFileNameFromURI(httpExchange)));
-                sendFile(httpExchange, targetFile);
-            } catch (Exception e) {
-                e.printStackTrace();
-                send404(httpExchange);
-            }
-        } else {
+        try {
+            File targetFile = getFile(getFileNameFromURI(httpExchange), new File(PunterHttpServer.root, getFileNameFromURI(httpExchange)));
+            sendFile(httpExchange, targetFile);
+        } catch (Exception e) {
+            e.printStackTrace();
             send404(httpExchange);
+        } finally {
+            httpExchange.close();
         }
-        httpExchange.close();
     }
 
     private String getFileNameFromURI(HttpExchange httpExchange) {
@@ -123,7 +121,7 @@ class MyDataHandler implements HttpHandler {
         }
         httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
         OutputStream outputStream = httpExchange.getResponseBody();
-        IOUtils.copy(new FileInputStream(targetFile), outputStream);
+        IOUtils.copyLarge(new FileInputStream(targetFile), outputStream);
         outputStream.close();
     }
 
