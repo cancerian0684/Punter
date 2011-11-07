@@ -34,18 +34,18 @@ public class SessionFacade {
     }
 
     public PunterMessage getMessage(String sessionId) throws InterruptedException {
-        return sessionMap.get(sessionId).getMessage();
+        return sessionMap.get(sessionId) == null ? new PunterRestartMessage() : sessionMap.get(sessionId).getMessage();
     }
 
     public void sendMessage(String sessionId, PunterMessage punterMessage) throws InterruptedException {
-         sessionMap.get(sessionId).sendMessage(punterMessage);
+        sessionMap.get(sessionId).sendMessage(punterMessage);
     }
 
     public void sendMessage(String sessionId, PunterMessage punterMessage, String topic) {
         topicHandler.publishMessage(sessionId, punterMessage, topic);
     }
 
-     public void sendMessageToAll(String senderSessionId, PunterMessage punterMessage) {
+    public void sendMessageToAll(String senderSessionId, PunterMessage punterMessage) {
         topicHandler.publishMessage(senderSessionId, punterMessage, "global");
     }
 

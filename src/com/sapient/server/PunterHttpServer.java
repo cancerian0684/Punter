@@ -18,7 +18,8 @@ public class PunterHttpServer {
     public static final String DATA = "/data/";
     public static String root = ".";
     private final HttpServer server;
-
+    private int webServerPort;
+    private int maxWebServerThread;
     public static void main(String[] args) throws IOException {
         PunterHttpServer httpServer = new PunterHttpServer();
     }
@@ -28,10 +29,12 @@ public class PunterHttpServer {
     }
 
     PunterHttpServer() throws IOException {
-        server = HttpServer.create(new InetSocketAddress(ServerSettings.getInstance().getWebServerPort()), 0);
+        webServerPort = ServerSettings.getInstance().getWebServerPort();
+        maxWebServerThread = ServerSettings.getInstance().getMaxWebServerThread();
+        server = HttpServer.create(new InetSocketAddress(webServerPort), 0);
         server.createContext(DATA, new MyDataHandler());
         server.createContext("/file/", new MyFileHandler());
-        server.setExecutor(Executors.newFixedThreadPool(ServerSettings.getInstance().getMaxWebServerThread()));
+        server.setExecutor(Executors.newFixedThreadPool(maxWebServerThread));
         server.start();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -43,7 +46,6 @@ public class PunterHttpServer {
 }
 
 class MyFileHandler implements HttpHandler {
-
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         InputStream inputStream = httpExchange.getRequestBody();
