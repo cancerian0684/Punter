@@ -37,6 +37,7 @@
     <libelement value="jar://$MODULE_DIR$/lib/httpcore-4.1.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/httpmime-4.1.1.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/commons-io-2.0.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/examples.jar!/" />
     <src_description expected_position="0">
       <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
       <src_folder value="file://$MODULE_DIR$/test" expected_position="1" />
@@ -409,6 +410,8 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="jedi-core" level="project" />
+    <orderEntry type="library" name="tools" level="project" />
+    <orderEntry type="library" name="examples" level="project" />
   </component>
 </module>
 
