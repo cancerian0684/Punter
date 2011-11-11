@@ -198,6 +198,7 @@ public class DownloadManagerGUI extends javax.swing.JFrame implements Observer{
 
     private void jbnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbnExitActionPerformed
         setVisible(false);
+        System.exit(0);
     }//GEN-LAST:event_jbnExitActionPerformed
 
     private void jbnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbnAddActionPerformed

@@ -43,6 +43,6 @@
 	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.6.0_27/lib/tools.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.7.0/demo/jpda/examples.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.7.0/demo/jpda/src.zip"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

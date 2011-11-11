@@ -34,7 +34,7 @@ public class PunterHttpServer {
         server = HttpServer.create(new InetSocketAddress(webServerPort), 0);
         server.createContext(DATA, new MyDataHandler());
         server.createContext("/file/", new MyFileHandler());
-        server.setExecutor(Executors.newFixedThreadPool(maxWebServerThread));
+        server.setExecutor(Executors.newCachedThreadPool());
         server.start();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override

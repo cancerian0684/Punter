@@ -111,7 +111,7 @@ public static void main(String[] args) {
 	System.out.println(2.00005 - 2.0);*/
 	try {
 		int i=0;
-		while(i<5000){
+		while(i<5){
 		logDocument.insertString(logDocument.getLength (),
 						"My Name is Munish\r\n", null);
 		System.out.println(logDocument.getLength());
