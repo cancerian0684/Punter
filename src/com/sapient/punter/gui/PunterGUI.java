@@ -1,14 +1,8 @@
 package com.sapient.punter.gui;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.TrayIcon;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
@@ -22,12 +16,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -89,7 +79,7 @@ import com.sapient.punter.utils.TextAreaFIFO;
 
 import static jedi.functional.FunctionalPrimitives.select;
 
-public class PunterGUI extends JPanel implements TaskObserver{
+public class PunterGUI extends JPanel implements TaskObserver, Observer{
     private boolean DEBUG = false;
     private final JTable taskTable;
     private final JTable processPropertyTable;
@@ -115,6 +105,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	private JTextArea jTextArea;
     private PunterJobScheduler punterJobScheduler;
     private boolean schedulerRunning=false;
+    private PunterJobBasket punterJobBasket;
 
     static{
     	try {
@@ -674,7 +665,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	          }
 	      });
 	    
-	    final JMenuItem addProcessMenu, runProcessMenu, exportProcess, importProcess;
+	    final JMenuItem addProcessMenu, runProcessMenu, exportProcess, importProcess, processURL;
 		final JPopupMenu popupProcess = new JPopupMenu();
 		addProcessMenu = new JMenuItem("Add Process");
 		addProcessMenu.addActionListener(new ActionListener() {
@@ -779,7 +770,31 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        	  }
 	          }
 	    });
-		
+
+
+
+        processURL = new JMenuItem("Process URL");
+		processURL.addActionListener(new ActionListener() {
+	          public void actionPerformed(ActionEvent e) {
+//	        	  System.out.println("Running Process");
+	        	  try{
+	        		  if(processTable.getSelectedRow()!=-1){
+                          ProcessData procDao = (ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
+                          String procId=""+procDao.getId();
+                          String server=StaticDaoFacade.getInstance().getServerHostAddress().getHostName();
+                          String port=""+StaticDaoFacade.getInstance().getWebServerPort();
+                          String client=StaticDaoFacade.getInstance().getLocalHostAddress().getHostName();
+                          String url="http://"+server+":"+port+"/process/"+client+"/"+procId;
+                          StringSelection stringSelection = new StringSelection(url);
+                          Toolkit toolkit = Toolkit.getDefaultToolkit();
+                          toolkit.getSystemClipboard().setContents(stringSelection, null);
+	        		  }
+	        	  }catch(Exception ee){
+	        		  ee.printStackTrace();
+	        	  }
+	          }
+	    });
+
 		runProcessMenu = new JMenuItem("Run Process");
 		runProcessMenu.addActionListener(new ActionListener() {
 	          public void actionPerformed(ActionEvent e) {
@@ -787,8 +802,7 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	        	  try{
 	        		  if(processTable.getSelectedRow()!=-1){
 	        			  ProcessData procDao=(ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
-	        			  procDao=StaticDaoFacade.getInstance().getProcess(procDao.getId());
-	        			  createProcess(procDao);
+                          punterJobBasket.addJobToBasket(procDao.getId());
 	        		  }
 	        	  }catch(Exception ee){
 	        		  ee.printStackTrace();
@@ -796,10 +810,11 @@ public class PunterGUI extends JPanel implements TaskObserver{
 	          }
 	    });
 		popupProcess.add(addProcessMenu);
-		popupProcess.add(runProcessMenu);
-		popupProcess.add(exportProcess);
-		popupProcess.add(importProcess);
-	    processTable.addMouseListener(new MouseAdapter() {
+        popupProcess.add(runProcessMenu);
+        popupProcess.add(exportProcess);
+        popupProcess.add(importProcess);
+        popupProcess.add(processURL);
+        processTable.addMouseListener(new MouseAdapter() {
 	          //JPopupMenu popup;
 	          public void mousePressed(MouseEvent e) {
 				if (processTable.getSelectedRowCount() > 1) {
@@ -1339,9 +1354,12 @@ public class PunterGUI extends JPanel implements TaskObserver{
         	final ArrayList<Object> newRequest = new ArrayList<Object>();
         	newRequest.add(p);
         	tmpModel.insertRow(newRequest);
-		}
-        if(processTable.getModel().getRowCount()>0)
+        }
+        punterJobBasket = PunterJobBasket.getInstance();
+        punterJobBasket.addObserver(this);
+        if(processTable.getModel().getRowCount()>0) {
             processTable.setRowSelectionInterval(0, 0);
+        }
         if(AppSettings.getInstance().isSchedulerEnabled()){
             startPunterJobScheduler();
         }
@@ -1361,7 +1379,6 @@ public class PunterGUI extends JPanel implements TaskObserver{
         if(!schedulerRunning){
             synchronized (this){
                 punterJobScheduler = new PunterJobScheduler();
-                punterJobScheduler.setGuiReference(this);
                 punterJobScheduler.start();
                 schedulerRunning=true;
             }
@@ -1394,7 +1411,8 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		};
 	}
     
-    public void createProcess(final ProcessData processData) throws Exception{
+    public void createAndRunProcess(long procId) throws Exception{
+        final ProcessData processData=StaticDaoFacade.getInstance().getProcess(procId);
         final ProcessHistory processHistory = ProcessHistoryBuilder.build(processData);
 		Thread thread=new Thread(){
 			@Override
@@ -1572,7 +1590,16 @@ public class PunterGUI extends JPanel implements TaskObserver{
 		 }
 	}
 
-	static class DefaultStringRenderer extends DefaultTableCellRenderer {
+    @Override
+    public void update(Observable o, Object arg) {
+        try {
+            createAndRunProcess((Long) arg);
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+    static class DefaultStringRenderer extends DefaultTableCellRenderer {
     	
     	public DefaultStringRenderer() { super(); }
     	@Override

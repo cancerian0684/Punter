@@ -25,13 +25,11 @@ public class MyHttpServer extends Thread {
 	BufferedReader inFromClient = null;
 	DataOutputStream outToClient = null;
 
-
 	public MyHttpServer(Socket client) {
 		connectedClient = client;
 	}
 
 	public void run() {
-
 		try {
 
 			System.out.println( "The Client "+
@@ -134,10 +132,8 @@ public class MyHttpServer extends Thread {
 	}
 
 	public static void main (String args[]) throws Exception {
-
 		ServerSocket Server = new ServerSocket (5000, 10, InetAddress.getByName("127.0.0.1"));
 		System.out.println ("TCPServer Waiting for client on port 5000");
-
 		while(true) {
 				Socket connected = Server.accept();
 	            (new MyHttpServer(connected)).start();

@@ -15,7 +15,10 @@ import java.util.Date;
 import java.util.concurrent.Executors;
 
 public class PunterHttpServer {
-    public static final String DATA = "/data/";
+    public static final String DATA = "/";
+    public static final String FILE = "/file/";
+    public static final String PROCESS = "/process/";
+
     public static String root = ".";
     private final HttpServer server;
     private int webServerPort;
@@ -33,7 +36,8 @@ public class PunterHttpServer {
         maxWebServerThread = ServerSettings.getInstance().getMaxWebServerThread();
         server = HttpServer.create(new InetSocketAddress(webServerPort), 0);
         server.createContext(DATA, new MyDataHandler());
-        server.createContext("/file/", new MyFileHandler());
+        server.createContext(FILE, new MyFileHandler());
+        server.createContext(PROCESS, new MyProcessHandler());
         server.setExecutor(Executors.newCachedThreadPool());
         server.start();
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -42,6 +46,37 @@ public class PunterHttpServer {
                 server.stop(0);
             }
         });
+    }
+}
+
+class MyProcessHandler implements HttpHandler {
+    @Override
+    public void handle(HttpExchange httpExchange) throws IOException {
+        InputStream inputStream = httpExchange.getRequestBody();
+
+        try {
+            URI requestURI = httpExchange.getRequestURI();
+            String[] split = requestURI.toASCIIString().split("[/]");
+            String hostname=split[2];
+            String processId=split[3];
+            PunterProcessRunMessage runMessage =new PunterProcessRunMessage();
+            runMessage.setHostname(hostname);
+            runMessage.setProcessId(Long.parseLong(processId));
+            SessionFacade.getInstance().sendMessageToAll("http", runMessage);
+            httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+            httpExchange.getResponseBody().write(new String("Process Submitted Successfully.").getBytes());
+            httpExchange.getResponseBody().close();
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            send404(httpExchange);
+        } finally {
+            httpExchange.close();
+        }
+    }
+
+     private void send404(HttpExchange httpExchange) throws IOException {
+        httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, 0);
+        httpExchange.getResponseBody().close();
     }
 }
 

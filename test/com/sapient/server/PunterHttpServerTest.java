@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import static junit.framework.Assert.assertEquals;
@@ -54,10 +55,17 @@ public class PunterHttpServerTest {
 
     @Test
     public void ShouldDownloadFileFromServer() throws IOException {
-        URL url = new URL("http://localhost:8080/data/index.html");
+        URL url = new URL("http://localhost:8080/index.html");
         java.net.URLConnection conn = url.openConnection();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         IOUtils.copy(conn.getInputStream(), output);
         assertEquals(673, output.size());
+    }
+
+    @Test
+    public void ShouldStartProcessAtServer() throws IOException {
+        URL url = new URL("http://localhost:8080/process/yldnw0070273clu/27");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        assertEquals(HttpURLConnection.HTTP_OK, conn.getResponseCode());
     }
 }

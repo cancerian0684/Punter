@@ -8,6 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class PunterSession implements Comparable<String> {
     String username;
     String sessionId;
+    String hostname;
     BlockingQueue<PunterMessage> myQueue;
     long lastAccessed;
     long age;
@@ -45,5 +46,13 @@ public class PunterSession implements Comparable<String> {
     }
     public void ping() {
         this.lastAccessed = System.currentTimeMillis();
+    }
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
     }
 }

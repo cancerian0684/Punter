@@ -34,7 +34,7 @@ public class ProcessExecutor {
 		});
 	}
 	public boolean isActive(){
-		return ((ThreadPoolExecutor)executor).getActiveCount()>0 && ((ThreadPoolExecutor)executor).getQueue().size()>0;
+		return ((ThreadPoolExecutor)executor).getActiveCount()>0;
 		//getQueueSize>0 && getActiveCount>0
 	}
 	public void shutdown(){

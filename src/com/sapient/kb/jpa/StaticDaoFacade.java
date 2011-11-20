@@ -8,19 +8,16 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.sapient.kb.gui.SearchQuery;
 import com.sapient.punter.gui.AppSettings;
+import com.sapient.punter.gui.PunterJobBasket;
 import com.sapient.punter.jpa.ProcessData;
 import com.sapient.punter.jpa.ProcessHistory;
 import com.sapient.punter.jpa.TaskData;
 import com.sapient.punter.jpa.TaskHistory;
 import com.sapient.punter.utils.ClipBoardListener;
-import com.sapient.server.ClipboardPunterMessage;
-import com.sapient.server.PunterMessage;
-import com.sapient.server.PunterRestartMessage;
-import com.sapient.server.PunterSearch;
+import com.sapient.server.*;
 
 import javax.swing.*;
 
@@ -66,14 +63,20 @@ public class StaticDaoFacade {
             clipBoardListener.handleContent((ClipboardPunterMessage) message);
         } else if (message instanceof PunterRestartMessage) {
             restartClient();
+        } else if (message instanceof PunterProcessRunMessage) {
+            try {
+                if (((PunterProcessRunMessage) message).getHostname().equalsIgnoreCase(getLocalHostAddress().getHostName())) {
+                    PunterJobBasket.getInstance().addJobToBasket(((PunterProcessRunMessage) message).getProcessId());
+                }
+            } catch (Exception e) {
+            }
         }
-
     }
 
     public void restartClient() {
         try {
-            String url=stub.getJNLPURL();
-            Runtime.getRuntime().exec("javaws "+url);
+            String url = stub.getJNLPURL();
+            Runtime.getRuntime().exec("javaws " + url);
             System.exit(0);
         } catch (UnknownHostException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -101,6 +104,10 @@ public class StaticDaoFacade {
 
     public InetAddress getServerHostAddress() throws Exception {
         return stub.getServerHostAddress();
+    }
+
+    public InetAddress getLocalHostAddress() throws UnknownHostException {
+        return InetAddress.getLocalHost();
     }
 
     public long getWebServerPort() throws RemoteException {

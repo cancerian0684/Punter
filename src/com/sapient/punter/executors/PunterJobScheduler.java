@@ -2,7 +2,7 @@ package com.sapient.punter.executors;
 
 import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.gui.AppSettings;
-import com.sapient.punter.gui.PunterGUI;
+import com.sapient.punter.gui.PunterJobBasket;
 import com.sapient.punter.jpa.ProcessData;
 import it.sauronsoftware.cron4j.SchedulingPattern;
 
@@ -12,13 +12,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class PunterJobScheduler extends Timer {
-    private PunterGUI guiReference;
     private static long TIMER_PERIOD = 1000 * 60 * 1;
     private static long lastReferenceTimeLong;
-
-    public void setGuiReference(PunterGUI guiReference) {
-        this.guiReference = guiReference;
-    }
 
     public PunterJobScheduler() {
         super(true);
@@ -37,7 +32,7 @@ public class PunterJobScheduler extends Timer {
                         String ss = pd.getInputParams().get("scheduleString").getValue().trim();
                         if (checkIfScheduledInPeriod(ss, lastReferenceTimeLong, TIMER_PERIOD)) {
                             System.err.println(checkIfScheduledInPeriod(ss, lastReferenceTimeLong, TIMER_PERIOD) + " " + new Date());
-                            guiReference.createProcess(pd);
+                            PunterJobBasket.getInstance().addJobToBasket(pd.getId());
                         }
                     }
                     lastReferenceTimeLong += TIMER_PERIOD;
