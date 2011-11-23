@@ -46,7 +46,7 @@ public class Main {
 			MultiCastResponder.getInstance();
 			ServerSettings.getInstance();
             PunterHttpServer.main(new String[]{});
-            java.awt.Desktop.getDesktop().browse(new URI("http://localhost:8080/data/index.html"));
+            java.awt.Desktop.getDesktop().browse(new URI("http://localhost:8080/index.html"));
             System.err.println("Web Server ready");
 		} catch (Exception e) {
 			System.err.println("Server exception: " + e.toString());
