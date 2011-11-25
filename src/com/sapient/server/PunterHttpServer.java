@@ -12,6 +12,8 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 
 public class PunterHttpServer {
@@ -53,13 +55,19 @@ class MyProcessHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         InputStream inputStream = httpExchange.getRequestBody();
-
         try {
             URI requestURI = httpExchange.getRequestURI();
             String[] split = requestURI.toASCIIString().split("[/]");
             String hostname=split[2];
             String processId=split[3];
+            processId=processId.substring(0,processId.indexOf("?")==-1?processId.length():processId.indexOf("?"));
             PunterProcessRunMessage runMessage =new PunterProcessRunMessage();
+            int i = requestURI.toASCIIString().indexOf("?");
+            if (i > -1) {
+                String searchURL = requestURI.toASCIIString().substring(requestURI.toASCIIString().indexOf("?") + 1);
+                System.out.println("Search URL: " + searchURL);
+                runMessage.setParams(initMap(searchURL));
+            }
             runMessage.setHostname(hostname);
             runMessage.setProcessId(Long.parseLong(processId));
             SessionFacade.getInstance().sendMessageToAll("http", runMessage);
@@ -72,6 +80,15 @@ class MyProcessHandler implements HttpHandler {
         } finally {
             httpExchange.close();
         }
+    }
+    public Map initMap(String search) throws UnsupportedEncodingException {
+        Map parmsMap = new HashMap<String,String>();
+        String params[] = search.split("&");
+        for (String param : params) {
+           String temp[] = param.split("=");
+           parmsMap.put(temp[0], java.net.URLDecoder.decode(temp[1], "UTF-8"));
+        }
+        return parmsMap;
     }
 
      private void send404(HttpExchange httpExchange) throws IOException {

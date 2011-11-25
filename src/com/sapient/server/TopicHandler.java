@@ -32,9 +32,11 @@ public class TopicHandler {
 
     public synchronized void publishMessage(String sessionId, PunterMessage punterMessage, String topic) {
         ArrayList<PunterSession> arrayList = topicSessionMap.get(topic);
-        for (PunterSession punterSession : arrayList) {
-            if (!punterSession.getSessionId().equalsIgnoreCase(sessionId))
-                punterSession.sendMessage(punterMessage);
+        if (arrayList != null) {
+            for (PunterSession punterSession : arrayList) {
+                if (!punterSession.getSessionId().equalsIgnoreCase(sessionId))
+                    punterSession.sendMessage(punterMessage);
+            }
         }
     }
 }

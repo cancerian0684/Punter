@@ -64,6 +64,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import com.sapient.punter.executors.PunterJobScheduler;
 import com.sapient.punter.jpa.*;
+import com.sapient.server.PunterProcessRunMessage;
 import jedi.functional.Filter;
 import neoe.ne.EditPanel;
 
@@ -802,7 +803,9 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
 	        	  try{
 	        		  if(processTable.getSelectedRow()!=-1){
 	        			  ProcessData procDao=(ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
-                          punterJobBasket.addJobToBasket(procDao.getId());
+                          PunterProcessRunMessage punterProcessRunMessage=new PunterProcessRunMessage();
+                          punterProcessRunMessage.setProcessId(procDao.getId());
+                          punterJobBasket.addJobToBasket(punterProcessRunMessage);
 	        		  }
 	        	  }catch(Exception ee){
 	        		  ee.printStackTrace();
@@ -1411,8 +1414,8 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
 		};
 	}
     
-    public void createAndRunProcess(long procId) throws Exception{
-        final ProcessData processData=StaticDaoFacade.getInstance().getProcess(procId);
+    public void createAndRunProcess(PunterProcessRunMessage processRunMessage) throws Exception{
+        final ProcessData processData=StaticDaoFacade.getInstance().getProcess(processRunMessage.getProcessId());
         final ProcessHistory processHistory = ProcessHistoryBuilder.build(processData);
 		Thread thread=new Thread(){
 			@Override
@@ -1421,7 +1424,6 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
     		  final ProcessHistory ph1 = StaticDaoFacade.getInstance().createProcessHistory(processHistory);
     		  final ArrayList<Object> newRequest = new ArrayList<Object>();
   	          newRequest.add(ph1);
-				
   	          javax.swing.SwingUtilities.invokeLater(new Runnable() {
   	        	public void run() {
             	try{
@@ -1593,7 +1595,8 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
     @Override
     public void update(Observable o, Object arg) {
         try {
-            createAndRunProcess((Long) arg);
+            PunterProcessRunMessage processRunMessage= (PunterProcessRunMessage) arg;
+            createAndRunProcess(processRunMessage);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }

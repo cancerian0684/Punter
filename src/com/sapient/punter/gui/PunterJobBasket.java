@@ -1,5 +1,7 @@
 package com.sapient.punter.gui;
 
+import com.sapient.server.PunterProcessRunMessage;
+
 import java.util.Observable;
 
 public class PunterJobBasket extends Observable {
@@ -15,9 +17,9 @@ public class PunterJobBasket extends Observable {
         return instance;
     }
 
-    public void addJobToBasket(long processId) {
-        System.out.println("Adding processId To Basket = " + processId);
+    public void addJobToBasket(PunterProcessRunMessage processRunMessage) {
+        System.out.println("Adding processId To Basket = " + processRunMessage.getProcessId());
         setChanged();
-        notifyObservers(processId);
+        notifyObservers(processRunMessage);
     }
 }

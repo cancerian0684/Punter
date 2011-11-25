@@ -1,8 +1,12 @@
 package com.sapient.server;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PunterProcessRunMessage extends PunterMessage {
     private long processId;
     private String hostname;
+    private Map<String,String> params=new HashMap<String, String>();
 
     public long getProcessId() {
         return processId;
@@ -18,5 +22,13 @@ public class PunterProcessRunMessage extends PunterMessage {
 
     public void setHostname(String hostname) {
         this.hostname = hostname;
+    }
+
+    public Map<String, String> getParams() {
+        return params;
+    }
+
+    public void setParams(Map<String, String> params) {
+        this.params = params;
     }
 }

@@ -4,6 +4,7 @@ import com.sapient.kb.jpa.StaticDaoFacade;
 import com.sapient.punter.gui.AppSettings;
 import com.sapient.punter.gui.PunterJobBasket;
 import com.sapient.punter.jpa.ProcessData;
+import com.sapient.server.PunterProcessRunMessage;
 import it.sauronsoftware.cron4j.SchedulingPattern;
 
 import java.util.Date;
@@ -32,7 +33,9 @@ public class PunterJobScheduler extends Timer {
                         String ss = pd.getInputParams().get("scheduleString").getValue().trim();
                         if (checkIfScheduledInPeriod(ss, lastReferenceTimeLong, TIMER_PERIOD)) {
                             System.err.println(checkIfScheduledInPeriod(ss, lastReferenceTimeLong, TIMER_PERIOD) + " " + new Date());
-                            PunterJobBasket.getInstance().addJobToBasket(pd.getId());
+                            PunterProcessRunMessage punterProcessRunMessage=new PunterProcessRunMessage();
+                            punterProcessRunMessage.setProcessId(pd.getId());
+                            PunterJobBasket.getInstance().addJobToBasket(punterProcessRunMessage);
                         }
                     }
                     lastReferenceTimeLong += TIMER_PERIOD;

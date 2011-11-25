@@ -66,7 +66,7 @@ public class StaticDaoFacade {
         } else if (message instanceof PunterProcessRunMessage) {
             try {
                 if (((PunterProcessRunMessage) message).getHostname().equalsIgnoreCase(getLocalHostAddress().getHostName())) {
-                    PunterJobBasket.getInstance().addJobToBasket(((PunterProcessRunMessage) message).getProcessId());
+                    PunterJobBasket.getInstance().addJobToBasket((PunterProcessRunMessage) message);
                 }
             } catch (Exception e) {
             }

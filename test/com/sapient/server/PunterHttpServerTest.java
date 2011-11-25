@@ -37,6 +37,7 @@ public class PunterHttpServerTest {
         conn.setAllowUserInteraction(false);
         conn.setUseCaches(false);
         conn.setChunkedStreamingMode(1024*1024);
+        System.setProperty("http.keepAlive", "false");
         OutputStream connOutputStream = conn.getOutputStream();
         IOUtils.copyLarge(fileInputStream, connOutputStream);
         fileInputStream.close();
