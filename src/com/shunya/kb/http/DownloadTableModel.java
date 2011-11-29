@@ -1,4 +1,4 @@
-package com.sapient.kb.http;
+package com.shunya.kb.http;
 
 import java.util.Observable;
 import java.util.Observer;

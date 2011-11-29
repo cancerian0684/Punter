@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
-package com.sapient.kb.utils;
+package com.shunya.kb.utils;
 
 /*
  * TextAreaDemo.java requires no other files.

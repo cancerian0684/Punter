@@ -1,4 +1,4 @@
-package com.sapient.kb.http;
+package com.shunya.kb.http;
 
 import java.net.URL;
 import java.util.ArrayList;

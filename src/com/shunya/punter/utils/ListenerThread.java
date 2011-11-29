@@ -1,4 +1,4 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 
 import java.awt.TrayIcon;
 import java.io.IOException;
@@ -6,8 +6,7 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import com.sapient.punter.gui.Main;
-import com.sapient.punter.gui.PunterGUI;
+import com.shunya.punter.gui.Main;
 
 public class ListenerThread extends Thread {
    public void run() {

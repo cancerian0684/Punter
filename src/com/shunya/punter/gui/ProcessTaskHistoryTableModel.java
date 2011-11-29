@@ -1,11 +1,11 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.punter.jpa.RunStatus;
-import com.sapient.punter.jpa.TaskHistory;
+import com.shunya.punter.jpa.RunStatus;
+import com.shunya.punter.jpa.TaskHistory;
  
 public class ProcessTaskHistoryTableModel extends AbstractTableModel {
 	public final int[] width={15,332,88};

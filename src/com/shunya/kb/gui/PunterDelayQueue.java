@@ -1,8 +1,8 @@
-package com.sapient.kb.gui;
+package com.shunya.kb.gui;
 
 import java.util.concurrent.TimeUnit;
 
-import com.sapient.punter.gui.AppSettings;
+import com.shunya.punter.gui.AppSettings;
 
 public class PunterDelayQueue<T> {
     private T element;

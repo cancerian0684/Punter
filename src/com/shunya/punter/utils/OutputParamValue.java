@@ -1,10 +1,10 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlTransient;
 
-import com.sapient.punter.annotations.OutputParam;
+import com.shunya.punter.annotations.OutputParam;
 
 public class OutputParamValue implements Serializable {
 	/**

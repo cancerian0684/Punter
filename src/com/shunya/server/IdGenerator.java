@@ -1,4 +1,4 @@
-package com.sapient.server;
+package com.shunya.server;
 
 /*
  * Copyright 2005 Joe Walker
@@ -17,7 +17,6 @@ package com.sapient.server;
  */
 // Revised from dwr
 
-import javax.persistence.Id;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;

@@ -1,4 +1,4 @@
-package com.sapient.punter.tasks;
+package com.shunya.punter.tasks;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -19,11 +19,11 @@ import java.util.logging.MemoryHandler;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.OutputParam;
-import com.sapient.punter.jpa.TaskData;
-import com.sapient.punter.utils.InputParamValue;
-import com.sapient.punter.utils.OutputParamValue;
+import com.shunya.punter.annotations.InputParam;
+import com.shunya.punter.annotations.OutputParam;
+import com.shunya.punter.jpa.TaskData;
+import com.shunya.punter.utils.InputParamValue;
+import com.shunya.punter.utils.OutputParamValue;
 
 public abstract class Tasks implements Serializable{
 	private Map<String,Object> sessionMap;

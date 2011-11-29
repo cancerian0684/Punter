@@ -1,11 +1,11 @@
-package com.sapient.server;
+package com.shunya.server;
 
-import com.sapient.kb.jpa.Document;
+import com.shunya.kb.jpa.Document;
 
 import java.io.File;
 import java.io.IOException;
 
-import static com.sapient.server.LocalTemporaryFileUtils.*;
+import static com.shunya.server.LocalTemporaryFileUtils.*;
 
 /**
  * Created by IntelliJ IDEA.

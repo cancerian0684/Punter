@@ -1,12 +1,10 @@
-package com.sapient.server;
+package com.shunya.server;
 
-import com.sapient.kb.jpa.Attachment;
-import com.sapient.kb.jpa.Document;
-import com.sapient.punter.gui.AppSettings;
+import com.shunya.kb.jpa.Attachment;
+import com.shunya.kb.jpa.Document;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;

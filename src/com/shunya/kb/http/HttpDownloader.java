@@ -1,4 +1,4 @@
-package com.sapient.kb.http;
+package com.shunya.kb.http;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

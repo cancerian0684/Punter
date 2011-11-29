@@ -1,8 +1,7 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 

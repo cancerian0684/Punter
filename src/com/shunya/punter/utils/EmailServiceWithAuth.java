@@ -1,4 +1,4 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 
 import java.io.File;
 import java.util.Properties;

@@ -1,10 +1,8 @@
-package com.sapient.punter.jpa;
+package com.shunya.punter.jpa;
 
 import java.io.Serializable;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -14,9 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-import javax.persistence.Version;
 
 @Entity
 @TableGenerator(name="seqGen",table="ID_GEN",pkColumnName="GEN_KEY",valueColumnName="GEN_VALUE",pkColumnValue="SEQ_ID",allocationSize=1)
@@ -117,6 +113,6 @@ public class TaskHistory implements Serializable{
 	}
 	@Override
     public String toString() {
-        return "com.sapient.punter.jpa.TaskHistory[id=" + id + "]";
+        return "com.shunya.punter.jpa.TaskHistory[id=" + id + "]";
     }
 }

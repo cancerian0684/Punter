@@ -1,4 +1,4 @@
-package com.sapient.punter.tasks;
+package com.shunya.punter.tasks;
 
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -11,10 +11,10 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
 
-import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.OutputParam;
-import com.sapient.punter.annotations.PunterTask;
-import com.sapient.punter.utils.StringUtils;
+import com.shunya.punter.annotations.InputParam;
+import com.shunya.punter.annotations.OutputParam;
+import com.shunya.punter.annotations.PunterTask;
+import com.shunya.punter.utils.StringUtils;
 
 @PunterTask(author="munishc",name="ColtMsgSenderTask",description="Echo's the input data to SOP",documentation= "docs/docs/TextSamplerDemoHelp.html")
 public class ColtMsgSenderTask extends Tasks {

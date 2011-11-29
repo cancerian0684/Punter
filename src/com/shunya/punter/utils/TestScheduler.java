@@ -1,4 +1,4 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 
 import it.sauronsoftware.cron4j.Predictor;
 import it.sauronsoftware.cron4j.SchedulingPattern;

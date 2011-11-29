@@ -1,6 +1,6 @@
-package com.sapient.server;
+package com.shunya.server;
 
-import com.sapient.kb.jpa.Document;
+import com.shunya.kb.jpa.Document;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

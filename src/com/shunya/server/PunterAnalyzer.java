@@ -1,4 +1,4 @@
-package com.sapient.server;
+package com.shunya.server;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.WhitespaceTokenizer;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
 
-import com.sapient.kb.utils.TestEditor;
+import com.shunya.kb.utils.TestEditor;
 
 public class PunterAnalyzer extends Analyzer {
 	public static final List<String> STOP_WORDS;

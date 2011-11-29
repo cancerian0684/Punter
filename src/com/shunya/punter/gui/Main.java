@@ -1,4 +1,4 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,13 +17,12 @@ import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
-import com.sapient.kb.gui.PunterKB;
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.executors.ProcessExecutor;
-import com.sapient.punter.utils.JavaScreenCapture;
-import com.sapient.punter.utils.Launcher;
-import com.sapient.punter.utils.StackWindow;
-import org.omg.SendingContext.RunTime;
+import com.shunya.kb.gui.PunterKB;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.executors.ProcessExecutor;
+import com.shunya.punter.utils.JavaScreenCapture;
+import com.shunya.punter.utils.Launcher;
+import com.shunya.punter.utils.StackWindow;
 
 public class Main{
 	private static BufferedImage currentImage;

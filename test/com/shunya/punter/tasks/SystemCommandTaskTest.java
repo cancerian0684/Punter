@@ -1,4 +1,4 @@
-package com.sapient.punter.tasks;
+package com.shunya.punter.tasks;
 
 import junit.framework.Assert;
 import org.junit.Before;

@@ -1,13 +1,12 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import java.util.Map;
-import java.util.Properties;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.jpa.TaskData;
-import com.sapient.punter.utils.OutputParamValue;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.jpa.TaskData;
+import com.shunya.punter.utils.OutputParamValue;
  class OutputParamTableModel extends AbstractTableModel {
         private String[] columnNames = {"<html><b>Property",
                                         "<html><b>Value"};

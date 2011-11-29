@@ -1,4 +1,4 @@
-package com.sapient.punter.tasks;
+package com.shunya.punter.tasks;
 
 import java.awt.Container;
 import java.awt.GridBagConstraints;
@@ -23,9 +23,9 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UIKeyboardInteractive;
 import com.jcraft.jsch.UserInfo;
-import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.PunterTask;
-import com.sapient.punter.utils.StringUtils;
+import com.shunya.punter.annotations.InputParam;
+import com.shunya.punter.annotations.PunterTask;
+import com.shunya.punter.utils.StringUtils;
 
 @PunterTask(author="munishc",name="SCPFromTask",description="SCP remote file to Local machine.",documentation= "docs/docs/SCPFromTask.html")
 public class SCPFromTask extends Tasks {

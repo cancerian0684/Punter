@@ -1,6 +1,5 @@
-package com.sapient.server;
+package com.shunya.server;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public interface ServerSettingsMBean {

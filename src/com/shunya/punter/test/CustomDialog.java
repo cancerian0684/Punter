@@ -1,4 +1,4 @@
-package com.sapient.punter.test;
+package com.shunya.punter.test;
 
 import javax.swing.JOptionPane;
 import javax.swing.JDialog;

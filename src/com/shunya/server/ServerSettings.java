@@ -1,6 +1,6 @@
-package com.sapient.server;
+package com.shunya.server;
 
-import com.sapient.kb.jpa.Document;
+import com.shunya.kb.jpa.Document;
 
 import javax.jnlp.*;
 import javax.management.*;

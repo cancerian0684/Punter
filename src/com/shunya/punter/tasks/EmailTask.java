@@ -1,12 +1,12 @@
-package com.sapient.punter.tasks;
+package com.shunya.punter.tasks;
 
 import java.util.logging.Level;
 
-import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.PunterTask;
-import com.sapient.punter.utils.EmailService;
-import com.sapient.punter.utils.EmailServiceWithAuth;
-import com.sapient.punter.utils.StringUtils;
+import com.shunya.punter.annotations.InputParam;
+import com.shunya.punter.annotations.PunterTask;
+import com.shunya.punter.utils.EmailService;
+import com.shunya.punter.utils.EmailServiceWithAuth;
+import com.shunya.punter.utils.StringUtils;
 
 @PunterTask(author="munishc",name="EmailTask",description="Email Task",documentation= "docs/docs/EmailTask.html")
 public class EmailTask extends Tasks {

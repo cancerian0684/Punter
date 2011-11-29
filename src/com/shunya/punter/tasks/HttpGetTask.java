@@ -1,15 +1,12 @@
-package com.sapient.punter.tasks;
+package com.shunya.punter.tasks;
 
-import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.OutputParam;
-import com.sapient.punter.annotations.PunterTask;
+import com.shunya.punter.annotations.InputParam;
+import com.shunya.punter.annotations.OutputParam;
+import com.shunya.punter.annotations.PunterTask;
 import org.apache.commons.io.IOUtils;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 @PunterTask(author = "munishc", name = "HttpGetTask", description = "Plays HTTP GET Request on the given URL.", documentation = "docs/docs/TextSamplerDemoHelp.html")

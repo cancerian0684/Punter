@@ -1,4 +1,4 @@
-package com.sapient.punter.tasks;
+package com.shunya.punter.tasks;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,9 +7,9 @@ import java.sql.Statement;
 import java.util.Scanner;
 import java.util.logging.Level;
 
-import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.PunterTask;
-import com.sapient.punter.utils.StringUtils;
+import com.shunya.punter.annotations.InputParam;
+import com.shunya.punter.annotations.PunterTask;
+import com.shunya.punter.utils.StringUtils;
 
 @PunterTask(author="munishc",name="CloseDAISYFundsTask",description="Close Out DAISY Funds.",documentation= "docs/docs/TextSamplerDemoHelp.html")
 public class CloseDAISYFundsTask extends Tasks {

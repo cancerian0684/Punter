@@ -1,4 +1,4 @@
-package com.sapient.kb.gui;
+package com.shunya.kb.gui;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -13,9 +13,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 
-import com.sapient.kb.jpa.Document;
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.gui.Main;
+import com.shunya.kb.jpa.Document;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.gui.Main;
 
 public class TagDialog extends JDialog{
 	private static TagDialog tagDialog;

@@ -1,4 +1,4 @@
-package com.sapient.kb.gui;
+package com.shunya.kb.gui;
 
 import java.io.Serializable;
 

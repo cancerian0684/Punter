@@ -1,4 +1,4 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -11,7 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import com.sapient.punter.test.TextSamplerDemo;
+import com.shunya.punter.test.TextSamplerDemo;
 
 public class DocumentationDialog extends JDialog {
 	private static final long serialVersionUID = -8214339161211735741L;
@@ -25,7 +25,7 @@ public class DocumentationDialog extends JDialog {
             public void run() {
                  //Turn off metal's use of bold fonts
 				UIManager.put("swing.boldMetal", Boolean.FALSE);
-				//"com/sapient/punter/test/TextSamplerDemoHelp.html"
+				//"com/shunya/punter/test/TextSamplerDemoHelp.html"
 				try {
 				java.net.URL helpURL = TextSamplerDemo.class.getClassLoader().getResource(docUrl);
 				if(helpURL!=null){

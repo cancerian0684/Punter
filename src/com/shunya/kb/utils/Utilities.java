@@ -1,4 +1,4 @@
-package com.sapient.kb.utils;
+package com.shunya.kb.utils;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;

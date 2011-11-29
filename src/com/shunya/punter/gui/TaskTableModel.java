@@ -1,4 +1,4 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import java.util.ArrayList;
 
@@ -6,8 +6,8 @@ import javax.swing.table.AbstractTableModel;
 
 import org.apache.commons.beanutils.BeanUtils;
 
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.jpa.TaskData;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.jpa.TaskData;
  
 public class TaskTableModel extends AbstractTableModel {
 	public final int[]width={45,74,225,46};

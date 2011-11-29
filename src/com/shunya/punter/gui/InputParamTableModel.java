@@ -1,4 +1,4 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import java.util.HashMap;
 
@@ -6,10 +6,9 @@ import javax.swing.table.AbstractTableModel;
 
 import org.apache.commons.beanutils.BeanUtils;
 
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.gui.TextAreaEditor.EditorListener;
-import com.sapient.punter.jpa.TaskData;
-import com.sapient.punter.utils.InputParamValue;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.jpa.TaskData;
+import com.shunya.punter.utils.InputParamValue;
  class InputParamTableModel extends AbstractTableModel {
         private String[] columnNames = {"<html><b>Property",
                                         "<html><b>Value"};

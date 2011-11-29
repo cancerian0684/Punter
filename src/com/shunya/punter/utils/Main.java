@@ -1,4 +1,4 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;

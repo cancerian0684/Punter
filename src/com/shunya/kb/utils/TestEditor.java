@@ -1,4 +1,4 @@
-package com.sapient.kb.utils;
+package com.shunya.kb.utils;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -7,7 +7,7 @@ import java.util.Scanner;
 import javax.swing.JFrame;
 
 import com.hexidec.ekit.EkitCore;
-import com.sapient.punter.utils.Stopwatch;
+import com.shunya.punter.utils.Stopwatch;
 
 public class TestEditor extends JFrame{
 	TestEditor(){

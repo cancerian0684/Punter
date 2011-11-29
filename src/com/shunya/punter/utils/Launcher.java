@@ -1,4 +1,4 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 
 import java.lang.reflect.Method;
 
@@ -69,6 +69,6 @@ public class Launcher {
 
 	public static void main(String[] args) {
 		Launcher l = new Launcher();
-		l.launch("com.sapient.punter.gui.Main");
+		l.launch("com.shunya.punter.gui.Main");
 	}
 }

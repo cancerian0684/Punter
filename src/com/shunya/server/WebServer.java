@@ -1,4 +1,4 @@
-package com.sapient.server;
+package com.shunya.server;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -17,8 +17,8 @@ import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import com.sapient.kb.jpa.Attachment;
-import com.sapient.kb.jpa.Document;
+import com.shunya.kb.jpa.Attachment;
+import com.shunya.kb.jpa.Document;
 class WebServer implements HttpConstants {
     /* static class data/methods */
 

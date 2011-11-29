@@ -1,4 +1,4 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Date;
-import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;

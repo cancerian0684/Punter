@@ -1,4 +1,4 @@
-package com.sapient.punter.tasks;
+package com.shunya.punter.tasks;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.OutputParam;
-import com.sapient.punter.annotations.PunterTask;
+import com.shunya.punter.annotations.InputParam;
+import com.shunya.punter.annotations.OutputParam;
+import com.shunya.punter.annotations.PunterTask;
 
 @PunterTask(author="munishc",name="CopyTableDataTask",description="Copie's Select Queries resultset to target Table.",documentation= "docs/docs/CopyTableDataTask.html")
 public class CopyTableDataTask extends Tasks {

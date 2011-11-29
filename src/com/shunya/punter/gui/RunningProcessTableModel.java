@@ -1,15 +1,13 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.punter.jpa.ProcessHistory;
-import com.sapient.punter.jpa.RunState;
-import com.sapient.punter.jpa.RunStatus;
+import com.shunya.punter.jpa.ProcessHistory;
+import com.shunya.punter.jpa.RunStatus;
 import jedi.functional.Filter;
-import jedi.functional.FunctionalPrimitives;
 
 import static jedi.functional.FunctionalPrimitives.select;
 

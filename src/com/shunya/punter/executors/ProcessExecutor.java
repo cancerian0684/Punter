@@ -1,12 +1,11 @@
-package com.sapient.punter.executors;
+package com.shunya.punter.executors;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.sapient.punter.gui.AppSettings;
+import com.shunya.punter.gui.AppSettings;
 
 public class ProcessExecutor {
 	private static ProcessExecutor processExecutor;
@@ -25,7 +24,7 @@ public class ProcessExecutor {
                 0L, TimeUnit.MILLISECONDS,
                 workQueue);
 	}
-	public void submitProcess(final com.sapient.punter.tasks.Process process){
+	public void submitProcess(final com.shunya.punter.tasks.Process process){
 		executor.submit(new Runnable() {
 			@Override
 			public void run() {

@@ -1,4 +1,4 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

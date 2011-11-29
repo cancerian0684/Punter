@@ -1,7 +1,7 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.server.ClipboardPunterMessage;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.server.ClipboardPunterMessage;
 
 import java.awt.*;
 import java.awt.datatransfer.*;

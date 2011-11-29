@@ -1,12 +1,12 @@
-package com.sapient.punter.tasks;
+package com.shunya.punter.tasks;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.OutputParam;
-import com.sapient.punter.annotations.PunterTask;
+import com.shunya.punter.annotations.InputParam;
+import com.shunya.punter.annotations.OutputParam;
+import com.shunya.punter.annotations.PunterTask;
 
 @PunterTask(author="munishc",name="EchoTask",description="Echo's the input data to SOP",documentation= "docs/docs/TextSamplerDemoHelp.html")
 public class EchoTask extends Tasks {

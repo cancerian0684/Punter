@@ -1,4 +1,4 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;

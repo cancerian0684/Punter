@@ -1,11 +1,11 @@
-package com.sapient.kb.gui;
+package com.shunya.kb.gui;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.kb.jpa.Document;
+import com.shunya.kb.jpa.Document;
  
 public class DocumentTableModel extends AbstractTableModel {
 	SimpleDateFormat sdf =new SimpleDateFormat("dd/MM/yy");

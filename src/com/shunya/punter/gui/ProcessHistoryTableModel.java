@@ -1,11 +1,11 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.punter.jpa.ProcessHistory;
+import com.shunya.punter.jpa.ProcessHistory;
  
 public class ProcessHistoryTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflsdfl"};

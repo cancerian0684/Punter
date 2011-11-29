@@ -1,4 +1,4 @@
-package com.sapient.server;
+package com.shunya.server;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,9 +41,9 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.util.Version;
 
-import com.sapient.kb.jpa.Attachment;
-import com.sapient.kb.jpa.Document;
-import com.sapient.punter.utils.Stopwatch;
+import com.shunya.kb.jpa.Attachment;
+import com.shunya.kb.jpa.Document;
+import com.shunya.punter.utils.Stopwatch;
 
 public class LuceneIndexDao {
 	static final File INDEX_DIR = new File("LuceneIndex");

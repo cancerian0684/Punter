@@ -22,7 +22,7 @@
         <tstamp/>
         <mkdir dir="${build}"/>
         <javac srcdir="${src}" destdir="${build}" debug="on"
-               excludes="com/sapient/punter/tasks/chat/**,com/sapient/punter/tasks/ChatTask.java">
+               excludes="com/shunya/punter/tasks/chat/**,com/shunya/punter/tasks/ChatTask.java">
             <classpath refid="lib.path.ref"/>
         </javac>
     </target>

@@ -1,8 +1,8 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import java.util.Comparator;
 
-import com.sapient.punter.jpa.TaskHistory;
+import com.shunya.punter.jpa.TaskHistory;
 
 public class TaskHistorySeqComparator implements Comparator{
 	@Override

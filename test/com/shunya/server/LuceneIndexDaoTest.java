@@ -1,8 +1,8 @@
-package com.sapient.server;
+package com.shunya.server;
 
 import org.junit.Test;
 
-import static com.sapient.server.LuceneIndexDao.getPunterParsedText;
+import static com.shunya.server.LuceneIndexDao.getPunterParsedText;
 import static junit.framework.Assert.assertEquals;
 
 public class LuceneIndexDaoTest {

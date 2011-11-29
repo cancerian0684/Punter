@@ -1,6 +1,5 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,11 +8,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.PlainDocument;
-import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
 
-import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.PunterTask;
-import com.sapient.punter.tasks.EchoTask;
+import com.shunya.punter.annotations.PunterTask;
+import com.shunya.punter.tasks.EchoTask;
 
 public class Test {
 	private static int lineBufferSize=300;
@@ -82,7 +79,7 @@ public class Test {
 		
 	}
 public static void main(String[] args) {
-	String taskPackage="com.sapient.punter.tasks";;
+	String taskPackage="com.shunya.punter.tasks";;
 	Package pkg=Package.getPackage(taskPackage);
 	PunterTask ann = EchoTask.class.getAnnotation(PunterTask.class);
 	System.err.println(ann.description());

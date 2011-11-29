@@ -1,4 +1,4 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -62,21 +62,21 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
-import com.sapient.punter.executors.PunterJobScheduler;
-import com.sapient.punter.jpa.*;
-import com.sapient.server.PunterProcessRunMessage;
+import com.shunya.punter.executors.PunterJobScheduler;
+import com.shunya.punter.jpa.*;
+import com.shunya.server.PunterProcessRunMessage;
 import jedi.functional.Filter;
 import neoe.ne.EditPanel;
 
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.annotations.PunterTask;
-import com.sapient.punter.executors.ProcessExecutor;
-import com.sapient.punter.gui.TextAreaEditor.EditorListener;
-import com.sapient.punter.tasks.Tasks;
-import com.sapient.punter.utils.ConsoleOutputStream;
-import com.sapient.punter.utils.InputParamValue;
-import com.sapient.punter.utils.OutputParamValue;
-import com.sapient.punter.utils.TextAreaFIFO;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.annotations.PunterTask;
+import com.shunya.punter.executors.ProcessExecutor;
+import com.shunya.punter.gui.TextAreaEditor.EditorListener;
+import com.shunya.punter.tasks.Tasks;
+import com.shunya.punter.utils.ConsoleOutputStream;
+import com.shunya.punter.utils.InputParamValue;
+import com.shunya.punter.utils.OutputParamValue;
+import com.shunya.punter.utils.TextAreaFIFO;
 
 import static jedi.functional.FunctionalPrimitives.select;
 
@@ -675,7 +675,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
 	        	  try{
 	        		  ProcessData proc=new ProcessData();
 	        		  proc.setName("new Process");
-	        		  HashMap<String, InputParamValue> inProp = com.sapient.punter.tasks.Process.listInputParams();
+	        		  HashMap<String, InputParamValue> inProp = com.shunya.punter.tasks.Process.listInputParams();
     	        	  proc.setInputParams(inProp);
     	        	  proc.setUsername(AppSettings.getInstance().getUsername());
     	        	  proc=StaticDaoFacade.getInstance().createProcess(proc);
@@ -774,7 +774,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
 
 
 
-        processURL = new JMenuItem("Process URL");
+        processURL = new JMenuItem("Copy URL");
 		processURL.addActionListener(new ActionListener() {
 	          public void actionPerformed(ActionEvent e) {
 //	        	  System.out.println("Running Process");
@@ -1434,7 +1434,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
             			processHistoryTable.setRowSelectionInterval(0, 0);
             		}
             		}
-            		final com.sapient.punter.tasks.Process process=com.sapient.punter.tasks.Process.getProcess(processData.getInputParams(),ph1);
+            		final com.shunya.punter.tasks.Process process=com.shunya.punter.tasks.Process.getProcess(processData.getInputParams(),ph1);
             		process.setTaskObservable(PunterGUI.this);
             		// Adding row to running process table model
             		final RunningProcessTableModel rptm=(RunningProcessTableModel) runningProcessTable.getModel();
@@ -1471,7 +1471,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
 		  };
 		  thread.start();
     }
-    public void runProcess(com.sapient.punter.tasks.Process process){
+    public void runProcess(com.shunya.punter.tasks.Process process){
     	ProcessExecutor.getInstance().submitProcess(process);
     }
     

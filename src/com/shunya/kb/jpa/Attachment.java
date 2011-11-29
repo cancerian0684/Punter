@@ -1,4 +1,4 @@
-package com.sapient.kb.jpa;
+package com.shunya.kb.jpa;
 
 import java.io.Serializable;
 import java.util.Date;

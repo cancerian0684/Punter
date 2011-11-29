@@ -1,6 +1,6 @@
-package com.sapient.server;
+package com.shunya.server;
 
-import com.sapient.punter.gui.SingleInstanceFileLock;
+import com.shunya.punter.gui.SingleInstanceFileLock;
 
 import java.io.File;
 import java.net.InetAddress;

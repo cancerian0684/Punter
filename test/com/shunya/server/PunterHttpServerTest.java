@@ -1,4 +1,4 @@
-package com.sapient.server;
+package com.shunya.server;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;

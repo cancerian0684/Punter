@@ -1,10 +1,5 @@
-package com.sapient.kb.gui;
+package com.shunya.kb.gui;
 
-import javax.swing.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.io.File;
-import java.util.List;
 /*
 
 public class FileAndTextTransferHandler extends TransferHandler {

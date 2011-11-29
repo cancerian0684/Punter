@@ -1,4 +1,4 @@
-package com.sapient.kb.jpa;
+package com.shunya.kb.jpa;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -24,9 +24,9 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
-import static com.sapient.kb.jpa.Document.DocumentType.EXTERNAL_DOC;
-import static com.sapient.kb.jpa.Document.DocumentType.PUNTER_DOC_WITHOUT_ATTACHMENT;
-import static com.sapient.kb.jpa.Document.DocumentType.PUNTER_DOC_WITH_ATTACHMENT;
+import static com.shunya.kb.jpa.Document.DocumentType.EXTERNAL_DOC;
+import static com.shunya.kb.jpa.Document.DocumentType.PUNTER_DOC_WITHOUT_ATTACHMENT;
+import static com.shunya.kb.jpa.Document.DocumentType.PUNTER_DOC_WITH_ATTACHMENT;
 
 @Entity
 @Table(name="DOCUMENT")

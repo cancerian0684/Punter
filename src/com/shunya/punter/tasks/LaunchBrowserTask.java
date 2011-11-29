@@ -1,14 +1,14 @@
-package com.sapient.punter.tasks;
+package com.shunya.punter.tasks;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 
-import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.OutputParam;
-import com.sapient.punter.annotations.PunterTask;
-import com.sapient.punter.utils.StringUtils;
+import com.shunya.punter.annotations.InputParam;
+import com.shunya.punter.annotations.OutputParam;
+import com.shunya.punter.annotations.PunterTask;
+import com.shunya.punter.utils.StringUtils;
 
 @PunterTask(author="munishc",name="LaunchBrowserTask",description="Launch the System default browser fpr the given URL.",documentation= "docs/docs/TextSamplerDemoHelp.html")
 public class LaunchBrowserTask extends Tasks {

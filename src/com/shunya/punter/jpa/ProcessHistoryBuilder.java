@@ -1,6 +1,6 @@
-package com.sapient.punter.jpa;
+package com.shunya.punter.jpa;
 
-import com.sapient.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacade;
 
 import java.util.ArrayList;
 import java.util.Date;

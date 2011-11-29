@@ -1,11 +1,10 @@
-package com.sapient.kb.gui;
+package com.shunya.kb.gui;
 
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -63,12 +62,12 @@ import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
 
 import com.hexidec.ekit.EkitCore;
 import com.hexidec.ekit.EkitCoreSpell;
-import com.sapient.kb.jpa.Attachment;
-import com.sapient.kb.jpa.Document;
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.gui.AppSettings;
-import com.sapient.punter.gui.Main;
-import com.sapient.punter.gui.PunterGUI;
+import com.shunya.kb.jpa.Attachment;
+import com.shunya.kb.jpa.Document;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.gui.AppSettings;
+import com.shunya.punter.gui.Main;
+import com.shunya.punter.gui.PunterGUI;
 
 public class DocumentEditor extends JDialog{
 	protected JTextField textField;

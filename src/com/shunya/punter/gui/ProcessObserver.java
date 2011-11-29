@@ -1,6 +1,6 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
-import com.sapient.punter.jpa.ProcessHistory;
+import com.shunya.punter.jpa.ProcessHistory;
 
 public interface ProcessObserver{
 void update(ProcessHistory ph);

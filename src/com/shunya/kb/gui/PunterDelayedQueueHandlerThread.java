@@ -1,6 +1,6 @@
-package com.sapient.kb.gui;
+package com.shunya.kb.gui;
 
-import com.sapient.punter.gui.AppSettings;
+import com.shunya.punter.gui.AppSettings;
 
 public class PunterDelayedQueueHandlerThread <T> extends Thread {
     public interface PunterDelayedQueueListener <T> {

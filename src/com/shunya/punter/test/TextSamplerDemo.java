@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
-package com.sapient.punter.test;
+package com.shunya.punter.test;
 
 /*
  * TextSamplerDemo.java requires the following files:
@@ -44,7 +44,6 @@ import javax.swing.text.*;
 import java.awt.*;              //for layout managers and more
 import java.awt.event.*;        //for action events
 
-import java.net.URL;
 import java.io.IOException;
 
 public class TextSamplerDemo extends JPanel
@@ -207,7 +206,7 @@ public class TextSamplerDemo extends JPanel
     private static JEditorPane createEditorPane() {
         JEditorPane editorPane = new JEditorPane();
         editorPane.setEditable(false);
-        java.net.URL helpURL = TextSamplerDemo.class.getClassLoader().getResource("com/sapient/punter/test/TextSamplerDemoHelp.html");
+        java.net.URL helpURL = TextSamplerDemo.class.getClassLoader().getResource("com/shunya/punter/test/TextSamplerDemoHelp.html");
         if (helpURL != null) {
             try {
                 editorPane.setPage(helpURL);

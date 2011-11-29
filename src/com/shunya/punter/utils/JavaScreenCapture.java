@@ -1,15 +1,11 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.datatransfer.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class JavaScreenCapture extends JFrame implements MouseListener, MouseMotionListener {

@@ -1,4 +1,4 @@
-package com.sapient.punter.annotations;
+package com.shunya.punter.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

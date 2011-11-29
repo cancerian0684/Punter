@@ -1,4 +1,4 @@
-package com.sapient.kb.utils;
+package com.shunya.kb.utils;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 
-import com.sapient.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacade;
 
 public class SearchOptionDialog  extends JDialog{
 	private static SearchOptionDialog sod;

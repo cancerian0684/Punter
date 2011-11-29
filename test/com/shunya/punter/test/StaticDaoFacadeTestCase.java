@@ -1,23 +1,18 @@
-package com.sapient.punter.test;
+package com.shunya.punter.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.gui.AppSettings;
+import com.shunya.punter.jpa.ProcessData;
+import com.shunya.punter.jpa.ProcessHistory;
+import com.shunya.punter.jpa.TaskData;
+import com.shunya.punter.jpa.TaskHistory;
+import org.junit.*;
 
 import java.util.Date;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.gui.AppSettings;
-import com.sapient.punter.jpa.ProcessData;
-import com.sapient.punter.jpa.ProcessHistory;
-import com.sapient.punter.jpa.TaskData;
-import com.sapient.punter.jpa.TaskHistory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class StaticDaoFacadeTestCase {
 
@@ -39,7 +34,7 @@ public class StaticDaoFacadeTestCase {
 
 	@Test
 	public void testRemoveTask() throws Exception{
-		com.sapient.punter.jpa.ProcessData process=new com.sapient.punter.jpa.ProcessData();
+		com.shunya.punter.jpa.ProcessData process=new com.shunya.punter.jpa.ProcessData();
 		process.setId(1L);
 		for(int i=0;i<=10;i++){
 		TaskData task=new TaskData();
@@ -92,7 +87,7 @@ public class StaticDaoFacadeTestCase {
 
 	@Test
 	public void testListTask() throws Exception{
-		com.sapient.punter.jpa.ProcessData process=new com.sapient.punter.jpa.ProcessData();
+		com.shunya.punter.jpa.ProcessData process=new com.shunya.punter.jpa.ProcessData();
 		process.setId(712L);
 		List<TaskData> t1 = StaticDaoFacade.getInstance().getProcessTasks(712L);
 		TaskData task=new TaskData();
@@ -105,7 +100,7 @@ public class StaticDaoFacadeTestCase {
 
 	@Test
 	public void testGetProcessList() throws Exception{
-		com.sapient.punter.jpa.ProcessData process=new com.sapient.punter.jpa.ProcessData();
+		com.shunya.punter.jpa.ProcessData process=new com.shunya.punter.jpa.ProcessData();
 		process.setName("UBS-101");
 		List<ProcessData> pl1 = StaticDaoFacade.getInstance().getProcessList(AppSettings.getInstance().getUsername());
 		StaticDaoFacade.getInstance().createProcess(process);

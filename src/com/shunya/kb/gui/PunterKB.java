@@ -1,4 +1,4 @@
-package com.sapient.kb.gui;
+package com.shunya.kb.gui;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -26,11 +26,11 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import com.sapient.kb.jpa.Attachment;
-import com.sapient.kb.jpa.Document;
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.gui.AppSettings;
-import com.sapient.punter.gui.Main;
+import com.shunya.kb.jpa.Attachment;
+import com.shunya.kb.jpa.Document;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.gui.AppSettings;
+import com.shunya.punter.gui.Main;
 import org.apache.commons.io.IOUtils;
 
 public class PunterKB extends JPanel {

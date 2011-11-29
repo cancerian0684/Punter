@@ -1,12 +1,12 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.jpa.ProcessHistory;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.jpa.ProcessHistory;
  
 public class ProcessAlertTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflsdfl",Boolean.FALSE};

@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
-package com.sapient.kb.utils;
+package com.shunya.kb.utils;
 
 /*
  * TableFilterDemo.java requires SpringUtilities.java
@@ -40,7 +40,6 @@ import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.Dimension;
-import java.awt.Component;
 
 public class TableFilterDemo extends JPanel {
     private boolean DEBUG = false;

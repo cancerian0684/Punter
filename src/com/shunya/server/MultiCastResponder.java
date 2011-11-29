@@ -1,4 +1,4 @@
-package com.sapient.server;
+package com.shunya.server;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

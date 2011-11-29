@@ -1,29 +1,12 @@
-package com.sapient.punter.jpa;
+package com.shunya.punter.jpa;
 
+import com.shunya.punter.utils.InputParamValue;
+
+import javax.persistence.*;
+import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
-import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlAccessOrder;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorOrder;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-
-import com.sapient.punter.utils.InputParamValue;
 
 @Entity
 @Table(name="PROCESS")

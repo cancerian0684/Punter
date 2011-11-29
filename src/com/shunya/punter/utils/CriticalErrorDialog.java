@@ -1,4 +1,4 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 
 import java.awt.EventQueue;
 import java.io.BufferedWriter;
@@ -11,7 +11,7 @@ import java.util.Date;
 
 import javax.swing.JOptionPane;
 
-import com.sapient.punter.gui.AppSettings;
+import com.shunya.punter.gui.AppSettings;
 
 public class CriticalErrorDialog extends javax.swing.JFrame 
 				implements Thread.UncaughtExceptionHandler {

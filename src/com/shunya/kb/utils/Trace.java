@@ -1,4 +1,4 @@
-package com.sapient.kb.utils;/*
+package com.shunya.kb.utils;/*
  * %W% %E%
  *
  * Copyright (c) 2006, Oracle and/or its affiliates. All rights reserved.
@@ -49,7 +49,7 @@ import java.io.IOException;
 
 /**
  * This program traces the execution of another program.
- * See "java com.sapient.kb.utils.Trace -help".
+ * See "java com.shunya.kb.utils.Trace -help".
  * It is a simple example of the use of the Java Debug Interface.
  *
  * @author Robert Field
@@ -66,7 +66,7 @@ public class Trace {
     // Thread transferring remote output stream to our output stream
     private Thread outThread = null;
 
-    // Mode for tracing the com.sapient.kb.utils.Trace program (default= 0 off)
+    // Mode for tracing the com.shunya.kb.utils.Trace program (default= 0 off)
     private int debugTraceMode = 0;
 
     //  Do we want to watch assignments to fields
@@ -74,9 +74,9 @@ public class Trace {
 
     // Class patterns for which we don't want events
     private String[] excludes = {"java.*", "javax.*", "sun.*",
-            "com.sun.*", "org.*", "$*", "com.sapient.kb.gui.DocumentTableModel.*", "*getRowCount*"};
+            "com.sun.*", "org.*", "$*", "com.shunya.kb.gui.DocumentTableModel.*", "*getRowCount*"};
 
-    private String[] includes={"com.sapient.kb.*"};
+    private String[] includes={"com.shunya.kb.*"};
     /**
      * main
      */
@@ -259,7 +259,7 @@ public class Trace {
      * Print command line usage help
      */
     void usage() {
-        System.err.println("Usage: java com.sapient.kb.utils.Trace <options> <class> <args>");
+        System.err.println("Usage: java com.shunya.kb.utils.Trace <options> <class> <args>");
         System.err.println("<options> are:");
         System.err.println(
                 "  -output <filename>   Output trace to <filename>");

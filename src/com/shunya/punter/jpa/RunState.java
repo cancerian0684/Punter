@@ -1,4 +1,4 @@
-package com.sapient.punter.jpa;
+package com.shunya.punter.jpa;
 
 public enum RunState {
 NEW,

@@ -1,4 +1,4 @@
-package com.sapient.kb.utils;/*
+package com.shunya.kb.utils;/*
  * %W% %E%
  *
  * Copyright (c) 2006, Oracle and/or its affiliates. All rights reserved.
@@ -33,7 +33,7 @@ package com.sapient.kb.utils;/*
  */
 
 
-import com.sapient.punter.utils.ClipBoardUtils;
+import com.shunya.punter.utils.ClipBoardUtils;
 import com.sun.jdi.*;
 import com.sun.jdi.request.*;
 import com.sun.jdi.event.*;

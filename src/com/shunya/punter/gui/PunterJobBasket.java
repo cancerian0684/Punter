@@ -1,6 +1,6 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
-import com.sapient.server.PunterProcessRunMessage;
+import com.shunya.server.PunterProcessRunMessage;
 
 import java.util.Observable;
 

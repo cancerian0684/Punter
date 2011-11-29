@@ -1,4 +1,4 @@
-package com.sapient.kb.jpa;
+package com.shunya.kb.jpa;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -9,15 +9,15 @@ import java.rmi.registry.Registry;
 import java.util.Collections;
 import java.util.List;
 
-import com.sapient.kb.gui.SearchQuery;
-import com.sapient.punter.gui.AppSettings;
-import com.sapient.punter.gui.PunterJobBasket;
-import com.sapient.punter.jpa.ProcessData;
-import com.sapient.punter.jpa.ProcessHistory;
-import com.sapient.punter.jpa.TaskData;
-import com.sapient.punter.jpa.TaskHistory;
-import com.sapient.punter.utils.ClipBoardListener;
-import com.sapient.server.*;
+import com.shunya.kb.gui.SearchQuery;
+import com.shunya.punter.gui.AppSettings;
+import com.shunya.punter.gui.PunterJobBasket;
+import com.shunya.punter.jpa.ProcessData;
+import com.shunya.punter.jpa.ProcessHistory;
+import com.shunya.punter.jpa.TaskData;
+import com.shunya.punter.jpa.TaskHistory;
+import com.shunya.punter.utils.ClipBoardListener;
+import com.shunya.server.*;
 
 import javax.swing.*;
 

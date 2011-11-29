@@ -1,9 +1,8 @@
-package com.sapient.server;
+package com.shunya.server;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 
 public class TopicHandler {
     private static TopicHandler instance;

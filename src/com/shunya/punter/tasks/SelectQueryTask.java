@@ -1,4 +1,4 @@
-package com.sapient.punter.tasks;
+package com.shunya.punter.tasks;
 
 import java.io.FileOutputStream;
 import java.sql.Connection;
@@ -23,10 +23,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.OutputParam;
-import com.sapient.punter.annotations.PunterTask;
-import com.sapient.punter.utils.StringUtils;
+import com.shunya.punter.annotations.InputParam;
+import com.shunya.punter.annotations.OutputParam;
+import com.shunya.punter.annotations.PunterTask;
+import com.shunya.punter.utils.StringUtils;
 
 @PunterTask(author="munishc",name="GenTableDDLTask",documentation= "docs/docs/GenTableDDLTask.html")
 public class SelectQueryTask extends Tasks {

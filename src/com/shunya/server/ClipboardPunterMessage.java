@@ -1,4 +1,4 @@
-package com.sapient.server;
+package com.shunya.server;
 
 public class ClipboardPunterMessage extends PunterMessage {
     private String contents;

@@ -1,9 +1,8 @@
-package com.sapient.punter.test;
+package com.shunya.punter.test;
 
 import java.io.File;
 
 import neoe.ne.EditPanel;
-import neoe.ne.U;
 
 public class Main {
 	public static void main(String[] args) throws Exception {

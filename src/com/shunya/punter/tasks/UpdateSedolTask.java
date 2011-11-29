@@ -1,4 +1,4 @@
-package com.sapient.punter.tasks;
+package com.shunya.punter.tasks;
 
 
 import java.sql.CallableStatement;
@@ -8,8 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
-import com.sapient.punter.annotations.InputParam;
-import com.sapient.punter.annotations.PunterTask;
+import com.shunya.punter.annotations.InputParam;
+import com.shunya.punter.annotations.PunterTask;
 
 @PunterTask(author="sharmban",name="UpdateSedolTask",description="Updates Sedol for Fund in AISDB and DAISY",documentation= "docs/docs/TextSamplerDemoHelp.html")
 public class UpdateSedolTask extends Tasks{

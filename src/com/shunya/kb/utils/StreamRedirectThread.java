@@ -1,4 +1,4 @@
-package com.sapient.kb.utils;/*
+package com.shunya.kb.utils;/*
  * %W% %E%
  *
  * Copyright (c) 2006, Oracle and/or its affiliates. All rights reserved.
@@ -36,7 +36,7 @@ package com.sapient.kb.utils;/*
 import java.io.*;
 
 /**
- * com.sapient.kb.utils.StreamRedirectThread is a thread which copies it's input to
+ * com.shunya.kb.utils.StreamRedirectThread is a thread which copies it's input to
  * it's output and terminates when it completes.
  *
  * @version     %Z% %M% %I% %E% %T%

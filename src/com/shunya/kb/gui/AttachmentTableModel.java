@@ -1,10 +1,10 @@
-package com.sapient.kb.gui;
+package com.shunya.kb.gui;
 
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.sapient.kb.jpa.Attachment;
+import com.shunya.kb.jpa.Attachment;
 
 public class AttachmentTableModel extends AbstractTableModel {
 	public final Object[] longValues = {new Integer(3),"Kaflksdfl","12345678","123456546865354343543543543584435"};

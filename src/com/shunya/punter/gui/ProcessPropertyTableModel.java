@@ -1,4 +1,4 @@
-package com.sapient.punter.gui;
+package com.shunya.punter.gui;
 
 import it.sauronsoftware.cron4j.Predictor;
 
@@ -8,8 +8,8 @@ import javax.swing.table.AbstractTableModel;
 
 import org.apache.commons.beanutils.BeanUtils;
 
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.jpa.ProcessData;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.jpa.ProcessData;
  
 public class ProcessPropertyTableModel extends AbstractTableModel {
 	public final int[] width = {150,206};

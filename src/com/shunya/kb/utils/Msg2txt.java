@@ -15,18 +15,9 @@
    limitations under the License.
 ==================================================================== */
 
-package com.sapient.kb.utils;
+package com.shunya.kb.utils;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.Map;
-
-import org.apache.poi.hsmf.MAPIMessage;
-import org.apache.poi.hsmf.datatypes.AttachmentChunks;
-import org.apache.poi.hsmf.exceptions.ChunkNotFoundException;
 
 /**
  * Reads one or several Outlook MSG files and for each of them creates

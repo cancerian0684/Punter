@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
 
-package com.sapient.punter.test;
+package com.shunya.punter.test;
 
 import javax.swing.JOptionPane;
 import javax.swing.JDialog;

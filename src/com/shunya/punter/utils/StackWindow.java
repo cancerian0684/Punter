@@ -1,12 +1,11 @@
-package com.sapient.punter.utils;
+package com.shunya.punter.utils;
 
-import com.sapient.kb.jpa.StaticDaoFacade;
-import com.sapient.punter.gui.AppSettings;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.gui.AppSettings;
 
 import java.awt.EventQueue;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.InetAddress;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
