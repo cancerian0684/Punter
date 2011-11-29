@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 
 public class PunterHttpServer {
     public static final String DATA = "/";
-    public static final String FILE = "/file/";
+    public static final String UPLOADS = "/upload/";
     public static final String PROCESS = "/process/";
 
     public static String root = ".";
@@ -38,7 +38,7 @@ public class PunterHttpServer {
         maxWebServerThread = ServerSettings.getInstance().getMaxWebServerThread();
         server = HttpServer.create(new InetSocketAddress(webServerPort), 0);
         server.createContext(DATA, new MyDataHandler());
-        server.createContext(FILE, new MyFileHandler());
+        server.createContext(UPLOADS, new MyFileUploadHandler());
         server.createContext(PROCESS, new MyProcessHandler());
         server.setExecutor(Executors.newCachedThreadPool());
         server.start();
@@ -97,13 +97,15 @@ class MyProcessHandler implements HttpHandler {
     }
 }
 
-class MyFileHandler implements HttpHandler {
+class MyFileUploadHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         InputStream inputStream = httpExchange.getRequestBody();
         URI requestURI = httpExchange.getRequestURI();
         String name = requestURI.toASCIIString().substring(requestURI.toASCIIString().lastIndexOf('/'));
-        IOUtils.copyLarge(inputStream, new FileOutputStream("e:/" + name));
+        File file=new File("uploads");
+        file.mkdirs();
+        IOUtils.copyLarge(inputStream, new FileOutputStream(new File(file, name)));
         httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
         httpExchange.getResponseBody().write(new String("File Received.").getBytes());
         httpExchange.getResponseBody().close();
