@@ -58,5 +58,5 @@
 </extension>
 
 </resources>
-<application-desc main-class="com.sapient.punter.utils.Launcher"/>
+<application-desc main-class="com.shunya.punter.utils.Launcher"/>
 </jnlp>

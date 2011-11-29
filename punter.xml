@@ -6,7 +6,7 @@
         <jar destfile="E:/installs/workspace_munish/Punter/punter.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
-                <attribute name="Rsrc-Main-Class" value="com.sapient.punter.gui.PunterGUI"/>
+                <attribute name="Rsrc-Main-Class" value="com.shunya.punter.gui.PunterGUI"/>
                 <attribute name="Class-Path" value="."/>
                 <attribute name="Rsrc-Class-Path" value="./ derby.jar toplink-essentials.jar derbyclient.jar derbynet.jar cron4j-2.2.3.jar junit.jar org.hamcrest.core_1.1.0.v20090501071000.jar"/>
             </manifest>

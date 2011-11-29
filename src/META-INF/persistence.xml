@@ -3,12 +3,12 @@
 	version="2.0" xmlns="http://java.sun.com/xml/ns/persistence">
 	<persistence-unit name="punter" transaction-type="RESOURCE_LOCAL">
 	<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.sapient.punter.jpa.TaskData</class>
-    <class>com.sapient.punter.jpa.ProcessData</class>
-    <class>com.sapient.punter.jpa.ProcessHistory</class>
-    <class>com.sapient.punter.jpa.TaskHistory</class>
-    <class>com.sapient.kb.jpa.Document</class>
-    <class>com.sapient.kb.jpa.Attachment</class>
+    <class>com.shunya.punter.jpa.TaskData</class>
+    <class>com.shunya.punter.jpa.ProcessData</class>
+    <class>com.shunya.punter.jpa.ProcessHistory</class>
+    <class>com.shunya.punter.jpa.TaskHistory</class>
+    <class>com.shunya.kb.jpa.Document</class>
+    <class>com.shunya.kb.jpa.Attachment</class>
     <properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver" />
 			<property name="javax.persistence.jdbc.url"  value="jdbc:derby://localhost:1527/punterDB;create=true" />
