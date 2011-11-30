@@ -11,7 +11,7 @@ import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="EchoTask",description="Load process properties into the system.",documentation= "docs/docs/TextSamplerDemoHelp.html")
+@PunterTask(author="munishc",name="EchoTask",description="Load process properties into the system.",documentation= "docs/TextSamplerDemoHelp.html")
 public class DeclareVariableTask extends Tasks {
 	private static final long serialVersionUID = 1L;
 

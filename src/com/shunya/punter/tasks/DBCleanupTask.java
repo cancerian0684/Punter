@@ -14,7 +14,7 @@ import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="DBCleanupTask",documentation= "docs/docs/DBCleanupTask.html")
+@PunterTask(author="munishc",name="DBCleanupTask",documentation= "docs/DBCleanupTask.html")
 public class DBCleanupTask extends Tasks {
 	@InputParam(required = true,description="jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1") 
 	private String conURL;

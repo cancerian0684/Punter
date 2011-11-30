@@ -38,7 +38,7 @@ import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="SVNCommitHistoryTask",description="Takes out SVN Commit history.",documentation= "docs/docs/TextSamplerDemoHelp.html")
+@PunterTask(author="munishc",name="SVNCommitHistoryTask",description="Takes out SVN Commit history.",documentation= "docs/TextSamplerDemoHelp.html")
 public class SVNCommitHistoryTask extends Tasks {
 	@InputParam(required = true,description="Line separated Project Names")
 	private String projectNames;

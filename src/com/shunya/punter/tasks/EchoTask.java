@@ -8,7 +8,7 @@ import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.annotations.PunterTask;
 
-@PunterTask(author="munishc",name="EchoTask",description="Echo's the input data to SOP",documentation= "docs/docs/TextSamplerDemoHelp.html")
+@PunterTask(author="munishc",name="EchoTask",description="Echo's the input data to SOP",documentation= "docs/TextSamplerDemoHelp.html")
 public class EchoTask extends Tasks {
 	@InputParam(required = true,description="enter your name here")
 	private String name;

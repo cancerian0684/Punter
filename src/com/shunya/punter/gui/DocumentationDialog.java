@@ -57,7 +57,7 @@ public class DocumentationDialog extends JDialog {
 	 private JEditorPane createEditorPane() {
 	        JEditorPane editorPane = new JEditorPane();
 	        editorPane.setEditable(false);
-	        java.net.URL helpURL = TextSamplerDemo.class.getClassLoader().getResource("docs/docs/TextSamplerDemoHelp.html");
+	        java.net.URL helpURL = TextSamplerDemo.class.getClassLoader().getResource("docs/TextSamplerDemoHelp.html");
 	        if (helpURL != null) {
 	            try {
 	                editorPane.setPage(helpURL);

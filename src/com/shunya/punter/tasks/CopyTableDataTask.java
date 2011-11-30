@@ -13,7 +13,7 @@ import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.annotations.PunterTask;
 
-@PunterTask(author="munishc",name="CopyTableDataTask",description="Copie's Select Queries resultset to target Table.",documentation= "docs/docs/CopyTableDataTask.html")
+@PunterTask(author="munishc",name="CopyTableDataTask",description="Copie's Select Queries resultset to target Table.",documentation= "docs/CopyTableDataTask.html")
 public class CopyTableDataTask extends Tasks {
 	@InputParam(required = true,description="Enter source DB URL Connection.")
 	private String sourceDbURL;

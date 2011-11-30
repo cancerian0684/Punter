@@ -11,7 +11,7 @@ import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="CloseDAISYFundsTask",description="Close Out DAISY Funds.",documentation= "docs/docs/TextSamplerDemoHelp.html")
+@PunterTask(author="munishc",name="CloseDAISYFundsTask",description="Close Out DAISY Funds.",documentation= "docs/TextSamplerDemoHelp.html")
 public class CloseDAISYFundsTask extends Tasks {
 	@InputParam(required = true,description="jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1") 
 	private String conURL;

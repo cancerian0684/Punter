@@ -16,7 +16,7 @@ import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="ColtMsgSenderTask",description="Echo's the input data to SOP",documentation= "docs/docs/TextSamplerDemoHelp.html")
+@PunterTask(author="munishc",name="ColtMsgSenderTask",description="Echo's the input data to SOP",documentation= "docs/TextSamplerDemoHelp.html")
 public class ColtMsgSenderTask extends Tasks {
 	@InputParam(required = true,description="enter your name here")
 	private String server;

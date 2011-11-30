@@ -15,7 +15,7 @@ import java.util.logging.Level;
 
 import static junit.framework.Assert.assertEquals;
 
-@PunterTask(author = "munishc", name = "HttpGetTask", description = "Plays HTTP GET Request on the given URL.", documentation = "docs/docs/TextSamplerDemoHelp.html")
+@PunterTask(author = "munishc", name = "HttpGetTask", description = "Plays HTTP GET Request on the given URL.", documentation = "docs/TextSamplerDemoHelp.html")
 public class HttpDownloadTask extends Tasks {
     @InputParam(required = true, description = "enter httpUrl here")
     private String httpUrl;

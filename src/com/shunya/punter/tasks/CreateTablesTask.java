@@ -11,7 +11,7 @@ import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.StringUtils;
 
-@PunterTask(author = "munishc", name = "CreateTablesTask", documentation = "docs/docs/CreateTablesTask.html")
+@PunterTask(author = "munishc", name = "CreateTablesTask", documentation = "docs/CreateTablesTask.html")
 public class CreateTablesTask extends Tasks {
 	@InputParam(required = true, description = "comma delimited sql DDL script")
 	private String SQLScript;

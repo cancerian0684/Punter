@@ -9,7 +9,7 @@ import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.annotations.PunterTask;
 
-@PunterTask(author="munishc",name="DBExportTask",documentation= "docs/docs/DBExportTask.html")
+@PunterTask(author="munishc",name="DBExportTask",documentation= "docs/DBExportTask.html")
 public class DBExportTask extends Tasks {
 	@InputParam(required = true,description="Get expCommand help from DBExport Task.") 
 	private String expCommand;

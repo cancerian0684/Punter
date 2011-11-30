@@ -10,7 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Level;
 
-@PunterTask(author = "munishc", name = "HttpGetTask", description = "Plays HTTP GET Request on the given URL.", documentation = "docs/docs/TextSamplerDemoHelp.html")
+@PunterTask(author = "munishc", name = "HttpGetTask", description = "Plays HTTP GET Request on the given URL.", documentation = "docs/TextSamplerDemoHelp.html")
 public class HttpGetTask extends Tasks {
     @InputParam(required = true, description = "enter your httpUrl here")
     private String httpUrl;

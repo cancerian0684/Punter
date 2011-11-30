@@ -25,7 +25,7 @@ import com.jcraft.jsch.UserInfo;
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.PunterTask;
 
-@PunterTask(author="munishc",name="SCPTask",description="SCP File to remote machine.",documentation= "docs/docs/SCPTask.html")
+@PunterTask(author="munishc",name="SCPTask",description="SCP File to remote machine.",documentation= "docs/SCPTask.html")
 public class SCPTask extends Tasks {
 	@InputParam(required = true,description="Hostname of Unix machine")
 	private String hostname;

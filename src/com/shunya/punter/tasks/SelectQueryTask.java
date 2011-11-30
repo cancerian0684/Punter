@@ -28,7 +28,7 @@ import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="GenTableDDLTask",documentation= "docs/docs/GenTableDDLTask.html")
+@PunterTask(author="munishc",name="GenTableDDLTask",documentation= "docs/GenTableDDLTask.html")
 public class SelectQueryTask extends Tasks {
 	@InputParam(required = true,description="jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1") 
 	private String conURL;

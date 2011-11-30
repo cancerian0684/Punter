@@ -27,7 +27,7 @@ import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="SCPFromTask",description="SCP remote file to Local machine.",documentation= "docs/docs/SCPFromTask.html")
+@PunterTask(author="munishc",name="SCPFromTask",description="SCP remote file to Local machine.",documentation= "docs/SCPFromTask.html")
 public class SCPFromTask extends Tasks {
 	@InputParam(required = true,description="Hostname of Unix machine")
 	private String hostname;

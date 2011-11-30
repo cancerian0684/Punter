@@ -8,7 +8,7 @@ import com.shunya.punter.utils.EmailService;
 import com.shunya.punter.utils.EmailServiceWithAuth;
 import com.shunya.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="EmailTask",description="Email Task",documentation= "docs/docs/EmailTask.html")
+@PunterTask(author="munishc",name="EmailTask",description="Email Task",documentation= "docs/EmailTask.html")
 public class EmailTask extends Tasks {
 	@InputParam(required = true,description="comma separated to addresses") 
 	private String toAddress;

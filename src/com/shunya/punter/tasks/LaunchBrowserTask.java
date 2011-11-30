@@ -10,7 +10,7 @@ import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="LaunchBrowserTask",description="Launch the System default browser fpr the given URL.",documentation= "docs/docs/TextSamplerDemoHelp.html")
+@PunterTask(author="munishc",name="LaunchBrowserTask",description="Launch the System default browser fpr the given URL.",documentation= "docs/TextSamplerDemoHelp.html")
 public class LaunchBrowserTask extends Tasks {
 	@InputParam(required = true,description="Enter the URL to launch")
 	private String url;

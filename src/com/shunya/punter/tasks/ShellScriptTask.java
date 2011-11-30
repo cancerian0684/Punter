@@ -27,7 +27,7 @@ import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.StringUtils;
 
-@PunterTask(author="munishc",name="ShellScriptTask",description="Runs Script in Bash Shell",documentation= "docs/docs/ShellScriptTask.html")
+@PunterTask(author="munishc",name="ShellScriptTask",description="Runs Script in Bash Shell",documentation= "docs/ShellScriptTask.html")
 public class ShellScriptTask extends Tasks {
 	@InputParam(required = true,description="Hostname of Unix machine")
 	private String hostname;
