@@ -36,8 +36,10 @@ public class ProcessData implements Serializable{
 	private String username;
 	private String name;
 	private String description;
+    @Column(length = 500)
 	private String comments;
-    @Column(length = 5000)
+    @Lob
+	@Basic(fetch=FetchType.EAGER)
 	private String inputParams;
 	@OneToMany(cascade={CascadeType.REMOVE,CascadeType.PERSIST},mappedBy = "process",fetch=FetchType.EAGER)
 	private List<TaskData> taskList;

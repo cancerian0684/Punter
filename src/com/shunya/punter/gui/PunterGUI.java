@@ -1094,7 +1094,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
         JScrollPane processHistoryPane = new JScrollPane(processHistoryTable);
         JScrollPane processTaskHistoryPane = new JScrollPane(processTaskHistoryTable);
         JSplitPane jsp4=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,processHistoryPane,processTaskHistoryPane);
-        jsp4.setDividerSize(0);
+        jsp4.setDividerSize(1);
         tabbedPane.addTab("Process History", null, jsp4,"Tasks Run History for selected Process");
         if(AppSettings.getInstance().getObject("processTaskHistoryTable")!=null)
 			GUIUtils.initilializeTableColumns(processTaskHistoryTable, (int[]) AppSettings.getInstance().getObject("processTaskHistoryTable"));

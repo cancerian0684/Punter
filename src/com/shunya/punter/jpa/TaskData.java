@@ -43,12 +43,15 @@ public class TaskData implements Serializable{
 	private int sequence;
 	private String name;
 	private String className;
+    @Column(length = 500)
 	private String description;
 	private String author;
 	private boolean active=true;
-    @Column(length = 5000)
+    @Lob
+	@Basic(fetch=FetchType.EAGER)
     private String inputParams;
-    @Column(length = 5000)
+    @Lob
+	@Basic(fetch=FetchType.EAGER)
     private String outputParams;
     @ManyToOne
 	@XmlTransient

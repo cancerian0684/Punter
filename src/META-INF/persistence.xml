@@ -18,7 +18,7 @@
 			<property name="eclipselink.ddl-generation" value="create-tables" />
 			<property name="eclipselink.ddl-generation.output-mode" value="database" />
 			<property name="eclipselink.target-database" value="DERBY"/>
-			<property name="eclipselink.logging.level" value="FINE" />
+			<property name="eclipselink.logging.level" value="INFO" />
 			<property name="eclipselink.cache.size.default" value="500"/>
 		</properties>
   </persistence-unit>

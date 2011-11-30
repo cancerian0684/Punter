@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.0+" codebase="http://localhost:8080/data/" href="punter.jnlp">
+<jnlp spec="1.0+" codebase="http://localhost:8080/" href="punter.jnlp">
 <information>
 <title>Punter Client</title>
 <vendor>Munish Chandel</vendor>
