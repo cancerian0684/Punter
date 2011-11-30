@@ -56,14 +56,12 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.PlainDocument;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.*;
 import javax.xml.transform.stream.StreamSource;
 
 import com.shunya.punter.executors.PunterJobScheduler;
 import com.shunya.punter.jpa.*;
+import com.shunya.punter.utils.*;
 import com.shunya.server.PunterProcessRunMessage;
 import jedi.functional.Filter;
 import neoe.ne.EditPanel;
@@ -73,10 +71,6 @@ import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.executors.ProcessExecutor;
 import com.shunya.punter.gui.TextAreaEditor.EditorListener;
 import com.shunya.punter.tasks.Tasks;
-import com.shunya.punter.utils.ConsoleOutputStream;
-import com.shunya.punter.utils.InputParamValue;
-import com.shunya.punter.utils.OutputParamValue;
-import com.shunya.punter.utils.TextAreaFIFO;
 
 import static jedi.functional.FunctionalPrimitives.select;
 
@@ -603,8 +597,8 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
 	        		  if ((s != null) && (s.length() > 0)) {
 //	        		      System.out.println("Selected Task... " + s + "!");
 	        		      Class<?> cls = Class.forName(taskProps.getProperty(s));
-	    	        	  HashMap<String, OutputParamValue> outProp = Tasks.listOutputParams((Tasks)cls.newInstance());
-	    	        	  HashMap<String, InputParamValue> inProp=Tasks.listInputParams((Tasks)cls.newInstance());
+	    	        	  FieldPropertiesMap outProp = Tasks.listOutputParams((Tasks)cls.newInstance());
+	    	        	  FieldPropertiesMap inProp=Tasks.listInputParams((Tasks)cls.newInstance());
 	    	        	  
 	    	        	  TaskData task=new TaskData();
 	    	        	  task.setInputParams(inProp);
@@ -675,7 +669,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
 	        	  try{
 	        		  ProcessData proc=new ProcessData();
 	        		  proc.setName("new Process");
-	        		  HashMap<String, InputParamValue> inProp = com.shunya.punter.tasks.Process.listInputParams();
+	        		  FieldPropertiesMap inProp = com.shunya.punter.tasks.Process.listInputParams();
     	        	  proc.setInputParams(inProp);
     	        	  proc.setUsername(AppSettings.getInstance().getUsername());
     	        	  proc=StaticDaoFacade.getInstance().createProcess(proc);
@@ -917,23 +911,31 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
         			int selectedRow = lsm.getMinSelectionIndex();
 //        			System.out.println("Row " + selectedRow + " is now selected.");
         			TaskData t=(TaskData)((TaskTableModel) taskTable.getModel()).getRow(taskTable.convertRowIndexToModel(selectedRow)).get(0);
-        			if(t.getInputParams()!=null){
-        			inputParamTable.setModel(new InputParamTableModel(t));
-        			inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
-        			initColumnSizesInputParamTable();
-        			}else{        				
-        				inputParamTable.setModel(new InputParamTableModel());
-        				inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
-        				initColumnSizesInputParamTable();
-        			}
-        			if(t.getOutputParams()!=null){
-        			outputParamTable.setModel(new OutputParamTableModel(t));
-        			initColumnSizesOutputParamTable();
-        			}else{
-        				outputParamTable.setModel(new OutputParamTableModel());
-        				initColumnSizesOutputParamTable();
-        			}
-        		}
+                    try {
+                        if(t.getInputParams()!=null){
+                        inputParamTable.setModel(new InputParamTableModel(t));
+                        inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
+                        initColumnSizesInputParamTable();
+                        }else{
+                            inputParamTable.setModel(new InputParamTableModel());
+                            inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
+                            initColumnSizesInputParamTable();
+                        }
+                    } catch (JAXBException e1) {
+                        e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+                    try {
+                        if(t.getOutputParams()!=null){
+                        outputParamTable.setModel(new OutputParamTableModel(t));
+                        initColumnSizesOutputParamTable();
+                        }else{
+                            outputParamTable.setModel(new OutputParamTableModel());
+                            initColumnSizesOutputParamTable();
+                        }
+                    } catch (JAXBException e1) {
+                        e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+                }
         	}
         });
         //Create the scroll pane and add the table to it.
@@ -1012,9 +1014,9 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
                     //populate process properties
                     ProcessPropertyTableModel pptmodel=(ProcessPropertyTableModel) processPropertyTable.getModel();
                     pptmodel.clearTable();
-                    HashMap<String, InputParamValue> props = process.getInputParams();
-                    for(Object key : props.keySet()) {  
-                		InputParamValue value = props.get(key);    
+                    FieldPropertiesMap props = process.getInputParams();
+                    for(String key : props.keySet()) {
+                		FieldProperties value = props.get(key);
 //                		System.out.println(key + " = " + value.getValue());
                 		final ArrayList<Object> newRequest = new ArrayList<Object>();
                     	newRequest.add(key);
@@ -1609,15 +1611,14 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
     	public Component getTableCellRendererComponent(JTable table,
     			Object value, boolean isSelected, boolean hasFocus, int row,
     			int column) {
-    		TaskData td=(TaskData) ((InputParamTableModel)table.getModel()).getValueAt(row, 2);
-    		InputParamValue value1 = (InputParamValue) td.getInputParams().get(table.getModel().getValueAt(row, 0));
-    		String tooltip="";
-    		if(value1.getInputParam()!=null)
-    		tooltip=value1.getInputParam().description();
-    		if(!tooltip.isEmpty())
-    			setToolTipText(tooltip);
-    		else
-    			setToolTipText(null);
+//    		TaskData td=(TaskData) ((InputParamTableModel)table.getModel()).getValueAt(row, 2);
+//    		FieldProperties value1 = (FieldProperties) td.getInputParams().get(table.getModel().getValueAt(row, 0));
+//    		String tooltip="";
+//    		tooltip=value1.getDescription();
+//    		if(tooltip!=null&&!tooltip.isEmpty())
+//    			setToolTipText(tooltip);
+//    		else
+//    			setToolTipText(null);
     		return super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
     				row, column);
     	}
@@ -1633,15 +1634,15 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer{
     	public Component getTableCellRendererComponent(JTable table,
     			Object value, boolean isSelected, boolean hasFocus, int row,
     			int column) {
-    		ProcessData td=(ProcessData)((ProcessPropertyTableModel)table.getModel()).getValueAt(row, 2);
-    		InputParamValue value1 = (InputParamValue) td.getInputParams().get(table.getModel().getValueAt(row, 0));
-    		String tooltip="";
-    		if(value1.getInputParam()!=null)
-    		tooltip=value1.getInputParam().description();
-    		if(!tooltip.isEmpty())
-    			setToolTipText(tooltip);
-    		else
-    			setToolTipText(null);
+//    		ProcessData td=(ProcessData)((ProcessPropertyTableModel)table.getModel()).getValueAt(row, 2);
+//    		FieldProperties value1 = (FieldProperties) td.getInputParams().get(table.getModel().getValueAt(row, 0));
+//    		String tooltip="";
+//    		if(value1.getDescription()!=null)
+//    		tooltip=value1.getDescription();
+//    		if(!tooltip.isEmpty())
+//    			setToolTipText(tooltip);
+//    		else
+//    			setToolTipText(null);
     		return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
     	}
     	public void setValue(Object value) {

@@ -3,26 +3,30 @@ package com.shunya.punter.gui;
 import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
+import javax.xml.bind.JAXBException;
 
 import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.jpa.TaskData;
+import com.shunya.punter.utils.FieldProperties;
+import com.shunya.punter.utils.FieldPropertiesMap;
 import com.shunya.punter.utils.OutputParamValue;
- class OutputParamTableModel extends AbstractTableModel {
+import org.apache.commons.beanutils.BeanUtils;
+
+class OutputParamTableModel extends AbstractTableModel {
         private String[] columnNames = {"<html><b>Property",
                                         "<html><b>Value"};
         public OutputParamTableModel() {
-			// TODO Auto-generated constructor stub
 		}
         public OutputParamTableModel(Object[][] data) {
         	this.data=data;
 		}
-        public OutputParamTableModel(TaskData t) {
-        	Map<String, OutputParamValue> prop = t.getOutputParams();
-        	int size=prop.size();
+        public OutputParamTableModel(TaskData t) throws JAXBException {
+        	FieldPropertiesMap prop = t.getOutputParams();
+        	int size=prop.keySet().size();
         	this.data=new Object[size][3];
         	int i=0;
-        	for(Object key : prop.keySet()) {  
-        		OutputParamValue value = prop.get(key);    
+        	for(String key : prop.keySet()) {
+        		FieldProperties value = prop.get(key);
 //        		System.out.println(key + " = " + value.getValue());
         		this.data[i][0]=key;
         		this.data[i][1]=value.getValue();
@@ -88,15 +92,18 @@ import com.shunya.punter.utils.OutputParamValue;
 
             data[row][col] = value;
             fireTableCellUpdated(row, col);
-            TaskData t=(TaskData) data[row][2];
-            OutputParamValue opv=t.getOutputParams().get((String)data[row][0]);
-            opv.setValue((String)value);
-            try {
-            	StaticDaoFacade.getInstance().saveTask(t);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
             if (true) {
+                try {
+                    TaskData taskData=(TaskData) data[row][2];
+                    FieldPropertiesMap propertiesMap = taskData.getOutputParams();
+                    FieldProperties opv= propertiesMap.get((String) data[row][0]);
+                    opv.setValue((String)value);
+                    taskData.setOutputParams(propertiesMap);
+                    StaticDaoFacade.getInstance().saveTask(taskData);
+                    BeanUtils.copyProperties(data[row][2], taskData);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 System.out.println("New value of data:");
                 printDebugData();
             }

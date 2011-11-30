@@ -549,14 +549,7 @@ public class PunterKB extends JPanel {
                     System.out.println(url);
                     StringSelection stringSelection = new StringSelection(url);
                     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                    clipboard.setContents(stringSelection, new ClipboardOwner() {
-                        @Override
-                        public void lostOwnership(Clipboard clipboard, Transferable contents) {
-                            // TODO Auto-generated method stub
-
-                        }
-                    });
-
+                    clipboard.setContents(stringSelection, null);
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }

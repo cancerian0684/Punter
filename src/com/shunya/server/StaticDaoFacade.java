@@ -9,8 +9,12 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
+import javax.xml.bind.JAXBException;
 
 import com.shunya.kb.gui.SearchQuery;
+import com.shunya.punter.tasks.*;
+import com.shunya.punter.tasks.Process;
+import com.shunya.punter.utils.FieldPropertiesMap;
 import org.apache.derby.drda.NetworkServerControl;
 
 import com.shunya.kb.jpa.Attachment;
@@ -19,7 +23,7 @@ import com.shunya.punter.jpa.ProcessData;
 import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
-import com.shunya.punter.utils.InputParamValue;
+import com.shunya.punter.utils.FieldProperties;
 
 public class StaticDaoFacade {
 	private static StaticDaoFacade sdf;
@@ -402,7 +406,7 @@ public  TaskHistory createTaskHistory(TaskHistory th)throws Exception{
 			q.setHint("eclipselink.refresh", "true");
 			List<ProcessData> processList = q.getResultList();
 			for (ProcessData processData : processList) {
-				 HashMap<String, InputParamValue> inProp = com.shunya.punter.tasks.Process.listInputParams();
+                FieldPropertiesMap inProp = Process.listInputParams();
 				 processData.setInputParams(inProp);
 				 try {
 				 	em.getTransaction().begin();
@@ -414,7 +418,9 @@ public  TaskHistory createTaskHistory(TaskHistory th)throws Exception{
 					e.printStackTrace();
 				}
 			}
-		} finally {
+		} catch (JAXBException e) {
+            e.printStackTrace();
+        } finally {
 			em.close();
 		}
 	}
@@ -531,8 +537,8 @@ public  void deleteTeam(){
     EntityManagerFactory emf = Persistence.createEntityManagerFactory("league");
     EntityManager em = emf.createEntityManager();
     
-    Query q = em.createQuery("delete from Team t " +
-            "where t.teamName = :name");
+    @SuppressWarnings({"JpaQlInspection"})
+    Query q = em.createQuery("delete from Team t where t.teamName = :name");
     q.setParameter("name", aTeamName);
     
     em.getTransaction().begin();

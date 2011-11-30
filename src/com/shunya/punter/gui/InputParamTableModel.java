@@ -3,31 +3,31 @@ package com.shunya.punter.gui;
 import java.util.HashMap;
 
 import javax.swing.table.AbstractTableModel;
+import javax.xml.bind.JAXBException;
 
+import com.shunya.punter.utils.FieldPropertiesMap;
 import org.apache.commons.beanutils.BeanUtils;
 
 import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.jpa.TaskData;
-import com.shunya.punter.utils.InputParamValue;
+import com.shunya.punter.utils.FieldProperties;
  class InputParamTableModel extends AbstractTableModel {
         private String[] columnNames = {"<html><b>Property",
                                         "<html><b>Value"};
         private boolean inputParam;
         public InputParamTableModel() {
-			// TODO Auto-generated constructor stub
 		}
         public InputParamTableModel(Object[][] data) {
-			// TODO Auto-generated constructor stub
         	this.data=data;
 		}
-        public InputParamTableModel(TaskData t) {
-        	HashMap<String,InputParamValue> prop;
+        public InputParamTableModel(TaskData t) throws JAXBException {
+        	FieldPropertiesMap prop;
         	prop=t.getInputParams();
-        	int size=prop.size();
+        	int size=prop.keySet().size();
         	this.data=new Object[size][3];
         	int i=0;
-        	for(Object key : prop.keySet()) {  
-        		InputParamValue value = (InputParamValue) prop.get(key);    
+        	for(String key : prop.keySet()) {
+        		FieldProperties value = (FieldProperties) prop.get(key);
 //        		System.out.println(key + " = " + value.getValue());
         		this.data[i][0]=key;
         		this.data[i][1]=value.getValue();
@@ -85,12 +85,14 @@ import com.shunya.punter.utils.InputParamValue;
          */
         public void setValueAt(final Object value,final int row,final int col) {
         	data[row][col] = value;
-            TaskData t=(TaskData) data[row][2];
-            InputParamValue ipv=(InputParamValue) t.getInputParams().get((String)data[row][0]);
-            ipv.setValue((String) value);
             try {
-				t=StaticDaoFacade.getInstance().saveTask(t);
-				BeanUtils.copyProperties(data[row][2], t);
+                TaskData taskData=(TaskData) data[row][2];
+                FieldPropertiesMap propertiesMap = taskData.getInputParams();
+                FieldProperties fieldProperties= propertiesMap.get((String) data[row][0]);
+                fieldProperties.setValue((String) value);
+                taskData.setInputParams(propertiesMap);
+                taskData=StaticDaoFacade.getInstance().saveTask(taskData);
+				BeanUtils.copyProperties(data[row][2], taskData);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

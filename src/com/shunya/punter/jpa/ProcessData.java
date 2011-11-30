@@ -1,8 +1,10 @@
 package com.shunya.punter.jpa;
 
-import com.shunya.punter.utils.InputParamValue;
+import com.shunya.punter.utils.FieldProperties;
+import com.shunya.punter.utils.FieldPropertiesMap;
 
 import javax.persistence.*;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -35,7 +37,8 @@ public class ProcessData implements Serializable{
 	private String name;
 	private String description;
 	private String comments;
-	private HashMap<String, InputParamValue> inputParams;
+    @Column(length = 5000)
+	private String inputParams;
 	@OneToMany(cascade={CascadeType.REMOVE,CascadeType.PERSIST},mappedBy = "process",fetch=FetchType.EAGER)
 	private List<TaskData> taskList;
 	@OneToMany(cascade={CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.LAZY)
@@ -77,11 +80,11 @@ public class ProcessData implements Serializable{
 	public void setProcessHistoryList(List<ProcessHistory> processHistoryList) {
 		this.processHistoryList = processHistoryList;
 	}
-	public HashMap<String, InputParamValue> getInputParams() {
-		return inputParams;
+	public FieldPropertiesMap getInputParams() throws JAXBException {
+		return FieldPropertiesMap.convertXmlToObject(inputParams);
 	}
-	public void setInputParams(HashMap<String, InputParamValue> inputParams) {
-		this.inputParams = inputParams;
+	public void setInputParams(FieldPropertiesMap inputParams) throws JAXBException {
+		this.inputParams = FieldPropertiesMap.convertObjectToXml(inputParams);
 	}
 	@Override
 	public int hashCode() {

@@ -10,10 +10,12 @@ import com.shunya.punter.jpa.RunState;
 import com.shunya.punter.jpa.RunStatus;
 import com.shunya.punter.jpa.TaskHistory;
 import com.shunya.punter.utils.EmailService;
-import com.shunya.punter.utils.InputParamValue;
+import com.shunya.punter.utils.FieldProperties;
+import com.shunya.punter.utils.FieldPropertiesMap;
 import com.shunya.punter.utils.StringUtils;
 
 import javax.swing.text.*;
+import javax.xml.bind.JAXBException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.text.ParseException;
@@ -30,7 +32,7 @@ public class Process implements Serializable {
     private Map sessionMap = new HashMap<String, Object>();
     private transient TaskObserver ts;
     private boolean failed = false;
-    private HashMap<String, InputParamValue> inputParams;
+    private FieldPropertiesMap inputParams;
     private ProcessHistory ph;
     @InputParam(description = "Stop process on task failure")
     private boolean stopOnTaskFailure = true;
@@ -88,11 +90,7 @@ public class Process implements Serializable {
     }
 
     public void afterProcessFinish() {
-        try {
-            StaticDaoFacade.getInstance().saveProcessHistory(ph);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        StaticDaoFacade.getInstance().saveProcessHistory(ph);
         po.update(ph);
         po.processCompleted();
         if (emailsToNotify != null && !emailsToNotify.isEmpty()) {
@@ -130,14 +128,14 @@ public class Process implements Serializable {
             processLogger.setLevel(Level.SEVERE);
     }
 
-    public void execute() {
+    public void execute() throws Exception{
         substituteParams();
         beforeProcessStart();
         executeProcessTasks();
         afterProcessFinish();
     }
 
-    private void executeProcessTasks() {
+    private void executeProcessTasks() throws JAXBException {
         ph.setRunStatus(RunStatus.RUNNING);
         ph.setLogDocument(logDocument);
         boolean keepRunning = true;
@@ -208,18 +206,17 @@ public class Process implements Serializable {
         this.ts = ts;
     }
 
-    public static HashMap<String, InputParamValue> listInputParams() {
+    public static FieldPropertiesMap listInputParams() {
         Field[] fields = Process.class.getDeclaredFields();
         System.out.println("Listing input params for process");
-        HashMap<String, InputParamValue> inProp = new HashMap<String, InputParamValue>();
+        Map<String,FieldProperties> inProp = new HashMap<String,FieldProperties>();
         for (Field field : fields) {
             if (field.isAnnotationPresent(InputParam.class)) {
                 InputParam ann = field.getAnnotation(InputParam.class);
-//			System.out.println(ann.required()==true?"*"+field.getName():""+field.getName());
-                inProp.put(field.getName(), new InputParamValue(ann, ""));
+                inProp.put(field.getName(), new FieldProperties(field.getName(), "",ann.description(),ann.required()));
             }
         }
-        return inProp;
+        return new FieldPropertiesMap(inProp);
     }
 
     private void substituteParams() {
@@ -263,7 +260,7 @@ public class Process implements Serializable {
         }
     }
 
-    public static Process getProcess(HashMap<String, InputParamValue> props, ProcessHistory ph) {
+    public static Process getProcess(FieldPropertiesMap props, ProcessHistory ph) {
         Process proc = new Process();
         proc.inputParams = props;
         proc.ph = ph;

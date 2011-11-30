@@ -2,21 +2,18 @@ package com.shunya.punter.jpa;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
+import javax.persistence.*;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import com.shunya.punter.utils.InputParamValue;
+import com.shunya.punter.utils.FieldProperties;
+import com.shunya.punter.utils.FieldPropertiesMap;
 import com.shunya.punter.utils.OutputParamValue;
 
 @Entity
@@ -49,9 +46,11 @@ public class TaskData implements Serializable{
 	private String description;
 	private String author;
 	private boolean active=true;
-	private HashMap<String, InputParamValue> inputParams;
-	private HashMap<String, OutputParamValue> outputParams;
-	@ManyToOne
+    @Column(length = 5000)
+    private String inputParams;
+    @Column(length = 5000)
+    private String outputParams;
+    @ManyToOne
 	@XmlTransient
 	private ProcessData process;
 	public long getId() {
@@ -92,17 +91,17 @@ public class TaskData implements Serializable{
 	public void setAuthor(String author) {
 		this.author = author;
 	}
-	public  HashMap<String, InputParamValue> getInputParams() {
-		return inputParams;
+	public FieldPropertiesMap getInputParams() throws JAXBException {
+		return FieldPropertiesMap.convertXmlToObject(inputParams);
 	}
-	public void setInputParams( HashMap<String, InputParamValue> inputParams) {
-		this.inputParams = inputParams;
+	public void setInputParams(FieldPropertiesMap inputParams) throws JAXBException {
+		this.inputParams = FieldPropertiesMap.convertObjectToXml(inputParams);
 	}
-	public HashMap<String,OutputParamValue> getOutputParams() {
-		return outputParams;
+	public FieldPropertiesMap getOutputParams() throws JAXBException {
+		return FieldPropertiesMap.convertXmlToObject(outputParams);
 	}
-	public void setOutputParams(HashMap<String,OutputParamValue> outputParams) {
-		this.outputParams = outputParams;
+	public void setOutputParams(FieldPropertiesMap outputParams) throws JAXBException {
+		this.outputParams = FieldPropertiesMap.convertObjectToXml(outputParams);
 	}
 	public ProcessData getProcess() {
 		return process;

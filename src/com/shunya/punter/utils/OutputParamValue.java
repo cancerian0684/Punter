@@ -16,7 +16,6 @@ public class OutputParamValue implements Serializable {
 	private String value;
 
 	public OutputParamValue() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public OutputParamValue(OutputParam inputParam, String value) {

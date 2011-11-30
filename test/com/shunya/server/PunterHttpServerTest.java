@@ -28,7 +28,7 @@ public class PunterHttpServerTest {
 
     @Test
     public void ShouldUploadFileToServer() throws IOException {
-        File file = new File("e:/Movies/Himalaya.avi");
+        File file = new File("e:/Music/yesboss1(songs.pk).mp3");
         URL url = new URL("http://localhost:8080/upload/"+file.getName());
         FileInputStream fileInputStream = new FileInputStream(file);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

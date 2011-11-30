@@ -1,5 +1,6 @@
 package com.shunya.punter.gui;
 
+import com.shunya.punter.utils.FieldPropertiesMap;
 import it.sauronsoftware.cron4j.Predictor;
 
 import java.util.ArrayList;
@@ -22,14 +23,7 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
                                   {"<html><b>Property","<html><b>Value"};
 	private Class [] columnClasses = new Class[] 
                                    {String.class,String.class};
-  
-  /**
-   * Constructor: Initializes the table structure, including number of columns
-   * and column headings. Also initializes table data with default values.
-   * @param <b>columns[] </b> array of column titles.
-   * @param <b>defaultv </b> array of default value objects, for each column.
-   * @param <b>rows </b> number of rows initially.
-   */
+
   public ArrayList<Object> getModelData(){
 	  ArrayList<Object>  newdata=new ArrayList<Object>(data); 
 	  return newdata;
@@ -54,52 +48,28 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
     return data.size();
   }
 
-  /**
-   * Overrides AbstractTableModel method. 
-   * @param <b>column number </b> column number
-   * @return <b>String </b> column name.
-   */
   public String getColumnName(int col){
     return columnNames[col];
   }
 
-  /**
-   * Overrides AbstractTableModel method.
-   * @param <b>rows </b> row number
-   * @param <b>rows </b> column number   
-   * @return <b>Object</b> the value at the specified cell.
-   */
   public Object getValueAt(int row, int col) {
     ArrayList<?> colArrayList = (ArrayList<?>) data.get(row);
     return colArrayList.get(col);
   }
-
-  /**
-   * Overrides AbstractTableModel method. Returns the class for the
-   * specified column.
-   * @param <b>col </b> column number  
-   * @return <b> Class </b> the class for the specified column.  
-   */
   public Class<?> getColumnClass(int col) {
     return columnClasses[col];
   }
 
-  /**
-   * Overrides AbstractTableModel method. Sets the value at the specified cell
-   * to object.
-   * @param <b>Object </b> 
-   * @param <b>row </b> row number   
-   * @param <b>column </b> column number   
-   * @return <b> Class </b> the class for the specified column.    
-   */
   public void setValueAt( Object obj, int row, int col ) {
     ArrayList<Object> colArrayList = (ArrayList<Object>)data.get(row);
     colArrayList.set( col, obj);
     try{
-    	ProcessData p=(ProcessData) colArrayList.get(2);
-    	p.getInputParams().get((String)colArrayList.get(0)).setValue((String) obj);
-    	p = StaticDaoFacade.getInstance().saveProcess(p);
-    	BeanUtils.copyProperties(colArrayList.get(2), p);
+    	ProcessData processData=(ProcessData) colArrayList.get(2);
+        FieldPropertiesMap propertiesMap = processData.getInputParams();
+        propertiesMap.get((String) colArrayList.get(0)).setValue((String) obj);
+        processData.setInputParams(propertiesMap);
+    	processData = StaticDaoFacade.getInstance().saveProcess(processData);
+    	BeanUtils.copyProperties(colArrayList.get(2), processData);
     	try{
     	if("scheduleString".equalsIgnoreCase((String)colArrayList.get(0))){
     		Predictor pr = new Predictor((String) obj);
@@ -116,11 +86,6 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
 	}
      super.fireTableDataChanged();
   }
-
-  /**
-   * Adds a new row to the table.
-   * @param <b>ArrayList </b> new row data
-   */
  /* public synchronized ArrayList insertRow( ArrayList newrow ) {
     data.add(0,newrow);
     super.fireTableRowsInserted(0,0);
@@ -133,10 +98,6 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
 	    return (ArrayList<?>) data.get(data.size()-1);
 	  }
 
-  /**
-   * Deletes the specified row from the table.
-   * @param <b>row </b> row number   
-   */
   public synchronized void deleteRow(int row) {
     data.remove(row);
     super.fireTableDataChanged();
@@ -147,10 +108,6 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
 	    data.removeAll(rows);
 	    super.fireTableDataChanged();
 	  }
-  /**
-   *  Delete all the rows existing after the selected row from the JTable
-   * @param <b>row </b> row number 
-   */
   public void deleteAfterSelectedRow(int row){
     // Get the initial size of the table before the deletion has started.
     int size = this.getRowCount();
@@ -167,20 +124,11 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
     }
     super.fireTableDataChanged();
   }
-  /**
-   * Returns the values at the specified row as a ArrayList.
-   * @param <b>row </b> row number
-   */
+
   public ArrayList<?> getRow(int row) {
     return (ArrayList<?>) data.get(row);
   }
 
-  /**
-   * Updates the specified row. It replaces the row ArrayList at the specified
-   * row with the new ArrayList.
-   * @param <b>ArrayList </b> row data
-   * @param <b>row </b> row number   
-   */
   public void updateRow( ArrayList<?> updatedRow, int row ) {
     data.set( row, updatedRow);
     super.fireTableDataChanged();

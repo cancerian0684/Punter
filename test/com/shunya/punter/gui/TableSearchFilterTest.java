@@ -23,25 +23,21 @@ public class TableSearchFilterTest {
 
 			@Override
 			public Object getIdentifier() {
-				// TODO Auto-generated method stub
 				return null;
 			}
 
 			@Override
 			public ProcessTableModel getModel() {
-				// TODO Auto-generated method stub
 				return null;
 			}
 
 			@Override
 			public Object getValue(int index) {
-				// TODO Auto-generated method stub
 				return null;
 			}
 
 			@Override
 			public int getValueCount() {
-				// TODO Auto-generated method stub
 				return 0;
 			}		});
 	}
