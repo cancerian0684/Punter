@@ -12,27 +12,15 @@ import com.shunya.punter.annotations.PunterTask;
 public class EchoTask extends Tasks {
 	@InputParam(required = true,description="enter your name here")
 	private String name;
-	@InputParam(required = false)
-	private int age;
-	@InputParam(required = false,description="<html>Enter Age in<br> dd-MMM-yyyy format</html>")
-	private Date dob;
 
 	@OutputParam
 	private String outName;
 
 	@Override
 	public boolean run() {
-		boolean status=false;
-		outName = "Hello " + name+" "+age+" "+dob;
+		outName = "Hello " + name;
 		LOGGER.get().log(Level.INFO, outName);
-		try {
-			TimeUnit.SECONDS.sleep(1);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		dob.getDate();
 		LOGGER.get().log(Level.WARNING, taskDao.getDescription()+name);
-		status=true;
-		return status;
+		return true;
 	}
 }

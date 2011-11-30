@@ -105,7 +105,9 @@ class MyFileUploadHandler implements HttpHandler {
         String name = requestURI.toASCIIString().substring(requestURI.toASCIIString().lastIndexOf('/'));
         File file=new File("uploads");
         file.mkdirs();
-        IOUtils.copyLarge(inputStream, new FileOutputStream(new File(file, name)));
+        FileOutputStream fileOutputStream = new FileOutputStream(new File(file, name));
+        IOUtils.copyLarge(inputStream, fileOutputStream);
+        fileOutputStream.close();
         httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
         httpExchange.getResponseBody().write(new String("File Received.").getBytes());
         httpExchange.getResponseBody().close();
