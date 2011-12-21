@@ -6,7 +6,7 @@ import com.shunya.punter.jpa.ProcessData;
 import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
-import org.junit.*;
+import org.junit.Test;
 
 import java.util.Date;
 import java.util.List;
@@ -15,23 +15,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class StaticDaoFacadeTestCase {
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
-
 	@Test
 	public void testRemoveTask() throws Exception{
 		com.shunya.punter.jpa.ProcessData process=new com.shunya.punter.jpa.ProcessData();

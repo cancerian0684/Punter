@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Client" type="Application" factoryName="Application">
-    <extension name="coverage" enabled="false" merge="false" />
+    <extension name="coverage" enabled="false" merge="false" runner="idea" />
     <option name="MAIN_CLASS_NAME" value="com.shunya.punter.gui.Main" />
     <option name="VM_PARAMETERS" value="" />
     <option name="PROGRAM_PARAMETERS" value="" />

@@ -5,6 +5,9 @@
     <inspection_tool class="AbstractMethodCallInConstructor" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AccessToNonThreadSafeStaticFieldFromInstance" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="nonThreadSafeTypes" value="java.text.DateFormat,java.util.Calendar" />
+      <option name="nonThreadSafeClasses">
+        <value />
+      </option>
     </inspection_tool>
     <inspection_tool class="AccessToStaticFieldLockedOnInstance" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AmbiguousMethodCall" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -171,6 +174,9 @@
     </inspection_tool>
     <inspection_tool class="PublicField" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoreEnums" value="false" />
+      <option name="ignorableAnnotations">
+        <value />
+      </option>
     </inspection_tool>
     <inspection_tool class="PublicFieldAccessedInSynchronizedContext" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PublicInnerClass" enabled="true" level="WARNING" enabled_by_default="true">
