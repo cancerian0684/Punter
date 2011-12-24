@@ -12,12 +12,35 @@ import java.net.URL;
 import java.net.UnknownHostException;
 
 public class ServerSettings implements ServerSettingsMBean, Serializable {
-    private static ServerSettingsMBean instance;
-    private static StaticDaoFacade sdf;
     private int maxResultsToDisplay = 10;
     private int maxProcessHistory = 5;
     private int maxProcessAlerts = 30;
     private int webServerPort = 8080;
+    private int maxWebServerThread = 5;
+    private String tempDirectory;
+
+    private transient StaticDaoFacade staticDaoFacade;
+
+    public void setStaticDaoFacade(StaticDaoFacade staticDaoFacade) {
+        this.staticDaoFacade = staticDaoFacade;
+    }
+    public ServerSettings() {
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        try {
+            mbs.registerMBean(this, new ObjectName("PunterServer:type=ServerSettings"));
+            System.err.println("ServerSettings registered with MBean Server.");
+        } catch (MBeanRegistrationException e) {
+            e.printStackTrace();
+        } catch (MalformedObjectNameException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (InstanceAlreadyExistsException e) {
+            e.printStackTrace();
+        } catch (NotCompliantMBeanException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public int getMaxWebServerThread() {
@@ -28,9 +51,6 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
     public void setMaxWebServerThread(int maxWebServerThread) {
         this.maxWebServerThread = maxWebServerThread;
     }
-
-    private int maxWebServerThread = 5;
-    private String tempDirectory;
 
     @Override
     public String getDevEmailCSV() {
@@ -44,39 +64,8 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 
     private String devEmailCSV = "munish.chandel@ubs.com";
 
-    public static synchronized ServerSettingsMBean getInstance() {
-        if (instance == null) {
-            loadState();
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    super.run();
-                    saveState();
-                }
-            });
-            sdf = StaticDaoFacade.getInstance();
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            try {
-                mbs.registerMBean(instance, new ObjectName("PunterServer:type=ServerSettings"));
-                System.err.println("ServerSettings registered with MBean Server.");
-            } catch (MBeanRegistrationException e) {
-                e.printStackTrace();
-            } catch (MalformedObjectNameException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            } catch (InstanceAlreadyExistsException e) {
-                e.printStackTrace();
-            } catch (NotCompliantMBeanException e) {
-                e.printStackTrace();
-            }
-        }
-        return instance;
-    }
-
-    private static void saveState() {
+    private void saveState() {
         System.out.println("serializing the settings.");
-        ServerSettingsMBean appSettings = ServerSettings.getInstance();
         try {
             PersistenceService ps;
             BasicService bs;
@@ -85,7 +74,7 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
             URL codebase = bs.getCodeBase();
             FileContents fc = ps.get(codebase);
             ObjectOutputStream oos = new ObjectOutputStream(fc.getOutputStream(true));
-            oos.writeObject(appSettings);
+            oos.writeObject(this);
             oos.flush();
             oos.close();
         } catch (Exception e) {
@@ -93,7 +82,7 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
             try {
                 FileOutputStream fout = new FileOutputStream("punter_server.dat");
                 ObjectOutputStream oos = new ObjectOutputStream(fout);
-                oos.writeObject(appSettings);
+                oos.writeObject(this);
                 oos.close();
             } catch (Exception ee) {
                 ee.printStackTrace();
@@ -101,14 +90,10 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
         }
     }
 
-    private ServerSettings() {
-
-    }
-
     @Override
     public void refreshIndexes() {
         System.err.println("Refreshing indexe's");
-        sdf.rebuildIndex();
+        staticDaoFacade.rebuildIndex();
         System.err.println("Indexes refreshed");
     }
 
@@ -182,7 +167,8 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
         this.maxProcessAlerts = maxProcessAlerts;
     }
 
-    private static void loadState() {
+    private void loadState() {
+        ServerSettingsMBean serverSettings;
         try {
             PersistenceService ps;
             BasicService bs;
@@ -195,7 +181,7 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
             settings = ps.get(codebase);
             ObjectInputStream ois = new ObjectInputStream(
                     settings.getInputStream());
-            instance = (ServerSettingsMBean) ois.readObject();
+            serverSettings = (ServerSettingsMBean) ois.readObject();
             ois.close();
         } catch (Exception fnfe) {
             try {
@@ -219,33 +205,32 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
                     FileInputStream fin = new FileInputStream(
                             "punter_server.dat");
                     ObjectInputStream ois = new ObjectInputStream(fin);
-                    instance = (ServerSettingsMBean) ois.readObject();
+                    serverSettings = (ServerSettingsMBean) ois.readObject();
                     ois.close();
                     System.out.println("Settings loaded succesfully.");
                 } catch (Exception ee) {
                     ee.printStackTrace();
-                    instance = new ServerSettings();
                 }
             }
-            // instance=new ServerSettings();
+            serverSettings=new ServerSettings();
         }
     }
 
     @Override
     public void updateAllProcessProperties() {
-        StaticDaoFacade.getInstance().updateAllProcessProperties();
+        staticDaoFacade.updateAllProcessProperties();
     }
 
     @Override
     public void deleteStaleProcessHistory(int staleDays) {
-        StaticDaoFacade.getInstance().deleteStaleHistory(staleDays);
+        staticDaoFacade.deleteStaleHistory(staleDays);
     }
 
     @Override
     public void deleteDocument(int docId) {
         Document doc = new Document();
         doc.setId(docId);
-        StaticDaoFacade.getInstance().deleteDocument(doc);
+        staticDaoFacade.deleteDocument(doc);
     }
 
     @Override
@@ -260,7 +245,7 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 
     @Override
     public void compressTables() {
-        StaticDaoFacade.getInstance().compressTables();
+        staticDaoFacade.compressTables();
     }
 
     @Override

@@ -1,10 +1,5 @@
 package com.shunya.server;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.rmi.RemoteException;
-import java.util.List;
-
 import com.shunya.kb.gui.SearchQuery;
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
@@ -13,15 +8,21 @@ import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.rmi.RemoteException;
+import java.util.List;
+
 public class PunterSearchServer implements PunterSearch {
     private StaticDaoFacade staticDaoFacade;
     private SessionFacade sessionFacade;
+    private ServerSettings settings;
 
-    public PunterSearchServer() {
-        staticDaoFacade = StaticDaoFacade.getInstance();
-        sessionFacade = SessionFacade.getInstance();
+    public PunterSearchServer(StaticDaoFacade staticDaoFacade,SessionFacade sessionFacade,ServerSettings settings) {
+        this.staticDaoFacade = staticDaoFacade;
+        this.sessionFacade = sessionFacade;
+        this.settings = settings;
     }
-
 
     @Override
     public void updateAccessCounter(Document doc) {
@@ -55,7 +56,7 @@ public class PunterSearchServer implements PunterSearch {
 
     @Override
     public String getDevEmailCSV() throws RemoteException {
-        return ServerSettings.getInstance().getDevEmailCSV();
+        return settings.getDevEmailCSV();
     }
 
     @Override
@@ -95,22 +96,22 @@ public class PunterSearchServer implements PunterSearch {
 
     @Override
     public TaskData createTask(TaskData task) throws Exception {
-        return staticDaoFacade.createTask(task);
+        return (TaskData) staticDaoFacade.save(task);
     }
 
     @Override
     public ProcessData createProcess(ProcessData proc) throws Exception {
-        return staticDaoFacade.createProcess(proc);
+        return (ProcessData) staticDaoFacade.save(proc);
     }
 
     @Override
     public ProcessHistory createProcessHistory(ProcessHistory ph) throws Exception {
-        return staticDaoFacade.createProcessHistory(ph);
+        return (ProcessHistory) staticDaoFacade.save(ph);
     }
 
     @Override
     public TaskHistory createTaskHistory(TaskHistory th) throws Exception {
-        return staticDaoFacade.createTaskHistory(th);
+        return (TaskHistory) staticDaoFacade.save(th);
     }
 
     @Override
@@ -209,7 +210,7 @@ public class PunterSearchServer implements PunterSearch {
 
     @Override
     public long getWebServerPort() {
-        return ServerSettings.getInstance().getWebServerPort();
+        return settings.getWebServerPort();
     }
 
     @Override

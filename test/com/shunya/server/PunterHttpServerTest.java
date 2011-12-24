@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import static junit.framework.Assert.assertEquals;
@@ -17,7 +16,7 @@ public class PunterHttpServerTest {
 
     @BeforeClass
     public static void startServer() throws IOException {
-        httpServer = new PunterHttpServer();
+        httpServer = new PunterHttpServer(null);
         System.out.println("server started.");
     }
 

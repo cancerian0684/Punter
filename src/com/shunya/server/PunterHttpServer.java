@@ -22,22 +22,22 @@ public class PunterHttpServer {
     public static final String PROCESS = "/process/";
 
     public static String root = ".";
-    private final HttpServer server;
+    private HttpServer server;
     private int webServerPort;
-    private int maxWebServerThread;
-    public static void main(String[] args) throws IOException {
-        PunterHttpServer httpServer = new PunterHttpServer();
-    }
+    private ServerContext context;
 
     public void stop() {
         server.stop(0);
     }
 
-    PunterHttpServer() throws IOException {
-        webServerPort = ServerSettings.getInstance().getWebServerPort();
-        maxWebServerThread = ServerSettings.getInstance().getMaxWebServerThread();
+    PunterHttpServer(ServerContext context){
+        this.context = context;
+    }
+
+    public void start() throws IOException {
+        webServerPort = context.getServerSettings().getWebServerPort();
         server = HttpServer.create(new InetSocketAddress(webServerPort), 0);
-        server.createContext(DATA, new MyDataHandler());
+        server.createContext(DATA, new MyDataHandler(context.getStaticDaoFacade()));
         server.createContext(UPLOADS, new MyFileUploadHandler());
         server.createContext(PROCESS, new MyProcessHandler());
         server.setExecutor(Executors.newCachedThreadPool());
@@ -58,10 +58,10 @@ class MyProcessHandler implements HttpHandler {
         try {
             URI requestURI = httpExchange.getRequestURI();
             String[] split = requestURI.toASCIIString().split("[/]");
-            String hostname=split[2];
-            String processId=split[3];
-            processId=processId.substring(0,processId.indexOf("?")==-1?processId.length():processId.indexOf("?"));
-            PunterProcessRunMessage runMessage =new PunterProcessRunMessage();
+            String hostname = split[2];
+            String processId = split[3];
+            processId = processId.substring(0, processId.indexOf("?") == -1 ? processId.length() : processId.indexOf("?"));
+            PunterProcessRunMessage runMessage = new PunterProcessRunMessage();
             int i = requestURI.toASCIIString().indexOf("?");
             if (i > -1) {
                 String searchURL = requestURI.toASCIIString().substring(requestURI.toASCIIString().indexOf("?") + 1);
@@ -81,17 +81,18 @@ class MyProcessHandler implements HttpHandler {
             httpExchange.close();
         }
     }
+
     public Map initMap(String search) throws UnsupportedEncodingException {
-        Map parmsMap = new HashMap<String,String>();
+        Map parmsMap = new HashMap<String, String>();
         String params[] = search.split("&");
         for (String param : params) {
-           String temp[] = param.split("=");
-           parmsMap.put(temp[0], java.net.URLDecoder.decode(temp[1], "UTF-8"));
+            String temp[] = param.split("=");
+            parmsMap.put(temp[0], java.net.URLDecoder.decode(temp[1], "UTF-8"));
         }
         return parmsMap;
     }
 
-     private void send404(HttpExchange httpExchange) throws IOException {
+    private void send404(HttpExchange httpExchange) throws IOException {
         httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, 0);
         httpExchange.getResponseBody().close();
     }
@@ -103,7 +104,7 @@ class MyFileUploadHandler implements HttpHandler {
         InputStream inputStream = httpExchange.getRequestBody();
         URI requestURI = httpExchange.getRequestURI();
         String name = requestURI.toASCIIString().substring(requestURI.toASCIIString().lastIndexOf('/'));
-        File file=new File("uploads");
+        File file = new File("uploads");
         file.mkdirs();
         FileOutputStream fileOutputStream = new FileOutputStream(new File(file, name));
         IOUtils.copyLarge(inputStream, fileOutputStream);
@@ -121,12 +122,13 @@ class MyDataHandler implements HttpHandler {
     final static int BUF_SIZE = 2048;
     static final byte[] EOL = {(byte) '\r', (byte) '\n'};
     byte[] buf;
-
+    private StaticDaoFacade staticDaoFacade;
     static {
         fillMap();
     }
 
-    MyDataHandler() {
+    MyDataHandler(StaticDaoFacade staticDaoFacade) {
+        this.staticDaoFacade = staticDaoFacade;
         buf = new byte[BUF_SIZE];
     }
 
@@ -191,10 +193,9 @@ class MyDataHandler implements HttpHandler {
             }
         }// Special Document
         else if (isLong(fname)) {
-            StaticDaoFacade docService = StaticDaoFacade.getInstance();
             Document doc = new Document();
             doc.setId(Long.parseLong(fname));
-            doc = docService.getDocument(doc);
+            doc = staticDaoFacade.getDocument(doc);
             targetFile = PunterWebDocumentHandler.process(doc);
         }
         return targetFile;

@@ -1,21 +1,8 @@
 package com.shunya.server;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import com.shunya.kb.jpa.Attachment;
+import com.shunya.kb.jpa.Document;
+import com.shunya.punter.utils.Stopwatch;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CachingTokenFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -28,11 +15,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.*;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.apache.lucene.search.highlight.QueryScorer;
@@ -41,9 +24,13 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.util.Version;
 
-import com.shunya.kb.jpa.Attachment;
-import com.shunya.kb.jpa.Document;
-import com.shunya.punter.utils.Stopwatch;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class LuceneIndexDao {
 	static final File INDEX_DIR = new File("LuceneIndex");
@@ -340,9 +327,6 @@ public class LuceneIndexDao {
 			System.out.println(terms.term().text());
 			System.err.println("Listing all the terms done..");*/
 			searchString = searchString.trim().toLowerCase();
-			if(batch<5){
-				batch=ServerSettings.getInstance().getMaxResultsToDisplay();
-			}
 			readerReadWriteLock.readLock().lock();
 			if(searchString.isEmpty()){
 				return Collections.EMPTY_LIST;
