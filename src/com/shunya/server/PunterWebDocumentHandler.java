@@ -5,7 +5,8 @@ import com.shunya.kb.jpa.Document;
 import java.io.File;
 import java.io.IOException;
 
-import static com.shunya.server.LocalTemporaryFileUtils.*;
+import static com.shunya.server.LocalTemporaryFileUtils.createZipFile;
+import static com.shunya.server.LocalTemporaryFileUtils.write;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,19 +19,19 @@ public enum PunterWebDocumentHandler {
     EXTERNAL_DOC_HANDLER(Document.DocumentType.EXTERNAL_DOC) {
         @Override
         public File handle(Document document) throws IOException {
-            return write(document.getContent(), new File("" + document.getId() + document.getExt()));
+            return write(document.getContent(), new File("" + document.getId() + document.getExt()), new File("Temp"));
         }
     },
     PUNTER_DOC_WITH_ATTACHMENT_HANDLER(Document.DocumentType.PUNTER_DOC_WITH_ATTACHMENT) {
         @Override
         public File handle(Document document) throws IOException {
-            return createZipFile(document);
+            return createZipFile(document, new File("Temp"));
         }
     },
     PUNTER_DOC_WITHOUT_ATTACHMENT_HANDLER(Document.DocumentType.PUNTER_DOC_WITHOUT_ATTACHMENT) {
         @Override
         public File handle(Document document) throws IOException {
-            return write(document.getContent(), new File("" + document.getId() + ".html"));
+            return write(document.getContent(), new File("" + document.getId() + ".html"), new File("Temp"));
         }
     };
 
@@ -45,10 +46,11 @@ public enum PunterWebDocumentHandler {
     public Document.DocumentType getDocumentType() {
         return documentType;
     }
+
     public static File process(Document document) throws IOException {
         PunterWebDocumentHandler[] values = values();
         for (PunterWebDocumentHandler punterWebDocumentHandler : values) {
-            if(punterWebDocumentHandler.getDocumentType()==document.getDocumentType()){
+            if (punterWebDocumentHandler.getDocumentType() == document.getDocumentType()) {
                 return punterWebDocumentHandler.handle(document);
             }
         }

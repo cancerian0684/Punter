@@ -19,19 +19,13 @@ import java.util.zip.ZipOutputStream;
  * To change this template use File | Settings | File Templates.
  */
 public class LocalTemporaryFileUtils {
-    public static final File TEMP_DIRECTORY = new File(ServerSettings.getInstance().getTempDirectory());
-
-    static {
-        TEMP_DIRECTORY.mkdirs();
-    }
-
-    public static File write(byte[] contents, File file) throws IOException {
+    public static File write(byte[] contents, File file, File TEMP_DIRECTORY) throws IOException {
         file = new File(TEMP_DIRECTORY, file.getName());
         IOUtils.write(contents, new FileOutputStream(file));
         return file;
     }
 
-    public static File createZipFile(Document doc) throws IOException {
+    public static File createZipFile(Document doc, File TEMP_DIRECTORY) throws IOException {
         Collection<Attachment> attachments = doc.getAttachments();
         File zipFile = new File(TEMP_DIRECTORY, doc.getId() + ".zip");
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile));
