@@ -30,7 +30,7 @@ public class PunterHttpServer {
         server.stop(0);
     }
 
-    PunterHttpServer(ServerContext context){
+    PunterHttpServer(ServerContext context) {
         this.context = context;
     }
 
@@ -123,6 +123,7 @@ class MyDataHandler implements HttpHandler {
     static final byte[] EOL = {(byte) '\r', (byte) '\n'};
     byte[] buf;
     private StaticDaoFacade staticDaoFacade;
+
     static {
         fillMap();
     }
@@ -140,6 +141,9 @@ class MyDataHandler implements HttpHandler {
         System.out.println("Request : " + httpExchange.getRemoteAddress() + " -> " + httpExchange.getRequestURI());
         try {
             File targetFile = getFile(getFileNameFromURI(httpExchange), new File(PunterHttpServer.root, getFileNameFromURI(httpExchange)));
+            if (!targetFile.exists()) {
+                throw new RuntimeException("File Not Found");
+            }
             sendFile(httpExchange, targetFile);
         } catch (Exception e) {
             e.printStackTrace();

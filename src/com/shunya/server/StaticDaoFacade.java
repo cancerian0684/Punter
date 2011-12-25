@@ -510,19 +510,15 @@ public class StaticDaoFacade {
             @Override
             public void run() {
                 EntityManager em = getSession();
-                try {
-                    Query q = em.createQuery("select t from TaskData t where t.process.id=:pid order by t.sequence");
-                    q.setParameter("pid", pid);
-                    q.setHint("eclipselink.refresh", "true");
-                    List<TaskData> taskList = q.getResultList();
-                    System.err.println("Listing Tasks for process.");
-                    for (TaskData task : taskList) {
-                        System.out.println(task.getSequence() + " -- " + task.getName());
-                    }
-                    resultHolder.setResult(taskList == null ? Collections.EMPTY_LIST : taskList);
-                } finally {
-                    em.close();
+                Query q = em.createQuery("select t from TaskData t where t.process.id=:pid order by t.sequence");
+                q.setParameter("pid", pid);
+                q.setHint("eclipselink.refresh", "true");
+                List<TaskData> taskList = q.getResultList();
+                System.err.println("Listing Tasks for process.");
+                for (TaskData task : taskList) {
+                    System.out.println(task.getSequence() + " -- " + task.getName());
                 }
+                resultHolder.setResult(taskList == null ? Collections.EMPTY_LIST : taskList);
             }
         });
         return resultHolder.getResult();
