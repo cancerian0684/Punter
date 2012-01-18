@@ -314,7 +314,6 @@ public class StaticDaoFacade {
             public void run() {
                 try {
                     EntityManager em = getSession();
-                    em.getTransaction().begin();
                     ProcessData tmp = em.find(ProcessData.class, p.getId());
                     //			em.lock(tmp, LockModeType.READ);
                     tmp.setName(p.getName());
@@ -322,7 +321,6 @@ public class StaticDaoFacade {
                     tmp.setUsername(p.getUsername());
                     tmp.setDescription(p.getDescription());
                     em.flush();
-                    em.getTransaction().commit();
                     resultHolder.setResult(p);
                 } catch (Exception e) {
                     throw new RuntimeException(e);

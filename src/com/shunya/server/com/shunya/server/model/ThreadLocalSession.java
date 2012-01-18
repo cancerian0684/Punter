@@ -10,7 +10,6 @@ public class ThreadLocalSession implements SessionCache{
     private static class ThreadLocalJPASession extends ThreadLocal<EntityManager>{
         @Override
         protected EntityManager initialValue() {
-            System.out.println("Creating new EntityManager. ");
             return JPASessionFactory.getInstance().getSession();
         }
     }
@@ -22,6 +21,5 @@ public class ThreadLocalSession implements SessionCache{
     public void clear() {
         threadLocalJPASession.get().close();
         threadLocalJPASession.remove();
-        System.out.println("Destroyed EntityManager. ");
     }
 }
