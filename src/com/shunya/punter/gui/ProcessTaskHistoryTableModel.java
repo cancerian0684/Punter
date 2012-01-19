@@ -1,12 +1,13 @@
 package com.shunya.punter.gui;
 
-import java.util.ArrayList;
-
-import javax.swing.table.AbstractTableModel;
-
 import com.shunya.punter.jpa.RunStatus;
 import com.shunya.punter.jpa.TaskHistory;
- 
+
+import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
+
+import static com.shunya.kb.utils.Utilities.formatMillis;
+
 public class ProcessTaskHistoryTableModel extends AbstractTableModel {
 	public final int[] width={15,332,88};
 	private static final long serialVersionUID = 1L;
@@ -72,14 +73,22 @@ public class ProcessTaskHistoryTableModel extends AbstractTableModel {
     case 0:
     	return th.getSequence();
     case 1:
-    	return th.getTask().getDescription();
+    	return "<html>"+th.getTask().getDescription()+" <sup>"+formatMillis(getRunDuration(th))+"</sup></html>";
     case 2:
     	return th.getRunStatus();
     }
     return colArrayList.get(col);
   }
 
-  /**
+    private long getRunDuration(TaskHistory th) {
+        try {
+            return th.getFinishTime().getTime() - th.getStartTime().getTime();
+        } catch (Exception e) {
+            return 0l;
+        }
+    }
+
+    /**
    * Overrides AbstractTableModel method. Returns the class for the
    * specified column.
    * @param <b>col </b> column number  

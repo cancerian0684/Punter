@@ -1,76 +1,36 @@
 package com.shunya.punter.gui;
 
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.annotations.PunterTask;
+import com.shunya.punter.executors.ProcessExecutor;
+import com.shunya.punter.executors.PunterJobScheduler;
+import com.shunya.punter.gui.TextAreaEditor.EditorListener;
+import com.shunya.punter.jpa.*;
+import com.shunya.punter.tasks.Tasks;
+import com.shunya.punter.utils.ConsoleOutputStream;
+import com.shunya.punter.utils.FieldProperties;
+import com.shunya.punter.utils.FieldPropertiesMap;
+import com.shunya.punter.utils.TextAreaFIFO;
+import com.shunya.server.PunterProcessRunMessage;
+import jedi.functional.Filter;
+import neoe.ne.EditPanel;
+
+import javax.swing.*;
+import javax.swing.Timer;
+import javax.swing.event.*;
+import javax.swing.table.*;
+import javax.swing.text.PlainDocument;
+import javax.xml.bind.*;
+import javax.xml.transform.stream.StreamSource;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.DefaultCellEditor;
-import javax.swing.InputMap;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.TransferHandler;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import javax.swing.text.PlainDocument;
-import javax.xml.bind.*;
-import javax.xml.transform.stream.StreamSource;
-
-import com.shunya.punter.executors.PunterJobScheduler;
-import com.shunya.punter.jpa.*;
-import com.shunya.punter.utils.*;
-import com.shunya.server.PunterProcessRunMessage;
-import jedi.functional.Filter;
-import neoe.ne.EditPanel;
-
-import com.shunya.kb.jpa.StaticDaoFacade;
-import com.shunya.punter.annotations.PunterTask;
-import com.shunya.punter.executors.ProcessExecutor;
-import com.shunya.punter.gui.TextAreaEditor.EditorListener;
-import com.shunya.punter.tasks.Tasks;
 
 import static jedi.functional.FunctionalPrimitives.select;
 
@@ -446,8 +406,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         }
 
         header.setPreferredSize(new Dimension(30, 26));
-        TableColumn col2 = taskTable.getColumnModel().getColumn(0);
-        col2.setCellRenderer(dtcr);
+        taskTable.getColumnModel().getColumn(0).setCellRenderer(dtcr);
         imap = taskTable.getInputMap(JComponent.WHEN_FOCUSED);
         imap.put(KeyStroke.getKeyStroke("DELETE"), "table.delete");
         amap = taskTable.getActionMap();

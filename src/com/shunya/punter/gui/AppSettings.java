@@ -1,31 +1,14 @@
 package com.shunya.punter.gui;
 
-import java.awt.Dimension;
-import java.awt.Point;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import javax.jnlp.*;
+import javax.management.*;
+import java.awt.*;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.jnlp.BasicService;
-import javax.jnlp.FileContents;
-import javax.jnlp.PersistenceService;
-import javax.jnlp.ServiceManager;
-import javax.jnlp.UnavailableServiceException;
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
 
 public class AppSettings implements Serializable, AppSettingsMBean{
 	private static final long serialVersionUID = 8652757533411927346L;
@@ -51,7 +34,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 	private Map<String, String> sessionMap;
     private boolean schedulerEnabled =true;
     private String tempDirectory;
-    private boolean showActiveTasks;
+    private boolean showActiveTasks =false;
 
     @Override
     public String getServerHost() {
@@ -79,7 +62,7 @@ public class AppSettings implements Serializable, AppSettingsMBean{
 		cache=new HashMap<String,Object>();
 		sessionMap = new HashMap<String, String>();
         tempDirectory="Temp";
-        showActiveTasks=true;
+        showActiveTasks=false;
 	}
 
 	public Map<String, String> getSessionMap() {

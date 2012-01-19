@@ -255,6 +255,8 @@ public class StaticDaoFacade {
                 taskHistory.setRunStatus(t.getRunStatus());
                 taskHistory.setSequence(t.getSequence());
                 taskHistory.setLogs(t.getLogs());
+                taskHistory.setStartTime(t.getStartTime());
+                taskHistory.setFinishTime(t.getFinishTime());
                 em.merge(taskHistory);
                 em.flush();
             }
@@ -271,6 +273,7 @@ public class StaticDaoFacade {
                 ProcessHistory ph = em.find(ProcessHistory.class, procHistory.getId());
                 ph.setRunState(procHistory.getRunState());
                 ph.setRunStatus(procHistory.getRunStatus());
+                ph.setStartTime(procHistory.getStartTime());
                 ph.setFinishTime(procHistory.getFinishTime());
                 ph.setClearAlert(procHistory.isClearAlert());
                 em.merge(ph);
@@ -299,6 +302,7 @@ public class StaticDaoFacade {
                 tmp.setName(t.getName());
                 tmp.setProcess(t.getProcess());
                 tmp.setSequence(t.getSequence());
+                tmp.setFailOver(t.isFailOver());
                 em.merge(tmp);
                 em.flush();
                 resultHolder.setResult(tmp);
@@ -354,8 +358,7 @@ public class StaticDaoFacade {
 
     }
 
-    public List<ProcessData> getScheduledProcessList(final String username)
-            throws Exception {
+    public List<ProcessData> getScheduledProcessList(final String username) throws Exception {
         final ResultHolder<List<ProcessData>> resultHolder = new ResultHolder<List<ProcessData>>();
         transatomatic.run(new Transatomatic.UnitOfWork() {
             @Override
@@ -367,10 +370,9 @@ public class StaticDaoFacade {
                 List<ProcessData> dbProcList = q.getResultList();
                 List<ProcessData> processList = new ArrayList<ProcessData>();
                 for (ProcessData processDao : dbProcList) {
-                    String ss = null;
+                    String ss;
                     try {
-                        ss = processDao.getInputParams().get("scheduleString")
-                                .getValue().trim();
+                        ss = processDao.getInputParams().get("scheduleString").getValue().trim();
                     } catch (JAXBException e) {
                         e.printStackTrace();
                         throw new RuntimeException(e);

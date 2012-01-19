@@ -1,12 +1,13 @@
 package com.shunya.punter.gui;
 
+import com.shunya.punter.jpa.ProcessHistory;
+
+import javax.swing.table.AbstractTableModel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import javax.swing.table.AbstractTableModel;
+import static com.shunya.kb.utils.Utilities.formatMillis;
 
-import com.shunya.punter.jpa.ProcessHistory;
- 
 public class ProcessHistoryTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflsdfl"};
 	private static final long serialVersionUID = 1L;
@@ -69,10 +70,18 @@ public class ProcessHistoryTableModel extends AbstractTableModel {
   public Object getValueAt(int row, int col) {
     ArrayList<?> colArrayList = (ArrayList<?>) data.get(row);
     ProcessHistory ph=(ProcessHistory) colArrayList.get(0);
-    return ""+ph.getId()+"  [ "+sdf.format(ph.getStartTime())+" ]"+" "+ph.getRunStatus().toString().charAt(0);
+    return "<html>"+ph.getId()+"<sup>"+sdf.format(ph.getStartTime())+"</sup>"+" "+ph.getRunStatus().toString().charAt(0)+" ["+formatMillis(getRunDuration(ph))+"]</html>";
   }
 
-  /**
+    private long getRunDuration(ProcessHistory ph) {
+        try {
+            return ph.getFinishTime().getTime()-ph.getStartTime().getTime();
+        } catch (Exception e) {
+            return 0l;
+        }
+    }
+
+    /**
    * Overrides AbstractTableModel method. Returns the class for the
    * specified column.
    * @param <b>col </b> column number  

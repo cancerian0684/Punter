@@ -20,10 +20,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -128,7 +125,7 @@ public class Process implements Serializable {
             processLogger.setLevel(Level.SEVERE);
     }
 
-    public void execute() throws Exception{
+    public void execute() throws Exception {
         substituteParams();
         beforeProcessStart();
         executeProcessTasks();
@@ -136,20 +133,22 @@ public class Process implements Serializable {
     }
 
     private void executeProcessTasks() throws JAXBException {
+        ph.setStartTime(new Date());
         ph.setRunStatus(RunStatus.RUNNING);
         ph.setLogDocument(logDocument);
         boolean keepRunning = true;
         int progressCounter = 0;
         for (TaskHistory th : ph.getTaskHistoryList()) {
-            Tasks task = Tasks.getTask(th.getTask().getClassName(), th.getTask().getInputParams(), th.getTask().getOutputParams());
+            Tasks task = Tasks.getTask(th.getTask());
             task.setTaskDao(th.getTask());
             task.setSessionMap(sessionMap);
             task.setLogDocument(logDocument);
             task.setDoVariableSubstitution(doVariableSubstitution);
             th.setRunState(RunState.RUNNING);
             th.setRunStatus(RunStatus.RUNNING);
+            th.setStartTime(new Date());
             boolean status = false;
-            if (keepRunning) {
+            if ((keepRunning && !task.getTaskDao().isFailOver()) || (task.getTaskDao().isFailOver() && failed)) {
                 try {
                     task.beforeTaskStart();
                     processLogger = task.LOGGER.get();
@@ -157,6 +156,7 @@ public class Process implements Serializable {
                     processLogger.log(Level.FINE, "started executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
                     status = task.execute();
                     processLogger.log(Level.FINE, "Finished executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
+                    th.setFinishTime(new Date());
                     if (stopOnTaskFailure) {
                         keepRunning = status;
                     }
@@ -173,9 +173,6 @@ public class Process implements Serializable {
                 } finally {
                     task.afterTaskFinish();
                 }
-                progressCounter++;
-                ph.setProgress(100 * progressCounter / ph.getTaskHistoryList().size());
-                po.update(ph);
                 th.setStatus(status);
                 if (status)
                     th.setRunStatus(RunStatus.SUCCESS);
@@ -191,8 +188,12 @@ public class Process implements Serializable {
                 th.setLogs("");
                 ts.saveTaskHistory(th);
             }
+            progressCounter++;
+            ph.setProgress(100 * progressCounter / ph.getTaskHistoryList().size());
+            po.update(ph);
+
         }
-         ph.setRunState(RunState.COMPLETED);
+        ph.setRunState(RunState.COMPLETED);
         if (!failed) {
             ph.setRunStatus(RunStatus.SUCCESS);
             if (!alwaysRaiseAlert)
@@ -200,6 +201,7 @@ public class Process implements Serializable {
         } else {
             ph.setRunStatus(RunStatus.FAILURE);
         }
+        ph.setFinishTime(new Date());
     }
 
     public void setTaskObservable(TaskObserver ts) {
@@ -209,11 +211,11 @@ public class Process implements Serializable {
     public static FieldPropertiesMap listInputParams() {
         Field[] fields = Process.class.getDeclaredFields();
         System.out.println("Listing input params for process");
-        Map<String,FieldProperties> inProp = new HashMap<String,FieldProperties>();
+        Map<String, FieldProperties> inProp = new HashMap<String, FieldProperties>();
         for (Field field : fields) {
             if (field.isAnnotationPresent(InputParam.class)) {
                 InputParam ann = field.getAnnotation(InputParam.class);
-                inProp.put(field.getName(), new FieldProperties(field.getName(), "",ann.description(),ann.required()));
+                inProp.put(field.getName(), new FieldProperties(field.getName(), "", ann.description(), ann.required()));
             }
         }
         return new FieldPropertiesMap(inProp);

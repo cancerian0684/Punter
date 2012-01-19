@@ -1,30 +1,20 @@
 package com.shunya.punter.tasks;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-import java.util.logging.MemoryHandler;
-
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.xml.bind.JAXBException;
-
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.utils.FieldProperties;
 import com.shunya.punter.utils.FieldPropertiesMap;
+
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.xml.bind.JAXBException;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.*;
 
 public abstract class Tasks implements Serializable {
     private Map<String, Object> sessionMap;
@@ -133,18 +123,20 @@ public abstract class Tasks implements Serializable {
         return new FieldPropertiesMap(fieldPropertiesMap);
     }
 
-    public static Tasks getTask(String taskName, FieldPropertiesMap input, FieldPropertiesMap output) {
+    public static Tasks getTask(TaskData taskData) {
         try {
-            Class<?> clz = Class.forName(taskName);
+            Class<?> clz = Class.forName(taskData.getClassName());
             Tasks task = (Tasks) clz.newInstance();
-            task.setOutputParams(output);
-            task.setInputParams(input);
+            task.setOutputParams(taskData.getOutputParams());
+            task.setInputParams(taskData.getInputParams());
             return task;
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (JAXBException e) {
             e.printStackTrace();
         }
         return null;
