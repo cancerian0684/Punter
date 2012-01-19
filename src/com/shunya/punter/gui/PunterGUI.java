@@ -1078,6 +1078,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                 stopPunterJobScheduler();
                 System.out.println("Divider Location :" + jsp3.getDividerLocation() + " - " + jsp3.getDividerSize());
                 AppSettings.getInstance().setObject("processTaskAlertTable", GUIUtils.getColumnWidth(processTaskAlertTable));
+                AppSettings.getInstance().setObject("processAlertTable", GUIUtils.getColumnWidth(processAlertTable));
                 AppSettings.getInstance().setObject("runningProcessTable", GUIUtils.getColumnWidth(runningProcessTable));
                 AppSettings.getInstance().setObject("processTaskHistoryTable", GUIUtils.getColumnWidth(processTaskHistoryTable));
                 AppSettings.getInstance().setObject("runningTaskTable", GUIUtils.getColumnWidth(runningTaskTable));
@@ -1129,8 +1130,10 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         }
         processAlertTable.getTableHeader().setReorderingAllowed(false);
         processAlertTable.getColumn("<html><b>Run ID").setPreferredWidth(250);
-        processAlertTable.getColumn("<html><b>Clear").setPreferredWidth(100);
+        processAlertTable.getColumn("<html><b>Clear").setPreferredWidth(50);
         processAlertTable.getColumn("<html><b>Run ID").setCellRenderer(new ProcessAlertTableRenderer());
+        if (AppSettings.getInstance().getObject("processAlertTable") != null)
+                    GUIUtils.initilializeTableColumns(processTaskAlertTable, (int[]) AppSettings.getInstance().getObject("processAlertTable"));
         JScrollPane processAlertPane = new JScrollPane(processAlertTable);
 
         processTaskAlertTable = new JTable(new ProcessTaskHistoryTableModel()) {
