@@ -11,7 +11,6 @@
         <pathelement location="bin/"/>
         <fileset dir="lib" includes="*.jar"/>
         <pathelement path="${java.class.path}/"/>
-        <pathelement path="${additional.path}"/>
     </path>
 
     <path id="lib.path.ref">
@@ -25,6 +24,11 @@
                excludes="com/shunya/punter/tasks/chat/**,com/shunya/punter/tasks/ChatTask.java">
             <classpath refid="lib.path.ref"/>
         </javac>
+       <!-- <copy todir="${build}">
+            <fileset dir="${src}"
+                     includes="**/*.xml,**/*.properties,**/*.txt,**/*.ico" />
+        </copy>-->
+
     </target>
 
     <target name="dist" depends="compile"
@@ -32,9 +36,11 @@
         <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
         <jar jarfile="${dist}/punter-${DSTAMP}.jar" basedir="${build}" update="true">
             <fileset dir="${src}">
+                <include name="docs/*.html"/>
                 <include name="images/*.png"/>
                 <include name="META-INF/*.xml"/>
                 <include name="resources/*.properties"/>
+                <include name="sql/*.sql"/>
             </fileset>
         </jar>
     </target>
@@ -50,7 +56,6 @@
     </target>
 
     <target name="clean" description="clean up">
-        <!-- Delete the ${build} and ${dist} directory trees -->
         <delete dir="${build}"/>
         <delete dir="${dist}"/>
     </target>
