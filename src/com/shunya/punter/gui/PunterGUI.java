@@ -247,6 +247,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         processTable.setFont(new Font("Arial", Font.TRUETYPE_FONT, 11));
         processTable.setForeground(Color.BLUE);
         processTable.setTableHeader(null);
+        processTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         processTable.getColumn("<html><b>My Process's").setCellRenderer(new ProcessTableRenderer());
         InputMap imap = processTable.getInputMap(JComponent.WHEN_FOCUSED);
         imap.put(KeyStroke.getKeyStroke("DELETE"), "table.delete");

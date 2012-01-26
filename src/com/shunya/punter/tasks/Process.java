@@ -112,17 +112,9 @@ public class Process implements Serializable {
     }
 
     private void setLoggingLevel(Logger processLogger) {
-        if (loggingLevel == null) {
-            return;
-        }
-        if (loggingLevel.equalsIgnoreCase("info"))
+        try{processLogger.setLevel(Level.parse(loggingLevel));}catch (Exception e){
             processLogger.setLevel(Level.INFO);
-        else if (loggingLevel.equalsIgnoreCase("fine"))
-            processLogger.setLevel(Level.FINE);
-        else if (loggingLevel.equalsIgnoreCase("warning"))
-            processLogger.setLevel(Level.WARNING);
-        else if (loggingLevel.equalsIgnoreCase("severe"))
-            processLogger.setLevel(Level.SEVERE);
+        }
     }
 
     public void execute() throws Exception {
@@ -246,16 +238,12 @@ public class Process implements Serializable {
                         }
                     }
                 } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
                     Tasks.LOGGER.get().severe(e.toString());
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
                     Tasks.LOGGER.get().severe(e.toString());
                 } catch (ParseException e) {
-                    e.printStackTrace();
                     Tasks.LOGGER.get().severe(e.toString());
                 } catch (Exception e) {
-                    e.printStackTrace();
                     Tasks.LOGGER.get().severe(e.toString());
                 }
             }
