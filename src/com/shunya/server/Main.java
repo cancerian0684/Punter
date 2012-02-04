@@ -40,11 +40,11 @@ public class Main {
         try {
             if (singleInstanceFileLock.checkIfAlreadyRunning())
                 System.exit(1);
-            String codebaseURI = new File("bin/").toURL().toURI().toString();
+            String codebaseURI = new File("lib/punter.jar").toURL().toURI().toString();
             System.out.println("Codebase is :" + codebaseURI);
             System.setProperty("java.rmi.server.codebase", codebaseURI);
-            System.setProperty("java.rmi.server.hostname", findHostName());
-            System.setProperty("java.security.policy", "policy.all");
+//            System.setProperty("java.rmi.server.hostname", findHostName());
+//            System.setProperty("java.security.policy", "policy.all");
 
             System.out.println("Killing the already running RMI Registry");
             Runtime.getRuntime().exec("taskkill /IM RMIREGISTRY.EXE");

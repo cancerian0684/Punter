@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="http://YLDNW0070273CLU:8080/" href="apache.jnlp">
+<jnlp spec="1.0+" codebase="http://localhost:8080/" href="apache.jnlp">
    <information>
       <title>Activation</title>
       <vendor>Apache Microsystems, Inc.</vendor>

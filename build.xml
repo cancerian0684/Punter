@@ -20,11 +20,11 @@
     <target name="compile" depends="clean">
         <tstamp/>
         <mkdir dir="${build}"/>
-        <javac srcdir="${src}" destdir="${build}" debug="on"
+        <javac srcdir="${src}" destdir="${build}" debug="on" source="1.6" target="1.6"
                excludes="com/shunya/punter/tasks/chat/**,com/shunya/punter/tasks/ChatTask.java">
             <classpath refid="lib.path.ref"/>
         </javac>
-        <!-- <copy todir="${build}">
+       <!-- <copy todir="${build}">
             <fileset dir="${src}"
                      includes="**/*.xml,**/*.properties,**/*.txt,**/*.ico" />
         </copy>-->
@@ -33,22 +33,12 @@
 
     <target name="dist" depends="compile"
             description="generate the distribution">
+        <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
         <jar jarfile="${dist}/punter-${DSTAMP}.jar" basedir="${build}" update="true">
             <fileset dir="${src}">
                 <include name="docs/*.html"/>
                 <include name="images/*.png"/>
                 <include name="META-INF/*.xml"/>
-                <include name="**/*.xsl"/>
-                <include name="resources/*.properties"/>
-                <include name="sql/*.sql"/>
-            </fileset>
-        </jar>
-        <jar jarfile="${dist}/punter.jar" basedir="${build}" update="true">
-            <fileset dir="${src}">
-                <include name="docs/*.html"/>
-                <include name="images/*.png"/>
-                <include name="META-INF/*.xml"/>
-                <include name="**/*.xsl"/>
                 <include name="resources/*.properties"/>
                 <include name="sql/*.sql"/>
             </fileset>
@@ -63,10 +53,6 @@
                 <fileset dir="${dist}" includes="punter*.jar"/>
             </path>
         </signjar>
-        <copy todir="${lib}">
-            <fileset dir="${dist}"
-                     includes="punter.jar"/>
-        </copy>
     </target>
 
     <target name="clean" description="clean up">
