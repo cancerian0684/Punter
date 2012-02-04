@@ -1,14 +1,5 @@
 package com.shunya.kb.jpa;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.util.Collections;
-import java.util.List;
-
 import com.shunya.kb.gui.SearchQuery;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.PunterJobBasket;
@@ -20,12 +11,23 @@ import com.shunya.punter.utils.ClipBoardListener;
 import com.shunya.server.*;
 
 import javax.swing.*;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.Collections;
+import java.util.List;
 
 public class StaticDaoFacade {
     private static StaticDaoFacade sdf;
     private PunterSearch stub;
-    private ClipBoardListener clipBoardListener = new ClipBoardListener();
+    private ClipBoardListener clipBoardListener;
 
+    public void setClipBoardListener(ClipBoardListener clipBoardListener) {
+        this.clipBoardListener = clipBoardListener;
+    }
 
     public String getSessionId() {
         return sessionId;
@@ -59,7 +61,7 @@ public class StaticDaoFacade {
     }
 
     private void process(PunterMessage message) {
-        if (message instanceof ClipboardPunterMessage) {
+        if (message instanceof ClipboardPunterMessage && clipBoardListener !=null) {
             clipBoardListener.handleContent((ClipboardPunterMessage) message);
         } else if (message instanceof PunterRestartMessage) {
             restartClient();
@@ -117,7 +119,6 @@ public class StaticDaoFacade {
     private StaticDaoFacade() {
         makeConnection();
         messageProcessor();
-        clipBoardListener.start();
     }
 
     public void setSessionId(String sessionId) {

@@ -7,8 +7,14 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.io.IOException;
 
-public class ClipBoardListener extends Thread implements ClipboardOwner {
+public class ClipBoardListener implements ClipboardOwner, PunterComponent {
     Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
+    private boolean listening = true;
+    private boolean started = false;
+
+    public ClipBoardListener() {
+        startComponent();
+    }
 
     public void run() {
         Transferable transferable = sysClip.getContents(this);
@@ -19,12 +25,13 @@ public class ClipBoardListener extends Thread implements ClipboardOwner {
         try {
             // sleep this thread so that other application is done with the Clipboard access.
             // otherwise an exception is thrown by the application.
-            this.sleep(100);
+            Thread.sleep(100);
             Transferable contents = sysClip.getContents(this);
             processContents(contents);
             regainOwnership(contents);
         } catch (Exception e) {
             System.out.println("Exception: " + e);
+            e.printStackTrace();
         }
     }
 
@@ -54,11 +61,34 @@ public class ClipBoardListener extends Thread implements ClipboardOwner {
     }
 
     void regainOwnership(Transferable transferable) {
-        sysClip.setContents(transferable, this);
+        sysClip.setContents(transferable, listening ? this : null);
     }
 
     public static void main(String[] args) {
         ClipBoardListener b = new ClipBoardListener();
-        b.start();
+        b.startComponent();
+    }
+
+    @Override
+    public void startComponent() {
+        if (!started) {
+            listening = true;
+            run();
+            started = true;
+        }
+    }
+
+    @Override
+    public void stopComponent() {
+        if (started) {
+            listening = false;
+            run();
+            started = false;
+        }
+    }
+
+    @Override
+    public boolean isStarted() {
+        return started;
     }
 }

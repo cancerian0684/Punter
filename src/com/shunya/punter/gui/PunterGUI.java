@@ -7,10 +7,7 @@ import com.shunya.punter.executors.PunterJobScheduler;
 import com.shunya.punter.gui.TextAreaEditor.EditorListener;
 import com.shunya.punter.jpa.*;
 import com.shunya.punter.tasks.Tasks;
-import com.shunya.punter.utils.ConsoleOutputStream;
-import com.shunya.punter.utils.FieldProperties;
-import com.shunya.punter.utils.FieldPropertiesMap;
-import com.shunya.punter.utils.TextAreaFIFO;
+import com.shunya.punter.utils.*;
 import com.shunya.server.PunterProcessRunMessage;
 import jedi.functional.Filter;
 import neoe.ne.EditPanel;
@@ -35,6 +32,8 @@ import java.util.List;
 import static jedi.functional.FunctionalPrimitives.select;
 
 public class PunterGUI extends JPanel implements TaskObserver, Observer {
+    public static final String WIN_A = "WIN_A";
+    public static final String WIN_Q = "WIN_Q";
     private boolean DEBUG = false;
     private final JTable taskTable;
     private final JTable processPropertyTable;
@@ -59,8 +58,10 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
     private JSplitPane jsp6;
     private JTextArea jTextArea;
     private PunterJobScheduler punterJobScheduler;
+    private PunterComponent clipBoardListener;
     private boolean schedulerRunning = false;
     private PunterJobBasket punterJobBasket;
+    private GlobalHotKeyListener globalHotKeyListener;
 
     static {
         try {
@@ -72,6 +73,8 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
 
     public PunterGUI() throws Exception {
         super(new GridLayout(1, 0));
+        clipBoardListener = new ClipBoardListener();
+        StaticDaoFacade.getInstance().setClipBoardListener((ClipBoardListener) clipBoardListener);
         tableSearchFilter = new TableSearchFilter();
         DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
         dtcr.setHorizontalAlignment(SwingConstants.CENTER);
@@ -243,7 +246,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         processTable.setShowGrid(true);
         processTable.setPreferredScrollableViewportSize(new Dimension(250, 300));
         processTable.setFillsViewportHeight(true);
-        processTable.setRowHeight(22);
+        processTable.setRowHeight(25);
         processTable.setFont(new Font("Arial", Font.TRUETYPE_FONT, 11));
         processTable.setForeground(Color.BLUE);
         processTable.setTableHeader(null);
@@ -275,7 +278,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             }
                         }
                         tableModel.deleteRows(selectedRowsData);
-                        if (tableModel.getRowCount() > 0) {
+                        if (processTable.getRowCount() > 0) {
                             processTable.setRowSelectionInterval(0, 0);
                         }
                     }
@@ -1220,6 +1223,11 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                         properties.load(new ByteArrayInputStream(string.getBytes()));
                         AppSettings.getInstance().setSessionMap((Map) properties);
                         AppSettings.getInstance().setObject("appProperties", string);
+                        try {
+                            int id = Integer.parseInt(properties.getProperty(WIN_A, "0"));
+                            globalHotKeyListener.setTaskIdToRun(id);
+                        } catch (Exception e) {
+                        }
                         // System.err.println("Properties Loaded to the System.");
                     } catch (IOException e) {
                         System.err.println("Error Loading properties into the system.");
@@ -1353,6 +1361,29 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
             }
         };
     }
+
+    public boolean isClipboardListenerRunning(){
+        if(clipBoardListener!=null){
+            return clipBoardListener.isStarted();
+        }
+        return false;
+    }
+
+    public void startClipBoardListener() {
+        if (clipBoardListener == null || !clipBoardListener.isStarted()) {
+            synchronized (this) {
+                clipBoardListener.startComponent();
+            }
+        }
+    }
+
+    public void stopClipBoardListener() {
+            if (clipBoardListener != null && clipBoardListener.isStarted()) {
+                synchronized (this) {
+                    clipBoardListener.stopComponent();
+                }
+            }
+        }
 
     public void startPunterJobScheduler() {
         if (!schedulerRunning) {
@@ -1579,6 +1610,14 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+    }
+
+    public GlobalHotKeyListener getGlobalHotKeyListener() {
+        return globalHotKeyListener;
+    }
+
+    public void setGlobalHotKeyListener(GlobalHotKeyListener globalHotKeyListener) {
+        this.globalHotKeyListener = globalHotKeyListener;
     }
 
     static class DefaultStringRenderer extends DefaultTableCellRenderer {

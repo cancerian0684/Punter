@@ -1,28 +1,21 @@
 package com.shunya.punter.gui;
 
+import com.shunya.kb.gui.PunterKB;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.punter.executors.ProcessExecutor;
+import com.shunya.punter.utils.GlobalHotKeyListener;
+import com.shunya.punter.utils.JavaScreenCapture;
+import com.shunya.punter.utils.Launcher;
+import com.shunya.punter.utils.StackWindow;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.Timer;
-import javax.swing.UIManager;
-
-import com.shunya.kb.gui.PunterKB;
-import com.shunya.kb.jpa.StaticDaoFacade;
-import com.shunya.punter.executors.ProcessExecutor;
-import com.shunya.punter.utils.JavaScreenCapture;
-import com.shunya.punter.utils.Launcher;
-import com.shunya.punter.utils.StackWindow;
 
 public class Main{
 	private static BufferedImage currentImage;
@@ -33,9 +26,10 @@ public class Main{
 	public static JFrame KBFrame;
 	public static JFrame PunterGuiFrame;
 	public static JFrame lastAccessed;
+	private GlobalHotKeyListener globalHotKeyListener;
 	private static Logger logger = Logger.getLogger(Main.class.getName());
     private SingleInstanceFileLock singleInstanceFileLock=new SingleInstanceFileLock("PunterClient.lock");
-	private Timer timer=new Timer(2000,new ActionListener(){
+	private Timer timer = new Timer(3000, new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			setAppropriateTrayIcon();
 		}
@@ -61,6 +55,11 @@ public class Main{
     private PunterGUI punterGUI;
 
     public Main() {
+		try {
+			globalHotKeyListener = new GlobalHotKeyListener();
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
 		try {
 			createAndShowGUI();
 			timer.start();
@@ -93,6 +92,7 @@ private void createAndShowGUI() throws Exception {
     PunterGuiFrame=new JFrame("My Personal Assistant");
     PunterGuiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     punterGUI = new PunterGUI();
+		punterGUI.setGlobalHotKeyListener(globalHotKeyListener);
     PunterGuiFrame.setContentPane(punterGUI);
     
     PunterGuiFrame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -173,6 +173,7 @@ private void createAndShowGUI() throws Exception {
 	    Runtime rt = Runtime.getRuntime();
 	    rt.addShutdownHook(new Thread() {
 	      public void run() {
+					globalHotKeyListener.cleanup();
                  StaticDaoFacade.getInstance().disconnect();
 	    	timer.stop();
 	    	logger.log(Level.INFO, "Exiting...");
@@ -244,6 +245,24 @@ private void createAndShowGUI() throws Exception {
             }
         });
         popup.add(schedulerMenuItem);
+
+            final MenuItem clipboardMenuItem = new MenuItem("Stop Clipboard");
+            clipboardMenuItem.setFont(new Font("Tahoma", Font.PLAIN, 12));
+            clipboardMenuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (punterGUI.isClipboardListenerRunning()) {
+                        punterGUI.stopClipBoardListener();
+                        clipboardMenuItem.setLabel("Start Clipboard");
+                        logger.log(Level.INFO, "Clipboard Stopped");
+                    } else {
+                        punterGUI.startClipBoardListener();
+                        clipboardMenuItem.setLabel("Stop Clipboard");
+                        logger.log(Level.INFO, "Clipboard Started");
+                    }
+                }
+            });
+            popup.add(clipboardMenuItem);
 
         MenuItem screenShotItem = new MenuItem("Capture Screen");
         screenShotItem.addActionListener(new ActionListener() {
