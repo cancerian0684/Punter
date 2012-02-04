@@ -29,6 +29,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 
+import static com.shunya.punter.utils.FieldPropertiesMap.parseStringMap;
 import static jedi.functional.FunctionalPrimitives.select;
 
 public class PunterGUI extends JPanel implements TaskObserver, Observer {
@@ -1423,7 +1424,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         };
     }
 
-    public void createAndRunProcess(PunterProcessRunMessage processRunMessage) throws Exception {
+    public void createAndRunProcess(final PunterProcessRunMessage processRunMessage) throws Exception {
         final ProcessData processData = StaticDaoFacade.getInstance().getProcess(processRunMessage.getProcessId());
         final ProcessHistory processHistory = ProcessHistoryBuilder.build(processData);
         Thread thread = new Thread() {
@@ -1443,7 +1444,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                                         processHistoryTable.setRowSelectionInterval(0, 0);
                                     }
                                 }
-                                final com.shunya.punter.tasks.Process process = com.shunya.punter.tasks.Process.getProcess(processData.getInputParams(), ph1);
+                                final com.shunya.punter.tasks.Process process = com.shunya.punter.tasks.Process.getProcess(processData.getInputParams(), ph1, parseStringMap(processRunMessage.getParams()));
                                 process.setTaskObservable(PunterGUI.this);
                                 // Adding row to running process table model
                                 final RunningProcessTableModel rptm = (RunningProcessTableModel) runningProcessTable.getModel();

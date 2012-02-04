@@ -30,7 +30,8 @@ public class Process implements Serializable {
     private transient TaskObserver ts;
     private boolean failed = false;
     private FieldPropertiesMap inputParams;
-    private ProcessHistory ph;
+    private FieldPropertiesMap overrideInputParams;
+    private ProcessHistory processHistory;
     @InputParam(description = "Stop process on task failure")
     private boolean stopOnTaskFailure = true;
     @InputParam(description = "Always raise alert for the task")
@@ -82,26 +83,26 @@ public class Process implements Serializable {
             ;
         };
         // System.err.println("Emails to notify : "+emailsToNotify);
-        ph.setRunState(RunState.RUNNING);
-        po.update(ph);
+        processHistory.setRunState(RunState.RUNNING);
+        po.update(processHistory);
     }
 
     public void afterProcessFinish() {
-        StaticDaoFacade.getInstance().saveProcessHistory(ph);
-        po.update(ph);
+        StaticDaoFacade.getInstance().saveProcessHistory(processHistory);
+        po.update(processHistory);
         po.processCompleted();
         if (emailsToNotify != null && !emailsToNotify.isEmpty()) {
-            if (emailsOnFailureOnly && ph.getRunStatus() == RunStatus.SUCCESS)
+            if (emailsOnFailureOnly && processHistory.getRunStatus() == RunStatus.SUCCESS)
                 return;
             try {
                 if (processLogger != null) {
                     processLogger.log(Level.INFO, "Sending Task Report Mail to : " + emailsToNotify);
                 }
                 StringBuilder processLogs = new StringBuilder(10000);
-                for (TaskHistory th : ph.getTaskHistoryList()) {
+                for (TaskHistory th : processHistory.getTaskHistoryList()) {
                     processLogs.append(th.getLogs() + "\r\n");
                 }
-                EmailService.getInstance().sendEMail("Punter Task : [" + ph.getRunStatus() + "] " + ph.getName(), emailsToNotify, processLogs.toString());
+                EmailService.getInstance().sendEMail("Punter Task : [" + processHistory.getRunStatus() + "] " + processHistory.getName(), emailsToNotify, processLogs.toString());
                 if (processLogger != null) {
                     processLogger.log(Level.INFO, "Mail Sent.");
                 }
@@ -125,15 +126,16 @@ public class Process implements Serializable {
     }
 
     private void executeProcessTasks() throws JAXBException {
-        ph.setStartTime(new Date());
-        ph.setRunStatus(RunStatus.RUNNING);
-        ph.setLogDocument(logDocument);
+        processHistory.setStartTime(new Date());
+        processHistory.setRunStatus(RunStatus.RUNNING);
+        processHistory.setLogDocument(logDocument);
         boolean keepRunning = true;
         int progressCounter = 0;
-        for (TaskHistory th : ph.getTaskHistoryList()) {
+        for (TaskHistory th : processHistory.getTaskHistoryList()) {
             Tasks task = Tasks.getTask(th.getTask());
             task.setTaskDao(th.getTask());
             task.setSessionMap(sessionMap);
+            task.setOverrideInputParams(overrideInputParams);
             task.setLogDocument(logDocument);
             task.setDoVariableSubstitution(doVariableSubstitution);
             th.setRunState(RunState.RUNNING);
@@ -181,19 +183,19 @@ public class Process implements Serializable {
                 ts.saveTaskHistory(th);
             }
             progressCounter++;
-            ph.setProgress(100 * progressCounter / ph.getTaskHistoryList().size());
-            po.update(ph);
+            processHistory.setProgress(100 * progressCounter / processHistory.getTaskHistoryList().size());
+            po.update(processHistory);
 
         }
-        ph.setRunState(RunState.COMPLETED);
+        processHistory.setRunState(RunState.COMPLETED);
         if (!failed) {
-            ph.setRunStatus(RunStatus.SUCCESS);
+            processHistory.setRunStatus(RunStatus.SUCCESS);
             if (!alwaysRaiseAlert)
-                ph.setClearAlert(true);
+                processHistory.setClearAlert(true);
         } else {
-            ph.setRunStatus(RunStatus.FAILURE);
+            processHistory.setRunStatus(RunStatus.FAILURE);
         }
-        ph.setFinishTime(new Date());
+        processHistory.setFinishTime(new Date());
     }
 
     public void setTaskObservable(TaskObserver ts) {
@@ -250,11 +252,12 @@ public class Process implements Serializable {
         }
     }
 
-    public static Process getProcess(FieldPropertiesMap props, ProcessHistory ph) {
-        Process proc = new Process();
-        proc.inputParams = props;
-        proc.ph = ph;
-        return proc;
+    public static Process getProcess(FieldPropertiesMap props, ProcessHistory history, FieldPropertiesMap overrideInputParams) {
+        Process process = new Process();
+        process.inputParams = props;
+        process.processHistory = history;
+        process.overrideInputParams=overrideInputParams;
+        return process;
     }
 
     public static void main(String[] args) {

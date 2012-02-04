@@ -1,8 +1,5 @@
 package com.shunya.punter.utils;
 
-import com.shunya.punter.tasks.EchoTask;
-import com.shunya.punter.tasks.Tasks;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -10,6 +7,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +30,16 @@ public class FieldPropertiesMap {
 
     public FieldProperties get(String name) {
         return properties.get(name);
+    }
+
+    public static FieldPropertiesMap parseStringMap(Map<String, String> propMap) {
+        Map<String, FieldProperties> propertiesMap = new HashMap<String, FieldProperties>();
+        if (propMap != null) {
+            for (String fieldName : propMap.keySet()) {
+                propertiesMap.put(fieldName, new FieldProperties(fieldName, propMap.get(fieldName), "", false));
+            }
+        }
+        return new FieldPropertiesMap(propertiesMap);
     }
 
     public static String convertObjectToXml(FieldPropertiesMap fieldPropertiesMap) throws JAXBException {

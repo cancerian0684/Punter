@@ -20,6 +20,7 @@ public abstract class Tasks implements Serializable {
     private Map<String, Object> sessionMap;
     private FieldPropertiesMap outputParams;
     private FieldPropertiesMap inputParams;
+    private FieldPropertiesMap overrideInputParams;
     protected TaskData taskDao;
     private transient ConsoleHandler cHandler = null;
     private transient MemoryHandler mHandler = null;
@@ -143,13 +144,19 @@ public abstract class Tasks implements Serializable {
     }
 
     private void substituteParams() throws Exception {
+        substituteParams(getInputParams());
+        if (getOverrideInputParams() != null)
+            substituteParams(getOverrideInputParams());
+    }
+
+    private void substituteParams(FieldPropertiesMap inputParams) throws Exception {
         Field[] fields = getClass().getDeclaredFields();
         for (Field field : fields) {
             if (field.isAnnotationPresent(InputParam.class)) {
                 try {
                     field.setAccessible(true);
-                    if (getInputParams().get(field.getName()) != null) {
-                        String fieldValue = getInputParams().get(field.getName()).getValue();
+                    if (inputParams.get(field.getName()) != null) {
+                        String fieldValue = inputParams.get(field.getName()).getValue();
                         if (fieldValue.length() >= 1) {
                             if (fieldValue.startsWith("$")) {
                                 fieldValue = fieldValue.substring(1);
@@ -173,7 +180,6 @@ public abstract class Tasks implements Serializable {
                                 boolean tmp = Boolean.parseBoolean(fieldValue);
                                 field.set(this, tmp);
                             }
-
                         }
                     }
                 } catch (IllegalArgumentException e) {
@@ -297,6 +303,14 @@ public abstract class Tasks implements Serializable {
 
     public void setSessionObject(String key, Object obj) {
         sessionMap.put(key, obj);
+    }
+
+    public void setOverrideInputParams(FieldPropertiesMap overrideInputParams) {
+        this.overrideInputParams = overrideInputParams;
+    }
+
+    public FieldPropertiesMap getOverrideInputParams() {
+        return overrideInputParams;
     }
 }
 

@@ -11,9 +11,8 @@ import sun.net.www.protocol.http.HttpURLConnection;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URLDecoder;
+import java.util.*;
 import java.util.concurrent.Executors;
 
 public class PunterHttpServer {
@@ -70,6 +69,7 @@ class MyProcessHandler implements HttpHandler {
             }
             runMessage.setHostname(hostname);
             runMessage.setProcessId(Long.parseLong(processId));
+            runMessage.setParams(parseQueryString(requestURI.toASCIIString()));
             SessionFacade.getInstance().sendMessageToAll("http", runMessage);
             httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
             httpExchange.getResponseBody().write(new String("Process Submitted Successfully.").getBytes());
@@ -95,6 +95,25 @@ class MyProcessHandler implements HttpHandler {
     private void send404(HttpExchange httpExchange) throws IOException {
         httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, 0);
         httpExchange.getResponseBody().close();
+    }
+
+    public static Map<String, String> parseQueryString(String data) {
+        if (data.indexOf("?") == -1 || data.length() <= (data.indexOf("?") + 1))
+            return Collections.emptyMap();
+        data = data.substring(data.indexOf("?") + 1);
+        Map<String, String> answer = new LinkedHashMap<String, String>();
+        for (String parameter : data.split("&")) {
+            String[] entities = parameter.split("=");
+            try {
+                String key = URLDecoder.decode(entities[0], "utf-8");
+                if (!answer.containsKey(key)) {
+                    answer.put(key, URLDecoder.decode(entities[1], "utf-8"));
+                }
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return answer;
     }
 }
 
