@@ -13,7 +13,10 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.*;
 
 public abstract class Tasks implements Serializable {
@@ -25,7 +28,7 @@ public abstract class Tasks implements Serializable {
     private transient ConsoleHandler cHandler = null;
     private transient MemoryHandler mHandler = null;
     private transient Level loggingLevel = Level.FINE;
-    private StringBuilder strLogger;
+    protected StringBuilder strLogger;
     private Document logDocument;
     private boolean doVariableSubstitution = false;
 
@@ -56,8 +59,8 @@ public abstract class Tasks implements Serializable {
         mHandler = new MemoryHandler(new Handler() {
             public void publish(LogRecord record) {
                 try {
-                    String msg = new Date(record.getMillis()) + " [" + record.getLevel() + "] " + record.getMessage();
-                    strLogger.append(msg + "\r");
+//                    String msg = new Date(record.getMillis()) + " [" + record.getLevel() + "] " + record.getMessage();
+                    strLogger.append(record.getMessage() + "\r");
                     logDocument.insertString(logDocument.getLength(), record.getMessage() + "\n", null);
                 } catch (BadLocationException e) {
                     e.printStackTrace();
