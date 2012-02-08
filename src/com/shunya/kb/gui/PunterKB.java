@@ -1,37 +1,34 @@
 package com.shunya.kb.gui;
 
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.*;
-import java.io.*;
-import java.net.URI;
-import java.rmi.RemoteException;
-import java.util.*;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
-
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
 import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.Main;
 import org.apache.commons.io.IOUtils;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.*;
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.*;
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.rmi.RemoteException;
+import java.util.*;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class PunterKB extends JPanel {
     private static JFrame frame;
@@ -64,6 +61,7 @@ public class PunterKB extends JPanel {
     }
 
     private PunterDelayedQueueHandlerThread<SearchQuery> punterDelayedQueueHandlerThread;
+
     {
         try {
             docService.getDocList(new SearchQuery.SearchQueryBuilder().query("").build());
@@ -515,7 +513,7 @@ public class PunterKB extends JPanel {
         pasteMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Paste ClipBoard Contents");
-               getContentsFromTransferrable(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null));
+                getContentsFromTransferrable(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null));
             }
         });
         popupProcess.add(pasteMenu);
@@ -584,6 +582,35 @@ public class PunterKB extends JPanel {
                 }
             }
         });
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Path dir = Paths.get("Temp");
+                    new WatchDir(dir, false, new WatchDir.FileObserver() {
+                        @Override
+                        public void notify(Path path) {
+                            if(path.toFile().getName().startsWith("~")||path.toFile().getName().endsWith(".tmp"))
+                                return;
+                            Document doc = new Document();
+                            try {
+                                System.err.println("Picked file :" + path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
+                                int id = Integer.parseInt(path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
+                                doc.setId(id);
+                                doc = docService.getDocument(doc);
+                                doc.setContent(getBytesFromFile(path.toFile()));
+                                docService.saveDocument(doc);
+                            } catch (Exception e2) {
+                                e2.printStackTrace();
+                            }
+                        }
+                    }, ENTRY_MODIFY).processEvents();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
     }
 
     private boolean getContentsFromTransferrable(Transferable transferable) {
@@ -613,9 +640,7 @@ public class PunterKB extends JPanel {
                 } catch (IOException e) {
                     return false;
                 }
-            }
-
-            else if (transferable.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream"))) {
+            } else if (transferable.isDataFlavorSupported(new DataFlavor("text/rtf; class=java.io.InputStream"))) {
                 System.err.println("Import possible .. rtf");
                 try {
                     String docName = JOptionPane.showInputDialog("Enter Document Name : ", "Test");
@@ -693,8 +718,7 @@ public class PunterKB extends JPanel {
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-            }
-            else if (transferable.isDataFlavorSupported(Linux)) {
+            } else if (transferable.isDataFlavorSupported(Linux)) {
 //                        String data = (String) transferable.getTransferData(Linux);
                 String data = IOUtils.toString((InputStreamReader) transferable.getTransferData(Linux));
                 for (StringTokenizer st = new StringTokenizer(data, "\r\n"); st.hasMoreTokens(); ) {
@@ -718,8 +742,7 @@ public class PunterKB extends JPanel {
                     doc = docService.saveDocument(doc);
                     System.err.println("Document added : " + file.getName());
                 }
-            }
-            else {
+            } else {
                 System.err.println("Data Flavors not supported yet :");
                 DataFlavor dfs[] = transferable.getTransferDataFlavors();
                 for (DataFlavor df : dfs) {

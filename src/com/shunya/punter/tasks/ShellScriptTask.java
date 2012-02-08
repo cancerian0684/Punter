@@ -1,31 +1,19 @@
 package com.shunya.punter.tasks;
 
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import com.jcraft.jsch.*;
+import com.shunya.punter.annotations.InputParam;
+import com.shunya.punter.annotations.OutputParam;
+import com.shunya.punter.annotations.PunterTask;
+import com.shunya.punter.utils.StringUtils;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelShell;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.UIKeyboardInteractive;
-import com.jcraft.jsch.UserInfo;
-import com.shunya.punter.annotations.InputParam;
-import com.shunya.punter.annotations.OutputParam;
-import com.shunya.punter.annotations.PunterTask;
-import com.shunya.punter.utils.StringUtils;
 
 @PunterTask(author="munishc",name="ShellScriptTask",description="Runs Script in Bash Shell",documentation= "docs/ShellScriptTask.html")
 public class ShellScriptTask extends Tasks {
@@ -72,14 +60,14 @@ public class ShellScriptTask extends Tasks {
 	      // Enable agent-forwarding.
 	      //((ChannelShell)channel).setAgentForwarding(true);
 	      
-	      PipedOutputStream pipeOut = new PipedOutputStream();
-	      PrintStream ps=new PrintStream(pipeOut);
+	      PipedOutputStream channelOutputStream = new PipedOutputStream();
+	      PrintStream ps=new PrintStream(channelOutputStream);
 	      
-	      PipedInputStream pipeIn = new PipedInputStream(pipeOut);
+	      PipedInputStream pipeIn = new PipedInputStream(channelOutputStream);
 	      
 //	      channel.setOutputStream(pipeOut);
-	      final PipedInputStream in = new PipedInputStream();
-	      PipedOutputStream out = new PipedOutputStream(in);
+	      final PipedInputStream channelInputStream = new PipedInputStream();
+	      PipedOutputStream out = new PipedOutputStream(channelInputStream);
 	      channel.setOutputStream(out);
 //	      channel.setOutputStream(System.out);
 //	      channel.setInputStream(pipeIn);
@@ -87,16 +75,16 @@ public class ShellScriptTask extends Tasks {
 	      ((ChannelShell)channel).setPtyType("vt102");
 	      channel.connect(5*1000);
 	      
-	      MyThread t=new MyThread(in,LOGGER.get());
-	      t.setDaemon(true);
-	      t.start();
+	      ChannelStreamWatcherThread watcherThread=new ChannelStreamWatcherThread(channelInputStream,LOGGER.get());
+	      watcherThread.setDaemon(true);
+	      watcherThread.start();
 	      
 	      ps.print("bash\r");
 	      ps.flush();
 	      TimeUnit.SECONDS.sleep(2);
 	      ps.print("echo munish1234\r");
 		  ps.flush();
-		  t.getResult(timeout);
+		  watcherThread.waitForToken(timeout);
 	      
 		  Scanner stk = new Scanner(script).useDelimiter("\r\n|\n\r|\r|\n");
 	      while (stk.hasNext()) {
@@ -107,13 +95,13 @@ public class ShellScriptTask extends Tasks {
 				}else if(token.equalsIgnoreCase("e")){
 					 ps.print("echo munish1234\r");
 				     ps.flush();
-				     LOGGER.get().log(Level.INFO, t.getResult(timeout));
+				     LOGGER.get().log(Level.INFO, watcherThread.waitForToken(timeout));
 				}else if(token.startsWith("e ")){
 					 String[] tmp = token.split(" ");
 					 if(tmp.length>1){
-						 t.setToken(tmp[1]);
+						 watcherThread.setToken(tmp[1]);
 					 }
-				     LOGGER.get().log(Level.INFO, t.getResult(timeout));
+				     LOGGER.get().log(Level.INFO, watcherThread.waitForToken(timeout));
 				}else if(token.toLowerCase().startsWith("e-")){
 					 String[] tmp = token.split("-");
 					 long localTimeout=timeout;
@@ -122,7 +110,7 @@ public class ShellScriptTask extends Tasks {
 					 }
 					 ps.print("echo munish1234\r");
 				     ps.flush();
-				     LOGGER.get().log(Level.INFO, t.getResult(localTimeout));
+				     LOGGER.get().log(Level.INFO, watcherThread.waitForToken(localTimeout));
 				}else{
 					try{
 					int sleep=Integer.parseInt(token);

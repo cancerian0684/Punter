@@ -36,9 +36,7 @@ public abstract class Tasks implements Serializable {
     public static final ThreadLocal<Logger> LOGGER = new ThreadLocal<Logger>() {
         @Override
         protected Logger initialValue() {
-            Logger logger = Logger.getLogger("Logger for "
-                    + Thread.currentThread().getName());
-//		    System.out.println("Created logger: " + logger.getName());
+            Logger logger = Logger.getLogger("Logger for " + Thread.currentThread().getName());
             return logger;
         }
     };
@@ -57,23 +55,22 @@ public abstract class Tasks implements Serializable {
           });*/
         mHandler = new MemoryHandler(new Handler() {
             public void publish(LogRecord record) {
-                String msg = new Date(record.getMillis()) + " [" + record.getLevel() + "] "
-                        + record.getMessage();
-                strLogger.append(msg + "\r");
                 try {
+                    String msg = new Date(record.getMillis()) + " [" + record.getLevel() + "] " + record.getMessage();
+                    strLogger.append(msg + "\r");
                     logDocument.insertString(logDocument.getLength(), record.getMessage() + "\n", null);
                 } catch (BadLocationException e) {
                     e.printStackTrace();
                 }
             }
 
+            @Override
             public void flush() {
-//        	System.out.println("flush called..");
             }
 
-            public void close() {
+            @Override
+            public void close() throws SecurityException {
             }
-
         }, 2, loggingLevel);
         LOGGER.get().addHandler(mHandler);
 //	    LOGGER.get().addHandler(cHandler);

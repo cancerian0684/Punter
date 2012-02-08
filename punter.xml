@@ -10,7 +10,7 @@
                 <attribute name="Class-Path" value="."/>
                 <attribute name="Rsrc-Class-Path" value="./ derby.jar toplink-essentials.jar derbyclient.jar derbynet.jar cron4j-2.2.3.jar junit.jar org.hamcrest.core_1.1.0.v20090501071000.jar"/>
             </manifest>
-            <zipfileset src="jar-in-jar-loader.zip"/>
+            <zipfileset src="jar-channelStream-jar-loader.zip"/>
             <fileset dir="E:/installs/workspace_munish/Punter/bin"/>
             <zipfileset dir="E:\installs\workspace_munish\Punter\lib" includes="derby.jar"/>
             <zipfileset dir="E:\installs\workspace_munish\Punter\lib" includes="toplink-essentials.jar"/>

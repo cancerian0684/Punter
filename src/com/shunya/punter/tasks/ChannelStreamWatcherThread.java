@@ -6,8 +6,8 @@ import java.io.PipedInputStream;
 import java.io.Reader;
 import java.util.logging.Logger;
 
-public class MyThread extends Thread {
-	private PipedInputStream in;
+public class ChannelStreamWatcherThread extends Thread {
+	private PipedInputStream channelStream;
 	private String token="\nmunish1234";
 	private StringBuffer sb = new StringBuffer();
 	private volatile boolean found = false;
@@ -17,11 +17,11 @@ public class MyThread extends Thread {
 	public void setToken(String token) {
 		this.token = token;
 	}
-	public MyThread(PipedInputStream in,Logger logger) {
-		this.in = in;
+	public ChannelStreamWatcherThread(PipedInputStream channelStream, Logger logger) {
+		this.channelStream = channelStream;
 	}
 
-	public synchronized String getResult(long timeout) {
+	public synchronized String waitForToken(long timeout) {
 		try {
 			while (!found)
 				wait(timeout);
@@ -39,7 +39,7 @@ public class MyThread extends Thread {
 
 	public synchronized void run() {
 		try {
-			  Reader reader = new InputStreamReader(this.in);
+			  Reader reader = new InputStreamReader(this.channelStream);
 			  int data = reader.read();
 			  while(data != -1){
 			      char theChar = (char) data;
