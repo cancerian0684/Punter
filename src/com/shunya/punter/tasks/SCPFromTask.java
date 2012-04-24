@@ -1,31 +1,15 @@
 package com.shunya.punter.tasks;
 
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Scanner;
-import java.util.logging.Level;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.UIKeyboardInteractive;
-import com.jcraft.jsch.UserInfo;
+import com.jcraft.jsch.*;
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.StringUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+import java.util.Scanner;
+import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="SCPFromTask",description="SCP remote file to Local machine.",documentation= "docs/SCPFromTask.html")
 public class SCPFromTask extends Tasks {
@@ -53,6 +37,7 @@ public class SCPFromTask extends Tasks {
 	      }
 	      
 	      JSch jsch=new JSch();
+//	      jsch.addIdentity(System.getProperty("user.home") + "/.ssh/id_rsa");
 	      //jsch.setKnownHosts("/home/foo/.ssh/known_hosts");
 	      Session session=jsch.getSession(username, hostname, 22);
 	      session.setPassword(password);
@@ -78,9 +63,9 @@ public class SCPFromTask extends Tasks {
 		      // get I/O streams for remote scp
 		      OutputStream out=channel.getOutputStream();
 		      InputStream in=channel.getInputStream();
-	
+
 		      channel.connect();
-	
+
 		      byte[] buf=new byte[1024];
 	
 		      // send '\0'

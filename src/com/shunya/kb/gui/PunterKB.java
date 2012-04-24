@@ -284,7 +284,11 @@ public class PunterKB extends JPanel {
                             System.out.println("Opening up the file.." + doc.getTitle());
                             File temp = new File("Temp");
                             temp.mkdir();
-                            File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
+                            String filename="D_"+doc.getId()+doc.getExt();
+                            if(!doc.getExt().isEmpty()){
+                                  filename=doc.getTitle();
+                            }
+							File nf=new File(temp, filename);
                             try {
                                 FileOutputStream fos = new FileOutputStream(nf);
                                 fos.write(doc.getContent());
@@ -809,7 +813,7 @@ public class PunterKB extends JPanel {
     }
 
     private void updateSearchResult() {
-        punterDelayedQueueHandlerThread.put(new SearchQuery.SearchQueryBuilder().query(searchTextField.getText()).category(getSelectedCategory()).specialText(toggleButton.isSelected()).andFilter(andOrToggleButton.isSelected()).maxResults(AppSettings.getInstance().getMaxResults()).build());
+        punterDelayedQueueHandlerThread.put(new SearchQuery.SearchQueryBuilder().query(searchTextField.getText().trim()+"*").category(getSelectedCategory()).specialText(toggleButton.isSelected()).andFilter(andOrToggleButton.isSelected()).maxResults(AppSettings.getInstance().getMaxResults()).build());
     }
 
     private String getSelectedCategory() {

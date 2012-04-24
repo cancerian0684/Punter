@@ -21,23 +21,24 @@ public class CheckStringForTokens extends Tasks {
 
 	@Override
 	public boolean run() {
-        boolean tokenFound=false;
+        boolean tokenPresent=false;
 		if(input!=null && expectedMessages!=null && !expectedMessages.isEmpty()){
 				String[] messages = expectedMessages.split("\n");
 				for (String message : messages) {
-					if(!input.contains(message)){
-						outName+=message+" not true,"+System.getProperty("line.separator");
+                if (input.contains(message)) {
+                    outName += message + " found in input," + System.getProperty("line.separator");
 				      }
 				}
 				if(outName.length()>=1){
 					LOGGER.get().log(Level.SEVERE, outName);
-                    tokenFound=true;
+                tokenPresent = true;
 				}
-            if(tokenFound && assertion){
+            if (tokenPresent == assertion) {
                 LOGGER.get().log(Level.INFO, "every expectation met.");
                 return true;
+            }else{
+                return false;
             }
-           return false;
 	      }
 		return true;
 	}

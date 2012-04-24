@@ -12,6 +12,8 @@ import java.util.logging.Level;
 
 @PunterTask(author = "munishc", name = "HttpGetTask", description = "Plays HTTP GET Request on the given URL.", documentation = "docs/TextSamplerDemoHelp.html")
 public class HttpGetTask extends Tasks {
+    private static final int SOCKET_TIMEOUT = 30*1000;
+    private static final int READ_TIMEOUT = 60*1000;
     @InputParam(required = true, description = "enter your httpUrl here")
     private String httpUrl;
     @InputParam(required = false)
@@ -27,6 +29,8 @@ public class HttpGetTask extends Tasks {
         try {
             URL url = new URL(httpUrl);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setConnectTimeout(SOCKET_TIMEOUT); 
+            urlConnection.setReadTimeout(READ_TIMEOUT); 
             int responseCode = urlConnection.getResponseCode();
             httpResponse = IOUtils.toString(urlConnection.getInputStream());
             LOGGER.get().log(Level.INFO, httpResponse);

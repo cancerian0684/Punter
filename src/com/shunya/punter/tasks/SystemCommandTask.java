@@ -12,15 +12,20 @@ public class SystemCommandTask extends Tasks {
     public String systemCommand;
     @InputParam(required = false, description = "Import terminated successfully")
     public String successMessage;
+    @InputParam(required = false, description = "Should wait for the Process termination or not ?")
+    public boolean waitForTerminate = true;
 
     @Override
     public boolean run() {
         boolean status;
         try {
-            LOGGER.get().log(Level.INFO, systemCommand);
-            java.lang.Process process = Runtime.getRuntime().exec(systemCommand);
+            java.lang.Process process = Runtime.getRuntime().exec(systemCommand.split("[\n]"));
             status = startOutputAndErrorReadThreads(process.getInputStream(), process.getErrorStream());
-            process.waitFor();
+            process.getOutputStream().close();
+            if (waitForTerminate) {
+                LOGGER.get().log(Level.INFO, "Waiting for the process to terminate");
+                process.waitFor();
+            }
         } catch (Exception e) {
             status = false;
             LOGGER.get().log(Level.SEVERE, e.getMessage());

@@ -1,12 +1,12 @@
 package com.shunya.punter.tasks;
 
-import java.util.logging.Level;
-
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.EmailService;
 import com.shunya.punter.utils.EmailServiceWithAuth;
 import com.shunya.punter.utils.StringUtils;
+
+import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="EmailTask",description="Email Task",documentation= "docs/EmailTask.html")
 public class EmailTask extends Tasks {
@@ -26,20 +26,38 @@ public class EmailTask extends Tasks {
 	private String username;
 	@InputParam(required = false,description="Password if Auth is required")
 	private String password;
-
+	@InputParam(required = false,description="Input String for matching")
+	private String inputString;
+	@InputParam(required = false,description="Line separated expected messages")
+	private String expectedMessages;
 	
 	@Override
 	public boolean run() {
 		boolean status=false;
 		try{
+			String outName = "";
+			if(inputString!=null && expectedMessages!=null && !expectedMessages.isEmpty()){
+					String[] messages = expectedMessages.split("\n");
+					for (String message : messages) {
+						if(!inputString.contains(message)){
+							outName+=message+" not true,"+System.getProperty("line.separator");
+					      }
+					}
+					if(outName.length()>=1){
+						LOGGER.get().log(Level.SEVERE, outName);
+					}else{
+						LOGGER.get().log(Level.INFO, "No Email was sent since Condition did not meet!");
+						return true;
+					}
+		      }
 			attachments=attachments==null?"":attachments;
 			String[] fileNames = attachments.split("[,;]");
 			if(username!=null&&password!=null&&!username.isEmpty()&&!password.isEmpty()){
 				//Authentication Based Email
-				EmailServiceWithAuth.getInstance(username,password).sendEMail(subject, toAddress, body, fileNames, fromAddress, ccAddress);
+				EmailServiceWithAuth.getInstance(username,password).sendEMail(subject, toAddress, body+outName, fileNames, fromAddress, ccAddress);
 			}else{
 				//Non-Auth Based Email
-				EmailService.getInstance().sendEMail(subject, toAddress, body, fileNames, fromAddress,ccAddress);
+				EmailService.getInstance().sendEMail(subject, toAddress, body+outName, fileNames, fromAddress,ccAddress);
 			}
 			status=true;
 			LOGGER.get().log(Level.INFO, "Email sent successfully To Addresses: "+toAddress);
