@@ -1,4 +1,4 @@
-package com.shunya.server.com.shunya.server.model;
+package com.shunya.server.model;
 
 import javax.persistence.EntityManager;
 

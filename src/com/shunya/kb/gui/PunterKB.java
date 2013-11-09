@@ -20,6 +20,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
@@ -284,11 +285,11 @@ public class PunterKB extends JPanel {
                             System.out.println("Opening up the file.." + doc.getTitle());
                             File temp = new File("Temp");
                             temp.mkdir();
-                            String filename="D_"+doc.getId()+doc.getExt();
-                            if(!doc.getExt().isEmpty()){
-                                  filename=doc.getTitle();
+                            String filename = "D_" + doc.getId() + doc.getExt();
+                            if (!doc.getExt().isEmpty()) {
+                                filename = doc.getTitle();
                             }
-							File nf=new File(temp, filename);
+                            File nf = new File(temp, filename);
                             try {
                                 FileOutputStream fos = new FileOutputStream(nf);
                                 fos.write(doc.getContent());
@@ -334,7 +335,7 @@ public class PunterKB extends JPanel {
 
             public void exportDone(JComponent c, Transferable t, int action) {
                 if (action == MOVE) {/*
-    					JTable table = (JTable) c;
+                        JTable table = (JTable) c;
     					int[] selectedRows = table.getSelectedRows();
     					ArrayList<Object> selectedRowsData = new ArrayList<Object>();
     					for (int selectedRow : selectedRows) {
@@ -591,10 +592,14 @@ public class PunterKB extends JPanel {
             public void run() {
                 try {
                     Path dir = Paths.get("Temp");
+                    if (!Files.exists(dir)) {
+                        Files.createDirectory(dir);
+                        System.out.println("dir created = " + dir);
+                    }
                     new WatchDir(dir, false, new WatchDir.FileObserver() {
                         @Override
                         public void notify(Path path) {
-                            if(path.toFile().getName().startsWith("~")||path.toFile().getName().endsWith(".tmp"))
+                            if (path.toFile().getName().startsWith("~") || path.toFile().getName().endsWith(".tmp"))
                                 return;
                             Document doc = new Document();
                             try {
@@ -813,7 +818,7 @@ public class PunterKB extends JPanel {
     }
 
     private void updateSearchResult() {
-        punterDelayedQueueHandlerThread.put(new SearchQuery.SearchQueryBuilder().query(searchTextField.getText().trim()+"*").category(getSelectedCategory()).specialText(toggleButton.isSelected()).andFilter(andOrToggleButton.isSelected()).maxResults(AppSettings.getInstance().getMaxResults()).build());
+        punterDelayedQueueHandlerThread.put(new SearchQuery.SearchQueryBuilder().query(searchTextField.getText().trim() + "*").category(getSelectedCategory()).specialText(toggleButton.isSelected()).andFilter(andOrToggleButton.isSelected()).maxResults(AppSettings.getInstance().getMaxResults()).build());
     }
 
     private String getSelectedCategory() {

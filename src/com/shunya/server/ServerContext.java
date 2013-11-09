@@ -1,7 +1,7 @@
 package com.shunya.server;
 
-import com.shunya.server.com.shunya.server.model.JPATransatomatic;
-import com.shunya.server.com.shunya.server.model.SessionCache;
+import com.shunya.server.model.JPATransatomatic;
+import com.shunya.server.model.SessionCache;
 
 public class ServerContext {
     private final StaticDaoFacade staticDaoFacade;

@@ -1,8 +1,8 @@
-package com.shunya.server.com.shunya.server.model;
+package com.shunya.server.model;
 
 import javax.persistence.EntityManager;
 
-public class ThreadLocalSession implements SessionCache{
+public class ThreadLocalSession implements SessionCache {
     @Override
     public EntityManager getUnderlyingEntityManager() {
         return threadLocalJPASession.get();
@@ -10,7 +10,7 @@ public class ThreadLocalSession implements SessionCache{
     private static class ThreadLocalJPASession extends ThreadLocal<EntityManager>{
         @Override
         protected EntityManager initialValue() {
-            return JPASessionFactory.getInstance().getSession();
+            return com.shunya.server.model.JPASessionFactory.getInstance().getSession();
         }
     }
     public final ThreadLocalJPASession threadLocalJPASession = new ThreadLocalJPASession();

@@ -1,11 +1,5 @@
 package com.shunya.server;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.util.List;
-
 import com.shunya.kb.gui.SearchQuery;
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
@@ -13,6 +7,12 @@ import com.shunya.punter.jpa.ProcessData;
 import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.util.List;
 
 public interface PunterSearch extends Remote {
     InetAddress getServerHostAddress() throws RemoteException, UnknownHostException;
@@ -88,8 +88,6 @@ public interface PunterSearch extends Remote {
     List<TaskData> getSortedTasksByProcessId(long pid) throws Exception;
 
     List<TaskData> getProcessTasks(long pid) throws Exception;
-
-    void deleteTeam() throws RemoteException;
 
     void sendMessage(String sessionId, PunterMessage punterMessage) throws RemoteException, InterruptedException;
 

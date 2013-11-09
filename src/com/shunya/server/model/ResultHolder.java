@@ -1,4 +1,4 @@
-package com.shunya.server.com.shunya.server.model;
+package com.shunya.server.model;
 
 public class ResultHolder<T> {
     T result;

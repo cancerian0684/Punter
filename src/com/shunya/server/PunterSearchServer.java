@@ -193,11 +193,6 @@ public class PunterSearchServer implements PunterSearch {
     }
 
     @Override
-    public void deleteTeam() throws RemoteException {
-        staticDaoFacade.deleteTeam();
-    }
-
-    @Override
     public List<ProcessHistory> getMySortedProcessHistoryList(String username)
             throws RemoteException {
         return staticDaoFacade.getMySortedProcessHistoryList(username);

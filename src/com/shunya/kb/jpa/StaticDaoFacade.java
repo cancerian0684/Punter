@@ -138,7 +138,7 @@ public class StaticDaoFacade {
         try {
             Registry registry = null;
             try {
-                registry = LocateRegistry.getRegistry(AppSettings.getInstance().getServerHost());
+                registry = LocateRegistry.getRegistry(AppSettings.getInstance().getServerHost(),2020);
             } catch (Exception e) {
                 e.printStackTrace();
                 AppSettings.getInstance().setServerHost(null);

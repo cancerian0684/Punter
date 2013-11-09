@@ -1,9 +1,9 @@
 package com.shunya.server;
 
 import com.shunya.punter.gui.SingleInstanceFileLock;
-import com.shunya.server.com.shunya.server.model.JPATransatomatic;
-import com.shunya.server.com.shunya.server.model.SessionCache;
-import com.shunya.server.com.shunya.server.model.ThreadLocalSession;
+import com.shunya.server.model.JPATransatomatic;
+import com.shunya.server.model.SessionCache;
+import com.shunya.server.model.ThreadLocalSession;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -40,7 +40,7 @@ public class Main {
         try {
             if (singleInstanceFileLock.checkIfAlreadyRunning())
                 System.exit(1);
-            String codebaseURI = new File("lib/punter.jar").toURL().toURI().toString();
+            String codebaseURI = new File("bin/").toURL().toURI().toString();
             System.out.println("Codebase is :" + codebaseURI);
             System.setProperty("java.rmi.server.codebase", codebaseURI);
 //            System.setProperty("java.rmi.server.hostname", findHostName());
@@ -51,7 +51,10 @@ public class Main {
             Thread.sleep(2000);
             System.out.println("Starting the rmi registry");
             //LocateRegistry.createRegistry(port)
-            final Process proc = Runtime.getRuntime().exec("rmiregistry");
+//            if (System.getSecurityManager() == null) {
+//                System.setSecurityManager(new SecurityManager());
+//            }
+            final Process proc = Runtime.getRuntime().exec("rmiregistry -Djava.rmi.server.useCodebaseOnly=false 2020");
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
@@ -64,7 +67,7 @@ public class Main {
             Thread.sleep(1000);
             PunterSearch obj = new PunterSearchServer(staticDaoFacade, sessionFacade, serverSettings);
             PunterSearch stub = (PunterSearch) UnicastRemoteObject.exportObject(obj, 0);
-            Registry registry = LocateRegistry.getRegistry();
+            Registry registry = LocateRegistry.createRegistry(2020);
             registry.rebind("PunterSearch", stub);
             System.err.println("RMI Server ready");
             MultiCastResponder.getInstance();

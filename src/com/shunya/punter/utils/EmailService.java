@@ -1,21 +1,15 @@
 package com.shunya.punter.utils;
 
-import java.io.File;
-import java.util.Properties;
+import com.sun.mail.smtp.SMTPMessage;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.SendFailedException;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
-
-import com.sun.mail.smtp.SMTPMessage;
+import java.io.File;
+import java.util.Properties;
 
 public class EmailService {
 	private static EmailService emailService;
@@ -58,7 +52,7 @@ public class EmailService {
 	         mex.printStackTrace();
 	      }
 	}
-	public void sendEMail(String subject, String commaSeparatedRecipients,String body,String[] attachments,String fromAddress,String ccAddress) {
+	public void sendEMail(String subject, String commaSeparatedRecipients, String body,String[] attachments,String fromAddress,String ccAddress) {
 	      // Get the default Session object.
 	      Session session = Session.getDefaultInstance(properties);
 	      try{

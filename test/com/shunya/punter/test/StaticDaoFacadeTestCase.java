@@ -8,9 +8,9 @@ import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
 import com.shunya.server.StaticDaoFacade;
-import com.shunya.server.com.shunya.server.model.JPATransatomatic;
-import com.shunya.server.com.shunya.server.model.SessionCache;
-import com.shunya.server.com.shunya.server.model.ThreadLocalSession;
+import com.shunya.server.model.JPATransatomatic;
+import com.shunya.server.model.SessionCache;
+import com.shunya.server.model.ThreadLocalSession;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

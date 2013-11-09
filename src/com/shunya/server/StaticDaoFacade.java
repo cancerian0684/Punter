@@ -9,10 +9,10 @@ import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
 import com.shunya.punter.tasks.Process;
 import com.shunya.punter.utils.FieldPropertiesMap;
-import com.shunya.server.com.shunya.server.model.JPATransatomatic;
-import com.shunya.server.com.shunya.server.model.ResultHolder;
-import com.shunya.server.com.shunya.server.model.SessionCache;
-import com.shunya.server.com.shunya.server.model.Transatomatic;
+import com.shunya.server.model.JPATransatomatic;
+import com.shunya.server.model.ResultHolder;
+import com.shunya.server.model.SessionCache;
+import com.shunya.server.model.Transatomatic;
 
 import javax.persistence.*;
 import javax.xml.bind.JAXBException;

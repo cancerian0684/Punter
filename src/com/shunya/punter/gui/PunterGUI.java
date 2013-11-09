@@ -1496,7 +1496,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     public void run() {
                         try {
                             ArrayList<?> ar = ((ProcessHistoryTableModel) processHistoryTable.getModel()).getRow(processHistoryTable.convertRowIndexToModel(processHistoryTable.getSelectedRow()));
-                            long pidTable = (Long) ((ProcessHistory) ar.get(0)).getId();
+                            long pidTable = ((ProcessHistory) ar.get(0)).getId();
                             long pid = taskHistory.getProcessHistory().getId();
                             if (pid == pidTable) {
                                 ProcessHistory ph = StaticDaoFacade.getInstance().getProcessHistoryById(pid);
