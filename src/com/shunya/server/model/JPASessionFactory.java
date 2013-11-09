@@ -1,12 +1,11 @@
 package com.shunya.server.model;
 
-import org.apache.derby.drda.NetworkServerControl;
+import org.h2.tools.Server;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import java.net.InetAddress;
-import java.util.Properties;
+import java.util.HashMap;
 
 public class JPASessionFactory {
     private static JPASessionFactory instance;
@@ -14,30 +13,20 @@ public class JPASessionFactory {
 
     private JPASessionFactory() {
         try {
-            Properties properties = System.getProperties();
-            properties.put("derby.system.home", ".");
-            final NetworkServerControl serverControl = new NetworkServerControl(InetAddress.getByName("localhost"), 1527);
-            try {
-                serverControl.start(null);
-                serverControl.logConnections(true);
-                System.err.println(serverControl.getRuntimeInfo());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            Thread.currentThread();
+            final Server server = Server.createTcpServer().start();
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     try {
                         emf.close();
                         System.out.println("Shutting down DB server.");
-                        serverControl.shutdown();
+                        server.stop();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             });
-            emf = Persistence.createEntityManagerFactory("punter", properties);
+            emf = Persistence.createEntityManagerFactory("punter", new HashMap());
         } catch (Exception e) {
             e.printStackTrace();
         }

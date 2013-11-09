@@ -43,8 +43,8 @@ public class Main {
             String codebaseURI = new File("bin/").toURL().toURI().toString();
             System.out.println("Codebase is :" + codebaseURI);
             System.setProperty("java.rmi.server.codebase", codebaseURI);
-//            System.setProperty("java.rmi.server.hostname", findHostName());
-//            System.setProperty("java.security.policy", "policy.all");
+            System.setProperty("java.rmi.server.hostname", findHostName());
+            System.setProperty("java.security.policy", "policy.all");
 
             System.out.println("Killing the already running RMI Registry");
             Runtime.getRuntime().exec("taskkill /IM RMIREGISTRY.EXE");
@@ -66,6 +66,7 @@ public class Main {
             });
             Thread.sleep(1000);
             PunterSearch obj = new PunterSearchServer(staticDaoFacade, sessionFacade, serverSettings);
+//            obj.getProcess(1L);
             PunterSearch stub = (PunterSearch) UnicastRemoteObject.exportObject(obj, 0);
             Registry registry = LocateRegistry.createRegistry(2020);
             registry.rebind("PunterSearch", stub);

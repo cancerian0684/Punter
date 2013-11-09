@@ -10,14 +10,14 @@
     <class>com.shunya.kb.jpa.Document</class>
     <class>com.shunya.kb.jpa.Attachment</class>
     <properties>
-			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver" />
-			<property name="javax.persistence.jdbc.url"  value="jdbc:derby://localhost:1527/punterDB;create=true" />
-			<property name="javax.persistence.jdbc.user" value="punter" />
-			<property name="javax.persistence.jdbc.password" value="punter" />
+			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="javax.persistence.jdbc.url"  value="jdbc:h2:~/punterDB" />
+			<property name="javax.persistence.jdbc.user" value="sa" />
+			<property name="javax.persistence.jdbc.password" value="sa" />
 			<!-- EclipseLink should create the database schema automatically -->
 			<property name="eclipselink.ddl-generation" value="create-tables" />
 			<property name="eclipselink.ddl-generation.output-mode" value="database" />
-			<property name="eclipselink.target-database" value="DERBY"/>
+			<property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
 			<property name="eclipselink.logging.level" value="INFO" />
 			<property name="eclipselink.cache.size.default" value="500"/>
 		</properties>
