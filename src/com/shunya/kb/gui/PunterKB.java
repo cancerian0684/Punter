@@ -424,7 +424,7 @@ public class PunterKB extends JPanel {
         c.gridy = 1;
         add(new JScrollPane(searchResultTable), c);
 
-        final JMenuItem addProcessMenu, openDocMenu, deleteDocMenu, docTagsMenu, reindexDocsMenu, copyURL, pasteMenu;
+        final JMenuItem addProcessMenu, openDocMenu,renameMenu, deleteDocMenu, docTagsMenu, reindexDocsMenu, copyURL, pasteMenu;
         final JPopupMenu popupProcess = new JPopupMenu();
         addProcessMenu = new JMenuItem("Add");
         addProcessMenu.addActionListener(new ActionListener() {
@@ -475,6 +475,33 @@ public class PunterKB extends JPanel {
             }
         });
         popupProcess.add(openDocMenu);
+
+        renameMenu = new JMenuItem("Rename");
+        renameMenu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (searchResultTable.getSelectedRow() >= 0) {
+                    System.out.println("Renaming Document");
+                    Document localDoc = (Document) ((DocumentTableModel) searchResultTable.getModel())
+                            .getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                    Document persisted = null;
+                    try {
+                        persisted = docService.getDocument(localDoc);
+                        final String newTitle = JOptionPane.showInputDialog(Main.KBFrame, "rename title to - ", persisted.getTitle());
+                        if (newTitle != null) {
+                            persisted.setTitle(newTitle);
+                            docService.saveDocument(persisted);
+                            localDoc.setTitle(persisted.getTitle());
+                            ((DocumentTableModel) searchResultTable.getModel()).refreshTable();
+                        }
+                    } catch (RemoteException e1) {
+                        e1.printStackTrace();
+                    }
+
+                }
+            }
+        });
+        popupProcess.add(renameMenu);
+
         deleteDocMenu = new JMenuItem("Delete");
         deleteDocMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -601,6 +628,7 @@ public class PunterKB extends JPanel {
                         public void notify(Path path) {
                             if (path.toFile().getName().startsWith("~") || path.toFile().getName().endsWith(".tmp"))
                                 return;
+                            if (path.toFile().getName().startsWith("D_")) {
                             Document doc = new Document();
                             try {
                                 System.err.println("Picked file :" + path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
@@ -611,6 +639,22 @@ public class PunterKB extends JPanel {
                                 docService.saveDocument(doc);
                             } catch (Exception e2) {
                                 e2.printStackTrace();
+                            }
+                            }else if (path.toFile().getName().startsWith("A_")) {
+                                Attachment attachment = new Attachment();
+                                try {
+                                    System.err.println("Picked Attachment for saving :" + path.toFile().getName());
+                                    int id = Integer.parseInt(path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
+                                    attachment.setId(id);
+                                    //TODO fetch the attachment
+//                                    attachment = docService.getAttachment(attachment);
+//                                    attachment.setContent(getBytesFromFile(path.toFile()));
+//                                    docService.saveAttachment(attachment);
+                                } catch (Exception e2) {
+                                    e2.printStackTrace();
+                                }
+                            }else {
+                                System.out.println("ignoring file : " + path.toFile().getAbsoluteFile());
                             }
                         }
                     }, ENTRY_MODIFY).processEvents();
