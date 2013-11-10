@@ -61,7 +61,7 @@ public class PunterKB extends JPanel {
         });
     }
 
-    private PunterDelayedQueueHandlerThread<SearchQuery> punterDelayedQueueHandlerThread;
+    private DelayedQueueHandlerThread<SearchQuery> punterDelayedQueueHandlerThread;
 
     {
         try {
@@ -76,6 +76,7 @@ public class PunterKB extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         searchTextField = new JTextField(20);
         searchTextField.setFont(new Font("Arial", Font.TRUETYPE_FONT, 12));
+        searchTextField.setPreferredSize(new Dimension(searchTextField.getWidth(), 30));
         searchTextField.getDocument().addDocumentListener(
                 new DocumentListener() {
                     public void changedUpdate(DocumentEvent e) {
@@ -90,7 +91,7 @@ public class PunterKB extends JPanel {
                         updateSearchResult();
                     }
                 });
-        punterDelayedQueueHandlerThread = new PunterDelayedQueueHandlerThread<SearchQuery>(new PunterDelayedQueueHandlerThread.PunterDelayedQueueListener<SearchQuery>() {
+        punterDelayedQueueHandlerThread = new DelayedQueueHandlerThread<>(new DelayedQueueHandlerThread.CallBackHandler<SearchQuery>() {
             @Override
             public void process(SearchQuery query) {
                 try {
@@ -100,6 +101,8 @@ public class PunterKB extends JPanel {
                 }
             }
         });
+
+        punterDelayedQueueHandlerThread.start();
         searchResultTable = new JTable(new DocumentTableModel()) {
             public boolean editCellAt(int row, int column, java.util.EventObject e) {
                 column = convertColumnIndexToModel(column);
@@ -351,6 +354,7 @@ public class PunterKB extends JPanel {
             }
         });
         categoryComboBox = new JComboBox(categories.toArray());
+        categoryComboBox.setPreferredSize(new Dimension((int) categoryComboBox.getPreferredSize().getWidth(), 30));
         categoryComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -361,7 +365,8 @@ public class PunterKB extends JPanel {
         toggleButton.setFocusPainted(true);
         toggleButton.setBorderPainted(true);
         toggleButton.setContentAreaFilled(true);
-        toggleButton.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        toggleButton.setPreferredSize(new Dimension(20, 31));
+        toggleButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         toggleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -378,7 +383,8 @@ public class PunterKB extends JPanel {
         andOrToggleButton.setFocusPainted(true);
         andOrToggleButton.setBorderPainted(true);
         andOrToggleButton.setContentAreaFilled(true);
-        andOrToggleButton.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        andOrToggleButton.setPreferredSize(new Dimension(20, 31));
+        andOrToggleButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         andOrToggleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

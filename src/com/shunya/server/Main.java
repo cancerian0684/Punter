@@ -6,6 +6,7 @@ import com.shunya.server.model.SessionCache;
 import com.shunya.server.model.ThreadLocalSession;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -46,14 +47,10 @@ public class Main {
             System.setProperty("java.rmi.server.hostname", findHostName());
             System.setProperty("java.security.policy", "policy.all");
 
-            System.out.println("Killing the already running RMI Registry");
-            Runtime.getRuntime().exec("taskkill /IM RMIREGISTRY.EXE");
-            Thread.sleep(2000);
+//            System.out.println("Killing the already running RMI Registry");
+//            Runtime.getRuntime().exec("taskkill /IM RMIREGISTRY.EXE");
+//            Thread.sleep(2000);
             System.out.println("Starting the rmi registry");
-            //LocateRegistry.createRegistry(port)
-//            if (System.getSecurityManager() == null) {
-//                System.setSecurityManager(new SecurityManager());
-//            }
             final Process proc = Runtime.getRuntime().exec("rmiregistry -Djava.rmi.server.useCodebaseOnly=false 2020");
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
@@ -81,9 +78,14 @@ public class Main {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
+        long t1= System.currentTimeMillis();
         Main main = new Main();
         main.startServer();
+        long t2= System.currentTimeMillis();
+        System.out.println("Server up in ["+(t2-t1)+"] ms, Press Enter to terminate");
+        System.in.read();
+        System.exit(0);
     }
 
     private String findHostName() {

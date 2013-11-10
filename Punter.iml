@@ -293,15 +293,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="javaws.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/javaws.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
       <library name="neoeedit.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/neoeedit.jar!/" />

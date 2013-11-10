@@ -16,7 +16,7 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-@PunterTask(author = "munishc", name = "ShellScriptTask", description = "Runs Script in Bash Shell", documentation = "com/sapient/punter/tasks/docs/ShellScriptTask.html")
+@PunterTask(author = "munishc", name = "ShellScriptTask", description = "Runs Script in Bash Shell", documentation = "com/shunya/punter/tasks/docs/ShellScriptTask.html")
 public class ShellScriptTask extends Tasks {
     @InputParam(required = true, description = "Hostname of Unix machine")
     private String hostname;

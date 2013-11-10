@@ -149,9 +149,8 @@ public class StaticDaoFacade {
             }
             stub.ping(getSessionId());
         } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
-//            AppSettings.getInstance().setServerHost(null);
-//			e.printStackTrace();
+            e.printStackTrace();
+            AppSettings.getInstance().setServerHost(null);
         }
     }
 

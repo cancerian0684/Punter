@@ -6,7 +6,7 @@ import com.shunya.punter.annotations.PunterTask;
 
 import java.util.logging.Level;
 
-@PunterTask(author = "munishc", name = "CheckStringForTokens", description = "Echo's the input data to SOP", documentation = "com/sapient/punter/tasks/docs/TextSamplerDemoHelp.html")
+@PunterTask(author = "munishc", name = "CheckStringForTokens", description = "Echo's the input data to SOP", documentation = "com/shunya/punter/tasks/docs/TextSamplerDemoHelp.html")
 public class CheckStringForTokens extends Tasks {
 	@InputParam(required = true,description="enter the input string")
 	private String input;
