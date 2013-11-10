@@ -1,65 +1,5 @@
 package com.shunya.kb.gui;
 
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.math.BigInteger;
-import java.rmi.RemoteException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-import javax.persistence.OptimisticLockException;
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.rtf.RTFEditorKit;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
-
 import com.hexidec.ekit.EkitCore;
 import com.hexidec.ekit.EkitCoreSpell;
 import com.shunya.kb.jpa.Attachment;
@@ -68,6 +8,31 @@ import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.Main;
 import com.shunya.punter.gui.PunterGUI;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
+
+import javax.imageio.ImageIO;
+import javax.persistence.OptimisticLockException;
+import javax.swing.*;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.rtf.RTFEditorKit;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.math.BigInteger;
+import java.rmi.RemoteException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 public class DocumentEditor extends JDialog{
 	protected JTextField textField;
@@ -105,7 +70,7 @@ public class DocumentEditor extends JDialog{
 		DocumentEditor testEditor=new DocumentEditor(parent,doc,docService);
 		testEditor.ekitCore.setDocumentText(new String(doc.getContent()));
 		testEditor.textField.setText(doc.getTitle());
-		testEditor.setTitle(doc.getId()+"-"+ doc.getTitle().substring(0, doc.getTitle().length()>20?20:doc.getTitle().length())+" ... [ "+doc.getAccessCount()+" .. "+doc.getDateAccessed()+" ]");
+		testEditor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
 		testEditor.pack();
 		testEditor.setVisible(true);
 //		testEditor.ekitCore.requestFocus();
@@ -416,16 +381,17 @@ public class DocumentEditor extends JDialog{
                */}
            }
 	     });
-		jtp.addTab("Attachments", new JScrollPane(attachmentTable));
+        jtp.addTab("Document", ekitCore);
+        jtp.addTab("Attachments", new JScrollPane(attachmentTable));
 		jtp.setPreferredSize(new Dimension(200, 100));
 		ekitCore.setPreferredSize(new Dimension(500,600));
-		jsp=new JSplitPane(JSplitPane.VERTICAL_SPLIT,ekitCore,jtp);
-		jsp.setDividerSize(5);
-		jsp.setDividerLocation(1.0);
+//		jsp=new JSplitPane(JSplitPane.VERTICAL_SPLIT,ekitCore,jtp);
+//		jsp.setDividerSize(5);
+//		jsp.setDividerLocation(1.0);
 		c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.weighty = 1.0;
-        getContentPane().add(jsp, c);
+        getContentPane().add(jtp, c);
         setPreferredSize(AppSettings.getInstance().getDocumentEditorLastDim());
         setLocation(AppSettings.getInstance().getDocumentEditorLocation());
 		addWindowListener(new WindowAdapter() {
