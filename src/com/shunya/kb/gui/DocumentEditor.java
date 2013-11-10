@@ -1,12 +1,9 @@
 package com.shunya.kb.gui;
 
-import com.hexidec.ekit.EkitCore;
-import com.hexidec.ekit.EkitCoreSpell;
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
 import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.gui.AppSettings;
-import com.shunya.punter.gui.Main;
 import com.shunya.punter.gui.PunterGUI;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
@@ -37,7 +34,7 @@ import java.util.List;
 public class DocumentEditor extends JDialog{
 	protected JTextField textField;
 	private JSplitPane jsp;
-	private EkitCore ekitCore;
+	private JEditorPane ekitCore;
 	private Document doc;
 	private StaticDaoFacade docService;
 	private JTable attachmentTable;
@@ -68,12 +65,12 @@ public class DocumentEditor extends JDialog{
 	}
 	public static void showEditor(Document doc,StaticDaoFacade docService,JFrame parent){
 		DocumentEditor testEditor=new DocumentEditor(parent,doc,docService);
-		testEditor.ekitCore.setDocumentText(new String(doc.getContent()));
+		testEditor.ekitCore.setText(new String(doc.getContent()));
 		testEditor.textField.setText(doc.getTitle());
 		testEditor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
 		testEditor.pack();
 		testEditor.setVisible(true);
-//		testEditor.ekitCore.requestFocus();
+		testEditor.ekitCore.requestFocus();
 	}
 	public DocumentEditor(JFrame parent,final Document ldoc,StaticDaoFacade docServic) {
 		super(parent,false);
@@ -83,13 +80,10 @@ public class DocumentEditor extends JDialog{
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.doc=ldoc;
 		this.docService=docServic;
-//	    this.ekitCore = new EkitCoreSpell(false, str1, str2, str3, null, localURL, bool1, bool2, bool3, bool4, str4, str5, bool5, bool6, true, bool8, (bool8) ? "NW|NS|OP|SV|PR|SP|CT|CP|PS|SP|UN|RE|SP|FN|SP|UC|UM|SP|SR|*|BL|IT|UD|SP|SK|SU|SB|SP|AL|AC|AR|AJ|SP|UL|OL|SP|LK|*|ST|SP|FO" : "NW|NS|OP|SV|PR|SP|CT|CP|PS|SP|UN|RE|SP|BL|IT|UD|SP|FN|SP|UC|SP|LK|SP|SR|SP|ST", bool9);
-	    this.ekitCore = new EkitCoreSpell(false);
-	    setJMenuBar(this.ekitCore.getMenuBar());
-	    this.ekitCore.setEnterKeyIsBreak(true);
-	    this.ekitCore.setFrame(Main.KBFrame);
-	    this.ekitCore.getTextPane().setEditable(false);
-	    this.ekitCore.getTextPane().addMouseListener(new DocumentEditMousListener());
+	    this.ekitCore = new JEditorPane();
+	    this.ekitCore.setEditable(false);
+        this.ekitCore.setFont(new Font("Courier New", Font.TRUETYPE_FONT, 12));
+	    this.ekitCore.addMouseListener(new DocumentEditMousListener());
 	    KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK , false);
 	    this.ekitCore.unregisterKeyboardAction(keystroke);
 	    textField = new JTextField(20);
@@ -458,7 +452,7 @@ public class DocumentEditor extends JDialog{
 	public void saveDocument() throws OptimisticLockException,Exception{
 		System.out.println("saving document..  "+textField.getText());
         doc.setTitle(textField.getText());
-        doc.setContent(ekitCore.getDocumentText().getBytes()); 
+        doc.setContent(ekitCore.getText().getBytes());
         doc.setMd5(currentMD5);
         doc.setDateUpdated(new Date());
     	try {
@@ -483,7 +477,7 @@ public class DocumentEditor extends JDialog{
 	public boolean isDocumentModified(){
 		if((!everEdited)&&doc.getTitle().equals(textField.getText()))
 			return false;
-		currentMD5=getMD5(ekitCore.getDocumentText());
+		currentMD5=getMD5(ekitCore.getText());
 		return !(currentMD5.equals(doc.getMd5())&&doc.getTitle().equals(textField.getText()));
 	}
 	static void copy(InputStream is, OutputStream os) throws IOException {
@@ -601,15 +595,15 @@ private class DocumentEditMousListener extends MouseAdapter {
       if(e.getClickCount()==2){
         	if(editable){
         		editable=false;
-        		setTitle(doc.getId()+"-"+ doc.getTitle().substring(0, doc.getTitle().length()>20?20:doc.getTitle().length())+" ... [ "+doc.getAccessCount()+" .. "+doc.getDateAccessed()+" ]");
-        		ekitCore.getTextPane().setEditable(editable);
+        		setTitle(doc.getId()+"-"+ doc.getTitle().substring(0, doc.getTitle().length()>40?40:doc.getTitle().length()));
+        		ekitCore.setEditable(editable);
         	}
         	else{
         		editable=true;
         		everEdited=true;
-        		setTitle(doc.getId()+"-"+ doc.getTitle().substring(0, doc.getTitle().length()>20?20:doc.getTitle().length())+" ... [ "+doc.getAccessCount()+" .. "+doc.getDateAccessed()+" ]..editing");
-        		ekitCore.getTextPane().setEditable(editable);
-        		ekitCore.getTextPane().getCaret().setVisible(true);
+        		setTitle(doc.getId()+"-"+ doc.getTitle().substring(0, doc.getTitle().length()>40?40:doc.getTitle().length())+ "...editing");
+        		ekitCore.setEditable(editable);
+        		ekitCore.getCaret().setVisible(true);
         	}
         }
     }
