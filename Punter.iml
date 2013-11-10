@@ -284,15 +284,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="javax.persistence_2.0.1.v201006031150.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/javax.persistence_2.0.1.v201006031150.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
       <library name="neoeedit.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/neoeedit.jar!/" />
@@ -381,6 +372,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/jsch-0.1.50.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/javax.persistence_2.1.0.v201304241213.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
