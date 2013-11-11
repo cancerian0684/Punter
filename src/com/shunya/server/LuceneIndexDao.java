@@ -9,7 +9,6 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.snowball.SnowballAnalyzer;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
@@ -333,7 +332,10 @@ public class LuceneIndexDao {
 			while(terms.next())
 			System.out.println(terms.term().text());
 			System.err.println("Listing all the terms done..");*/
+
             searchString = searchString.trim().toLowerCase();
+            if(searchString.equals("**"))
+                searchString="*";
             readerReadWriteLock.readLock().lock();
             if (searchString.isEmpty()) {
                 return Collections.EMPTY_LIST;
@@ -354,8 +356,7 @@ public class LuceneIndexDao {
             query.add(query1, BooleanClause.Occur.MUST);
             query.add(query2, BooleanClause.Occur.MUST);
             BooleanQuery.setMaxClauseCount(100000);
-            Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter(
-                    "<font color=red>", "</font>"), new QueryScorer(query1));
+            Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<span style='color:red;'>", "</span>"), new QueryScorer(query1));
             TopDocs hits = null;
 //			CachingWrapperFilter cwf=new CachingWrapperFilter();
             hits = isearcher.search(query, start + batch);
@@ -417,14 +418,8 @@ public class LuceneIndexDao {
 //			System.out.print(sw.getElapsedTime()+" \n");
             sw.reset();
             return resultDocs;
-        } catch (CorruptIndexException e1) {
+        } catch (InvalidTokenOffsetsException | ParseException | IOException e1) {
             e1.printStackTrace();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (InvalidTokenOffsetsException e) {
-            e.printStackTrace();
         } finally {
             readerReadWriteLock.readLock().unlock();
         }
