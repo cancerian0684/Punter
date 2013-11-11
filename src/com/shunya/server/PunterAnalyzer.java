@@ -1,6 +1,5 @@
 package com.shunya.server;
 
-import com.shunya.kb.utils.TestEditor;
 import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
 
@@ -11,7 +10,7 @@ public class PunterAnalyzer extends Analyzer {
     public static final List<String> STOP_WORDS = new ArrayList<String>(100);
 
     static {
-        Scanner scanner = new Scanner(TestEditor.class.getClassLoader().getResourceAsStream("resources/stopwords.properties"));
+        Scanner scanner = new Scanner(PunterAnalyzer.class.getClassLoader().getResourceAsStream("resources/stopwords.properties"));
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             StringTokenizer stk = new StringTokenizer(line, ",");

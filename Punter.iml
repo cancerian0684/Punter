@@ -246,15 +246,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="ekitspell.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/ekitspell.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
       <library name="commons-beanutils-core-1.8.3.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/commons-beanutils-core-1.8.3.jar!/" />
@@ -348,7 +339,6 @@
     </orderEntry>
     <orderEntry type="library" name="jedi-core" level="project" />
     <orderEntry type="library" name="tools" level="project" />
-    <orderEntry type="library" name="examples" level="project" />
     <orderEntry type="library" name="junit" level="project" />
     <orderEntry type="module-library">
       <library>
