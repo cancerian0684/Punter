@@ -4,6 +4,7 @@ import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
 import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.gui.AppSettings;
+import com.shunya.punter.gui.GUIUtils;
 import com.shunya.punter.gui.PunterGUI;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
@@ -13,6 +14,7 @@ import org.markdown4j.Markdown4jProcessor;
 import javax.imageio.ImageIO;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.html.HTMLEditorKit;
@@ -102,10 +104,12 @@ public class DocumentEditor extends JDialog {
         this.ekitCore.setContentType("text/html");
         final HTMLEditorKit kit = new HTMLEditorKit();
         this.ekitCore.setEditorKit(kit);
-       /* try {
-            File cssfile = new File("src/resources/bootstrap.min.css");
+      /* try {
+            File cssfile = new File("src/resources/punter.css");
+//            URL cssfileUrl = this.getClass().getResource("src/resources/punter.css");
             StyleSheet styleSheet = kit.getStyleSheet();
             styleSheet.importStyleSheet(cssfile.toURI().toURL());
+//            styleSheet.importStyleSheet(cssfileUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }*/
@@ -175,6 +179,13 @@ public class DocumentEditor extends JDialog {
         attachmentTable.setFont(new Font("Courier New", Font.TRUETYPE_FONT, 11));
         attachmentTable.getColumnModel().getColumn(0).setPreferredWidth(20);
         attachmentTable.setDragEnabled(true);
+        TableCellRenderer dcr = attachmentTable.getDefaultRenderer(Long.class);
+        if (dcr instanceof JLabel) {
+//            ((JLabel) dcr).setVerticalAlignment(SwingConstants.TOP);
+//            ((JLabel) dcr).setBorder(new EmptyBorder(0, 0, 0, 0));
+            ((JLabel) dcr).setHorizontalAlignment(JLabel.LEFT);
+        }
+        GUIUtils.initilializeTableColumns(attachmentTable, AttachmentTableModel.longValues);
         InputMap imap = attachmentTable.getInputMap(JComponent.WHEN_FOCUSED);
         imap.put(KeyStroke.getKeyStroke("DELETE"), "table.delete");
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK, false), "table.copy");

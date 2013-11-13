@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class AttachmentTableModel extends AbstractTableModel {
-    public final Object[] longValues = {new Integer(3), "Kaflksdfl", "12345678", "123456546865354343543543543584435"};
+    public static final int[] longValues = {20, 350, 50, 100};
     private static final long serialVersionUID = 1L;
     /**
      * Holds the table data in a two dimensional ArrayList datastructure
