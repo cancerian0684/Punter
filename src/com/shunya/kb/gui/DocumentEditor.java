@@ -110,7 +110,8 @@ public class DocumentEditor extends JDialog {
             e.printStackTrace();
         }*/
 //        this.ekitCore.setFont(new Font("Courier New", Font.TRUETYPE_FONT, 12));
-//        this.ekitCore.setFont(new Font("Arial", Font.TRUETYPE_FONT, 12));
+//        this.ekitCore.setFont(new Font("Times New Roman", Font.TRUETYPE_FONT, 12));
+        this.ekitCore.setFont(new Font("Arial", Font.TRUETYPE_FONT, 12));
         this.ekitCore.addMouseListener(new DocumentEditMousListener());
         KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK, false);
         this.ekitCore.unregisterKeyboardAction(keystroke);

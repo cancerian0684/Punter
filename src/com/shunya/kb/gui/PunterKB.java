@@ -36,7 +36,6 @@ public class PunterKB extends JPanel {
     private JTextField searchTextField;
     private JTable searchResultTable;
     private JComboBox categoryComboBox;
-    private JToggleButton toggleButton = new JToggleButton("<html>E</html>");
     private JToggleButton andOrToggleButton = new JToggleButton("O");
     private static final List<String> categories = StaticDaoFacade.getInstance().getCategories();
     private static StaticDaoFacade docService = StaticDaoFacade.getInstance();
@@ -361,23 +360,6 @@ public class PunterKB extends JPanel {
                 updateSearchResult();
             }
         });
-        toggleButton.setOpaque(true);
-        toggleButton.setFocusPainted(true);
-        toggleButton.setBorderPainted(true);
-        toggleButton.setContentAreaFilled(true);
-        toggleButton.setPreferredSize(new Dimension(20, 31));
-        toggleButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        toggleButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateSearchResult();
-                if (toggleButton.isSelected()) {
-                    toggleButton.setText("<html><b>E</b></html>");
-                } else {
-                    toggleButton.setText("<html>E</html>");
-                }
-            }
-        });
 
         andOrToggleButton.setOpaque(true);
         andOrToggleButton.setFocusPainted(true);
@@ -407,17 +389,11 @@ public class PunterKB extends JPanel {
         c.weightx = 0.01;
         c.gridx = 1;
         c.gridy = 0;
-        add(toggleButton, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.01;
-        c.gridx = 2;
-        c.gridy = 0;
         add(andOrToggleButton, c);
 
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.1;
-        c.gridx = 3;
+        c.gridx = 2;
         c.gridy = 0;
         add(categoryComboBox, c);
 
@@ -425,7 +401,7 @@ public class PunterKB extends JPanel {
         c.ipady = 0;      //make this component tall
         c.weightx = 0.0;
         c.weighty = 0.9;
-        c.gridwidth = 4;
+        c.gridwidth = 3;
         c.gridx = 0;
         c.gridy = 1;
         add(new JScrollPane(searchResultTable), c);
@@ -579,7 +555,7 @@ public class PunterKB extends JPanel {
                 try {
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
                     Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-                    String url = "http://" + docService.getServerHostAddress().getHostName() + ":"
+                    String url = "http://" + docService.getServerHostAddress().getHostAddress() + ":"
                             + docService.getWebServerPort()
                             + "/" + doc.getId();
                     System.out.println(url);
@@ -868,7 +844,7 @@ public class PunterKB extends JPanel {
     }
 
     private void updateSearchResult() {
-        punterDelayedQueueHandlerThread.put(new SearchQuery.SearchQueryBuilder().query(searchTextField.getText().trim() + "*").category(getSelectedCategory()).specialText(toggleButton.isSelected()).andFilter(andOrToggleButton.isSelected()).maxResults(AppSettings.getInstance().getMaxResults()).build());
+        punterDelayedQueueHandlerThread.put(new SearchQuery.SearchQueryBuilder().query(searchTextField.getText().trim() + "*").category(getSelectedCategory()).andFilter(andOrToggleButton.isSelected()).maxResults(AppSettings.getInstance().getMaxResults()).build());
     }
 
     private String getSelectedCategory() {

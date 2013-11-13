@@ -1,6 +1,7 @@
 package com.shunya.server;
 
 import com.shunya.kb.jpa.Document;
+import org.markdown4j.Markdown4jProcessor;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +32,8 @@ public enum PunterWebDocumentHandler {
     PUNTER_DOC_WITHOUT_ATTACHMENT_HANDLER(Document.DocumentType.PUNTER_DOC_WITHOUT_ATTACHMENT) {
         @Override
         public File handle(Document document) throws IOException {
-            return write(document.getContent(), new File("" + document.getId() + ".html"), new File("Temp"));
+            final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
+            return write(markdown4jProcessor.process(new String(document.getContent())).getBytes(), new File("" + document.getId() + ".html"), new File("Temp"));
         }
     };
 

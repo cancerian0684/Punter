@@ -288,8 +288,8 @@ public class LuceneIndexDao {
         }
         Map<String, Float> boostMap = new HashMap<String, Float>();
         boostMap.put("title", 4.0f);
-        boostMap.put("contents", 4.0f);
-        boostMap.put("id", 5.0f);
+        boostMap.put("contents", 3.0f);
+        boostMap.put("id", 1.0f);
         boostMap.put("attachment", 2.0f);
         boostMap.put("tags", 5.0f);
         parser1 = new MultiFieldQueryParser(Version.LUCENE_30, new String[]{"title", "contents", "id", "attachment", "tags"}, analyzer, boostMap);
@@ -318,7 +318,7 @@ public class LuceneIndexDao {
         writerWriteLock.unlock();
     }
 
-    public List<Document> search(String searchString, String category, boolean isSpclTxt, boolean isAND, int start, int batch) {
+    public List<Document> search(String searchString, String category, boolean isAND, int start, int batch) {
         Stopwatch sw = new Stopwatch();
         sw.start();
         try {
@@ -340,14 +340,12 @@ public class LuceneIndexDao {
             if (searchString.isEmpty()) {
                 return Collections.EMPTY_LIST;
             }
-            if (isSpclTxt)
-                searchString = itrim(getPunterParsedText(searchString));
             parser1.setAllowLeadingWildcard(true);
             if (isAND)
                 parser1.setDefaultOperator(QueryParser.AND_OPERATOR);
             else
                 parser1.setDefaultOperator(QueryParser.OR_OPERATOR);
-            Query query1 = parser1.parse(searchString);
+            Query query1 = parser1.parse(searchString +" "+ itrim(getPunterParsedText(searchString)));
             Query query2 = parser2.parse(category);
 //			MultiPhraseQuery leaningTower = new MultiPhraseQuery();
 //			leaningTower.add(new Term("content", "tower"));
