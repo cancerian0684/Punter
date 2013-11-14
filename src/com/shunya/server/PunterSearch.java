@@ -15,6 +15,8 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public interface PunterSearch extends Remote {
+    List<String> getAllTerms() throws RemoteException;
+
     InetAddress getServerHostAddress() throws RemoteException, UnknownHostException;
 
     long getWebServerPort() throws RemoteException;

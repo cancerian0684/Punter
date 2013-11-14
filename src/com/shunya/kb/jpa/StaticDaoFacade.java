@@ -163,6 +163,10 @@ public class StaticDaoFacade {
         return Collections.emptyList();
     }
 
+    public List<String> getAllTerms() throws RemoteException {
+        return stub.getAllTerms();
+    }
+
     public void updateAccessCounter(Document doc) throws RemoteException {
         stub.updateAccessCounter(doc);
     }

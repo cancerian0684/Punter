@@ -3,6 +3,7 @@ package com.shunya.kb.gui;
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
 import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.utils.TextCompletionHandler;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.GUIUtils;
 import com.shunya.punter.gui.PunterGUI;
@@ -19,7 +20,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.text.*;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.rtf.RTFEditorKit;
@@ -46,7 +48,7 @@ public class DocumentEditor extends JFrame {
     private final MyUndoableEditListener undoableEditListener = new MyUndoableEditListener();
     protected JTextField textField;
     private JTextPane jTextPane;
-    private JTextPane jTextPaneForEditing;
+    private JTextArea jTextPaneForEditing;
     private Document doc;
     private StaticDaoFacade docService;
     private JTable attachmentTable;
@@ -134,11 +136,14 @@ public class DocumentEditor extends JFrame {
         jTextPane.getCaret().setVisible(false);
         setHtmlDocFont();
 
-        jTextPaneForEditing = new JTextPane();
+        jTextPaneForEditing = new JTextArea();
         jTextPaneForEditing.setMargin(new Insets(5, 5, 5, 5));
-        jTextPaneForEditing.setContentType("text/plain");
-        jTextPaneForEditing.setFont(new Font("Arial", Font.TRUETYPE_FONT, 14));
+        jTextPaneForEditing.setWrapStyleWord(true);
+        jTextPaneForEditing.setLineWrap(true);
+        jTextPaneForEditing.setFont(new Font("Arial", Font.TRUETYPE_FONT, 12));
         jTextPaneForEditing.setText(new String(ldoc.getContent()));
+
+        new TextCompletionHandler(jTextPaneForEditing, docService);
 
         addBindings();
 
@@ -547,14 +552,6 @@ public class DocumentEditor extends JFrame {
         Font font = new Font("Arial", Font.TRUETYPE_FONT, 15);
         String bodyRule = "body { font-family: " + font.getFamily() + "; " + "font-size: " + font.getSize() + "pt; }";
         ((HTMLDocument) jTextPane.getStyledDocument()).getStyleSheet().addRule(bodyRule);
-    }
-
-    private void setTextPlainDocFont() {
-        StyleContext sc = StyleContext.getDefaultStyleContext();
-        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.FontFamily, "Arial");
-        aset = sc.addAttribute(aset, StyleConstants.FontSize, 24);
-        aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
-        jTextPaneForEditing.setCharacterAttributes(aset, true);
     }
 
     public void saveDocument() throws Exception {

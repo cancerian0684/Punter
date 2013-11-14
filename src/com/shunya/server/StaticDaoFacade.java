@@ -16,6 +16,7 @@ import com.shunya.server.model.Transatomatic;
 
 import javax.persistence.*;
 import javax.xml.bind.JAXBException;
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.*;
 
@@ -85,6 +86,14 @@ public class StaticDaoFacade {
     public List<Document> getDocList(SearchQuery query) {
         long t1 = System.currentTimeMillis();
         List<Document> result = LuceneIndexDao.getInstance().search(query.getQuery(), query.getCategory(), query.isAndFilter(), 0, query.getMaxResults());
+        long t2 = System.currentTimeMillis();
+        System.err.println("time consumed : " + (t2 - t1));
+        return result;
+    }
+
+    public List<String> getAllTerms() throws IOException {
+        long t1 = System.currentTimeMillis();
+        List<String> result = LuceneIndexDao.getInstance().listAllTermsForTitle();
         long t2 = System.currentTimeMillis();
         System.err.println("time consumed : " + (t2 - t1));
         return result;

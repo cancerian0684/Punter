@@ -11,6 +11,8 @@ import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermEnum;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -256,7 +258,7 @@ public class LuceneIndexDao {
             }
             FSWriter = new IndexWriter(FSDirectory, analyzer, !alreadyExists,
                     IndexWriter.MaxFieldLength.UNLIMITED);
-            FSWriter.setRAMBufferSizeMB(50);
+            FSWriter.setRAMBufferSizeMB(20);
             FSWriter.maybeMerge();
             FSWriter.optimize();
             ireader = IndexReader.open(FSDirectory, true);
@@ -327,15 +329,10 @@ public class LuceneIndexDao {
                 refreshIsearcher();
             }
             sw.reset();
-            /*System.err.println("Listing all the terms ");
-			TermEnum terms = ireader.terms(new Term("content", ""));
-			while(terms.next())
-			System.out.println(terms.term().text());
-			System.err.println("Listing all the terms done..");*/
 
             searchString = searchString.trim().toLowerCase();
-            if(searchString.equals("**"))
-                searchString="*";
+            if (searchString.equals("**"))
+                searchString = "*";
             readerReadWriteLock.readLock().lock();
             if (searchString.isEmpty()) {
                 return Collections.EMPTY_LIST;
@@ -345,7 +342,7 @@ public class LuceneIndexDao {
                 parser1.setDefaultOperator(QueryParser.AND_OPERATOR);
             else
                 parser1.setDefaultOperator(QueryParser.OR_OPERATOR);
-            Query query1 = parser1.parse(searchString +" "+ itrim(getPunterParsedText(searchString)));
+            Query query1 = parser1.parse(searchString + " " + itrim(getPunterParsedText(searchString)));
             Query query2 = parser2.parse(category);
 //			MultiPhraseQuery leaningTower = new MultiPhraseQuery();
 //			leaningTower.add(new Term("content", "tower"));
@@ -379,7 +376,7 @@ public class LuceneIndexDao {
                 String contents = doc.get("content");
                 int maxNumFragmentsRequired = 2;
                 String fragmentSeparator = "...";
- 				 /*Source source;
+                  /*Source source;
  				 source = new Source(new StringReader(title));
  				 TextExtractor te=new TextExtractor(source);
  				 title = te.toString();*/
@@ -422,6 +419,17 @@ public class LuceneIndexDao {
             readerReadWriteLock.readLock().unlock();
         }
         return Collections.EMPTY_LIST;
+    }
+
+    public List<String> listAllTermsForTitle() throws IOException {
+        System.err.println("Listing all the terms ");
+        Set<String> uniqueTerms = new HashSet<>(1000);
+        TermEnum terms = ireader.terms(new Term("title", "content"));
+        while (terms.next())
+            uniqueTerms.add(terms.term().text());
+        terms.close();
+        System.err.println("Listing all the terms done.."+uniqueTerms);
+        return new ArrayList<>(uniqueTerms);
     }
 
     public static String itrim(String source) {

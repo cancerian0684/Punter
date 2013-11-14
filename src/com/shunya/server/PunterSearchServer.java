@@ -8,6 +8,7 @@ import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
@@ -196,6 +197,16 @@ public class PunterSearchServer implements PunterSearch {
     public List<ProcessHistory> getMySortedProcessHistoryList(String username)
             throws RemoteException {
         return staticDaoFacade.getMySortedProcessHistoryList(username);
+    }
+
+    @Override
+    public List<String> getAllTerms() throws RemoteException {
+        try {
+            return staticDaoFacade.getAllTerms();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RemoteException(e.getMessage());
+        }
     }
 
     @Override
