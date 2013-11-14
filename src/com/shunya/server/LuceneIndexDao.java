@@ -47,7 +47,7 @@ public class LuceneIndexDao {
         org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
         doc.add(new StringField("id", "" + pDoc.getId(), Field.Store.YES));
         doc.add(new TextField("title", getPunterParsedText2(pDoc.getTitle()), Field.Store.NO));
-        doc.add(new StringField("titleS", pDoc.getTitle(), Field.Store.YES));
+        doc.add(new Field("titleS", pDoc.getTitle(), StringField.TYPE_STORED));
         doc.add(new StringField("author", pDoc.getAuthor() != null ? pDoc.getAuthor() : "", Field.Store.YES));
         doc.add(new TextField("category", pDoc.getCategory(), Field.Store.YES));
         doc.add(new StringField("created", DateTools.timeToString(pDoc.getDateCreated().getTime(), DateTools.Resolution.MINUTE), Field.Store.YES));
@@ -56,7 +56,7 @@ public class LuceneIndexDao {
             String contents = PunterTextExtractor.getText(pDoc.getContent(), "", pDoc.getExt());
             doc.add(new TextField("contents", itrim(getPunterParsedText2(contents)), Field.Store.NO));
             int len = contents.length();
-            doc.add(new TextField("content", contents.substring(0, len > 20000 ? 20000 : len), Field.Store.YES));
+            doc.add(new Field("content", contents.substring(0, len > 20000 ? 20000 : len), StringField.TYPE_STORED));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,7 +81,7 @@ public class LuceneIndexDao {
 
     public static String getPunterParsedText2(String inText) {
         StringTokenizer stk = new StringTokenizer(inText, " ,");
-        Set<String> words = new HashSet<String>(1000);
+        Set<String> words = new HashSet<>(1000);
         while (stk.hasMoreTokens()) {
             String token = stk.nextToken();
             words.add(token);
@@ -284,8 +284,9 @@ public class LuceneIndexDao {
             highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
             highlighter.setTextFragmenter(new SimpleFragmenter(200));
             TopDocs hits = null;
-//			CachingWrapperFilter cwf=new CachingWrapperFilter();
-            hits = searcher.search(query, start + batch);
+            QueryWrapperFilter queryFilter = new QueryWrapperFilter(query);
+            CachingWrapperFilter cwf=new CachingWrapperFilter(queryFilter);
+            hits = searcher.search(query, cwf, start + batch);
             int numTotalHits = hits.totalHits;
             System.out.println(query);
             List<Document> resultDocs = new ArrayList<>(50);
