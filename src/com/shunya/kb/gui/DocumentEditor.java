@@ -14,6 +14,8 @@ import org.markdown4j.Markdown4jProcessor;
 import javax.imageio.ImageIO;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.table.TableCellRenderer;
@@ -41,19 +43,15 @@ import java.util.Date;
 import java.util.List;
 
 public class DocumentEditor extends JFrame {
-    private final DocumentEditor.MyUndoableEditListener undoableEditListener = new MyUndoableEditListener();
+    private final MyUndoableEditListener undoableEditListener = new MyUndoableEditListener();
     protected JTextField textField;
     private JTextPane jTextPane;
-    private StyledDocument htmlDoc = new HTMLDocument();
-    private StyledDocument plainDoc = new DefaultStyledDocument();
+    private JTextPane jTextPaneForEditing;
     private Document doc;
     private StaticDaoFacade docService;
     private JTable attachmentTable;
     private String currentMD5;
-    private int lastCaretPosition = 0;
-    private boolean editable = false;
-    private boolean everEdited = false;
-    private boolean currentlyStateIsHtmlView = true;
+    private boolean mayBeEdited = false;
     private static BufferedImage idleImage;
 
     //undo helpers
@@ -89,15 +87,15 @@ public class DocumentEditor extends JFrame {
     public static void showEditor(Document doc, StaticDaoFacade docService) {
         DocumentEditor editor = new DocumentEditor(doc, docService);
         try {
+            editor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
+            editor.textField.setText(doc.getTitle());
             editor.jTextPane.setText(editor.markdown4jProcessor.process(new String(doc.getContent())));
+            editor.jTextPane.setCaretPosition(0);
         } catch (IOException e) {
             e.printStackTrace();
             editor.jTextPane.setText("unable to parse the markdown syntax");
         }
-        editor.textField.setText(doc.getTitle());
-        editor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
         editor.pack();
-        editor.jTextPane.setCaretPosition(0);
         editor.setVisible(true);
         editor.jTextPane.requestFocus();
     }
@@ -106,9 +104,9 @@ public class DocumentEditor extends JFrame {
         undoAction = new UndoAction();
         redoAction = new RedoAction();
         undo.setLimit(500);
-        plainDoc.addUndoableEditListener(undoableEditListener);
+        jTextPaneForEditing.getDocument().addUndoableEditListener(undoableEditListener);
 
-        InputMap inputMap = jTextPane.getInputMap();
+        InputMap inputMap = jTextPaneForEditing.getInputMap();
 
         //Ctrl-z for undo
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK);
@@ -120,26 +118,30 @@ public class DocumentEditor extends JFrame {
     }
 
     public DocumentEditor(final Document ldoc, StaticDaoFacade docServic) {
-//        super(ldoc.getTitle());
         setAlwaysOnTop(false);
         setIconImage(idleImage);
         setLayout(new GridBagLayout());
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.doc = ldoc;
         this.docService = docServic;
-        jTextPane = new JTextPane(plainDoc);
+        jTextPane = new JTextPane();
+        jTextPane.setContentType("text/html");
         jTextPane.setMargin(new Insets(5, 5, 5, 5));
-
-        jTextPane.setText(new String(ldoc.getContent()));
-
-        jTextPane.setDocument(htmlDoc);
         jTextPane.setEditable(false);
-
         final HTMLEditorKit kit = new HTMLEditorKit();
         jTextPane.setEditorKit(kit);
         jTextPane.setContentType(kit.getContentType());
-
+        jTextPane.getCaret().setVisible(false);
         setHtmlDocFont();
+
+        jTextPaneForEditing = new JTextPane();
+        jTextPaneForEditing.setMargin(new Insets(5, 5, 5, 5));
+        jTextPaneForEditing.setContentType("text/plain");
+        jTextPaneForEditing.setFont(new Font("Arial", Font.TRUETYPE_FONT, 14));
+        jTextPaneForEditing.setText(new String(ldoc.getContent()));
+
+        addBindings();
+
       /* try {
             File cssfile = new File("src/resources/punter.css");
 //            URL cssfileUrl = this.getClass().getResource("src/resources/punter.css");
@@ -150,8 +152,8 @@ public class DocumentEditor extends JFrame {
             e.printStackTrace();
         }*/
 
-        jTextPane.addMouseListener(new DocumentEditMousListener());
-        addBindings();
+//        jTextPane.addMouseListener(new DocumentEditMousListener());
+
 
         textField = new JTextField(20);
         textField.setFont(new Font("Arial", Font.TRUETYPE_FONT, 12));
@@ -161,7 +163,24 @@ public class DocumentEditor extends JFrame {
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.fill = GridBagConstraints.HORIZONTAL;
         getContentPane().add(textField, c);
-        JTabbedPane jtp = new JTabbedPane();
+        final JTabbedPane jtp = new JTabbedPane();
+        jtp.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+//                System.out.println("Tab: " + jtp.getSelectedIndex());
+                if (jtp.getSelectedIndex() == 0) {
+                    setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
+                    try {
+                        jTextPane.setText(markdown4jProcessor.process(jTextPaneForEditing.getText()));
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                } else if(1 == jtp.getSelectedIndex()){
+                    mayBeEdited =true;
+                    setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()) + "...editing");
+                }
+            }
+        });
+
         attachmentTable = new JTable(new AttachmentTableModel()) {
             public boolean editCellAt(int row, int column, java.util.EventObject e) {
                 column = convertColumnIndexToModel(column);
@@ -251,7 +270,7 @@ public class DocumentEditor extends JFrame {
         Collection<Attachment> attchmts = doc.getAttachments();
         if (attchmts != null)
             for (Attachment attachment : attchmts) {
-                ArrayList<Object> newRow = new ArrayList<Object>();
+                ArrayList<Object> newRow = new ArrayList<>();
                 newRow.add(attachment);
                 atm.insertRow(newRow);
             }
@@ -451,7 +470,8 @@ public class DocumentEditor extends JFrame {
                 }
             }
         });
-        jtp.addTab("Document", new JScrollPane(jTextPane));
+        jtp.addTab("HTML View", new JScrollPane(jTextPane));
+        jtp.addTab("Editor", new JScrollPane(jTextPaneForEditing));
         jtp.addTab("Attachments", new JScrollPane(attachmentTable));
         jtp.setPreferredSize(new Dimension(200, 100));
         jTextPane.setPreferredSize(new Dimension(500, 600));
@@ -524,8 +544,7 @@ public class DocumentEditor extends JFrame {
 
     private void setHtmlDocFont() {
         Font font = new Font("Arial", Font.TRUETYPE_FONT, 15);
-        String bodyRule = "body { font-family: " + font.getFamily() + "; " +
-                "font-size: " + font.getSize() + "pt; }";
+        String bodyRule = "body { font-family: " + font.getFamily() + "; " + "font-size: " + font.getSize() + "pt; }";
         ((HTMLDocument) jTextPane.getStyledDocument()).getStyleSheet().addRule(bodyRule);
     }
 
@@ -534,21 +553,17 @@ public class DocumentEditor extends JFrame {
         AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.FontFamily, "Arial");
         aset = sc.addAttribute(aset, StyleConstants.FontSize, 24);
         aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
-        jTextPane.setCharacterAttributes(aset, true);
+        jTextPaneForEditing.setCharacterAttributes(aset, true);
     }
 
     public void saveDocument() throws Exception {
         System.out.println("saving document before exit..  " + textField.getText());
         doc.setTitle(textField.getText());
-        if (!currentlyStateIsHtmlView) {
-            doc.setContent(jTextPane.getText().getBytes());
-        }
+        doc.setContent(jTextPaneForEditing.getText().getBytes());
         doc.setMd5(currentMD5);
         doc.setDateUpdated(new Date());
         try {
             Document tmpDoc = docService.saveDocument(doc);
-            /*BeanUtilsBean.setInstance(new BeanUtilsBean2());
-    		ConvertUtils.deregister();*/
             DateLocaleConverter converter = new DateLocaleConverter();
             converter.setLenient(true);
             ConvertUtils.register(converter, java.util.Date.class);
@@ -565,13 +580,9 @@ public class DocumentEditor extends JFrame {
     }
 
     public boolean isDocumentModified() {
-        if ((!everEdited) && doc.getTitle().equals(textField.getText()))
+        if ((!mayBeEdited) && doc.getTitle().equals(textField.getText()))
             return false;
-        if (!currentlyStateIsHtmlView) {
-            currentMD5 = getMD5(jTextPane.getText());
-        } else {
-            currentMD5 = getMD5(new String(doc.getContent()));
-        }
+        currentMD5 = getMD5(jTextPaneForEditing.getText());
         return !(currentMD5.equals(doc.getMd5()) && doc.getTitle().equals(textField.getText()));
     }
 
@@ -610,10 +621,8 @@ public class DocumentEditor extends JFrame {
     }
 
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
-        //1. Create the frame.
         JFrame frame = new JFrame("FrameDemo");
-//        UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-        //2. Optional: What happens when the frame closes?
+        UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Document doc = new Document();
         doc.setId(1L);
@@ -649,44 +658,6 @@ public class DocumentEditor extends JFrame {
         return extension;
     }
 
-    private class DocumentEditMousListener extends MouseAdapter {
-        public void mouseClicked(MouseEvent e) {
-            if (e.getClickCount() == 2) {
-                if (editable) {
-                    currentlyStateIsHtmlView = true;
-                    editable = false;
-                    lastCaretPosition = jTextPane.getCaretPosition();
-                    setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
-                    jTextPane.setEditable(editable);
-                    try {
-                        doc.setContent(jTextPane.getText().getBytes());
-                        String html = markdown4jProcessor.process(jTextPane.getText());
-                        jTextPane.setDocument(htmlDoc);
-                        jTextPane.setContentType("text/html");
-                        setHtmlDocFont();
-                        jTextPane.setText(html);
-                        jTextPane.getCaret().setVisible(false);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                } else {
-                    currentlyStateIsHtmlView = false;
-                    editable = true;
-                    everEdited = true;
-                    setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()) + "...editing");
-                    jTextPane.setEditable(true);
-                    jTextPane.setContentType("text/plain");
-                    jTextPane.setFont(new Font("Arial", Font.TRUETYPE_FONT, 13));
-                    jTextPane.setDocument(plainDoc);
-                    jTextPane.setCaretPosition(lastCaretPosition);
-                    jTextPane.getCaret().setVisible(true);
-
-                }
-            }
-        }
-    }
-
-
     class UndoAction extends AbstractAction {
         public UndoAction() {
             super("Undo");
@@ -694,8 +665,6 @@ public class DocumentEditor extends JFrame {
         }
 
         public void actionPerformed(ActionEvent e) {
-            if(currentlyStateIsHtmlView)
-                return;
             try {
                 undo.undo();
             } catch (CannotUndoException ex) {
@@ -724,8 +693,6 @@ public class DocumentEditor extends JFrame {
         }
 
         public void actionPerformed(ActionEvent e) {
-            if(currentlyStateIsHtmlView)
-                return;
             try {
                 undo.redo();
             } catch (CannotRedoException ex) {
