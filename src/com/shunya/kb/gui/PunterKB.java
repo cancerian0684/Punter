@@ -131,7 +131,7 @@ public class PunterKB extends JPanel {
                             }
                             if (column == 1) {
                                 if (doc.getExt().isEmpty())
-                                    DocumentEditor.showEditor(doc, docService, null);
+                                    DocumentEditor.showEditor(doc, docService);
                                 else {
                                     if (Desktop.isDesktopSupported()) {
                                         System.out.println("Opening up the file.." + doc.getTitle());
@@ -365,7 +365,7 @@ public class PunterKB extends JPanel {
         andOrToggleButton.setFocusPainted(true);
         andOrToggleButton.setBorderPainted(true);
         andOrToggleButton.setContentAreaFilled(true);
-        andOrToggleButton.setPreferredSize(new Dimension(20, 31));
+        andOrToggleButton.setPreferredSize(new Dimension(22, 32));
         andOrToggleButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         andOrToggleButton.addActionListener(new ActionListener() {
             @Override
@@ -419,7 +419,7 @@ public class PunterKB extends JPanel {
                 } catch (RemoteException e1) {
                     e1.printStackTrace();
                 }
-                DocumentEditor.showEditor(doc, docService, Main.KBFrame);
+                DocumentEditor.showEditor(doc, docService);
             }
         });
         popupProcess.add(addProcessMenu);
@@ -432,7 +432,7 @@ public class PunterKB extends JPanel {
                     try {
                         doc = docService.getDocument(doc);
                         if (doc.getExt().isEmpty())
-                            DocumentEditor.showEditor(doc, docService, Main.KBFrame);
+                            DocumentEditor.showEditor(doc, docService);
                         else {
                             if (Desktop.isDesktopSupported()) {
                                 System.out.println("Opening up the file.." + doc.getExt());
