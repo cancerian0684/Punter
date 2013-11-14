@@ -11,8 +11,6 @@ public interface ServerSettingsMBean {
 
 	public int getMaxResultsToDisplay();
 
-	public void optimizeIndex();
-
 	public abstract void setMaxProcessHistory(int maxProcessHistory);
 
 	public abstract int getMaxProcessHistory();

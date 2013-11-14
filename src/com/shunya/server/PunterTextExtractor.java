@@ -1,18 +1,23 @@
 package com.shunya.server;
 
 import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.parser.PdfTextExtractor;
+import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
+import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
+import com.itextpdf.text.pdf.parser.TextExtractionStrategy;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.TextExtractor;
+import org.apache.poi.POIOLE2TextExtractor;
 import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
 import org.apache.poi.hsmf.MAPIMessage;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.markdown4j.Markdown4jProcessor;
 
 import javax.swing.text.Document;
 import javax.swing.text.rtf.RTFEditorKit;
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
+import java.util.*;
 
 public class PunterTextExtractor {
 
@@ -40,14 +45,23 @@ public class PunterTextExtractor {
                 text.append(te.toString());
             } else if (ext.equalsIgnoreCase(".pdf")) {
                 PdfReader reader = new PdfReader(bais);
-                int pages = reader.getNumberOfPages() > 20 ? 20 : reader.getNumberOfPages();
-                for (int i = 0; i < pages; i++) {
-                    text.append(PdfTextExtractor.getTextFromPage(reader, i + 1));
+                PdfReaderContentParser parser = new PdfReaderContentParser(reader);
+                TextExtractionStrategy strategy;
+                for (int i = 1; i <= reader.getNumberOfPages(); i++) {
+                    strategy = parser.processContent(i, new SimpleTextExtractionStrategy());
+                    text.append(strategy.getResultantText());
                 }
+                reader.close();
             }
             //APache POI
             else if (ext.equalsIgnoreCase(".doc") || ext.equalsIgnoreCase(".docx") || ext.equalsIgnoreCase(".xls") || ext.equalsIgnoreCase(".xlsx") || ext.equalsIgnoreCase(".ppt") || ext.equalsIgnoreCase(".pptx")) {
-                POITextExtractor oleTextExtractor = ExtractorFactory.createExtractor(bais);
+                POIFSFileSystem fileSystem = new POIFSFileSystem(bais);
+                // Firstly, get an extractor for the Workbook
+                POIOLE2TextExtractor oleTextExtractor = ExtractorFactory.createExtractor(fileSystem);
+                // Then a List of extractors for any embedded Excel, Word, PowerPoint
+                // or Visio objects embedded into it.
+                POITextExtractor[] embeddedExtractors = ExtractorFactory.getEmbededDocsTextExtractors(oleTextExtractor);
+
                 String ta = oleTextExtractor.getText();
                 text.append(ta.substring(0, ta.length() > 20000 ? 20000 : ta.length()));
             } else if (ext.equalsIgnoreCase(".msg")) {
@@ -55,10 +69,108 @@ public class PunterTextExtractor {
                 text.append(msg.getSubject() + " ");
                 text.append(msg.getTextBody() + " ");
             }
-            System.err.println("Indexed Document : " + ext);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return text.toString();
+    }
+
+    public static String getPunterParsedText2(String inText) {
+        StringTokenizer stk = new StringTokenizer(inText, " ,");
+        Set<String> words = new HashSet<String>(1000);
+        while (stk.hasMoreTokens()) {
+            String token = stk.nextToken();
+            words.add(token);
+            words.addAll(getPunterParsedSubText(token));
+        }
+        StringBuilder sb = new StringBuilder(10000);
+        for (String word : words) {
+            sb.append(word + " ");
+        }
+        return sb.toString();
+    }
+
+    public static List<String> getPunterParsedSubText(String inText) {
+        StringBuilder sb = new StringBuilder();
+        List<String> wordsList = new ArrayList<String>(5);
+        char curr;
+        char prev = '\0';
+        for (int i = 0; i < inText.length(); i++) {
+            curr = inText.charAt(i);
+            if (!Character.isLetter(curr) && Character.isLetter(prev)) {
+//				System.err.println("boundary .. "+curr);
+//				sb.append(' ');
+                if (sb.length() > 0)
+                    wordsList.add(sb.toString());
+                sb.setLength(0);
+                if (Character.isLetterOrDigit(curr))
+                    sb.append(curr);
+            } else if (!Character.isLowerCase(curr) && Character.isLowerCase(prev)) {
+//              System.err.println("boundary .. "+curr);
+                if (sb.length() > 0)
+                    wordsList.add(sb.toString());
+                sb.setLength(0);
+                if (Character.isLetterOrDigit(curr))
+                    sb.append(curr);
+            } else if (Character.isLetter(curr) && !Character.isLetter(prev)) {
+//				System.err.println("boundary .. "+curr);
+//				sb.append(' ');
+                if (sb.length() > 0)
+                    wordsList.add(sb.toString());
+                sb.setLength(0);
+                if (Character.isLetterOrDigit(curr))
+                    sb.append(curr);
+            } else {
+                if (Character.isLetterOrDigit(curr)) {
+                    sb.append(curr);
+                } else {
+//					sb.append(' ');
+                    if (sb.length() > 0)
+                        wordsList.add(sb.toString());
+                    sb.setLength(0);
+                }
+            }
+            prev = curr;
+        }
+        if (sb.length() > 0)
+            wordsList.add(sb.toString());
+        return wordsList;
+    }
+
+    public static String getPunterParsedText(String inText) {
+        StringBuilder sb = new StringBuilder();
+        char curr;
+        char prev = '\0';
+        for (int i = 0; i < inText.length(); i++) {
+            curr = inText.charAt(i);
+            if (!Character.isLetter(curr) && Character.isLetter(prev)) {
+//				System.err.println("boundary .. "+curr);
+                sb.append(' ');
+                if (Character.isLetterOrDigit(curr))
+                    sb.append(curr);
+            } else if (!Character.isLowerCase(curr) && Character.isLowerCase(prev)) {
+//              System.err.println("boundary .. "+curr);
+                sb.append(' ');
+                if (Character.isLetterOrDigit(curr))
+                    sb.append(curr);
+            } else if (Character.isLetter(curr) && !Character.isLetter(prev)) {
+//				System.err.println("boundary .. "+curr);
+                sb.append(' ');
+                if (Character.isLetterOrDigit(curr))
+                    sb.append(curr);
+            } else {
+                if (Character.isLetterOrDigit(curr))
+                    sb.append(curr);
+                else
+                    sb.append(' ');
+
+            }
+            prev = curr;
+        }
+        return sb.toString();
+    }
+
+    public static String itrim(String source) {
+        return source.replaceAll("\\b\\s{2,}\\b", " ");
     }
 }

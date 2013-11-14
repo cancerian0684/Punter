@@ -176,7 +176,12 @@ public class StaticDaoFacade {
     }
 
     public List<Document> getDocList(SearchQuery searchQuery) throws RemoteException {
-        return stub.getDocList(searchQuery);
+        try {
+            return stub.getDocList(searchQuery);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RemoteException(e.getMessage());
+        }
     }
 
     public Document saveDocument(Document doc) throws RemoteException {

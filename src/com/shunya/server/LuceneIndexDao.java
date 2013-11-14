@@ -4,65 +4,37 @@ import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
 import com.shunya.punter.utils.Stopwatch;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CachingTokenFilter;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.snowball.SnowballAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.TermEnum;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.*;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
-import org.apache.lucene.search.highlight.Highlighter;
-import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
-import org.apache.lucene.search.highlight.QueryScorer;
-import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
+import org.apache.lucene.search.highlight.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
+import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Version;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class LuceneIndexDao {
     static final File INDEX_DIR = new File("LuceneIndex");
-    private Directory FSDirectory;
-    private IndexWriter FSWriter;
-    private IndexSearcher isearcher;
-    private IndexReader ireader;
-    private final Lock writerWriteLock = new ReentrantLock();
-    private ReentrantReadWriteLock readerReadWriteLock = new ReentrantReadWriteLock();
-    private Analyzer analyzer = new SnowballAnalyzer(Version.LUCENE_30, "English", PunterAnalyzer.stopWords);
+    private Directory directory;
+    private IndexWriter indexWriter;
+    private Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_45);
     private static LuceneIndexDao luceneIndexDao;
     private final QueryParser parser1;
     private final QueryParser parser2;
 
-    public void refreshIsearcher() {
-        try {
-            IndexReader tempReader = IndexReader.open(FSDirectory, true);
-            IndexSearcher tempSearcher = new IndexSearcher(tempReader);
-            IndexSearcher temp1 = isearcher;
-            IndexReader temp2 = ireader;
-            readerReadWriteLock.writeLock().lock();
-            ireader = tempReader;
-            isearcher = tempSearcher;
-            readerReadWriteLock.writeLock().unlock();
-            temp1.close();
-            temp2.close();
-            System.out.println("Total Docs in the index :" + isearcher.maxDoc());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    private SearcherManager searcherManager;
 
     public static LuceneIndexDao getInstance() {
         if (luceneIndexDao == null) {
@@ -73,18 +45,18 @@ public class LuceneIndexDao {
 
     public static org.apache.lucene.document.Document createLuceneDocument(Document pDoc) {
         org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
-        doc.add(new Field("id", "" + pDoc.getId(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("title", getPunterParsedText2(pDoc.getTitle()), Field.Store.NO, Field.Index.ANALYZED));
-        doc.add(new Field("titleS", pDoc.getTitle(), Field.Store.YES, Field.Index.NO));
-        doc.add(new Field("author", pDoc.getAuthor() != null ? pDoc.getAuthor() : "", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("category", pDoc.getCategory(), Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field("created", DateTools.timeToString(pDoc.getDateCreated().getTime(), DateTools.Resolution.MINUTE), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("updated", DateTools.timeToString(pDoc.getDateUpdated().getTime(), DateTools.Resolution.MINUTE), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new StringField("id", "" + pDoc.getId(), Field.Store.YES));
+        doc.add(new TextField("title", getPunterParsedText2(pDoc.getTitle()), Field.Store.NO));
+        doc.add(new StringField("titleS", pDoc.getTitle(), Field.Store.YES));
+        doc.add(new StringField("author", pDoc.getAuthor() != null ? pDoc.getAuthor() : "", Field.Store.YES));
+        doc.add(new TextField("category", pDoc.getCategory(), Field.Store.YES));
+        doc.add(new StringField("created", DateTools.timeToString(pDoc.getDateCreated().getTime(), DateTools.Resolution.MINUTE), Field.Store.YES));
+        doc.add(new StringField("updated", DateTools.timeToString(pDoc.getDateUpdated().getTime(), DateTools.Resolution.MINUTE), Field.Store.YES));
         try {
             String contents = PunterTextExtractor.getText(pDoc.getContent(), "", pDoc.getExt());
-            doc.add(new Field("contents", itrim(getPunterParsedText2(contents)), Field.Store.NO, Field.Index.ANALYZED));
+            doc.add(new TextField("contents", itrim(getPunterParsedText2(contents)), Field.Store.NO));
             int len = contents.length();
-            doc.add(new Field("content", contents.substring(0, len > 20000 ? 20000 : len), Field.Store.YES, Field.Index.NO));
+            doc.add(new TextField("content", contents.substring(0, len > 20000 ? 20000 : len), Field.Store.YES));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -95,14 +67,14 @@ public class LuceneIndexDao {
                 attchs.append(PunterTextExtractor.getText(attachment.getContent(), attachment.getTitle(), attachment.getExt()));
             }
 //		System.out.println(attchs.toString());
-        doc.add(new Field("attachment", itrim(getPunterParsedText2(attchs.toString())), Field.Store.NO, Field.Index.ANALYZED));
+        doc.add(new TextField("attachment", itrim(getPunterParsedText2(attchs.toString())), Field.Store.YES));
         if (pDoc.getTag() != null) {
             StringTokenizer stk = new StringTokenizer(pDoc.getTag(), " ;,");
             StringBuilder tags = new StringBuilder();
             while (stk.hasMoreTokens()) {
                 tags.append(stk.nextToken() + " ");
             }
-            doc.add(new Field("tags", itrim(getPunterParsedText(tags.toString())), Field.Store.NO, Field.Index.ANALYZED));
+            doc.add(new TextField("tags", itrim(getPunterParsedText(tags.toString())), Field.Store.NO));
         }
         return doc;
     }
@@ -203,87 +175,65 @@ public class LuceneIndexDao {
     }
 
     public void deleteIndex() {
-        writerWriteLock.lock();
         try {
-            System.err.println("Num of Docs after index deletion :" + FSWriter.numDocs());
-            FSWriter.deleteAll();
-            FSWriter.expungeDeletes();
-            FSWriter.commit();
-            System.err.println("Num of Docs after index deletion :" + FSWriter.numDocs());
+            System.err.println("Num of Docs after index deletion :" + indexWriter.numDocs());
+            indexWriter.deleteAll();
+            indexWriter.deleteUnusedFiles();
+            indexWriter.commit();
+            System.err.println("Num of Docs after index deletion :" + indexWriter.numDocs());
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            writerWriteLock.unlock();
         }
     }
 
     public void indexDocs(Document doc) {
-        writerWriteLock.lock();
-        QueryParser parser = new QueryParser(Version.LUCENE_30, "id", analyzer);
         try {
-            Query query = parser.parse(QueryParser.escape("" + doc.getId()));
-            FSWriter.deleteDocuments(query);
-            FSWriter.expungeDeletes();
-            FSWriter.addDocument(createLuceneDocument(doc));
-            FSWriter.commit();
+            indexWriter.updateDocument(new Term("id", "" + doc.getId()), createLuceneDocument(doc));
+            indexWriter.commit();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            writerWriteLock.unlock();
         }
     }
 
     public void deleteIndexForDoc(Document doc) {
-        writerWriteLock.lock();
-        QueryParser parser = new QueryParser(Version.LUCENE_30, "id", new SnowballAnalyzer(Version.LUCENE_30, "English"));
         try {
-            Query query = parser.parse(QueryParser.escape("" + doc.getId()));
-            FSWriter.deleteDocuments(query);
-            FSWriter.expungeDeletes();
-            FSWriter.commit();
+            indexWriter.deleteDocuments(new Term("id", QueryParser.escape("" + doc.getId())));
+            indexWriter.deleteUnusedFiles();
+            indexWriter.commit();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            writerWriteLock.unlock();
         }
     }
 
     private LuceneIndexDao() {
         try {
-            FSDirectory = NIOFSDirectory.open(INDEX_DIR);
-            FSDirectory.clearLock("write.lock");
-            boolean alreadyExists = IndexReader.indexExists(FSDirectory);
-            if (!alreadyExists) {
-                System.out.println("Index directory does not exists. Creating one.");
-            }
-            FSWriter = new IndexWriter(FSDirectory, analyzer, !alreadyExists,
-                    IndexWriter.MaxFieldLength.UNLIMITED);
-            FSWriter.setRAMBufferSizeMB(20);
-            FSWriter.maybeMerge();
-            FSWriter.optimize();
-            ireader = IndexReader.open(FSDirectory, true);
-            isearcher = new IndexSearcher(ireader);
-
+            directory = NIOFSDirectory.open(INDEX_DIR);
+            directory.clearLock("write.lock");
+            Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_45);
+            IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_45, analyzer);
+            iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+            iwc.setIndexDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
+            iwc.setMergePolicy(new TieredMergePolicy());
+            iwc.setRAMBufferSizeMB(64.0);
+            indexWriter = new IndexWriter(directory, iwc);
             Runtime rt = Runtime.getRuntime();
             rt.addShutdownHook(new Thread() {
                 public void run() {
                     try {
                         System.out.println("Lucene shutdown initiated.");
-                        readerReadWriteLock.writeLock().lock();
-                        writerWriteLock.lock();
-                        ireader.close();
-                        FSWriter.optimize();
-                        FSWriter.close();
-                        FSDirectory.close();
+                        indexWriter.commit();
+                        indexWriter.forceMerge(1);
+                        indexWriter.forceMergeDeletes(true);
+                        indexWriter.deleteUnusedFiles();
+                        indexWriter.close(true);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     } finally {
-                        readerReadWriteLock.writeLock().unlock();
-                        writerWriteLock.unlock();
                         System.out.println("Lucene shutdown completed.");
                     }
                 }
             });
+            searcherManager = new SearcherManager(indexWriter, true, null);
         } catch (IOException e) {
             System.out.println(" caught a " + e.getClass() +
                     "\n with message: " + e.getMessage());
@@ -293,47 +243,26 @@ public class LuceneIndexDao {
         boostMap.put("contents", 3.0f);
         boostMap.put("id", 1.0f);
         boostMap.put("attachment", 2.0f);
-        boostMap.put("tags", 5.0f);
-        parser1 = new MultiFieldQueryParser(Version.LUCENE_30, new String[]{"title", "contents", "id", "attachment", "tags"}, analyzer, boostMap);
-        parser2 = new QueryParser(Version.LUCENE_30, "category", analyzer);
+        boostMap.put("tags", 4.2f);
+        parser1 = new MultiFieldQueryParser(Version.LUCENE_45, new String[]{"title", "contents", "id", "attachment", "tags"}, analyzer, boostMap);
+        parser1.setAllowLeadingWildcard(true);
+        parser1.setAnalyzeRangeTerms(true);
+        parser1.setDefaultOperator(QueryParser.Operator.OR);
+
+        parser2 = new QueryParser(Version.LUCENE_45, "category", analyzer);
+        parser2.setDefaultOperator(QueryParser.Operator.AND);
     }
 
-    public void optimizeIndex() {
-        readerReadWriteLock.writeLock().lock();
-        writerWriteLock.lock();
-        try {
-            isearcher.close();
-            ireader.close();
-            FSWriter.expungeDeletes();
-            FSWriter.commit();
-            FSWriter.maybeMerge();
-            FSWriter.optimize();
-            FSWriter.close();
-            ireader = IndexReader.open(FSDirectory, true);
-            isearcher = new IndexSearcher(ireader);
-            FSWriter = new IndexWriter(FSDirectory, analyzer,
-                    false, IndexWriter.MaxFieldLength.UNLIMITED);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        readerReadWriteLock.writeLock().unlock();
-        writerWriteLock.unlock();
-    }
-
-    public List<Document> search(String searchString, String category, boolean isAND, int start, int batch) {
+    public List<Document> search(String searchString, String category, boolean isAND, int start, int batch) throws IOException {
         Stopwatch sw = new Stopwatch();
         sw.start();
+        searcherManager.maybeRefresh();
+        IndexSearcher searcher = searcherManager.acquire();
         try {
-            if (!ireader.isCurrent()) {
-                System.out.println("Refreshing IndexSearcher version to :" + ireader.getCurrentVersion(FSDirectory));
-                refreshIsearcher();
-            }
             sw.reset();
-
             searchString = searchString.trim().toLowerCase();
             if (searchString.equals("**"))
                 searchString = "*";
-            readerReadWriteLock.readLock().lock();
             if (searchString.isEmpty()) {
                 return Collections.EMPTY_LIST;
             }
@@ -343,7 +272,7 @@ public class LuceneIndexDao {
             else
                 parser1.setDefaultOperator(QueryParser.OR_OPERATOR);
             Query query1 = parser1.parse(searchString + " " + itrim(getPunterParsedText(searchString)));
-            Query query2 = parser2.parse(category);
+            Query query2 = parser2.parse(QueryParser.escape(category));
 //			MultiPhraseQuery leaningTower = new MultiPhraseQuery();
 //			leaningTower.add(new Term("content", "tower"));
 //			leaningTower.add(new Term("content", "tower"));
@@ -352,16 +281,18 @@ public class LuceneIndexDao {
             query.add(query2, BooleanClause.Occur.MUST);
             BooleanQuery.setMaxClauseCount(100000);
             Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<span style='color:red;'>", "</span>"), new QueryScorer(query1));
+            highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
+            highlighter.setTextFragmenter(new SimpleFragmenter(200));
             TopDocs hits = null;
 //			CachingWrapperFilter cwf=new CachingWrapperFilter();
-            hits = isearcher.search(query, start + batch);
+            hits = searcher.search(query, start + batch);
             int numTotalHits = hits.totalHits;
             System.out.println(query);
-            List<Document> resultDocs = new ArrayList<Document>(50);
+            List<Document> resultDocs = new ArrayList<>(50);
             for (int i = start; i < numTotalHits && i < (start + batch); i++) {
 //				Explanation exp = isearcher.explain(query, i);
 //				System.err.println(exp.getDescription());
-                org.apache.lucene.document.Document doc = isearcher.doc(hits.scoreDocs[i].doc);                    //get the next document
+                org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);                    //get the next document
                 Document document = new Document();
                 try {
                     document.setDateCreated(DateTools.stringToDate(doc.get("created")));
@@ -376,13 +307,7 @@ public class LuceneIndexDao {
                 String contents = doc.get("content");
                 int maxNumFragmentsRequired = 2;
                 String fragmentSeparator = "...";
-                  /*Source source;
- 				 source = new Source(new StringReader(title));
- 				 TextExtractor te=new TextExtractor(source);
- 				 title = te.toString();*/
-                TokenStream tokenStream = analyzer.tokenStream("titleS", new StringReader(title));
-                CachingTokenFilter filter = new CachingTokenFilter(tokenStream);
-                String result = highlighter.getBestFragments(filter, title, maxNumFragmentsRequired, fragmentSeparator);
+                String result = highlighter.getBestFragments(analyzer.tokenStream("titleS", new StringReader(title)), title, maxNumFragmentsRequired, fragmentSeparator);
                 if (result.length() > 0) {
                     result = result.replaceAll("\n", "<Br>");
                     document.setTitle(result);
@@ -390,14 +315,12 @@ public class LuceneIndexDao {
                     document.setTitle(title);
                 }
                 document.setScore(hits.scoreDocs[i].score);
-				/*source = new Source(new StringReader(contents));
-				te=new TextExtractor(source);
- 				contents = te.toString();*/
-
                 if (!searchString.equals("*")) {
-                    tokenStream = analyzer.tokenStream("content", new StringReader(contents));
-                    filter = new CachingTokenFilter(tokenStream);
-                    result = highlighter.getBestFragments(filter, contents, maxNumFragmentsRequired, fragmentSeparator);
+                    result = highlighter.getBestFragments(analyzer.tokenStream("content", new StringReader(contents)), contents, maxNumFragmentsRequired, fragmentSeparator);
+                    if (result.length() <= 0) {
+                        String attachment = doc.get("attachment");
+                        result = "Attachment : "+ highlighter.getBestFragments(analyzer.tokenStream("attachment", new StringReader(attachment)), attachment, maxNumFragmentsRequired, fragmentSeparator);
+                    }
                     if (result.length() > 0) {
                         result = result.replace('\n', ' ');
                         result = itrim(result);
@@ -416,20 +339,30 @@ public class LuceneIndexDao {
         } catch (InvalidTokenOffsetsException | ParseException | IOException e1) {
             e1.printStackTrace();
         } finally {
-            readerReadWriteLock.readLock().unlock();
+            searcherManager.release(searcher);
         }
         return Collections.EMPTY_LIST;
     }
 
     public List<String> listAllTermsForTitle() throws IOException {
         System.err.println("Listing all the terms ");
-        Set<String> uniqueTerms = new HashSet<>(1000);
-        TermEnum terms = ireader.terms(new Term("title", "content"));
-        while (terms.next())
-            uniqueTerms.add(terms.term().text());
-        terms.close();
-        System.err.println("Listing all the terms done.."+uniqueTerms);
-        return new ArrayList<>(uniqueTerms);
+        final IndexSearcher indexSearcher = searcherManager.acquire();
+        try {
+            Set<String> uniqueTerms = new HashSet<>(1000);
+            Fields fields = MultiFields.getFields(indexSearcher.getIndexReader());
+            Terms terms = fields.terms("title");
+            TermsEnum iterator = terms.iterator(null);
+            BytesRef byteRef = null;
+            while ((byteRef = iterator.next()) != null) {
+                String term = new String(byteRef.bytes, byteRef.offset, byteRef.length);
+                System.out.println(term);
+                uniqueTerms.add(term);
+            }
+            System.err.println("Listing all the terms done.." + uniqueTerms);
+            return new ArrayList<>(uniqueTerms);
+        } finally {
+            searcherManager.release(indexSearcher);
+        }
     }
 
     public static String itrim(String source) {

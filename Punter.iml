@@ -107,100 +107,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="lucene-core-3.0.2.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/lucene-core-3.0.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MAVEN_REPOSITORY$/org/apache/lucene/lucene-core/3.0.2/lucene-core-3.0.2-sources.jar" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="lucene-highlighter-3.0.2.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/lucene-highlighter-3.0.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="lucene-memory-3.0.2.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/lucene-memory-3.0.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="lucene-snowball-3.0.2.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/lucene-snowball-3.0.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="poi-3.6-20091214.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/poi-3.6-20091214.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MAVEN_REPOSITORY$/org/apache/poi/poi/3.6/poi-3.6-sources.jar" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="poi-contrib-3.6-20091214.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/poi-contrib-3.6-20091214.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="poi-examples-3.6-20091214.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/poi-examples-3.6-20091214.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="poi-ooxml-3.6-20091214.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/poi-ooxml-3.6-20091214.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="poi-ooxml-schemas-3.6-20091214.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/poi-ooxml-schemas-3.6-20091214.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="poi-scratchpad-3.6-20091214.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/poi-scratchpad-3.6-20091214.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
       <library name="dom4j-1.6.1.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/dom4j-1.6.1.jar!/" />
@@ -287,15 +193,6 @@
       <library name="svnkit.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/svnkit.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="commons-codec-1.4.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/commons-codec-1.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -403,6 +300,66 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lucene-core-4.5.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lucene-highlighter-4.5.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lucene-queries-4.5.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lucene-queryparser-4.5.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.ideaLibSources/lucene-queryparser-4.5.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lucene-analyzers-common-4.5.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.ideaLibSources/lucene-analyzers-common-4.5.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/lucene-memory-4.5.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="commons-codec-1.5" level="project" />
+    <orderEntry type="library" name="poi-3.9-20121203" level="project" />
   </component>
 </module>
 

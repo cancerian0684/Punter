@@ -83,7 +83,7 @@ public class StaticDaoFacade {
         return resultHolder.getResult();
     }
 
-    public List<Document> getDocList(SearchQuery query) {
+    public List<Document> getDocList(SearchQuery query) throws IOException {
         long t1 = System.currentTimeMillis();
         List<Document> result = LuceneIndexDao.getInstance().search(query.getQuery(), query.getCategory(), query.isAndFilter(), 0, query.getMaxResults());
         long t2 = System.currentTimeMillis();

@@ -8,6 +8,7 @@ import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.Remote;
@@ -31,7 +32,7 @@ public interface PunterSearch extends Remote {
 
     Document createDocument(String author) throws RemoteException;
 
-    List<Document> getDocList(SearchQuery searchQuery) throws RemoteException;
+    List<Document> getDocList(SearchQuery searchQuery) throws IOException;
 
     Document saveDocument(Document doc) throws RemoteException;
 

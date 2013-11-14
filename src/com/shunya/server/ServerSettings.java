@@ -139,11 +139,6 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
     }
 
     @Override
-    public void optimizeIndex() {
-        LuceneIndexDao.getInstance().optimizeIndex();
-    }
-
-    @Override
     public int getMaxProcessHistory() {
         if (maxProcessHistory <= 5)
             maxProcessHistory = 5;

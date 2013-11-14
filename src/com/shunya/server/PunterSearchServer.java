@@ -36,7 +36,7 @@ public class PunterSearchServer implements PunterSearch {
     }
 
     @Override
-    public List<Document> getDocList(SearchQuery query) {
+    public List<Document> getDocList(SearchQuery query) throws IOException {
         return staticDaoFacade.getDocList(query);
     }
 

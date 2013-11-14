@@ -179,8 +179,8 @@ public class DocumentEditor extends JFrame {
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
-                } else if(1 == jtp.getSelectedIndex()){
-                    mayBeEdited =true;
+                } else if (1 == jtp.getSelectedIndex()) {
+                    mayBeEdited = true;
                     setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()) + "...editing");
                 }
             }
@@ -358,6 +358,24 @@ public class DocumentEditor extends JFrame {
                             copy(in, fo);
                             //  fo.write(out.getBytes());
                             fo.close();
+                            final String newTitle = JOptionPane.showInputDialog(DocumentEditor.this, "Document Title - ", "test doc");
+                            if (newTitle != null) {
+                                Attachment attchment = new Attachment();
+
+                                attchment.setTitle(newTitle);
+                                attchment.setContent(getBytesFromFile(f));
+                                attchment.setDateCreated(new Date());
+                                attchment.setDocument(doc);
+                                attchment.setExt(getExtension(f));
+                                attchment.setLength(f.length());
+                                attchment = docService.saveAttachment(attchment);
+
+                                AttachmentTableModel atm = ((AttachmentTableModel) attachmentTable.getModel());
+                                ArrayList<Object> newRow = new ArrayList<>();
+                                newRow.add(attchment);
+                                atm.insertRow(newRow);
+                            }
+                            f.delete();
 //                  fileListerWorker.getFileListQueue().add(f);
                             System.out.println(f.getAbsolutePath());
                   /*for (File f : l) {
@@ -419,7 +437,7 @@ public class DocumentEditor extends JFrame {
                     Attachment attch = (Attachment) atm.getRow(attachmentTable.convertRowIndexToModel(selectedRow)).get(0);
                     File temp = new File("Temp");
                     temp.mkdir();
-                    File nf = new File(temp, attch.getTitle());
+                    File nf = new File(temp, attch.getTitle()+attch.getExt());
                     if (!nf.exists()) {
                         try {
                             FileOutputStream fos = new FileOutputStream(nf);
