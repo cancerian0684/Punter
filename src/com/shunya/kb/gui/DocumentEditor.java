@@ -515,6 +515,7 @@ public class DocumentEditor extends JFrame {
                 DocumentEditor.this.docService = null;
                 DocumentEditor.this.currentMD5 = null;
                 DocumentEditor.this.jTextPane = null;
+                DocumentEditor.this.jTextPaneForEditing = null;
                 DocumentEditor.this.attachmentTable = null;
                 DocumentEditor.this.textField = null;
                 dispose();
