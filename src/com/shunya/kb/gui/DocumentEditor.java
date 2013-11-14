@@ -14,11 +14,16 @@ import org.markdown4j.Markdown4jProcessor;
 import javax.imageio.ImageIO;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.*;
+import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.rtf.RTFEditorKit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -35,10 +40,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-public class DocumentEditor extends JDialog {
+public class DocumentEditor extends JFrame {
+    private final DocumentEditor.MyUndoableEditListener undoableEditListener = new MyUndoableEditListener();
     protected JTextField textField;
     private JSplitPane jsp;
-    private JEditorPane ekitCore;
+    private JTextPane jTextPane;
+    private StyledDocument htmlDoc = new HTMLDocument();
+    private StyledDocument plainDoc = new DefaultStyledDocument();
     private Document doc;
     private StaticDaoFacade docService;
     private JTable attachmentTable;
@@ -47,6 +55,11 @@ public class DocumentEditor extends JDialog {
     private boolean everEdited = false;
     private boolean currentlyStateIsHtmlView = true;
     private static BufferedImage idleImage;
+
+    //undo helpers
+    protected UndoAction undoAction;
+    protected RedoAction redoAction;
+    protected UndoManager undo = new UndoManager();
 
     static {
         try {
@@ -74,36 +87,53 @@ public class DocumentEditor extends JDialog {
     }
 
     public static void showEditor(Document doc, StaticDaoFacade docService, JFrame parent) {
-        DocumentEditor testEditor = new DocumentEditor(parent, doc, docService);
-        String html = null;
+        DocumentEditor editor = new DocumentEditor(doc, docService);
         try {
-            testEditor.ekitCore.setContentType("text/html");
-            html = testEditor.markdown4jProcessor.process(new String(doc.getContent()));
-            testEditor.ekitCore.setText(html);
+            editor.jTextPane.setText(editor.markdown4jProcessor.process(new String(doc.getContent())));
         } catch (IOException e) {
             e.printStackTrace();
-            testEditor.ekitCore.setText("unable to parse the markdown syntax");
+            editor.jTextPane.setText("unable to parse the markdown syntax");
         }
-        testEditor.textField.setText(doc.getTitle());
-        testEditor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
-        testEditor.pack();
-        testEditor.setVisible(true);
-        testEditor.ekitCore.requestFocus();
+        editor.textField.setText(doc.getTitle());
+        editor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
+        editor.pack();
+        editor.jTextPane.setCaretPosition(0);
+        editor.setVisible(true);
+        editor.jTextPane.requestFocus();
     }
 
-    public DocumentEditor(JFrame parent, final Document ldoc, StaticDaoFacade docServic) {
-        super(parent, false);
+    protected void addBindings() {
+        undoAction= new UndoAction();
+        redoAction = new RedoAction();
+
+        InputMap inputMap = jTextPane.getInputMap();
+
+        //Ctrl-z for undo
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK);
+        inputMap.put(key, undoAction);
+
+        //Ctrl-y for redo
+        key = KeyStroke.getKeyStroke(KeyEvent.VK_Y, Event.CTRL_MASK);
+        inputMap.put(key, redoAction);
+    }
+
+    public DocumentEditor(final Document ldoc, StaticDaoFacade docServic) {
+        super(ldoc.getTitle());
         setAlwaysOnTop(false);
         setIconImage(idleImage);
         setLayout(new GridBagLayout());
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.doc = ldoc;
         this.docService = docServic;
-        this.ekitCore = new JEditorPane();
-        this.ekitCore.setEditable(false);
-        this.ekitCore.setContentType("text/html");
+        jTextPane = new JTextPane();
+        jTextPane.setMargin(new Insets(5, 5, 5, 5));
+        jTextPane.setEditable(false);
+
         final HTMLEditorKit kit = new HTMLEditorKit();
-        this.ekitCore.setEditorKit(kit);
+        jTextPane.setEditorKit(kit);
+        jTextPane.setContentType(kit.getContentType());
+
+        setHtmlDocFont();
       /* try {
             File cssfile = new File("src/resources/punter.css");
 //            URL cssfileUrl = this.getClass().getResource("src/resources/punter.css");
@@ -113,12 +143,10 @@ public class DocumentEditor extends JDialog {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }*/
-//        this.ekitCore.setFont(new Font("Courier New", Font.TRUETYPE_FONT, 12));
-//        this.ekitCore.setFont(new Font("Times New Roman", Font.TRUETYPE_FONT, 12));
-        this.ekitCore.setFont(new Font("Arial", Font.TRUETYPE_FONT, 12));
-        this.ekitCore.addMouseListener(new DocumentEditMousListener());
-        KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK, false);
-        this.ekitCore.unregisterKeyboardAction(keystroke);
+
+        jTextPane.addMouseListener(new DocumentEditMousListener());
+        addBindings();
+        undo.setLimit(500);
         textField = new JTextField(20);
         GridBagConstraints c = new GridBagConstraints();
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -399,7 +427,7 @@ public class DocumentEditor extends JDialog {
 
             public void exportDone(JComponent c, Transferable t, int action) {
                 if (action == MOVE) {/*
-					JTable table = (JTable) c;
+                    JTable table = (JTable) c;
 					int[] selectedRows = table.getSelectedRows();
 					ArrayList<Object> selectedRowsData = new ArrayList<Object>();
 					for (int selectedRow : selectedRows) {
@@ -414,13 +442,10 @@ public class DocumentEditor extends JDialog {
                 }
             }
         });
-        jtp.addTab("Document", new JScrollPane(ekitCore));
+        jtp.addTab("Document", new JScrollPane(jTextPane));
         jtp.addTab("Attachments", new JScrollPane(attachmentTable));
         jtp.setPreferredSize(new Dimension(200, 100));
-        ekitCore.setPreferredSize(new Dimension(500, 600));
-//		jsp=new JSplitPane(JSplitPane.VERTICAL_SPLIT,ekitCore,jtp);
-//		jsp.setDividerSize(5);
-//		jsp.setDividerLocation(1.0);
+        jTextPane.setPreferredSize(new Dimension(500, 600));
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.weighty = 1.0;
@@ -460,7 +485,7 @@ public class DocumentEditor extends JDialog {
                 DocumentEditor.this.doc = null;
                 DocumentEditor.this.docService = null;
                 DocumentEditor.this.currentMD5 = null;
-                DocumentEditor.this.ekitCore = null;
+                DocumentEditor.this.jTextPane = null;
                 DocumentEditor.this.attachmentTable = null;
                 DocumentEditor.this.jsp = null;
                 DocumentEditor.this.textField = null;
@@ -485,15 +510,21 @@ public class DocumentEditor extends JDialog {
                 }
             }
         };
-        keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK, false);
+        KeyStroke keystroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK, false);
         textField.registerKeyboardAction(actionListener, keystroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
-    public void saveDocument() throws OptimisticLockException, Exception {
+    private void setHtmlDocFont() {Font font = new Font("Arial", Font.PLAIN, 15);
+        String bodyRule = "body { font-family: " + font.getFamily() + "; " +
+                "font-size: " + font.getSize() + "pt; }";
+        ((HTMLDocument)jTextPane.getDocument()).getStyleSheet().addRule(bodyRule);
+    }
+
+    public void saveDocument() throws Exception {
         System.out.println("saving document before exit..  " + textField.getText());
         doc.setTitle(textField.getText());
         if (!currentlyStateIsHtmlView) {
-            doc.setContent(ekitCore.getText().getBytes());
+            doc.setContent(jTextPane.getText().getBytes());
         }
         doc.setMd5(currentMD5);
         doc.setDateUpdated(new Date());
@@ -519,7 +550,11 @@ public class DocumentEditor extends JDialog {
     public boolean isDocumentModified() {
         if ((!everEdited) && doc.getTitle().equals(textField.getText()))
             return false;
-        currentMD5 = getMD5(ekitCore.getText());
+        if (!currentlyStateIsHtmlView) {
+            currentMD5 = getMD5(jTextPane.getText());
+        }else{
+            currentMD5 = getMD5(new String(doc.getContent()));
+        }
         return !(currentMD5.equals(doc.getMd5()) && doc.getTitle().equals(textField.getText()));
     }
 
@@ -560,58 +595,19 @@ public class DocumentEditor extends JDialog {
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         //1. Create the frame.
         JFrame frame = new JFrame("FrameDemo");
-        UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+//        UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
         //2. Optional: What happens when the frame closes?
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Document doc = new Document();
         doc.setId(1L);
-        try {
+        doc.setContent("###this is just a dummy content".getBytes());
+        doc.setTitle("test title");
+        /*try {
             doc = StaticDaoFacade.getInstance().getDocument(doc);
         } catch (RemoteException e) {
             e.printStackTrace();
-        }
-        DocumentEditor.showEditor(doc, StaticDaoFacade.getInstance(), frame);
-	/*net.sf.memoranda.ui.htmleditor.HTMLEditor editor=new HTMLEditor();
-	editor.editor.setAntiAlias(true);
-//	editor.initEditor();
-	editor.editToolbar.setFloatable(true);
-	// editor.editor.enableInputMethods(false);
-	// editor.editor.getInputContext().selectInputMethod(Locale.getDefault());
-	titleField.addKeyListener(new KeyListener() {
-
-		public void keyPressed(KeyEvent ke) {
-			if (ke.getKeyCode() == KeyEvent.VK_ENTER)
-				editor.editor.requestFocus();
-		}
-
-		public void keyReleased(KeyEvent arg0) {
-		}
-
-		public void keyTyped(KeyEvent arg0) {
-		}
-	});
-	//HTMLFileExport
-//	editor.editor.setEditable(false);
-	editor.editToolbar.setVisible(true);
-	frame.getContentPane().add(editor, BorderLayout.CENTER);
-//	com.hexidec.ekit.EkitCore ec=new EkitCore();
-//	frame.getContentPane().add(ec, BorderLayout.CENTER);
-	//4. Size the frame.
-	frame.setPreferredSize(new Dimension(500, 500));
-	frame.pack();
-
-	//5. Show it.
-	frame.setVisible(true);
-	while(true)
-	try {
-		TimeUnit.SECONDS.sleep(5);
-		System.err.println(editor.document.getText(0, editor.document.getLength()));
-		System.err.println(editor.getContent());
-	} catch (BadLocationException e) {
-		e.printStackTrace();
-	} catch (InterruptedException e) {
-		e.printStackTrace();
-	}*/
+        }*/
+        DocumentEditor.showEditor(doc, null, frame);
 
     }
 
@@ -640,15 +636,17 @@ public class DocumentEditor extends JDialog {
         public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() == 2) {
                 if (editable) {
-                    currentlyStateIsHtmlView=true;
+                    currentlyStateIsHtmlView = true;
                     editable = false;
                     setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
-                    ekitCore.setEditable(editable);
+                    jTextPane.setEditable(editable);
                     try {
-                        doc.setContent(ekitCore.getText().getBytes());
-                        String html = markdown4jProcessor.process(ekitCore.getText());
-                        ekitCore.setContentType("text/html");
-                        ekitCore.setText(html);
+                        doc.setContent(jTextPane.getText().getBytes());
+                        String html = markdown4jProcessor.process(jTextPane.getText());
+                        jTextPane.setContentType("text/html");
+                        setHtmlDocFont();
+                        jTextPane.setText(html);
+                        jTextPane.getCaret().setVisible(false);
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
@@ -657,12 +655,89 @@ public class DocumentEditor extends JDialog {
                     editable = true;
                     everEdited = true;
                     setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()) + "...editing");
-                    ekitCore.setContentType("text/plain");
-                    ekitCore.setEditable(editable);
-                    ekitCore.setText(new String(doc.getContent()));
-                    ekitCore.getCaret().setVisible(true);
+                    jTextPane.setContentType("text/plain");
+                    setTextPlainDocFont();
+                    jTextPane.setEditable(editable);
+                    jTextPane.setText(new String(doc.getContent()));
+                    jTextPane.getCaret().setVisible(true);
+                    jTextPane.getDocument().addUndoableEditListener(undoableEditListener);
                 }
             }
+        }
+    }
+
+    private void setTextPlainDocFont() {StyleContext sc = StyleContext.getDefaultStyleContext();
+
+        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.FontFamily, "Arial");
+        aset = sc.addAttribute(aset, StyleConstants.FontSize, 14);
+        aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+        jTextPane.setCharacterAttributes(aset, true);
+    }
+
+    class UndoAction extends AbstractAction {
+        public UndoAction() {
+            super("Undo");
+            setEnabled(false);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+                System.out.println("undo called");
+                undo.undo();
+            } catch (CannotUndoException ex) {
+                System.out.println("Unable to undo: " + ex);
+                ex.printStackTrace();
+            }
+            updateUndoState();
+            redoAction.updateRedoState();
+        }
+
+        protected void updateUndoState() {
+            if (undo.canUndo()) {
+                setEnabled(true);
+                putValue(Action.NAME, undo.getUndoPresentationName());
+            } else {
+                setEnabled(false);
+                putValue(Action.NAME, "Undo");
+            }
+        }
+    }
+
+    class RedoAction extends AbstractAction {
+        public RedoAction() {
+            super("Redo");
+            setEnabled(false);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+                undo.redo();
+            } catch (CannotRedoException ex) {
+                System.out.println("Unable to redo: " + ex);
+                ex.printStackTrace();
+            }
+            updateRedoState();
+            undoAction.updateUndoState();
+        }
+
+        protected void updateRedoState() {
+            if (undo.canRedo()) {
+                setEnabled(true);
+                putValue(Action.NAME, undo.getRedoPresentationName());
+            } else {
+                setEnabled(false);
+                putValue(Action.NAME, "Redo");
+            }
+        }
+    }
+
+    //This one listens for edits that can be undone.
+    protected class MyUndoableEditListener implements UndoableEditListener {
+        public void undoableEditHappened(UndoableEditEvent e) {
+            //Remember the edit and update the menus.
+            undo.addEdit(e.getEdit());
+            undoAction.updateUndoState();
+            redoAction.updateRedoState();
         }
     }
 }
