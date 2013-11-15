@@ -41,6 +41,7 @@ public class PunterKB extends JPanel {
     private static StaticDaoFacade docService = StaticDaoFacade.getInstance();
 
     private DataFlavor Linux = new DataFlavor("text/uri-list;class=java.io.Reader");
+    private DataFlavor plainText = new DataFlavor("text/plain; class=java.lang.String; charset=Unicode");
     private DataFlavor Windows = DataFlavor.javaFileListFlavor;
     private DataFlavor rtfDataFlavor = new DataFlavor("text/rtf; class=java.io.InputStream");
     private DataFlavor htmlDataFlavor = new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16");
@@ -406,7 +407,7 @@ public class PunterKB extends JPanel {
         c.gridy = 1;
         add(new JScrollPane(searchResultTable), c);
 
-        final JMenuItem addProcessMenu, openDocMenu,renameMenu, deleteDocMenu, docTagsMenu, reindexDocsMenu, copyURL, pasteMenu;
+        final JMenuItem addProcessMenu, openDocMenu, renameMenu, deleteDocMenu, docTagsMenu, reindexDocsMenu, copyURL, pasteMenu;
         final JPopupMenu popupProcess = new JPopupMenu();
         addProcessMenu = new JMenuItem("Add");
         addProcessMenu.addActionListener(new ActionListener() {
@@ -611,18 +612,18 @@ public class PunterKB extends JPanel {
                             if (path.toFile().getName().startsWith("~") || path.toFile().getName().endsWith(".tmp"))
                                 return;
                             if (path.toFile().getName().startsWith("D_")) {
-                            Document doc = new Document();
-                            try {
-                                System.err.println("Picked file :" + path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
-                                int id = Integer.parseInt(path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
-                                doc.setId(id);
-                                doc = docService.getDocument(doc);
-                                doc.setContent(getBytesFromFile(path.toFile()));
-                                docService.saveDocument(doc);
-                            } catch (Exception e2) {
-                                e2.printStackTrace();
-                            }
-                            }else if (path.toFile().getName().startsWith("A_")) {
+                                Document doc = new Document();
+                                try {
+                                    System.err.println("Picked file :" + path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
+                                    int id = Integer.parseInt(path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
+                                    doc.setId(id);
+                                    doc = docService.getDocument(doc);
+                                    doc.setContent(getBytesFromFile(path.toFile()));
+                                    docService.saveDocument(doc);
+                                } catch (Exception e2) {
+                                    e2.printStackTrace();
+                                }
+                            } else if (path.toFile().getName().startsWith("A_")) {
                                 Attachment attachment = new Attachment();
                                 try {
                                     System.err.println("Picked Attachment for saving :" + path.toFile().getName());
@@ -635,7 +636,7 @@ public class PunterKB extends JPanel {
                                 } catch (Exception e2) {
                                     e2.printStackTrace();
                                 }
-                            }else {
+                            } else {
                                 System.out.println("ignoring file : " + path.toFile().getAbsoluteFile());
                             }
                         }
@@ -752,6 +753,23 @@ public class PunterKB extends JPanel {
                     System.out.println("IOException");
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
+                }
+            } else if (transferable.isDataFlavorSupported(plainText)) {
+                System.out.println(System.getProperty("os.name"));
+                String data = (String) transferable.getTransferData(plainText);
+
+                Document doc = new Document();
+                doc.setAuthor(AppSettings.getInstance().getUsername());
+                final String newTitle = JOptionPane.showInputDialog(Main.KBFrame, "Title ", "test text file");
+                if (newTitle != null) {
+                    doc.setTitle(newTitle);
+                    doc.setContent(data.getBytes());
+                    doc.setExt(".txt");
+                    doc.setDateCreated(new Date());
+                    doc.setDateUpdated(new Date());
+                    doc.setCategory(getSelectedCategory());
+                    doc = docService.saveDocument(doc);
+                    System.err.println("Document added : " + newTitle);
                 }
             } else if (transferable.isDataFlavorSupported(Linux)) {
 //                        String data = (String) transferable.getTransferData(Linux);
