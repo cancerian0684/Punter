@@ -33,7 +33,7 @@ public class HttpGetTask extends Tasks {
             urlConnection.setReadTimeout(READ_TIMEOUT); 
             int responseCode = urlConnection.getResponseCode();
             httpResponse = IOUtils.toString(urlConnection.getInputStream());
-            LOGGER.get().log(Level.INFO, httpResponse);
+//            LOGGER.get().log(Level.INFO, httpResponse);
             if (expectedResponseCode == responseCode)
                 status = true;
             else

@@ -8,6 +8,7 @@
     <class>com.shunya.punter.jpa.ProcessHistory</class>
     <class>com.shunya.punter.jpa.TaskHistory</class>
     <class>com.shunya.kb.jpa.Document</class>
+    <class>com.shunya.kb.jpa.Category</class>
     <class>com.shunya.kb.jpa.Attachment</class>
     <properties>
 			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />

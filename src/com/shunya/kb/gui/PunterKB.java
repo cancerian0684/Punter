@@ -65,11 +65,11 @@ public class PunterKB extends JPanel {
     private DelayedQueueHandlerThread<SearchQuery> punterDelayedQueueHandlerThread;
 
     public PunterKB(StaticDaoFacade staticDaoFacade) throws ClassNotFoundException, RemoteException {
-        docService= staticDaoFacade;
+        docService = staticDaoFacade;
         docService.getDocList(new SearchQuery.SearchQueryBuilder().query("").build());
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        categories=  docService.getCategories();
+        categories = docService.getCategories();
         searchTextField = new JTextField(20);
         searchTextField.setFont(new Font("Arial", Font.TRUETYPE_FONT, 12));
         searchTextField.setPreferredSize(new Dimension(searchTextField.getWidth(), 30));
@@ -269,7 +269,7 @@ public class PunterKB extends JPanel {
                 final DataFlavor flavors[] = {Windows, Linux};
                 JTable table = (JTable) c;
                 int[] selectedRows = table.getSelectedRows();
-                final List<File> files = new java.util.ArrayList<File>();
+                final List<File> files = new java.util.ArrayList<>();
                 for (int selectedRow : selectedRows) {
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
                     Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(selectedRow)).get(0);
@@ -287,6 +287,9 @@ public class PunterKB extends JPanel {
                             String filename = "D_" + doc.getId() + doc.getExt();
                             if (!doc.getExt().isEmpty()) {
                                 filename = doc.getTitle();
+                                if (filename.lastIndexOf(".") == -1) {
+                                    filename += doc.getExt();
+                                }
                             }
                             File nf = new File(temp, filename);
                             try {
