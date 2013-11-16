@@ -167,7 +167,6 @@ public class LuceneIndexDao {
                     sb.append(curr);
                 else
                     sb.append(' ');
-
             }
             prev = curr;
         }
@@ -235,15 +234,14 @@ public class LuceneIndexDao {
             });
             searcherManager = new SearcherManager(indexWriter, true, null);
         } catch (IOException e) {
-            System.out.println(" caught a " + e.getClass() +
-                    "\n with message: " + e.getMessage());
+            System.out.println(" caught a " + e.getClass() + "\n with message: " + e.getMessage());
         }
-        Map<String, Float> boostMap = new HashMap<String, Float>();
-        boostMap.put("title", 4.0f);
+        Map<String, Float> boostMap = new HashMap<>();
+        boostMap.put("title", 3.5f);
         boostMap.put("contents", 3.0f);
         boostMap.put("id", 1.0f);
         boostMap.put("attachment", 2.0f);
-        boostMap.put("tags", 4.2f);
+        boostMap.put("tags", 3.8f);
         parser1 = new MultiFieldQueryParser(Version.LUCENE_45, new String[]{"title", "contents", "id", "attachment", "tags"}, analyzer, boostMap);
         parser1.setAllowLeadingWildcard(true);
         parser1.setAnalyzeRangeTerms(true);
@@ -285,10 +283,9 @@ public class LuceneIndexDao {
             highlighter.setTextFragmenter(new SimpleFragmenter(200));
             TopDocs hits = null;
             QueryWrapperFilter queryFilter = new QueryWrapperFilter(query);
-            CachingWrapperFilter cwf=new CachingWrapperFilter(queryFilter);
+            CachingWrapperFilter cwf = new CachingWrapperFilter(queryFilter);
             hits = searcher.search(query, cwf, start + batch);
             int numTotalHits = hits.totalHits;
-            System.out.println(query);
             List<Document> resultDocs = new ArrayList<>(50);
             for (int i = start; i < numTotalHits && i < (start + batch); i++) {
 //				Explanation exp = isearcher.explain(query, i);
@@ -320,7 +317,9 @@ public class LuceneIndexDao {
                     result = highlighter.getBestFragments(analyzer.tokenStream("content", new StringReader(contents)), contents, maxNumFragmentsRequired, fragmentSeparator);
                     if (result.length() <= 0) {
                         String attachment = doc.get("attachment");
-                        result = "Attachment : "+ highlighter.getBestFragments(analyzer.tokenStream("attachment", new StringReader(attachment)), attachment, maxNumFragmentsRequired, fragmentSeparator);
+                        final String bestFragments = highlighter.getBestFragments(analyzer.tokenStream("attachment", new StringReader(attachment)), attachment, maxNumFragmentsRequired, fragmentSeparator);
+                        if (bestFragments != null && !bestFragments.isEmpty())
+                            result = "Attachment : " + bestFragments;
                     }
                     if (result.length() > 0) {
                         result = result.replace('\n', ' ');
@@ -338,6 +337,7 @@ public class LuceneIndexDao {
             sw.reset();
             return resultDocs;
         } catch (InvalidTokenOffsetsException | ParseException | IOException e1) {
+            System.out.println("Search Query - "+searchString+", category - " +category);
             e1.printStackTrace();
         } finally {
             searcherManager.release(searcher);
@@ -356,10 +356,10 @@ public class LuceneIndexDao {
             BytesRef byteRef = null;
             while ((byteRef = iterator.next()) != null) {
                 String term = new String(byteRef.bytes, byteRef.offset, byteRef.length);
-                System.out.println(term);
+//                System.out.println(term);
                 uniqueTerms.add(term);
             }
-            System.err.println("Listing all the terms done.." + uniqueTerms);
+//            System.err.println("Listing all the terms done.." + uniqueTerms);
             return new ArrayList<>(uniqueTerms);
         } finally {
             searcherManager.release(indexSearcher);

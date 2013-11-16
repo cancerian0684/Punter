@@ -1,6 +1,6 @@
 package com.shunya.punter.executors;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.PunterJobBasket;
 import com.shunya.punter.jpa.ProcessData;
@@ -25,7 +25,7 @@ public class PunterJobScheduler extends Timer {
             @Override
             public void run() {
                 try {
-                    List<ProcessData> scheduledProcList = StaticDaoFacade.getInstance().getScheduledProcessList(AppSettings.getInstance().getUsername());
+                    List<ProcessData> scheduledProcList = StaticDaoFacadeRemote.getInstance().getScheduledProcessList(AppSettings.getInstance().getUsername());
                     if (lastReferenceTimeLong == 0L) {
                         lastReferenceTimeLong = System.currentTimeMillis();
                     }

@@ -1,16 +1,13 @@
 package com.shunya.punter.gui;
 
-import java.util.Map;
-
-import javax.swing.table.AbstractTableModel;
-import javax.xml.bind.JAXBException;
-
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.utils.FieldProperties;
 import com.shunya.punter.utils.FieldPropertiesMap;
-import com.shunya.punter.utils.OutputParamValue;
 import org.apache.commons.beanutils.BeanUtils;
+
+import javax.swing.table.AbstractTableModel;
+import javax.xml.bind.JAXBException;
 
 class OutputParamTableModel extends AbstractTableModel {
         private String[] columnNames = {"<html><b>Property",
@@ -99,7 +96,7 @@ class OutputParamTableModel extends AbstractTableModel {
                     FieldProperties opv= propertiesMap.get((String) data[row][0]);
                     opv.setValue((String)value);
                     taskData.setOutputParams(propertiesMap);
-                    StaticDaoFacade.getInstance().saveTask(taskData);
+                    StaticDaoFacadeRemote.getInstance().saveTask(taskData);
                     BeanUtils.copyProperties(data[row][2], taskData);
                 } catch (Exception e) {
                     e.printStackTrace();

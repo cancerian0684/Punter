@@ -1,12 +1,11 @@
 package com.shunya.punter.gui;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
+import com.shunya.punter.jpa.ProcessHistory;
 
 import javax.swing.table.AbstractTableModel;
-
-import com.shunya.kb.jpa.StaticDaoFacade;
-import com.shunya.punter.jpa.ProcessHistory;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
  
 public class ProcessAlertTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflsdfl",Boolean.FALSE};
@@ -108,7 +107,7 @@ public class ProcessAlertTableModel extends AbstractTableModel {
         	ph.setClearAlert(Boolean.parseBoolean(obj.toString()));
         	break;
         }
-        StaticDaoFacade.getInstance().saveProcessHistory(ph);
+        StaticDaoFacadeRemote.getInstance().saveProcessHistory(ph);
         }catch(Exception e){
         	e.printStackTrace();
         }

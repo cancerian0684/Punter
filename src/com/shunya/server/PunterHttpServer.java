@@ -29,7 +29,7 @@ public class PunterHttpServer {
         server.stop(0);
     }
 
-    PunterHttpServer(ServerContext context) {
+    public PunterHttpServer(ServerContext context) {
         this.context = context;
     }
 

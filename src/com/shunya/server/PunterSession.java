@@ -14,7 +14,7 @@ public class PunterSession implements Comparable<String> {
     public PunterSession(String sessionId, String username) {
         this.sessionId = sessionId;
         this.username = username;
-        this.myQueue = new LinkedBlockingQueue<PunterMessage>();
+        this.myQueue = new LinkedBlockingQueue<>();
         this.age = 1000 * 60 * 10; //10 minutes
         this.lastAccessed = System.currentTimeMillis();
     }

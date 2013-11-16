@@ -1,6 +1,6 @@
 package com.shunya.kb.utils;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeInterface;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -23,7 +23,7 @@ public class TextCompletionHandler implements DocumentListener {
     private final List<String> words;
     private Mode mode = Mode.INSERT;
 
-    public TextCompletionHandler(JTextArea textArea, StaticDaoFacade docService) {
+    public TextCompletionHandler(JTextArea textArea, StaticDaoFacadeInterface docService) {
         this.textArea = textArea;
         this.textArea.getDocument().addDocumentListener(this);
 

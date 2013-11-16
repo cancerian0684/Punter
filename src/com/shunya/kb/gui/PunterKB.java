@@ -2,7 +2,8 @@ package com.shunya.kb.gui;
 
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeInterface;
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.Main;
 import org.apache.commons.io.IOUtils;
@@ -37,8 +38,8 @@ public class PunterKB extends JPanel {
     private JTable searchResultTable;
     private JComboBox categoryComboBox;
     private JToggleButton andOrToggleButton = new JToggleButton("O");
-    private static final List<String> categories = StaticDaoFacade.getInstance().getCategories();
-    private static StaticDaoFacade docService = StaticDaoFacade.getInstance();
+    private static final List<String> categories = StaticDaoFacadeRemote.getInstance().getCategories();
+    private static StaticDaoFacadeInterface docService = StaticDaoFacadeRemote.getInstance();
 
     private DataFlavor Linux = new DataFlavor("text/uri-list;class=java.io.Reader");
     private DataFlavor plainText = new DataFlavor("text/plain; class=java.lang.String; charset=Unicode");
@@ -166,7 +167,7 @@ public class PunterKB extends JPanel {
                                     doc.setCategory(s);
                                     luceneDoc.setCategory(s);
                                     try {
-                                        StaticDaoFacade.getInstance().saveDocument(doc);
+                                        StaticDaoFacadeRemote.getInstance().saveDocument(doc);
                                     } catch (RemoteException e1) {
                                         e1.printStackTrace();
                                     }

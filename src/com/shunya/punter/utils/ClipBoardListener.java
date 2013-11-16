@@ -1,6 +1,6 @@
 package com.shunya.punter.utils;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
 import com.shunya.server.ClipboardPunterMessage;
 
 import java.awt.*;
@@ -49,7 +49,7 @@ public class ClipBoardListener implements ClipboardOwner, PunterComponent {
                 System.out.println(s);
                 ClipboardPunterMessage punterMessage = new ClipboardPunterMessage();
                 punterMessage.setContents(s);
-                StaticDaoFacade.getInstance().sendMessageToPeer(punterMessage);
+                StaticDaoFacadeRemote.getInstance().sendMessageToPeer(punterMessage);
             } catch (UnsupportedFlavorException e2) {
                 e2.printStackTrace();
             } catch (IOException e2) {

@@ -1,16 +1,13 @@
 package com.shunya.punter.gui;
 
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
+import com.shunya.punter.jpa.ProcessData;
 import com.shunya.punter.utils.FieldPropertiesMap;
 import it.sauronsoftware.cron4j.Predictor;
-
-import java.util.ArrayList;
-
-import javax.swing.table.AbstractTableModel;
-
 import org.apache.commons.beanutils.BeanUtils;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
-import com.shunya.punter.jpa.ProcessData;
+import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
  
 public class ProcessPropertyTableModel extends AbstractTableModel {
 	public final int[] width = {150,206};
@@ -68,7 +65,7 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
         FieldPropertiesMap propertiesMap = processData.getInputParams();
         propertiesMap.get((String) colArrayList.get(0)).setValue((String) obj);
         processData.setInputParams(propertiesMap);
-    	processData = StaticDaoFacade.getInstance().saveProcess(processData);
+    	processData = StaticDaoFacadeRemote.getInstance().saveProcess(processData);
     	BeanUtils.copyProperties(colArrayList.get(2), processData);
     	try{
     	if("scheduleString".equalsIgnoreCase((String)colArrayList.get(0))){

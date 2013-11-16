@@ -1,6 +1,6 @@
 package com.shunya.punter.gui;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
 import com.shunya.punter.jpa.TaskData;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -135,7 +135,7 @@ public class TaskTableModel extends AbstractTableModel {
                     default:
                         break;
                 }
-                task = StaticDaoFacade.getInstance().saveTask(task);
+                task = StaticDaoFacadeRemote.getInstance().saveTask(task);
                 BeanUtils.copyProperties(colArrayList.get(0), task);
             } catch (Exception e) {
                 e.printStackTrace();

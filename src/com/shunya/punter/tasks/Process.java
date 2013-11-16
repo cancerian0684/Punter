@@ -1,6 +1,6 @@
 package com.shunya.punter.tasks;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.ProcessObserver;
@@ -88,7 +88,7 @@ public class Process implements Serializable {
     }
 
     public void afterProcessFinish() {
-        StaticDaoFacade.getInstance().saveProcessHistory(processHistory);
+        StaticDaoFacadeRemote.getInstance().saveProcessHistory(processHistory);
         po.update(processHistory);
         po.processCompleted();
         if (emailsToNotify != null && !emailsToNotify.isEmpty()) {

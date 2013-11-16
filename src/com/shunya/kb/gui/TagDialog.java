@@ -1,21 +1,14 @@
 package com.shunya.kb.gui;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import com.shunya.kb.jpa.Document;
+import com.shunya.kb.jpa.StaticDaoFacadeInterface;
+import com.shunya.punter.gui.Main;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
-
-import com.shunya.kb.jpa.Document;
-import com.shunya.kb.jpa.StaticDaoFacade;
-import com.shunya.punter.gui.Main;
 
 public class TagDialog extends JDialog{
 	private static TagDialog tagDialog;
@@ -23,8 +16,8 @@ public class TagDialog extends JDialog{
 	    private JTextArea textArea;
 	    private JButton saveBtn;
 	    private Document doc;
-	    private StaticDaoFacade docService;
-	    public static void getInstance(Document doc,StaticDaoFacade docService){
+	    private StaticDaoFacadeInterface docService;
+	    public static void getInstance(Document doc,StaticDaoFacadeInterface docService){
 	    	if(tagDialog==null){
 	    		tagDialog=new TagDialog();
 	    	}

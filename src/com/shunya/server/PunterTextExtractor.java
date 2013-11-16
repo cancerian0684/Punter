@@ -47,7 +47,8 @@ public class PunterTextExtractor {
                 PdfReader reader = new PdfReader(bais);
                 PdfReaderContentParser parser = new PdfReaderContentParser(reader);
                 TextExtractionStrategy strategy;
-                for (int i = 1; i <= reader.getNumberOfPages(); i++) {
+                int maxPagesToRead = reader.getNumberOfPages() > 10 ? 10 : reader.getNumberOfPages();
+                for (int i = 1; i <= maxPagesToRead; i++) {
                     strategy = parser.processContent(i, new SimpleTextExtractionStrategy());
                     text.append(strategy.getResultantText());
                 }

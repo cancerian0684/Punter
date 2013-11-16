@@ -1,6 +1,6 @@
 package com.shunya.punter.gui;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.executors.ProcessExecutor;
 import com.shunya.punter.executors.PunterJobScheduler;
@@ -75,7 +75,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
     public PunterGUI() throws Exception {
         super(new GridLayout(1, 0));
         clipBoardListener = new ClipBoardListener();
-        StaticDaoFacade.getInstance().setClipBoardListener((ClipBoardListener) clipBoardListener);
+        StaticDaoFacadeRemote.getInstance().setClipBoardListener((ClipBoardListener) clipBoardListener);
         tableSearchFilter = new TableSearchFilter();
         DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
         dtcr.setHorizontalAlignment(SwingConstants.CENTER);
@@ -273,7 +273,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             ProcessData proc = (ProcessData) request.get(0);
                             try {
                                 System.err.println("removing process : " + proc.getId());
-                                StaticDaoFacade.getInstance().removeProcess(proc);
+                                StaticDaoFacadeRemote.getInstance().removeProcess(proc);
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }
@@ -313,7 +313,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                                 for (TaskData taskData : tl) {
                                     taskData.setProcess(processData);
                                 }
-                                processData = StaticDaoFacade.getInstance().createProcess(processData);
+                                processData = StaticDaoFacadeRemote.getInstance().createProcess(processData);
                                 ArrayList<Object> newrow = new ArrayList<Object>();
                                 newrow.add(processData);
                                 ((ProcessTableModel) processTable.getModel()).insertRow(newrow);
@@ -356,7 +356,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     final List<File> files = new java.util.ArrayList<File>();
                     for (int i : selectedRows) {
                         ProcessData procDao = (ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(i)).get(0);
-                        procDao = StaticDaoFacade.getInstance().getProcess(procDao.getId());
+                        procDao = StaticDaoFacadeRemote.getInstance().getProcess(procDao.getId());
                         File file = new File(temp, procDao.getName() + ".xml");
                         FileWriter fw = new FileWriter(file);
                         marshaller.marshal(procDao, fw);
@@ -429,7 +429,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                         TaskData task = (TaskData) request.get(0);
                         try {
                             System.err.println("removing task : " + task.getId());
-                            StaticDaoFacade.getInstance().removeTask(task);
+                            StaticDaoFacadeRemote.getInstance().removeTask(task);
                         } catch (Exception e1) {
                             e1.printStackTrace();
                         }
@@ -464,12 +464,12 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                                 TaskData taskData = root.getValue();
                                 ProcessData procDao = (ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
                                 taskData.setProcess(procDao);
-                                taskData = StaticDaoFacade.getInstance().createTask(taskData);
+                                taskData = StaticDaoFacadeRemote.getInstance().createTask(taskData);
                                 if (procDao.getTaskList() == null) {
                                     procDao.setTaskList(new ArrayList<TaskData>());
                                 }
                                 procDao.getTaskList().add(taskData);
-                                StaticDaoFacade.getInstance().saveProcess(procDao);
+                                StaticDaoFacadeRemote.getInstance().saveProcess(procDao);
                                 TaskTableModel model = (TaskTableModel) taskTable.getModel();
                                 final ArrayList<Object> newRequest = new ArrayList<Object>();
                                 newRequest.add(taskData);
@@ -583,7 +583,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             ProcessData p = new ProcessData();
                             p.setId(procId);
                             task.setProcess(p);
-                            task = StaticDaoFacade.getInstance().createTask(task);
+                            task = StaticDaoFacadeRemote.getInstance().createTask(task);
                             TaskTableModel model = (TaskTableModel) taskTable.getModel();
                             final ArrayList<Object> newRequest = new ArrayList<Object>();
                             newRequest.add(task);
@@ -647,7 +647,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     FieldPropertiesMap inProp = com.shunya.punter.tasks.Process.listInputParams();
                     proc.setInputParams(inProp);
                     proc.setUsername(AppSettings.getInstance().getUsername());
-                    proc = StaticDaoFacade.getInstance().createProcess(proc);
+                    proc = StaticDaoFacadeRemote.getInstance().createProcess(proc);
                     ProcessTableModel model = (ProcessTableModel) processTable.getModel();
                     final ArrayList<Object> newRequest = new ArrayList<Object>();
                     newRequest.add(proc);
@@ -698,7 +698,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             for (TaskData taskData : tl) {
                                 taskData.setProcess(procDao);
                             }
-                            procDao = StaticDaoFacade.getInstance().createProcess(procDao);
+                            procDao = StaticDaoFacadeRemote.getInstance().createProcess(procDao);
                             ArrayList<Object> newrow = new ArrayList<Object>();
                             newrow.add(procDao);
                             ((ProcessTableModel) processTable.getModel()).insertRow(newrow);
@@ -717,7 +717,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                 try {
                     if (processTable.getSelectedRow() != -1) {
                         ProcessData procDao = (ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
-                        procDao = StaticDaoFacade.getInstance().getProcess(procDao.getId());
+                        procDao = StaticDaoFacadeRemote.getInstance().getProcess(procDao.getId());
                         JAXBContext context = JAXBContext.newInstance(ProcessData.class);
                         Marshaller marshaller = context.createMarshaller();
                         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -751,9 +751,9 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     if (processTable.getSelectedRow() != -1) {
                         ProcessData procDao = (ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
                         String procId = "" + procDao.getId();
-                        String server = StaticDaoFacade.getInstance().getServerHostAddress().getHostName();
-                        String port = "" + StaticDaoFacade.getInstance().getWebServerPort();
-                        String client = StaticDaoFacade.getInstance().getLocalHostAddress().getHostName();
+                        String server = StaticDaoFacadeRemote.getInstance().getServerHostAddress().getHostName();
+                        String port = "" + StaticDaoFacadeRemote.getInstance().getWebServerPort();
+                        String client = StaticDaoFacadeRemote.getInstance().getLocalHostAddress().getHostName();
                         String url = "http://" + server + ":" + port + "/process/" + client + "/" + procId;
                         StringSelection stringSelection = new StringSelection(url);
                         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -953,7 +953,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
 //	      	        	System.out.println("PID= "+procId);
                         //populate processHistory
                         ProcessHistoryTableModel phtmodel = (ProcessHistoryTableModel) processHistoryTable.getModel();
-                        List<ProcessHistory> phl = StaticDaoFacade.getInstance().getSortedProcessHistoryListForProcessId(procId);
+                        List<ProcessHistory> phl = StaticDaoFacadeRemote.getInstance().getSortedProcessHistoryListForProcessId(procId);
                         phtmodel.clearTable();
                         for (ProcessHistory ph : phl) {
                             final ArrayList<Object> newRequest = new ArrayList<Object>();
@@ -964,9 +964,9 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             processHistoryTable.setRowSelectionInterval(0, 0);
                         }
                         //populate task table
-                        List<TaskData> taskList = StaticDaoFacade.getInstance().getProcessTasksById(procId);
+                        List<TaskData> taskList = StaticDaoFacadeRemote.getInstance().getProcessTasksById(procId);
                         taskList = select(taskList, ActiveTaskFilter(AppSettings.getInstance().isShowActiveTasks()));
-                        ProcessData process = StaticDaoFacade.getInstance().getProcess(procId);
+                        ProcessData process = StaticDaoFacadeRemote.getInstance().getProcess(procId);
                         TaskTableModel model = (TaskTableModel) taskTable.getModel();
                         model.clearTable();
                         AppSettings.getInstance().setObject("inputParamTable", GUIUtils.getColumnWidth(inputParamTable));
@@ -1200,7 +1200,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                 if (sel == 3) {
                     ((ProcessTaskHistoryTableModel) processTaskAlertTable.getModel()).clearTable();
                     ProcessAlertTableModel phtmodel = (ProcessAlertTableModel) processAlertTable.getModel();
-                    List<ProcessHistory> phl = StaticDaoFacade.getInstance().getMySortedProcessHistoryList(
+                    List<ProcessHistory> phl = StaticDaoFacadeRemote.getInstance().getMySortedProcessHistoryList(
                             AppSettings.getInstance().getUsername());
                     phtmodel.clearTable();
                     for (ProcessHistory ph : phl) {
@@ -1252,7 +1252,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     try {
                         ArrayList<?> ar = ((ProcessAlertTableModel) processAlertTable.getModel()).getRow(processAlertTable.convertRowIndexToModel(processAlertTable.getSelectedRow()));
                         long phId = (Long) ((ProcessHistory) ar.get(0)).getId();
-                        ProcessHistory ph = StaticDaoFacade.getInstance().getProcessHistoryById(phId);
+                        ProcessHistory ph = StaticDaoFacadeRemote.getInstance().getProcessHistoryById(phId);
                         //populate ProcessTaskHistory
                         ProcessTaskHistoryTableModel pthtmodel = (ProcessTaskHistoryTableModel) processTaskAlertTable.getModel();
                         List<TaskHistory> pthl = ph.getTaskHistoryList();
@@ -1316,7 +1316,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     try {
                         ArrayList<?> ar = ((ProcessHistoryTableModel) processHistoryTable.getModel()).getRow(processHistoryTable.convertRowIndexToModel(processHistoryTable.getSelectedRow()));
                         long phId = (Long) ((ProcessHistory) ar.get(0)).getId();
-                        ProcessHistory ph = StaticDaoFacade.getInstance().getProcessHistoryById(phId);
+                        ProcessHistory ph = StaticDaoFacadeRemote.getInstance().getProcessHistoryById(phId);
                         //populate ProcessTaskHistory
                         ProcessTaskHistoryTableModel pthtmodel = (ProcessTaskHistoryTableModel) processTaskHistoryTable.getModel();
                         List<TaskHistory> pthl = ph.getTaskHistoryList();
@@ -1337,7 +1337,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
             }
         });
         ProcessTableModel tmpModel = (ProcessTableModel) processTable.getModel();
-        List<ProcessData> pl = StaticDaoFacade.getInstance().getProcessList(AppSettings.getInstance().getUsername());
+        List<ProcessData> pl = StaticDaoFacadeRemote.getInstance().getProcessList(AppSettings.getInstance().getUsername());
         for (ProcessData p : pl) {
             final ArrayList<Object> newRequest = new ArrayList<Object>();
             newRequest.add(p);
@@ -1425,13 +1425,13 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
     }
 
     public void createAndRunProcess(final PunterProcessRunMessage processRunMessage) throws Exception {
-        final ProcessData processData = StaticDaoFacade.getInstance().getProcess(processRunMessage.getProcessId());
+        final ProcessData processData = StaticDaoFacadeRemote.getInstance().getProcess(processRunMessage.getProcessId());
         final ProcessHistory processHistory = ProcessHistoryBuilder.build(processData);
         Thread thread = new Thread() {
             @Override
             public void run() {
                 try {
-                    final ProcessHistory ph1 = StaticDaoFacade.getInstance().createProcessHistory(processHistory);
+                    final ProcessHistory ph1 = StaticDaoFacadeRemote.getInstance().createProcessHistory(processHistory);
                     final ArrayList<Object> newRequest = new ArrayList<Object>();
                     newRequest.add(ph1);
                     javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -1490,7 +1490,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
     @Override
     public void saveTaskHistory(final TaskHistory taskHistory) {
         try {
-            StaticDaoFacade.getInstance().saveTaskHistory(taskHistory);
+            StaticDaoFacadeRemote.getInstance().saveTaskHistory(taskHistory);
             if (processHistoryTable.getSelectedRow() != -1) {
                 javax.swing.SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -1499,7 +1499,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             long pidTable = ((ProcessHistory) ar.get(0)).getId();
                             long pid = taskHistory.getProcessHistory().getId();
                             if (pid == pidTable) {
-                                ProcessHistory ph = StaticDaoFacade.getInstance().getProcessHistoryById(pid);
+                                ProcessHistory ph = StaticDaoFacadeRemote.getInstance().getProcessHistoryById(pid);
                                 //populate ProcessTaskHistory
                                 ProcessTaskHistoryTableModel pthtmodel = (ProcessTaskHistoryTableModel) processTaskHistoryTable.getModel();
                                 List<TaskHistory> pthl = ph.getTaskHistoryList();

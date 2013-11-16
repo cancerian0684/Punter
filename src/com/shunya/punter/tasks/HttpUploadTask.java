@@ -1,6 +1,6 @@
 package com.shunya.punter.tasks;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.annotations.PunterTask;
@@ -11,8 +11,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Level;
-
-import static junit.framework.Assert.assertEquals;
 
 @PunterTask(author = "munishc", name = "HttpGetTask", description = "Plays HTTP GET Request on the given URL.", documentation = "docs/TextSamplerDemoHelp.html")
 public class HttpUploadTask extends Tasks {
@@ -54,7 +52,7 @@ public class HttpUploadTask extends Tasks {
             in.close();
             status = true;
             LOGGER.get().log(Level.INFO, buf.toString());
-            fileDownloadPath="http://"+StaticDaoFacade.getInstance().getServerHostAddress().getHostAddress()+":"+StaticDaoFacade.getInstance().getWebServerPort()+"/uploads/"+file.getName();
+            fileDownloadPath="http://"+ StaticDaoFacadeRemote.getInstance().getServerHostAddress().getHostAddress()+":"+ StaticDaoFacadeRemote.getInstance().getWebServerPort()+"/uploads/"+file.getName();
         } catch (Exception e) {
             LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
         }

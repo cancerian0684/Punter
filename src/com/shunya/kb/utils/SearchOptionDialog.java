@@ -1,19 +1,14 @@
 package com.shunya.kb.utils;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.List;
-
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-
-import com.shunya.kb.jpa.StaticDaoFacade;
 
 public class SearchOptionDialog  extends JDialog{
 	private static SearchOptionDialog sod;
-	private static final List<String> categories=StaticDaoFacade.getInstance().getCategories();
+	private static final List<String> categories= StaticDaoFacadeRemote.getInstance().getCategories();
 	private JList optionList;
 	public static SearchOptionDialog getInstance(){
 		if(sod==null){

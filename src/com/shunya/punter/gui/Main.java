@@ -1,7 +1,7 @@
 package com.shunya.punter.gui;
 
 import com.shunya.kb.gui.PunterKB;
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
 import com.shunya.punter.executors.ProcessExecutor;
 import com.shunya.punter.utils.GlobalHotKeyListener;
 import com.shunya.punter.utils.JavaScreenCapture;
@@ -175,7 +175,7 @@ public class Main {
             rt.addShutdownHook(new Thread() {
                 public void run() {
                     globalHotKeyListener.cleanup();
-                    StaticDaoFacade.getInstance().disconnect();
+                    StaticDaoFacadeRemote.getInstance().disconnect();
                     timer.stop();
                     logger.log(Level.INFO, "Exiting...");
                 }
@@ -198,7 +198,7 @@ public class Main {
             ActionListener restartListener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    StaticDaoFacade.getInstance().restartClient();
+                    StaticDaoFacadeRemote.getInstance().restartClient();
                 }
             };
 
@@ -332,12 +332,13 @@ public class Main {
 
     public static boolean isConnected() {
         try {
-            StaticDaoFacade.getInstance().ping();
+            StaticDaoFacadeRemote.getInstance().ping();
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             logger.log(Level.WARNING, "connection to server lost.");
             try {
-                StaticDaoFacade.getInstance().makeConnection();
+                StaticDaoFacadeRemote.getInstance().makeConnection();
                 logger.log(Level.WARNING, "connection to server restored.");
             } catch (Exception ee) {
                 // TODO: handle exception

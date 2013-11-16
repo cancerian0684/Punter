@@ -1,15 +1,12 @@
 package com.shunya.punter.utils;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeRemote;
 import com.shunya.punter.gui.AppSettings;
 
-import java.awt.EventQueue;
+import javax.swing.*;
+import java.awt.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 public class StackWindow extends JFrame implements Thread.UncaughtExceptionHandler {
 
@@ -46,7 +43,7 @@ public class StackWindow extends JFrame implements Thread.UncaughtExceptionHandl
 					@Override
 					public void run() {
 						try {
-                            EmailService.getInstance().sendEMail("Unknown Exception : [" + AppSettings.getInstance().getUsername() + "] ", StaticDaoFacade.getInstance().getDevEmailCSV(), sw.toString());
+                            EmailService.getInstance().sendEMail("Unknown Exception : [" + AppSettings.getInstance().getUsername() + "] ", StaticDaoFacadeRemote.getInstance().getDevEmailCSV(), sw.toString());
 						} catch (Throwable E) {
 							System.err.println(E.toString());
 						}

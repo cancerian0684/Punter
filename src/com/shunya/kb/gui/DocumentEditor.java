@@ -2,7 +2,7 @@ package com.shunya.kb.gui;
 
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeInterface;
 import com.shunya.kb.utils.TextCompletionHandler;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.GUIUtils;
@@ -50,7 +50,7 @@ public class DocumentEditor extends JFrame {
     private JTextPane jTextPane;
     private JTextArea jTextPaneForEditing;
     private Document doc;
-    private StaticDaoFacade docService;
+    private StaticDaoFacadeInterface docService;
     private JTable attachmentTable;
     private String currentMD5;
     private boolean mayBeEdited = false;
@@ -86,7 +86,7 @@ public class DocumentEditor extends JFrame {
         }
     }
 
-    public static void showEditor(Document doc, StaticDaoFacade docService) {
+    public static void showEditor(Document doc, StaticDaoFacadeInterface docService) {
         DocumentEditor editor = new DocumentEditor(doc, docService);
         try {
             editor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
@@ -119,7 +119,7 @@ public class DocumentEditor extends JFrame {
         inputMap.put(key, redoAction);
     }
 
-    public DocumentEditor(final Document ldoc, StaticDaoFacade docServic) {
+    public DocumentEditor(final Document ldoc, StaticDaoFacadeInterface docServic) {
         setAlwaysOnTop(false);
         setIconImage(idleImage);
         setLayout(new GridBagLayout());
@@ -645,7 +645,7 @@ public class DocumentEditor extends JFrame {
         doc.setContent("###this is just a dummy content".getBytes());
         doc.setTitle("test title");
         /*try {
-            doc = StaticDaoFacade.getInstance().getDocument(doc);
+            doc = StaticDaoFacadeRemote.getInstance().getDocument(doc);
         } catch (RemoteException e) {
             e.printStackTrace();
         }*/
