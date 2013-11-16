@@ -1,7 +1,7 @@
 package com.shunya.kb.gui;
 
 import com.shunya.kb.jpa.Document;
-import com.shunya.kb.jpa.StaticDaoFacadeInterface;
+import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.gui.Main;
 
 import javax.swing.*;
@@ -16,8 +16,8 @@ public class TagDialog extends JDialog{
 	    private JTextArea textArea;
 	    private JButton saveBtn;
 	    private Document doc;
-	    private StaticDaoFacadeInterface docService;
-	    public static void getInstance(Document doc,StaticDaoFacadeInterface docService){
+	    private StaticDaoFacade docService;
+	    public static void getInstance(Document doc,StaticDaoFacade docService){
 	    	if(tagDialog==null){
 	    		tagDialog=new TagDialog();
 	    	}

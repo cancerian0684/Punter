@@ -1,6 +1,6 @@
 package com.shunya.punter.tasks;
 
-import com.shunya.kb.jpa.StaticDaoFacadeRemote;
+import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.ProcessObserver;
@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Process implements Serializable {
+    private StaticDaoFacade staticDaoFacade;
     private List<Tasks> taskList = new ArrayList<Tasks>();
     private Map sessionMap = new HashMap<String, Object>();
     private transient TaskObserver ts;
@@ -88,7 +89,7 @@ public class Process implements Serializable {
     }
 
     public void afterProcessFinish() {
-        StaticDaoFacadeRemote.getInstance().saveProcessHistory(processHistory);
+        staticDaoFacade.saveProcessHistory(processHistory);
         po.update(processHistory);
         po.processCompleted();
         if (emailsToNotify != null && !emailsToNotify.isEmpty()) {
@@ -133,6 +134,7 @@ public class Process implements Serializable {
         int progressCounter = 0;
         for (TaskHistory th : processHistory.getTaskHistoryList()) {
             Tasks task = Tasks.getTask(th.getTask());
+            task.setStaticDaoFacade(staticDaoFacade);
             task.setTaskDao(th.getTask());
             task.setSessionMap(sessionMap);
             task.setOverrideInputParams(overrideInputParams);
@@ -252,8 +254,9 @@ public class Process implements Serializable {
         }
     }
 
-    public static Process getProcess(FieldPropertiesMap props, ProcessHistory history, FieldPropertiesMap overrideInputParams) {
+    public static Process getProcess(StaticDaoFacade staticDaoFacade, FieldPropertiesMap props, ProcessHistory history, FieldPropertiesMap overrideInputParams) {
         Process process = new Process();
+        process.staticDaoFacade = staticDaoFacade;
         process.inputParams = props;
         process.processHistory = history;
         process.overrideInputParams=overrideInputParams;

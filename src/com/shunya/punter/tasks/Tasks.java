@@ -1,5 +1,6 @@
 package com.shunya.punter.tasks;
 
+import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.jpa.TaskData;
@@ -25,6 +26,7 @@ public abstract class Tasks implements Serializable {
     private FieldPropertiesMap inputParams;
     private FieldPropertiesMap overrideInputParams;
     protected TaskData taskDao;
+    protected StaticDaoFacade staticDaoFacade;
     private transient ConsoleHandler cHandler = null;
     private transient MemoryHandler mHandler = null;
     private transient Level loggingLevel = Level.FINE;
@@ -82,6 +84,14 @@ public abstract class Tasks implements Serializable {
 
     public void setLoggingLevel(Level loggingLevel) {
         this.loggingLevel = loggingLevel;
+    }
+
+    public StaticDaoFacade getStaticDaoFacade() {
+        return staticDaoFacade;
+    }
+
+    public void setStaticDaoFacade(StaticDaoFacade staticDaoFacade) {
+        this.staticDaoFacade = staticDaoFacade;
     }
 
     public String getMemoryLogs() {

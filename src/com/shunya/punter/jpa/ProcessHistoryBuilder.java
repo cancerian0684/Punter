@@ -1,6 +1,6 @@
 package com.shunya.punter.jpa;
 
-import com.shunya.kb.jpa.StaticDaoFacadeRemote;
+import com.shunya.kb.jpa.StaticDaoFacade;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,9 +14,9 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class ProcessHistoryBuilder {
-    public static ProcessHistory build(final ProcessData procDao) {
-        List<TaskData> sortedTasksByProcessId = StaticDaoFacadeRemote.getInstance().getSortedTasksByProcessId(procDao.getId());
-        final List<TaskHistory> thList = new ArrayList<TaskHistory>(10);
+    public static ProcessHistory build(final ProcessData procDao, StaticDaoFacade staticDaoFacade) {
+        List<TaskData> sortedTasksByProcessId = staticDaoFacade.getSortedTasksByProcessId(procDao.getId());
+        final List<TaskHistory> thList = new ArrayList<>(10);
         final ProcessHistory processHistory = new ProcessHistory();
         processHistory.setName(procDao.getName());
         processHistory.setStartTime(new Date());

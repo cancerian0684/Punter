@@ -3,27 +3,37 @@ package com.shunya.kb.jpa;
 import com.shunya.kb.gui.SearchQuery;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.PunterJobBasket;
+import com.shunya.punter.gui.SingleInstanceFileLock;
 import com.shunya.punter.jpa.ProcessData;
 import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
 import com.shunya.punter.utils.ClipBoardListener;
 import com.shunya.server.*;
+import com.shunya.server.model.JPATransatomatic;
+import com.shunya.server.model.SessionCache;
+import com.shunya.server.model.ThreadLocalSession;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.Collections;
 import java.util.List;
 
-public class StaticDaoFacadeLocal implements StaticDaoFacadeInterface {
-    private static StaticDaoFacadeInterface sdf;
+public class StaticDaoFacadeLocal implements StaticDaoFacade {
+
     private PunterSearch stub;
     private ClipBoardListener clipBoardListener;
+
+    private SingleInstanceFileLock singleInstanceFileLock;
+    private com.shunya.server.StaticDaoFacade staticDaoFacade;
+    private SessionFacade sessionFacade;
+    private SessionCache sessionCache;
+    private JPATransatomatic transatomatic;
+    private PunterHttpServer punterHttpServer;
+    private ServerSettings serverSettings;
+    private ServerContext context;
 
     @Override
     public void setClipBoardListener(ClipBoardListener clipBoardListener) {
@@ -81,17 +91,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacadeInterface {
 
     @Override
     public void restartClient() {
-        try {
-            String url = stub.getJNLPURL();
-            Runtime.getRuntime().exec("javaws " + url);
-            System.exit(0);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (RemoteException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+       //this will not work
     }
 
     @Override
@@ -99,16 +99,11 @@ public class StaticDaoFacadeLocal implements StaticDaoFacadeInterface {
         return stub.getMessage(getSessionId());
     }
 
-    public static StaticDaoFacadeInterface getInstance() {
-        if (sdf == null) {
-            sdf = new StaticDaoFacadeLocal();
-        }
-        return sdf;
-    }
+
 
     @Override
     public void ping() throws RemoteException {
-        stub.ping(getSessionId());
+//        stub.ping(getSessionId());
     }
 
     @Override
@@ -126,8 +121,18 @@ public class StaticDaoFacadeLocal implements StaticDaoFacadeInterface {
         return stub.getWebServerPort();
     }
 
-    private StaticDaoFacadeLocal() {
-        makeConnection();
+    public StaticDaoFacadeLocal() {
+        singleInstanceFileLock = new SingleInstanceFileLock("PunterServer.lock");
+        sessionFacade = SessionFacade.getInstance();
+        sessionCache = new ThreadLocalSession();
+        transatomatic = new JPATransatomatic((ThreadLocalSession) sessionCache);
+        serverSettings = new ServerSettings();
+        staticDaoFacade = new com.shunya.server.StaticDaoFacade(sessionCache, transatomatic);
+        serverSettings.setStaticDaoFacade(staticDaoFacade);
+        staticDaoFacade.setSettings(serverSettings);
+        context = new ServerContext(staticDaoFacade, sessionFacade, sessionCache, transatomatic, serverSettings);
+        punterHttpServer = new PunterHttpServer(context);
+        stub = new PunterSearchServer(staticDaoFacade, sessionFacade, serverSettings);
         messageProcessor();
     }
 
@@ -138,32 +143,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacadeInterface {
 
     @Override
     public synchronized void makeConnection() {
-        String defaultHost = "127.0.0.1";
-        if (AppSettings.getInstance().getServerHost() == null || AppSettings.getInstance().getServerHost().isEmpty()) {
-            if (AppSettings.getInstance().isMultiSearchEnable()) {
-                MultiCastServerLocator mcsl = new MultiCastServerLocator();
-                defaultHost = mcsl.LocateServerAddress();
-            }
-            defaultHost = JOptionPane.showInputDialog("Enter Server IP Address : ", defaultHost);
-            AppSettings.getInstance().setServerHost(defaultHost);
-        }
-        try {
-            Registry registry = null;
-            try {
-                registry = LocateRegistry.getRegistry(AppSettings.getInstance().getServerHost(),2020);
-            } catch (Exception e) {
-                e.printStackTrace();
-                AppSettings.getInstance().setServerHost(null);
-            }
-            stub = (PunterSearch) registry.lookup("PunterSearch");
-            if (getSessionId() == null) {
-                setSessionId(stub.connect(getUsername()));
-            }
-            stub.ping(getSessionId());
-        } catch (Exception e) {
-            e.printStackTrace();
-            AppSettings.getInstance().setServerHost(null);
-        }
+         //nothing to make connection to
     }
 
     @Override
@@ -467,11 +447,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacadeInterface {
 
     @Override
     public void disconnect() {
-        try {
-            stub.disconnect(getSessionId());
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        //do nothing to disconnect
     }
 
     @Override

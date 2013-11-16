@@ -2,8 +2,8 @@ package com.shunya.kb.gui;
 
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
-import com.shunya.kb.jpa.StaticDaoFacadeInterface;
-import com.shunya.kb.jpa.StaticDaoFacadeRemote;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeStrategy;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.Main;
 import org.apache.commons.io.IOUtils;
@@ -38,8 +38,8 @@ public class PunterKB extends JPanel {
     private JTable searchResultTable;
     private JComboBox categoryComboBox;
     private JToggleButton andOrToggleButton = new JToggleButton("O");
-    private static final List<String> categories = StaticDaoFacadeRemote.getInstance().getCategories();
-    private static StaticDaoFacadeInterface docService = StaticDaoFacadeRemote.getInstance();
+    private final StaticDaoFacade docService;
+    private final List<String> categories;
 
     private DataFlavor Linux = new DataFlavor("text/uri-list;class=java.io.Reader");
     private DataFlavor plainText = new DataFlavor("text/plain; class=java.lang.String; charset=Unicode");
@@ -64,17 +64,12 @@ public class PunterKB extends JPanel {
 
     private DelayedQueueHandlerThread<SearchQuery> punterDelayedQueueHandlerThread;
 
-    {
-        try {
-            docService.getDocList(new SearchQuery.SearchQueryBuilder().query("").build());
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public PunterKB() throws ClassNotFoundException {
+    public PunterKB(StaticDaoFacade staticDaoFacade) throws ClassNotFoundException, RemoteException {
+        docService= staticDaoFacade;
+        docService.getDocList(new SearchQuery.SearchQueryBuilder().query("").build());
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
+        categories=  docService.getCategories();
         searchTextField = new JTextField(20);
         searchTextField.setFont(new Font("Arial", Font.TRUETYPE_FONT, 12));
         searchTextField.setPreferredSize(new Dimension(searchTextField.getWidth(), 30));
@@ -167,7 +162,7 @@ public class PunterKB extends JPanel {
                                     doc.setCategory(s);
                                     luceneDoc.setCategory(s);
                                     try {
-                                        StaticDaoFacadeRemote.getInstance().saveDocument(doc);
+                                        docService.saveDocument(doc);
                                     } catch (RemoteException e1) {
                                         e1.printStackTrace();
                                     }
@@ -936,7 +931,7 @@ public class PunterKB extends JPanel {
     }
 
     //save last modified time then after 2 seconds poll for modified time of files. pick all files after that last scan time.
-    public static void indexAllTempDocs() {
+    public void indexAllTempDocs() {
         File temp = new File("Temp");
         if (temp.exists()) {
             File[] files = temp.listFiles();
@@ -967,7 +962,7 @@ public class PunterKB extends JPanel {
         os.close();
     }
 
-    private static void createAndShowGUI() throws Exception {
+    private void createAndShowGUI() throws Exception {
         //Create and set up the window.
         frame = new JFrame("Search");
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -975,9 +970,7 @@ public class PunterKB extends JPanel {
         frame.setLocationRelativeTo(null);
 
         //Create and set up the content pane.
-        PunterKB newContentPane = new PunterKB();
-        newContentPane.setOpaque(true); //content panes must be opaque
-        frame.setContentPane(newContentPane);
+        frame.setContentPane(this);
 
         frame.pack();
         frame.setVisible(true);
@@ -988,7 +981,9 @@ public class PunterKB extends JPanel {
             public void run() {
                 try {
                     UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-                    createAndShowGUI();
+                    StaticDaoFacadeStrategy strategy = new StaticDaoFacadeStrategy(StaticDaoFacadeStrategy.Strategy.LOCAL);
+                    PunterKB punterKB = new PunterKB(strategy.getInstance());
+                    punterKB.createAndShowGUI();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

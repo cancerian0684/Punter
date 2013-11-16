@@ -1,6 +1,6 @@
 package com.shunya.punter.gui;
 
-import com.shunya.kb.jpa.StaticDaoFacadeRemote;
+import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.jpa.TaskData;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class TaskTableModel extends AbstractTableModel {
     public final int[] width = {45, 74, 225, 46, 46};
     private static final long serialVersionUID = 1L;
+    private final StaticDaoFacade staticDaoFacade;
     /**
      * Holds the table data in a two dimensional ArrayList datastructure
      */
@@ -36,8 +37,9 @@ public class TaskTableModel extends AbstractTableModel {
         return newdata;
     }
 
-    public TaskTableModel() {
+    public TaskTableModel(StaticDaoFacade staticDaoFacade) {
 
+        this.staticDaoFacade = staticDaoFacade;
     }
 
     /**
@@ -135,7 +137,7 @@ public class TaskTableModel extends AbstractTableModel {
                     default:
                         break;
                 }
-                task = StaticDaoFacadeRemote.getInstance().saveTask(task);
+                task = staticDaoFacade.saveTask(task);
                 BeanUtils.copyProperties(colArrayList.get(0), task);
             } catch (Exception e) {
                 e.printStackTrace();

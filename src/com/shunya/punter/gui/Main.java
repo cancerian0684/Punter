@@ -1,7 +1,8 @@
 package com.shunya.punter.gui;
 
 import com.shunya.kb.gui.PunterKB;
-import com.shunya.kb.jpa.StaticDaoFacadeRemote;
+import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.kb.jpa.StaticDaoFacadeStrategy;
 import com.shunya.punter.executors.ProcessExecutor;
 import com.shunya.punter.utils.GlobalHotKeyListener;
 import com.shunya.punter.utils.JavaScreenCapture;
@@ -26,8 +27,9 @@ public class Main {
     public static JFrame KBFrame;
     public static JFrame PunterGuiFrame;
     public static JFrame lastAccessed;
-    private GlobalHotKeyListener globalHotKeyListener;
     private static Logger logger = Logger.getLogger(Main.class.getName());
+    private GlobalHotKeyListener globalHotKeyListener;
+    private final StaticDaoFacade staticDaoFacade;
     private SingleInstanceFileLock singleInstanceFileLock = new SingleInstanceFileLock("PunterClient.lock");
     private Timer timer = new Timer(3000, new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -55,6 +57,8 @@ public class Main {
     private PunterGUI punterGUI;
 
     public Main() {
+        StaticDaoFacadeStrategy strategy = new StaticDaoFacadeStrategy(StaticDaoFacadeStrategy.Strategy.LOCAL);
+        staticDaoFacade = strategy.getInstance();
         try {
             globalHotKeyListener = new GlobalHotKeyListener();
         } catch (Throwable t) {
@@ -73,7 +77,7 @@ public class Main {
         KBFrame = new JFrame("Search");
         JFrame.setDefaultLookAndFeelDecorated(true);
         KBFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        KBFrame.setContentPane(new PunterKB());
+        KBFrame.setContentPane(new PunterKB(staticDaoFacade));
         if (AppSettings.getInstance().KBFrameLocation != null)
             KBFrame.setLocation(AppSettings.getInstance().KBFrameLocation);
         if (AppSettings.getInstance().getKBFrameDimension() != null)
@@ -92,7 +96,7 @@ public class Main {
 
         PunterGuiFrame = new JFrame("My Personal Assistant");
         PunterGuiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        punterGUI = new PunterGUI();
+        punterGUI = new PunterGUI(staticDaoFacade);
         punterGUI.setGlobalHotKeyListener(globalHotKeyListener);
         PunterGuiFrame.setContentPane(punterGUI);
 
@@ -110,7 +114,7 @@ public class Main {
         PunterGuiFrame.pack();
         if (AppSettings.getInstance().PunterGuiFrameLocation != null)
             PunterGuiFrame.setLocation(AppSettings.getInstance().PunterGuiFrameLocation);
-        Thread.UncaughtExceptionHandler handler = new StackWindow("Unhandled Exception", 500, 400);
+        Thread.UncaughtExceptionHandler handler = new StackWindow("Unhandled Exception", 500, 400, staticDaoFacade.getDevEmailCSV());
         Thread.setDefaultUncaughtExceptionHandler(handler);
        
       /* 
@@ -175,7 +179,7 @@ public class Main {
             rt.addShutdownHook(new Thread() {
                 public void run() {
                     globalHotKeyListener.cleanup();
-                    StaticDaoFacadeRemote.getInstance().disconnect();
+                    staticDaoFacade.disconnect();
                     timer.stop();
                     logger.log(Level.INFO, "Exiting...");
                 }
@@ -198,7 +202,7 @@ public class Main {
             ActionListener restartListener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    StaticDaoFacadeRemote.getInstance().restartClient();
+                    staticDaoFacade.restartClient();
                 }
             };
 
@@ -330,15 +334,15 @@ public class Main {
         return ProcessExecutor.getInstance().isActive();
     }
 
-    public static boolean isConnected() {
+    public boolean isConnected() {
         try {
-            StaticDaoFacadeRemote.getInstance().ping();
+            staticDaoFacade.ping();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             logger.log(Level.WARNING, "connection to server lost.");
             try {
-                StaticDaoFacadeRemote.getInstance().makeConnection();
+                staticDaoFacade.makeConnection();
                 logger.log(Level.WARNING, "connection to server restored.");
             } catch (Exception ee) {
                 // TODO: handle exception

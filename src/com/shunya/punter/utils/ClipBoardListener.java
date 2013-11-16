@@ -1,6 +1,6 @@
 package com.shunya.punter.utils;
 
-import com.shunya.kb.jpa.StaticDaoFacadeRemote;
+import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.server.ClipboardPunterMessage;
 
 import java.awt.*;
@@ -8,11 +8,13 @@ import java.awt.datatransfer.*;
 import java.io.IOException;
 
 public class ClipBoardListener implements ClipboardOwner, PunterComponent {
+    private final StaticDaoFacade staticDaoFacade;
     Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
     private boolean listening = true;
     private boolean started = false;
 
-    public ClipBoardListener() {
+    public ClipBoardListener(StaticDaoFacade staticDaoFacade) {
+        this.staticDaoFacade = staticDaoFacade;
         startComponent();
     }
 
@@ -49,7 +51,7 @@ public class ClipBoardListener implements ClipboardOwner, PunterComponent {
                 System.out.println(s);
                 ClipboardPunterMessage punterMessage = new ClipboardPunterMessage();
                 punterMessage.setContents(s);
-                StaticDaoFacadeRemote.getInstance().sendMessageToPeer(punterMessage);
+                staticDaoFacade.sendMessageToPeer(punterMessage);
             } catch (UnsupportedFlavorException e2) {
                 e2.printStackTrace();
             } catch (IOException e2) {
@@ -62,11 +64,6 @@ public class ClipBoardListener implements ClipboardOwner, PunterComponent {
 
     void regainOwnership(Transferable transferable) {
         sysClip.setContents(transferable, listening ? this : null);
-    }
-
-    public static void main(String[] args) {
-        ClipBoardListener b = new ClipBoardListener();
-        b.startComponent();
     }
 
     @Override

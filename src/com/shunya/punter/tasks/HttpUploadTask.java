@@ -1,6 +1,5 @@
 package com.shunya.punter.tasks;
 
-import com.shunya.kb.jpa.StaticDaoFacadeRemote;
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.annotations.PunterTask;
@@ -52,7 +51,7 @@ public class HttpUploadTask extends Tasks {
             in.close();
             status = true;
             LOGGER.get().log(Level.INFO, buf.toString());
-            fileDownloadPath="http://"+ StaticDaoFacadeRemote.getInstance().getServerHostAddress().getHostAddress()+":"+ StaticDaoFacadeRemote.getInstance().getWebServerPort()+"/uploads/"+file.getName();
+            fileDownloadPath="http://"+ getStaticDaoFacade().getServerHostAddress().getHostAddress()+":"+ getStaticDaoFacade().getWebServerPort()+"/uploads/"+file.getName();
         } catch (Exception e) {
             LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
         }

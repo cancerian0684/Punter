@@ -13,7 +13,7 @@ import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.List;
 
-public interface StaticDaoFacadeInterface {
+public interface StaticDaoFacade {
     void setClipBoardListener(ClipBoardListener clipBoardListener);
 
     String getSessionId();

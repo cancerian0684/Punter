@@ -1,6 +1,6 @@
 package com.shunya.punter.gui;
 
-import com.shunya.kb.jpa.StaticDaoFacadeRemote;
+import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.jpa.ProcessData;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -10,7 +10,8 @@ import java.util.ArrayList;
 public class ProcessTableModel extends AbstractTableModel {
 	public final int[]width={116};
 	private static final long serialVersionUID = 1L;
-	/** Holds the table data in a two dimensional ArrayList datastructure */
+    private final StaticDaoFacade staticDaoFacade;
+    /** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
 
 	/** Holds the column names */         
@@ -30,8 +31,9 @@ public class ProcessTableModel extends AbstractTableModel {
 	  ArrayList<Object>  newdata=new ArrayList<Object>(data); 
 	  return newdata;
   }
-  public ProcessTableModel() {
-	  
+  public ProcessTableModel(StaticDaoFacade staticDaoFacade) {
+
+      this.staticDaoFacade = staticDaoFacade;
   }
 
   /**
@@ -101,7 +103,7 @@ public class ProcessTableModel extends AbstractTableModel {
     try{
     	ProcessData p=(ProcessData) colArrayList.get(0);
     	p.setName((String)obj);
-    	p= StaticDaoFacadeRemote.getInstance().saveProcess(p);
+    	p= staticDaoFacade.saveProcess(p);
     	BeanUtils.copyProperties(colArrayList.get(0), p);
     }catch (Exception e) {
     	e.printStackTrace();

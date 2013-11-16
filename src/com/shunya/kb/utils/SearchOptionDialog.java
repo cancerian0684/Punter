@@ -1,14 +1,14 @@
 package com.shunya.kb.utils;
 
-import com.shunya.kb.jpa.StaticDaoFacadeRemote;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+
 public class SearchOptionDialog  extends JDialog{
 	private static SearchOptionDialog sod;
-	private static final List<String> categories= StaticDaoFacadeRemote.getInstance().getCategories();
+	private static final List<String> categories= asList("test","all");
 	private JList optionList;
 	public static SearchOptionDialog getInstance(){
 		if(sod==null){
