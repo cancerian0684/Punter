@@ -134,10 +134,16 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
         punterHttpServer = new PunterHttpServer(context);
         stub = new PunterSearchServer(staticDaoFacade, sessionFacade, serverSettings);
         messageProcessor();
+        try {
+            punterHttpServer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void setSessionId(String sessionId) {
+
         this.sessionId = sessionId;
     }
 

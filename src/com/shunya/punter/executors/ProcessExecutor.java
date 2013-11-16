@@ -1,11 +1,11 @@
 package com.shunya.punter.executors;
 
+import com.shunya.punter.gui.AppSettings;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import com.shunya.punter.gui.AppSettings;
 
 public class ProcessExecutor {
     private static ProcessExecutor processExecutor;
@@ -20,7 +20,7 @@ public class ProcessExecutor {
     }
 
     public ProcessExecutor() {
-        workQueue = new LinkedBlockingQueue<Runnable>(10);
+        workQueue = new LinkedBlockingQueue<>(10);
         executor = new ThreadPoolExecutor(AppSettings.getInstance().getMaxExecutorSize(), AppSettings.getInstance().getMaxExecutorSize(),
                 0L, TimeUnit.MILLISECONDS,
                 workQueue);

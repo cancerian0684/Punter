@@ -1,37 +1,28 @@
 package com.shunya.punter.utils;
 
-import java.io.File;
-import java.util.Properties;
+import com.sun.mail.smtp.SMTPMessage;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-
-import com.sun.mail.smtp.SMTPMessage;
+import java.io.File;
+import java.util.Properties;
 
 public class EmailServiceWithAuth {
 	private static EmailServiceWithAuth emailService;
 	private final Properties properties;
 	private  final Authenticator auth;
 	public static EmailServiceWithAuth getInstance(String username,String password){
-//		if(emailService==null){
-//		}
 		emailService=new EmailServiceWithAuth(username,password);
 		return emailService;
 	}
 	private EmailServiceWithAuth(String username,String password){
 	      properties = System.getProperties();
-	      properties.setProperty("mail.smtp.host", "NLDNC108PEX1.ubsw.net");
+	      properties.setProperty("mail.smtp.host", "");
 	      properties.setProperty("mail.smtp.auth", "true");
 	      properties.setProperty("name", username);
 	      properties.setProperty("password", password);

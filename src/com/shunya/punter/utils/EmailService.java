@@ -22,7 +22,7 @@ public class EmailService {
 	}
 	private EmailService(){
 	      properties = System.getProperties();
-	      properties.setProperty("mail.smtp.host", "mailhost.ldn.swissbank.com");
+	      properties.setProperty("mail.smtp.host", "");
 	      properties.setProperty("mail.smtp.auth", "false");
 	}
 	public void sendEMail(String subject, String commaSeparatedRecipients,String body) {

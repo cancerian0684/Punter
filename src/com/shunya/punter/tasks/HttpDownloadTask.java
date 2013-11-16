@@ -6,20 +6,16 @@ import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Level;
-
-import static junit.framework.Assert.assertEquals;
 
 @PunterTask(author = "munishc", name = "HttpGetTask", description = "Plays HTTP GET Request on the given URL.", documentation = "docs/TextSamplerDemoHelp.html")
 public class HttpDownloadTask extends Tasks {
     @InputParam(required = true, description = "enter httpUrl here")
     private String httpUrl;
-    @InputParam(required = false)
+    @InputParam(required = true)
     private String localPath;
 
     @OutputParam

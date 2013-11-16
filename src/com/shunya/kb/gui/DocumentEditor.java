@@ -261,12 +261,16 @@ public class DocumentEditor extends JFrame {
                     for (int selectedRow : selectedRows) {
                         AttachmentTableModel atm = ((AttachmentTableModel) attachmentTable.getModel());
                         Attachment attch = (Attachment) atm.getRow(attachmentTable.convertRowIndexToModel(attachmentTable.getSelectedRow())).get(0);
-                        try {
-                            docService.deleteAttachment(attch);
-                        } catch (RemoteException e1) {
-                            e1.printStackTrace();
+                        int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + attch.getId() + " ?", "Confirm",
+                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                        if (response == JOptionPane.YES_OPTION) {
+                            try {
+                                docService.deleteAttachment(attch);
+                            } catch (RemoteException e1) {
+                                e1.printStackTrace();
+                            }
+                            atm.deleteRow(selectedRow);
                         }
-                        atm.deleteRow(selectedRow);
                     }
                 }
             }
@@ -437,7 +441,7 @@ public class DocumentEditor extends JFrame {
                     Attachment attch = (Attachment) atm.getRow(attachmentTable.convertRowIndexToModel(selectedRow)).get(0);
                     File temp = new File("Temp");
                     temp.mkdir();
-                    File nf = new File(temp, attch.getTitle()+attch.getExt());
+                    File nf = new File(temp, attch.getTitle() + attch.getExt());
                     if (!nf.exists()) {
                         try {
                             FileOutputStream fos = new FileOutputStream(nf);

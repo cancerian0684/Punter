@@ -1450,7 +1450,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                                 process.setTaskObservable(PunterGUI.this);
                                 // Adding row to running process table model
                                 final RunningProcessTableModel rptm = (RunningProcessTableModel) runningProcessTable.getModel();
-                                ArrayList<Object> newRequest1 = new ArrayList<Object>();
+                                ArrayList<Object> newRequest1 = new ArrayList<>();
                                 newRequest1.add(ph1);
                                 rptm.insertRowAtBeginning(newRequest1);
                                 process.addObserver(new ProcessObserver() {
