@@ -315,7 +315,6 @@ public class PunterKB extends JPanel {
                                 for (File file : files) {
                                     data += file.toURI() + "\r\n";
                                 }
-//                              return data;
                                 return new InputStreamReader(IOUtils.toInputStream(data));
                             }
                             return null;

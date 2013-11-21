@@ -269,7 +269,14 @@ public class LuceneIndexDao {
                 parser1.setDefaultOperator(QueryParser.AND_OPERATOR);
             else
                 parser1.setDefaultOperator(QueryParser.OR_OPERATOR);
-            Query query1 = parser1.parse(searchString + " " + itrim(getPunterParsedText(searchString)));
+            Query query1;
+            try {
+                query1 = parser1.parse(searchString + " " + itrim(getPunterParsedText(searchString)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                System.out.println("Parsing of input query failed, trying with the escaped syntax now.");
+                query1 = parser1.parse(itrim(getPunterParsedText(searchString)));
+            }
             Query query2 = parser2.parse(QueryParser.escape(category));
 //			MultiPhraseQuery leaningTower = new MultiPhraseQuery();
 //			leaningTower.add(new Term("content", "tower"));

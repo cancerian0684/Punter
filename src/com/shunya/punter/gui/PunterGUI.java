@@ -35,7 +35,6 @@ import static jedi.functional.FunctionalPrimitives.select;
 public class PunterGUI extends JPanel implements TaskObserver, Observer {
     public static final String WIN_A = "WIN_A";
     public static final String WIN_Q = "WIN_Q";
-    private boolean DEBUG = false;
     private final JTable taskTable;
     private final JTable processPropertyTable;
     private TableRowSorter<ProcessTableModel> sorter;
@@ -1434,7 +1433,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
             public void run() {
                 try {
                     final ProcessHistory ph1 = staticDaoFacade.createProcessHistory(processHistory);
-                    final ArrayList<Object> newRequest = new ArrayList<Object>();
+                    final ArrayList<Object> newRequest = new ArrayList<>();
                     newRequest.add(ph1);
                     javax.swing.SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -1575,8 +1574,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         sportColumn.setCellEditor(new DefaultCellEditor(comboBox));
 
         //Set up tool tips for the sport cells.
-        DefaultTableCellRenderer renderer =
-                new DefaultTableCellRenderer();
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         renderer.setToolTipText("Click for combo box");
         sportColumn.setCellRenderer(renderer);
     }
