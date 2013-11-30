@@ -11,6 +11,8 @@ import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
 import org.apache.poi.hsmf.MAPIMessage;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.markdown4j.Markdown4jProcessor;
 
 import javax.swing.text.Document;
@@ -54,8 +56,12 @@ public class PunterTextExtractor {
                 }
                 reader.close();
             }
+            else if(ext.equalsIgnoreCase(".docx") ) {
+                final String wordText = getWordText(bais);
+                text.append(wordText.substring(0, wordText.length() > 20000 ? 20000 : wordText.length()));
+            }
             //APache POI
-            else if (ext.equalsIgnoreCase(".doc") || ext.equalsIgnoreCase(".docx") || ext.equalsIgnoreCase(".xls") || ext.equalsIgnoreCase(".xlsx") || ext.equalsIgnoreCase(".ppt") || ext.equalsIgnoreCase(".pptx")) {
+            else if (ext.equalsIgnoreCase(".doc") || ext.equalsIgnoreCase(".xls") || ext.equalsIgnoreCase(".xlsx") || ext.equalsIgnoreCase(".ppt") || ext.equalsIgnoreCase(".pptx")) {
                 POIFSFileSystem fileSystem = new POIFSFileSystem(bais);
                 // Firstly, get an extractor for the Workbook
                 POIOLE2TextExtractor oleTextExtractor = ExtractorFactory.createExtractor(fileSystem);
@@ -74,6 +80,18 @@ public class PunterTextExtractor {
             e.printStackTrace();
         }
         return text.toString();
+    }
+
+    public static String getWordText(ByteArrayInputStream bais) {
+        try {
+            XWPFDocument document =new XWPFDocument(bais);
+            XWPFWordExtractor extractor = new XWPFWordExtractor(document);
+            String fileData = extractor.getText();
+            return fileData;
+        } catch (Exception exep) {
+            exep.printStackTrace();
+        }
+        return "";
     }
 
     public static String getPunterParsedText2(String inText) {
