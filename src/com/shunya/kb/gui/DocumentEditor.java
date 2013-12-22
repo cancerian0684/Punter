@@ -140,7 +140,7 @@ public class DocumentEditor extends JFrame {
         jTextPaneForEditing.setMargin(new Insets(5, 5, 5, 5));
         jTextPaneForEditing.setWrapStyleWord(true);
         jTextPaneForEditing.setLineWrap(true);
-        jTextPaneForEditing.setFont(new Font("Arial", Font.TRUETYPE_FONT, 12));
+        jTextPaneForEditing.setFont(new Font("Arial Unicode MS", Font.TRUETYPE_FONT, 12));
         jTextPaneForEditing.setText(new String(ldoc.getContent()));
 
         new TextCompletionHandler(jTextPaneForEditing, docService);
@@ -161,7 +161,7 @@ public class DocumentEditor extends JFrame {
 
 
         textField = new JTextField(20);
-        textField.setFont(new Font("Arial", Font.TRUETYPE_FONT, 12));
+        textField.setFont(new Font("Arial Unicode MS", Font.TRUETYPE_FONT, 12));
         textField.setPreferredSize(new Dimension(textField.getWidth(), 30));
 
         GridBagConstraints c = new GridBagConstraints();
