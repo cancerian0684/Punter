@@ -100,7 +100,7 @@ public class StaticDaoFacade {
     }
 
     public Document saveDocument(final Document doc) {
-        final ResultHolder<Document> resultHolder = new ResultHolder<Document>();
+        final ResultHolder<Document> resultHolder = new ResultHolder<>();
         transatomatic.run(new Transatomatic.UnitOfWork() {
             @Override
             public void run() {

@@ -2,7 +2,6 @@ package com.shunya.server;
 
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
-import com.shunya.punter.utils.Stopwatch;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.DateTools;
@@ -252,12 +251,10 @@ public class LuceneIndexDao {
     }
 
     public List<Document> search(String searchString, String category, boolean isAND, int start, int batch) throws IOException {
-        Stopwatch sw = new Stopwatch();
-        sw.start();
+        long t1=System.currentTimeMillis();
         searcherManager.maybeRefresh();
         IndexSearcher searcher = searcherManager.acquire();
         try {
-            sw.reset();
             searchString = searchString.trim().toLowerCase();
             if (searchString.equals("**"))
                 searchString = "*";
@@ -293,6 +290,7 @@ public class LuceneIndexDao {
             CachingWrapperFilter cwf = new CachingWrapperFilter(queryFilter);
             hits = searcher.search(query, cwf, start + batch);
             int numTotalHits = hits.totalHits;
+            System.out.println("time = "+(System.currentTimeMillis()-t1));
             List<Document> resultDocs = new ArrayList<>(50);
             for (int i = start; i < numTotalHits && i < (start + batch); i++) {
 //				Explanation exp = isearcher.explain(query, i);
@@ -340,11 +338,9 @@ public class LuceneIndexDao {
                 }
                 resultDocs.add(document);
             }
-//			System.out.print(sw.getElapsedTime()+" \n");
-            sw.reset();
             return resultDocs;
         } catch (InvalidTokenOffsetsException | ParseException | IOException e1) {
-            System.out.println("Search Query - "+searchString+", category - " +category);
+            System.out.println("Search Query - " + searchString + ", Category - " + category);
             e1.printStackTrace();
         } finally {
             searcherManager.release(searcher);
@@ -366,7 +362,7 @@ public class LuceneIndexDao {
 //                System.out.println(term);
                 uniqueTerms.add(term);
             }
-//            System.err.println("Listing all the terms done.." + uniqueTerms);
+//          System.err.println("Listing all the terms done.." + uniqueTerms);
             return new ArrayList<>(uniqueTerms);
         } finally {
             searcherManager.release(indexSearcher);

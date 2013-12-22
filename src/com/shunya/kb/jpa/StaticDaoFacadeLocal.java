@@ -133,7 +133,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
         context = new ServerContext(staticDaoFacade, sessionFacade, sessionCache, transatomatic, serverSettings);
         punterHttpServer = new PunterHttpServer(context);
         stub = new PunterSearchServer(staticDaoFacade, sessionFacade, serverSettings);
-        messageProcessor();
+//        messageProcessor();
         try {
             punterHttpServer.start();
         } catch (IOException e) {

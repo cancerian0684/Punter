@@ -1300,9 +1300,11 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         jsp3.setDividerSize(1);
         if (AppSettings.getInstance().getObject("jsp3Location") != null)
             jsp3.setDividerLocation(((Integer) AppSettings.getInstance().getObject("jsp3Location")));
-        JSplitPane jsp5 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, jsp3, splitRunningProcessPane);
-        jsp5.setDividerSize(1);
-        add(jsp5);
+        /*JSplitPane jsp5 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, jsp3, splitRunningProcessPane);
+        jsp5.setDividerSize(1);*/
+//        add(jsp5);
+        add(jsp3);
+        tabbedPane.addTab("Running Tasks", null, splitRunningProcessPane, "Running Tasks in Punter");
 
         ListSelectionModel PHTSelectionModel = processHistoryTable.getSelectionModel();
         PHTSelectionModel.addListSelectionListener(new ListSelectionListener() {
