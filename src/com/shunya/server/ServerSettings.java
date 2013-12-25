@@ -102,7 +102,7 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
     @Override
     public void refreshIndexes() {
         System.err.println("Refreshing indexe's");
-        staticDaoFacade.buildSynonymCache();
+        staticDaoFacade.buildSynonymsCacheLocal();
         staticDaoFacade.rebuildIndex();
         System.err.println("Indexes refreshed");
     }

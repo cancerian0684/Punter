@@ -227,6 +227,16 @@ public class StaticDaoFacade {
         });
     }
 
+    public void buildSynonymsCacheLocal(){
+        System.out.println("Rebuilding Synonym Cache Local");
+        Scanner scanner = new Scanner(StaticDaoFacade.class.getClassLoader().getResourceAsStream("resources/synonyms.properties"));
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            SynonymService.getService().addWords(line);
+        }
+        scanner.close();
+    }
+
     public void rebuildIndex() {
         transatomatic.run(new Transatomatic.UnitOfWork() {
             @Override

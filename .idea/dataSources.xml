@@ -1,3 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project version="4" />
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" hash="3764391601">
+    <data-source source="LOCAL" name="H2 - Punter Local" uuid="6b874ce4-b96b-4e40-ae25-bf5257018d35">
+      <driver-ref>h2.embedded</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.h2.Driver</jdbc-driver>
+      <jdbc-url>jdbc:h2:file:///D:\workspace\Punter\punterDB</jdbc-url>
+      <user-name>sa</user-name>
+      <user-password>dfd9dfcb</user-password>
+      <libraries />
+    </data-source>
+  </component>
+</project>
 
