@@ -1,6 +1,7 @@
 package com.shunya.server;
 
 import com.shunya.kb.jpa.Document;
+import com.shunya.kb.jpa.SynonymWord;
 
 import javax.jnlp.*;
 import javax.management.*;
@@ -91,8 +92,17 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
     }
 
     @Override
+    public void addSynonym(String words){
+        SynonymWord synonymWord = new SynonymWord();
+        synonymWord.setWords(words);
+        staticDaoFacade.create(synonymWord);
+        System.out.println("synonymWord = " + synonymWord.getWords());
+    }
+
+    @Override
     public void refreshIndexes() {
         System.err.println("Refreshing indexe's");
+        staticDaoFacade.buildSynonymCache();
         staticDaoFacade.rebuildIndex();
         System.err.println("Indexes refreshed");
     }

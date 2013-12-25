@@ -71,7 +71,14 @@ public class LuceneIndexDao {
             StringTokenizer stk = new StringTokenizer(pDoc.getTag(), " ;,");
             StringBuilder tags = new StringBuilder();
             while (stk.hasMoreTokens()) {
-                tags.append(stk.nextToken() + " ");
+                final String s = stk.nextToken();
+                tags.append(s + " ");
+                final String[] synonym = SynonymService.getService().getSynonym(s);
+                if(synonym!=null){
+                    for (String s1 : synonym) {
+                        tags.append(s1 + " ");
+                    }
+                }
             }
             doc.add(new TextField("tags", itrim(getPunterParsedText(tags.toString())), Field.Store.NO));
         }
@@ -83,6 +90,12 @@ public class LuceneIndexDao {
         Set<String> words = new HashSet<>(1000);
         while (stk.hasMoreTokens()) {
             String token = stk.nextToken();
+            final String[] synonym = SynonymService.getService().getSynonym(token);
+            if(synonym!=null){
+                for (String s : synonym) {
+                    words.add(s);
+                }
+            }
             words.add(token);
             words.addAll(getPunterParsedSubText(token));
         }

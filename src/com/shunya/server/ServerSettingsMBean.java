@@ -3,7 +3,9 @@ package com.shunya.server;
 import java.net.UnknownHostException;
 
 public interface ServerSettingsMBean {
-	public void refreshIndexes();
+    void addSynonym(String words);
+
+    public void refreshIndexes();
 
 	public void stopServer();
 

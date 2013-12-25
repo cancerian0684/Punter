@@ -3,6 +3,7 @@ package com.shunya.server;
 import com.shunya.kb.gui.SearchQuery;
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
+import com.shunya.kb.jpa.SynonymWord;
 import com.shunya.punter.jpa.ProcessData;
 import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.TaskData;
@@ -99,6 +100,34 @@ public class StaticDaoFacade {
         return result;
     }
 
+    public SynonymWord create(final SynonymWord words) {
+        final ResultHolder<SynonymWord> resultHolder = new ResultHolder<>();
+        transatomatic.run(new Transatomatic.UnitOfWork() {
+            @Override
+            public void run() {
+                EntityManager em = getSession();
+                em.persist(words);
+                em.flush();
+                resultHolder.setResult(words);
+            }
+        });
+        return resultHolder.getResult();
+    }
+
+    public SynonymWord saveSynonymWords(final SynonymWord doc) {
+        final ResultHolder<SynonymWord> resultHolder = new ResultHolder<>();
+        transatomatic.run(new Transatomatic.UnitOfWork() {
+            @Override
+            public void run() {
+                EntityManager em = getSession();
+                SynonymWord document = em.merge(doc);
+                SynonymService.getService().addWords(document.getWords());
+                resultHolder.setResult(document);
+            }
+        });
+        return resultHolder.getResult();
+    }
+
     public Document saveDocument(final Document doc) {
         final ResultHolder<Document> resultHolder = new ResultHolder<>();
         transatomatic.run(new Transatomatic.UnitOfWork() {
@@ -180,6 +209,22 @@ public class StaticDaoFacade {
             }
         });
         return true;
+    }
+
+    public void buildSynonymCache(){
+        transatomatic.run(new Transatomatic.UnitOfWork() {
+            @Override
+            public void run() {
+                System.out.println("Rebuilding Synonym Cache");
+                EntityManager em = getSession();
+                Query query = em.createQuery("SELECT e FROM SynonymWord e");
+                List<SynonymWord> allDocs = query.getResultList();
+                for (SynonymWord synonymWord : allDocs) {
+                    System.out.println(synonymWord.getWords());
+                    SynonymService.getService().addWords(synonymWord.getWords());
+                }
+            }
+        });
     }
 
     public void rebuildIndex() {

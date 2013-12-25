@@ -35,6 +35,7 @@ public class Main {
         staticDaoFacade.setSettings(serverSettings);
         context = new ServerContext(staticDaoFacade, sessionFacade, sessionCache, transatomatic, serverSettings);
         punterHttpServer = new PunterHttpServer(context);
+        staticDaoFacade.buildSynonymCache();
     }
 
     public void startServer() {
