@@ -15,7 +15,7 @@ public class ClipBoardListener implements ClipboardOwner, PunterComponent {
 
     public ClipBoardListener(StaticDaoFacade staticDaoFacade) {
         this.staticDaoFacade = staticDaoFacade;
-        startComponent();
+//        startComponent();
     }
 
     public void run() {

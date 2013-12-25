@@ -6,7 +6,9 @@ import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.kb.jpa.StaticDaoFacadeStrategy;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.Main;
+import com.shunya.punter.utils.DevEmailService;
 import org.apache.commons.io.IOUtils;
+import org.markdown4j.Markdown4jProcessor;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -27,6 +29,8 @@ import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -40,6 +44,7 @@ public class PunterKB extends JPanel {
     private JToggleButton andOrToggleButton = new JToggleButton("O");
     private final StaticDaoFacade docService;
     private final List<String> categories;
+    private ExecutorService executorService = Executors.newCachedThreadPool();
 
     private DataFlavor Linux = new DataFlavor("text/uri-list;class=java.io.Reader");
     private DataFlavor plainText = new DataFlavor("text/plain; class=java.lang.String; charset=Unicode");
@@ -405,7 +410,7 @@ public class PunterKB extends JPanel {
         c.gridy = 1;
         add(new JScrollPane(searchResultTable), c);
 
-        final JMenuItem addProcessMenu, openDocMenu, renameMenu, deleteDocMenu, docTagsMenu, reindexDocsMenu, copyURL, pasteMenu;
+        final JMenuItem addProcessMenu, openDocMenu, renameMenu, deleteDocMenu, docTagsMenu, reindexDocsMenu, copyURL, pasteMenu, emailMenu;
         final JPopupMenu popupProcess = new JPopupMenu();
         addProcessMenu = new JMenuItem("Add");
         addProcessMenu.addActionListener(new ActionListener() {
@@ -546,7 +551,7 @@ public class PunterKB extends JPanel {
             }
         });
         popupProcess.add(reindexDocsMenu);
-        reindexDocsMenu.setEnabled(false);
+//        reindexDocsMenu.setEnabled(false);
 
         copyURL = new JMenuItem("Copy URL");
         copyURL.addActionListener(new ActionListener() {
@@ -567,6 +572,69 @@ public class PunterKB extends JPanel {
             }
         });
         popupProcess.add(copyURL);
+
+        emailMenu = new JMenuItem("Email");
+        emailMenu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
+                            DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
+                            Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                            List<File> files = new ArrayList<>();
+                            File temp = new File("Temp");
+                            if (!temp.exists())
+                                temp.mkdir();
+                            doc = docService.getDocument(doc);
+                            //Punter Doc
+                            if (doc.getExt().isEmpty()) {
+                                Collection<Attachment> attchs = doc.getAttachments();
+                                for (Attachment attch : attchs) {
+                                    File nf = new File(temp, attch.getTitle());
+                                    try {
+                                        FileOutputStream fos = new FileOutputStream(nf);
+                                        fos.write(attch.getContent());
+                                        fos.close();
+                                        files.add(nf);
+                                    } catch (IOException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                }
+                                final String htmlContent = markdown4jProcessor.process(new String(doc.getContent()));
+                                DevEmailService.getInstance().sendEmail(doc.getTitle(), "cancerian0684@gmail.com", htmlContent, files);
+                            }
+                            //System Doc
+                            else {
+                                System.out.println("Opening up the file.." + doc.getTitle());
+                                String filename = "D_" + doc.getId() + doc.getExt();
+                                if (!doc.getExt().isEmpty()) {
+                                    filename = doc.getTitle();
+                                    if (filename.lastIndexOf(".") == -1) {
+                                        filename += doc.getExt();
+                                    }
+                                }
+                                File nf = new File(temp, filename);
+                                try {
+                                    FileOutputStream fos = new FileOutputStream(nf);
+                                    fos.write(doc.getContent());
+                                    fos.close();
+                                    files.add(nf);
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                                DevEmailService.getInstance().sendEmail(doc.getTitle(), "cancerian0684@gmail.com", "PFA", files);
+                            }
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+        popupProcess.add(emailMenu);
+
         registerKeyBindings();
         searchResultTable.addMouseListener(new MouseAdapter() {
             //JPopupMenu popup;
@@ -581,7 +649,7 @@ public class PunterKB extends JPanel {
                     if (SwingUtilities.isRightMouseButton(e)) {
                         if (selectedRow != -1) {
                             searchResultTable.setRowSelectionInterval(selectedRow, selectedRow);
-                            selectedRow = searchResultTable.convertRowIndexToModel(selectedRow);
+                            int actualRow = searchResultTable.convertRowIndexToModel(selectedRow);
                             openDocMenu.setEnabled(true);
                             deleteDocMenu.setEnabled(true);
                             docTagsMenu.setEnabled(true);
