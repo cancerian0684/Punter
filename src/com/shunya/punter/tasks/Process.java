@@ -9,13 +9,14 @@ import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.RunState;
 import com.shunya.punter.jpa.RunStatus;
 import com.shunya.punter.jpa.TaskHistory;
-import com.shunya.punter.utils.EmailService;
+import com.shunya.punter.utils.DevEmailService;
 import com.shunya.punter.utils.FieldProperties;
 import com.shunya.punter.utils.FieldPropertiesMap;
 import com.shunya.punter.utils.StringUtils;
 
 import javax.swing.text.*;
 import javax.xml.bind.JAXBException;
+import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.text.ParseException;
@@ -103,7 +104,7 @@ public class Process implements Serializable {
                 for (TaskHistory th : processHistory.getTaskHistoryList()) {
                     processLogs.append(th.getLogs() + "\r\n");
                 }
-                EmailService.getInstance().sendEMail("Punter Task : [" + processHistory.getRunStatus() + "] " + processHistory.getName(), emailsToNotify, processLogs.toString());
+                DevEmailService.getInstance().sendEmail("Punter Task : [" + processHistory.getRunStatus() + "] " + processHistory.getName(), emailsToNotify, processLogs.toString(), Collections.<File>emptyList());
                 if (processLogger != null) {
                     processLogger.log(Level.INFO, "Mail Sent.");
                 }
