@@ -178,6 +178,7 @@ public class StaticDaoFacade {
                 Document doc = attach.getDocument();
                 doc = em.find(Document.class, doc.getId());
                 em.refresh(doc);
+                em.getTransaction().commit();
                 LuceneIndexDao.getInstance().indexDocs(doc);
                 resultHolder.setResult(attach);
             }
@@ -225,7 +226,6 @@ public class StaticDaoFacade {
                 doc = em.find(Document.class, doc.getId());
                 em.refresh(doc);
                 LuceneIndexDao.getInstance().indexDocs(doc);
-
             }
         });
         return true;

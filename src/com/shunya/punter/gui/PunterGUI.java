@@ -249,7 +249,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         processTable.setPreferredScrollableViewportSize(new Dimension(250, 300));
         processTable.setFillsViewportHeight(true);
         processTable.setRowHeight(25);
-        processTable.setFont(new Font("Arial", Font.TRUETYPE_FONT, 11));
+        processTable.setFont(new Font("Arial Unicode MS", Font.TRUETYPE_FONT, 11));
         processTable.setForeground(Color.BLUE);
         processTable.setTableHeader(null);
         processTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);

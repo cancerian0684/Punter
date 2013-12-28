@@ -281,10 +281,6 @@ public class Main {
 
             popup.addSeparator();
 
-//            MenuItem restartItem = new MenuItem("Restart");
-//            restartItem.addActionListener(restartListener);
-//            popup.add(restartItem);
-
             MenuItem defaultItem = new MenuItem("Exit");
             defaultItem.addActionListener(exitListener);
             popup.add(defaultItem);

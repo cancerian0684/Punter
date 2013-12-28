@@ -1,9 +1,7 @@
 package com.shunya.punter.utils;
 
-import java.awt.Font;
-
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
+import javax.swing.*;
+import java.awt.*;
 
 public class LogWindow extends JFrame {
 	private TextAreaFIFO logArea;
@@ -13,7 +11,7 @@ public class LogWindow extends JFrame {
 		logArea.setRows(10);
 		logArea.setColumns(25);
 		logArea.setEditable(false);
-		logArea.setFont(new Font("Arial",0,12));
+		logArea.setFont(new Font("Arial Unicode MS",0,12));
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		getContentPane().add(new JScrollPane(logArea));
 		setLocationRelativeTo(null);

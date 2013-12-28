@@ -76,7 +76,7 @@ public class PunterKB extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         categories = docService.getCategories();
         searchTextField = new JTextField(20);
-        searchTextField.setFont(new Font("Arial", Font.TRUETYPE_FONT, 12));
+        searchTextField.setFont(new Font("Arial Unicode MS", Font.TRUETYPE_FONT, 12));
         searchTextField.setPreferredSize(new Dimension(searchTextField.getWidth(), 30));
         searchTextField.getDocument().addDocumentListener(
                 new DocumentListener() {
@@ -196,7 +196,7 @@ public class PunterKB extends JPanel {
         searchResultTable.setDragEnabled(true);
         searchResultTable.setIntercellSpacing(new Dimension(0, 0));
         searchResultTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        searchResultTable.setFont(new Font("Arial", Font.TRUETYPE_FONT, 11));
+        searchResultTable.setFont(new Font("Arial Unicode MS", Font.TRUETYPE_FONT, 11));
 //		 TableCellRenderer dcr=searchResultTable.getColumn("<html><b>Document Name").getCellRenderer();
         TableCellRenderer dcr = searchResultTable.getDefaultRenderer(String.class);
         if (dcr instanceof JLabel) {
