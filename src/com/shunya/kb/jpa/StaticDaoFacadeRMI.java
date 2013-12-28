@@ -206,6 +206,11 @@ public class StaticDaoFacadeRMI implements StaticDaoFacade {
     }
 
     @Override
+    public Attachment getAttachment(Attachment doc) throws RemoteException {
+        return stub.getAttachment(doc);
+    }
+
+    @Override
     public boolean deleteAttachment(Attachment attch) throws RemoteException {
         return stub.deleteAttachment(attch);
     }

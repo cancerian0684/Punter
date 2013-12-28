@@ -19,7 +19,7 @@ public class PunterSearchServer implements PunterSearch {
     private SessionFacade sessionFacade;
     private ServerSettings settings;
 
-    public PunterSearchServer(StaticDaoFacade staticDaoFacade,SessionFacade sessionFacade,ServerSettings settings) {
+    public PunterSearchServer(StaticDaoFacade staticDaoFacade, SessionFacade sessionFacade, ServerSettings settings) {
         this.staticDaoFacade = staticDaoFacade;
         this.sessionFacade = sessionFacade;
         this.settings = settings;
@@ -47,12 +47,20 @@ public class PunterSearchServer implements PunterSearch {
 
     @Override
     public Attachment saveAttachment(Attachment attach) {
-        return staticDaoFacade.saveAttachment(attach);
+        if (attach.getId() != 0)
+            return staticDaoFacade.mergeAttachment(attach);
+        else
+            return staticDaoFacade.saveAttachment(attach);
     }
 
     @Override
     public Document getDocument(Document doc) {
         return staticDaoFacade.getDocument(doc);
+    }
+
+    @Override
+    public Attachment getAttachment(Attachment doc) {
+        return staticDaoFacade.getAttachment(doc);
     }
 
     @Override
@@ -221,7 +229,7 @@ public class PunterSearchServer implements PunterSearch {
 
     @Override
     public String getJNLPURL() throws UnknownHostException, RemoteException {
-        return "http://"+getServerHostAddress().getHostAddress()+":"+getWebServerPort()+"/punter.jnlp";
+        return "http://" + getServerHostAddress().getHostAddress() + ":" + getWebServerPort() + "/punter.jnlp";
     }
 
     @Override

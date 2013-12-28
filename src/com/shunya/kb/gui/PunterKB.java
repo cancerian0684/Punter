@@ -695,10 +695,9 @@ public class PunterKB extends JPanel {
                                     System.err.println("Picked Attachment for saving :" + path.toFile().getName());
                                     int id = Integer.parseInt(path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
                                     attachment.setId(id);
-                                    //TODO fetch the attachment
-//                                    attachment = docService.getAttachment(attachment);
-//                                    attachment.setContent(getBytesFromFile(path.toFile()));
-//                                    docService.saveAttachment(attachment);
+                                    attachment = docService.getAttachment(attachment);
+                                    attachment.setContent(getBytesFromFile(path.toFile()));
+                                    docService.saveAttachment(attachment);
                                 } catch (Exception e2) {
                                     e2.printStackTrace();
                                 }

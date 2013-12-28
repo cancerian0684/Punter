@@ -54,6 +54,8 @@ public interface StaticDaoFacade {
 
     Document getDocument(Document doc) throws RemoteException;
 
+    Attachment getAttachment(Attachment doc) throws RemoteException;
+
     boolean deleteAttachment(Attachment attch) throws RemoteException;
 
     boolean deleteDocument(Document attch) throws RemoteException;

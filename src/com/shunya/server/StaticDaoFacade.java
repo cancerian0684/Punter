@@ -147,6 +147,26 @@ public class StaticDaoFacade {
         return resultHolder.getResult();
     }
 
+    public Attachment mergeAttachment(final Attachment attach) {
+        final ResultHolder<Attachment> resultHolder = new ResultHolder<>();
+        transatomatic.run(new Transatomatic.UnitOfWork() {
+            @Override
+            public void run() {
+                EntityManager em = getSession();
+                Attachment attachment = em.merge(attach);
+                em.flush();
+//                em.getTransaction().commit();
+                Document doc = attachment.getDocument();
+                doc = em.find(Document.class, doc.getId());
+                em.refresh(doc);
+                em.getTransaction().commit();
+                LuceneIndexDao.getInstance().indexDocs(doc);
+                resultHolder.setResult(attachment);
+            }
+        });
+        return resultHolder.getResult();
+    }
+
     public Attachment saveAttachment(final Attachment attach) {
         final ResultHolder<Attachment> resultHolder = new ResultHolder<Attachment>();
         transatomatic.run(new Transatomatic.UnitOfWork() {
@@ -174,6 +194,20 @@ public class StaticDaoFacade {
                 Document document = em.find(Document.class, doc.getId());
                 em.refresh(document);
                 resultHolder.setResult(document);
+            }
+        });
+        return resultHolder.getResult();
+    }
+
+    public Attachment getAttachment(final Attachment attachment) {
+        final ResultHolder<Attachment> resultHolder = new ResultHolder<>();
+        transatomatic.run(new Transatomatic.UnitOfWork() {
+            @Override
+            public void run() {
+                EntityManager em = getSession();
+                Attachment persisted = em.find(Attachment.class, attachment.getId());
+                em.refresh(persisted);
+                resultHolder.setResult(persisted);
             }
         });
         return resultHolder.getResult();

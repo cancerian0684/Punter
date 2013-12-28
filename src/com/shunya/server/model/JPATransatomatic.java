@@ -6,9 +6,10 @@ import javax.persistence.EntityTransaction;
 public class JPATransatomatic implements Transatomatic {
     private ThreadLocalSession threadLocalSession;
 
-    public JPATransatomatic(ThreadLocalSession threadLocalSession){
+    public JPATransatomatic(ThreadLocalSession threadLocalSession) {
         this.threadLocalSession = threadLocalSession;
     }
+
     @Override
     public void run(UnitOfWork unitOfWork) {
         final EntityManager em = threadLocalSession.getUnderlyingEntityManager();
@@ -17,7 +18,9 @@ public class JPATransatomatic implements Transatomatic {
             tx = em.getTransaction();
             tx.begin();
             unitOfWork.run();
-            tx.commit();
+            if (tx != null && tx.isActive()) {
+                tx.commit();
+            }
         } finally {
             if (tx != null && tx.isActive()) {
                 tx.rollback();

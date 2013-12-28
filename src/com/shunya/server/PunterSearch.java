@@ -40,6 +40,8 @@ public interface PunterSearch extends Remote {
 
     Document getDocument(Document doc) throws RemoteException;
 
+    Attachment getAttachment(Attachment doc) throws RemoteException;
+
     boolean deleteAttachment(Attachment attch) throws RemoteException;
 
     boolean deleteDocument(Document attch) throws RemoteException;
@@ -94,9 +96,9 @@ public interface PunterSearch extends Remote {
 
     void sendMessage(String sessionId, PunterMessage punterMessage) throws RemoteException, InterruptedException;
 
-    void sendMessage(String sessionId, PunterMessage punterMessage,String topic) throws RemoteException, InterruptedException;
+    void sendMessage(String sessionId, PunterMessage punterMessage, String topic) throws RemoteException, InterruptedException;
 
-    PunterMessage getMessage(String sessionId) throws InterruptedException,RemoteException;
+    PunterMessage getMessage(String sessionId) throws InterruptedException, RemoteException;
 
     String getDevEmailCSV() throws RemoteException;
 

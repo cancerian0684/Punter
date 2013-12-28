@@ -203,6 +203,11 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     }
 
     @Override
+    public Attachment getAttachment(Attachment doc) {
+        return staticDaoFacade.getAttachment(doc);
+    }
+
+    @Override
     public boolean deleteAttachment(Attachment attch) throws RemoteException {
         return stub.deleteAttachment(attch);
     }

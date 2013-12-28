@@ -205,7 +205,7 @@ public class DocumentEditor extends JFrame {
                         if (Desktop.isDesktopSupported()) {
                             File temp = new File("Temp");
                             temp.mkdir();
-                            File nf = new File(temp, "A" + attch.getId() + "" + attch.getExt());
+                            File nf = new File(temp, "A_" + attch.getId() + "" + attch.getExt());
                             System.out.println("Opening up the file.." + nf.getName());
                             try {
                                 if (!nf.exists()) {
