@@ -209,7 +209,7 @@ public class PunterKB extends JPanel {
             ((JLabel) headerRenderer).setHorizontalAlignment(JLabel.CENTER);
         }
         header.setPreferredSize(new Dimension(30, 15));
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < 3; i++) {
             column = searchResultTable.getColumnModel().getColumn(i);
             if (i == 1) {
@@ -611,7 +611,7 @@ public class PunterKB extends JPanel {
                                 String filename = "D_" + doc.getId() + doc.getExt();
                                 if (!doc.getExt().isEmpty()) {
                                     filename = doc.getTitle();
-                                    if (filename.lastIndexOf(".") == -1) {
+                                    if (!filename.endsWith(doc.getExt())) {
                                         filename += doc.getExt();
                                     }
                                 }
