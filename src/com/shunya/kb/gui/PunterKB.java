@@ -4,6 +4,7 @@ import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
 import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.kb.jpa.StaticDaoFacadeStrategy;
+import com.shunya.kb.utils.WordService;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.Main;
 import com.shunya.punter.utils.DevEmailService;
@@ -23,6 +24,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,6 +53,7 @@ public class PunterKB extends JPanel {
     private DataFlavor Windows = DataFlavor.javaFileListFlavor;
     private DataFlavor rtfDataFlavor = new DataFlavor("text/rtf; class=java.io.InputStream");
     private DataFlavor htmlDataFlavor = new DataFlavor("text/html; class=java.io.InputStream; charset=UTF-16");
+    private WordService wordService;
 
     public void registerKeyBindings() {
 //        KeyStroke.getKeyStroke("F2")
@@ -69,7 +72,8 @@ public class PunterKB extends JPanel {
 
     private DelayedQueueHandlerThread<SearchQuery> punterDelayedQueueHandlerThread;
 
-    public PunterKB(StaticDaoFacade staticDaoFacade) throws ClassNotFoundException, RemoteException {
+    public PunterKB(StaticDaoFacade staticDaoFacade) throws ClassNotFoundException, RemoteException, URISyntaxException {
+        wordService = new WordService();
         docService = staticDaoFacade;
         docService.getDocList(new SearchQuery.SearchQueryBuilder().query("").build());
         setLayout(new GridBagLayout());
@@ -133,7 +137,7 @@ public class PunterKB extends JPanel {
                             }
                             if (column == 1) {
                                 if (doc.getExt().isEmpty())
-                                    DocumentEditor.showEditor(doc, docService);
+                                    DocumentEditor.showEditor(doc, docService, wordService);
                                 else {
                                     if (Desktop.isDesktopSupported()) {
                                         System.out.println("Opening up the file.." + doc.getTitle());
@@ -423,7 +427,7 @@ public class PunterKB extends JPanel {
                 } catch (RemoteException e1) {
                     e1.printStackTrace();
                 }
-                DocumentEditor.showEditor(doc, docService);
+                DocumentEditor.showEditor(doc, docService, wordService);
             }
         });
         popupProcess.add(addProcessMenu);
@@ -436,7 +440,7 @@ public class PunterKB extends JPanel {
                     try {
                         doc = docService.getDocument(doc);
                         if (doc.getExt().isEmpty())
-                            DocumentEditor.showEditor(doc, docService);
+                            DocumentEditor.showEditor(doc, docService, wordService);
                         else {
                             if (Desktop.isDesktopSupported()) {
                                 System.out.println("Opening up the file.." + doc.getExt());

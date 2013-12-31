@@ -39,6 +39,7 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
+import java.net.URISyntaxException;
 
 
 public class TextAreaDemo extends JFrame{
@@ -50,7 +51,11 @@ public class TextAreaDemo extends JFrame{
     public TextAreaDemo() {
         super("TextAreaDemo");
         initComponents();
-        new TextCompletionHandler(textArea, null);
+        try {
+            new TextCompletionHandler(textArea, null, new WordService());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
 

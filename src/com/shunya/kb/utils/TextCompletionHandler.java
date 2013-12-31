@@ -7,8 +7,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import java.awt.event.ActionEvent;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,12 +17,13 @@ public class TextCompletionHandler implements DocumentListener {
 
     private static enum Mode {INSERT, COMPLETION}
 
-    ;
-    private final List<String> words;
+    private final WordService wordService;
+
     private Mode mode = Mode.INSERT;
 
-    public TextCompletionHandler(JTextArea textArea, StaticDaoFacade docService) {
+    public TextCompletionHandler(JTextArea textArea, StaticDaoFacade docService, WordService wordService) {
         this.textArea = textArea;
+        this.wordService = wordService;
         this.textArea.getDocument().addDocumentListener(this);
 
         InputMap im = textArea.getInputMap();
@@ -33,23 +32,23 @@ public class TextCompletionHandler implements DocumentListener {
         im.put(KeyStroke.getKeyStroke("ENTER"), COMMIT_ACTION);
         am.put(COMMIT_ACTION, new CommitAction());
 
-        words = new ArrayList<>(5);
-        words.add("munish");
-        words.add("chandel");
-        words.add("spark");
-        words.add("special");
-        words.add("spectacles");
-        words.add("spectacular");
-        words.add("swing");
-        try {
-            final List<String> allTerms = docService.getAllTerms();
-            for (String term : allTerms) {
-                words.add(term.toLowerCase());
-            }
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-        Collections.sort(words);
+//        words = new ArrayList<>(5);
+//        words.add("munish");
+//        words.add("chandel");
+//        words.add("spark");
+//        words.add("special");
+//        words.add("spectacles");
+//        words.add("spectacular");
+//        words.add("swing");
+//        try {
+//            final List<String> allTerms = docService.getAllTerms();
+//            for (String term : allTerms) {
+//                words.add(term.toLowerCase());
+//            }
+//        } catch (RemoteException e) {
+//            e.printStackTrace();
+//        }
+//        Collections.sort(words);
     }
 
     @Override
@@ -79,6 +78,7 @@ public class TextCompletionHandler implements DocumentListener {
         }
 
         String prefix = content.substring(w + 1).toLowerCase();
+        final List<String> words = wordService.getWords();
         int n = Collections.binarySearch(words, prefix);
         if (n < 0 && -n <= words.size()) {
             String match = words.get(-n - 1);

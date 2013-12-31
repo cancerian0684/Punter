@@ -4,6 +4,7 @@ import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
 import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.kb.utils.TextCompletionHandler;
+import com.shunya.kb.utils.WordService;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.GUIUtils;
 import com.shunya.punter.gui.PunterGUI;
@@ -36,6 +37,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigInteger;
+import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -86,8 +88,8 @@ public class DocumentEditor extends JFrame {
         }
     }
 
-    public static void showEditor(Document doc, StaticDaoFacade docService) {
-        DocumentEditor editor = new DocumentEditor(doc, docService);
+    public static void showEditor(Document doc, StaticDaoFacade docService, WordService wordService) {
+        DocumentEditor editor = new DocumentEditor(doc, docService, wordService);
         try {
             editor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
             editor.textField.setText(doc.getTitle());
@@ -119,7 +121,7 @@ public class DocumentEditor extends JFrame {
         inputMap.put(key, redoAction);
     }
 
-    public DocumentEditor(final Document ldoc, StaticDaoFacade docServic) {
+    public DocumentEditor(final Document ldoc, StaticDaoFacade docServic, WordService wordService) {
         setAlwaysOnTop(false);
         setIconImage(idleImage);
         setLayout(new GridBagLayout());
@@ -143,7 +145,7 @@ public class DocumentEditor extends JFrame {
         jTextPaneForEditing.setFont(new Font("Arial Unicode MS", Font.TRUETYPE_FONT, 12));
         jTextPaneForEditing.setText(new String(ldoc.getContent()));
 
-        new TextCompletionHandler(jTextPaneForEditing, docService);
+        new TextCompletionHandler(jTextPaneForEditing, docService, wordService);
 
         addBindings();
 
@@ -640,7 +642,7 @@ public class DocumentEditor extends JFrame {
         return bytes;
     }
 
-    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, URISyntaxException {
         JFrame frame = new JFrame("FrameDemo");
         UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -653,7 +655,7 @@ public class DocumentEditor extends JFrame {
         } catch (RemoteException e) {
             e.printStackTrace();
         }*/
-        DocumentEditor.showEditor(doc, null);
+        DocumentEditor.showEditor(doc, null, new WordService());
 
     }
 
