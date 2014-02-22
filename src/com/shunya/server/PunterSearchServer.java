@@ -46,6 +46,11 @@ public class PunterSearchServer implements PunterSearch {
     }
 
     @Override
+    public void deleteAllForCategory(String category) throws IOException {
+        staticDaoFacade.deleteAllForCategory(category);
+    }
+
+    @Override
     public Attachment saveAttachment(Attachment attach) {
         if (attach.getId() != 0)
             return staticDaoFacade.mergeAttachment(attach);

@@ -36,6 +36,8 @@ public interface PunterSearch extends Remote {
 
     Document saveDocument(Document doc) throws RemoteException;
 
+    void deleteAllForCategory(String category) throws IOException;
+
     Attachment saveAttachment(Attachment attach) throws RemoteException;
 
     Document getDocument(Document doc) throws RemoteException;

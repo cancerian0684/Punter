@@ -25,9 +25,8 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.List;
@@ -36,7 +35,8 @@ import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static java.nio.file.FileVisitResult.CONTINUE;
+import static java.nio.file.StandardWatchEventKinds.*;
 
 public class PunterKB extends JPanel {
     private static JFrame frame;
@@ -563,9 +563,17 @@ public class PunterKB extends JPanel {
                 try {
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
                     Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                    String docId;
+                    if (doc.getCategory().equalsIgnoreCase("/all/uploads")) {
+                        doc = docService.getDocument(doc);
+//                        Base64.getEncoder().encode(doc.getTitle().getBytes())
+                        docId = "uploads/" + doc.getTitle();
+                        docId=docId.replaceAll(" ", "%20");
+                    } else
+                        docId = "" + doc.getId();
                     String url = "http://" + docService.getServerHostAddress().getHostAddress() + ":"
                             + docService.getWebServerPort()
-                            + "/" + doc.getId();
+                            + "/" + docId;
                     System.out.println(url);
                     StringSelection stringSelection = new StringSelection(url);
                     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -716,6 +724,59 @@ public class PunterKB extends JPanel {
             }
         };
         thread.start();
+
+        Thread uploadScanner = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                updateUploadsCache();
+                Path dir = Paths.get("uploads");
+                try {
+                    new WatchDir(dir, false, new WatchDir.FileObserver() {
+                        @Override
+                        public void notify(Path path) {
+                            updateUploadsCache();
+                        }
+                    }, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE).processEvents();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        uploadScanner.start();
+    }
+
+    private void updateUploadsCache() {
+        Path dir = Paths.get("uploads");
+        try {
+            System.out.println("Deleting all for category");
+            docService.deleteAllForCategory("/all/uploads");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Scanning directory for uploads - " + dir.getFileName());
+        try {
+            Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+                    if (path.toFile().getName().startsWith("~") || path.toFile().getName().endsWith(".tmp"))
+                        return CONTINUE;
+                    final String fileName = path.getFileName().toString();
+                    Document doc = new Document();
+                    doc.setAuthor(AppSettings.getInstance().getUsername());
+                    doc.setTitle(fileName);
+//                    doc.setContent(fileName.getBytes());
+                    doc.setExt(getExtension(path.toFile()));
+                    doc.setDateCreated(new Date(path.toFile().lastModified()));
+                    doc.setDateUpdated(new Date());
+                    doc.setCategory("/all/uploads");
+                    docService.saveDocument(doc);
+                    System.err.println("Document added : " + fileName);
+                    return CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean getContentsFromTransferrable(Transferable transferable) {

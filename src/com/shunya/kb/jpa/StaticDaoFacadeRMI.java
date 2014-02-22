@@ -191,6 +191,11 @@ public class StaticDaoFacadeRMI implements StaticDaoFacade {
     }
 
     @Override
+    public void deleteAllForCategory(String category) throws IOException {
+        stub.deleteAllForCategory(category);
+    }
+
+    @Override
     public Document saveDocument(Document doc) throws RemoteException {
         return stub.saveDocument(doc);
     }

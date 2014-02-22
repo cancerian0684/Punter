@@ -51,14 +51,15 @@ public class LuceneIndexDao {
         doc.add(new TextField("category", pDoc.getCategory(), Field.Store.YES));
         doc.add(new StringField("created", DateTools.timeToString(pDoc.getDateCreated().getTime(), DateTools.Resolution.MINUTE), Field.Store.YES));
         doc.add(new StringField("updated", DateTools.timeToString(pDoc.getDateUpdated().getTime(), DateTools.Resolution.MINUTE), Field.Store.YES));
-        try {
-            String contents = PunterTextExtractor.getText(pDoc.getContent(), "", pDoc.getExt());
-            doc.add(new TextField("contents", itrim(getPunterParsedText2(contents)), Field.Store.NO));
-            int len = contents.length();
-            doc.add(new Field("content", contents.substring(0, len > 20000 ? 20000 : len), StringField.TYPE_STORED));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        if (pDoc.getContent() != null)
+            try {
+                String contents = PunterTextExtractor.getText(pDoc.getContent(), "", pDoc.getExt());
+                doc.add(new TextField("contents", itrim(getPunterParsedText2(contents)), Field.Store.NO));
+                int len = contents.length();
+                doc.add(new Field("content", contents.substring(0, len > 20000 ? 20000 : len), StringField.TYPE_STORED));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         Collection<Attachment> attchmts = pDoc.getAttachments();
         StringBuilder attchs = new StringBuilder();
         if (attchmts != null)
@@ -74,7 +75,7 @@ public class LuceneIndexDao {
                 final String s = stk.nextToken();
                 tags.append(s + " ");
                 final String[] synonym = SynonymService.getService().getSynonym(s);
-                if(synonym!=null){
+                if (synonym != null) {
                     for (String s1 : synonym) {
                         tags.append(s1 + " ");
                     }
@@ -91,7 +92,7 @@ public class LuceneIndexDao {
         while (stk.hasMoreTokens()) {
             String token = stk.nextToken();
             final String[] synonym = SynonymService.getService().getSynonym(token);
-            if(synonym!=null){
+            if (synonym != null) {
                 for (String s : synonym) {
                     words.add(s);
                 }
@@ -264,7 +265,7 @@ public class LuceneIndexDao {
     }
 
     public List<Document> search(String searchString, String category, boolean isAND, int start, int batch) throws IOException {
-        long t1=System.currentTimeMillis();
+        long t1 = System.currentTimeMillis();
         searcherManager.maybeRefresh();
         IndexSearcher searcher = searcherManager.acquire();
         try {
@@ -303,7 +304,7 @@ public class LuceneIndexDao {
             CachingWrapperFilter cwf = new CachingWrapperFilter(queryFilter);
             hits = searcher.search(query, cwf, start + batch);
             int numTotalHits = hits.totalHits;
-            System.out.println("time = "+(System.currentTimeMillis()-t1));
+            System.out.println("time = " + (System.currentTimeMillis() - t1));
             List<Document> resultDocs = new ArrayList<>(50);
             for (int i = start; i < numTotalHits && i < (start + batch); i++) {
 //				Explanation exp = isearcher.explain(query, i);
@@ -320,7 +321,7 @@ public class LuceneIndexDao {
                 document.setCategory(doc.get("category"));
                 document.setId(Long.parseLong(doc.get("id")));
                 String title = doc.get("titleS");
-                String contents = doc.get("content");
+                String contents = doc.get("content") == null ? "" : doc.get("content");
                 int maxNumFragmentsRequired = 2;
                 String fragmentSeparator = "...";
                 String result = highlighter.getBestFragments(analyzer.tokenStream("titleS", new StringReader(title)), title, maxNumFragmentsRequired, fragmentSeparator);

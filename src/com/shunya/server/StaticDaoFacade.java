@@ -92,6 +92,17 @@ public class StaticDaoFacade {
         return result;
     }
 
+    public void deleteAllForCategory(String category) throws IOException {
+        long t1 = System.currentTimeMillis();
+        List<Document> result = LuceneIndexDao.getInstance().search("*", category, true, 0, 100);
+        for (Document document : result) {
+            System.out.println("Deleting document - " + document);
+            deleteDocument(document);
+        }
+        long t2 = System.currentTimeMillis();
+        System.err.println("time consumed : " + (t2 - t1));
+    }
+
     public List<String> getAllTerms() throws IOException {
         long t1 = System.currentTimeMillis();
         List<String> result = LuceneIndexDao.getInstance().listAllTermsForTitle();
@@ -135,7 +146,6 @@ public class StaticDaoFacade {
             public void run() {
                 EntityManager em = getSession();
                 Document document = em.merge(doc);
-//                TODO
 //                em.flush();
 //                em.getTransaction().commit();
 //                document = em.find(Document.class, document.getId());
@@ -245,7 +255,7 @@ public class StaticDaoFacade {
         return true;
     }
 
-    public void buildSynonymCache(){
+    public void buildSynonymCache() {
         transatomatic.run(new Transatomatic.UnitOfWork() {
             @Override
             public void run() {
@@ -261,7 +271,7 @@ public class StaticDaoFacade {
         });
     }
 
-    public void buildSynonymsCacheLocal(){
+    public void buildSynonymsCacheLocal() {
         System.out.println("Rebuilding Synonym Cache Local");
         Scanner scanner = new Scanner(StaticDaoFacade.class.getClassLoader().getResourceAsStream("resources/synonyms.properties"));
         while (scanner.hasNextLine()) {

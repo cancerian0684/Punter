@@ -31,24 +31,6 @@ public class TextCompletionHandler implements DocumentListener {
         im.put(KeyStroke.getKeyStroke("TAB"), COMMIT_ACTION);
         im.put(KeyStroke.getKeyStroke("ENTER"), COMMIT_ACTION);
         am.put(COMMIT_ACTION, new CommitAction());
-
-//        words = new ArrayList<>(5);
-//        words.add("munish");
-//        words.add("chandel");
-//        words.add("spark");
-//        words.add("special");
-//        words.add("spectacles");
-//        words.add("spectacular");
-//        words.add("swing");
-//        try {
-//            final List<String> allTerms = docService.getAllTerms();
-//            for (String term : allTerms) {
-//                words.add(term.toLowerCase());
-//            }
-//        } catch (RemoteException e) {
-//            e.printStackTrace();
-//        }
-//        Collections.sort(words);
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.shunya.punter.jpa.TaskHistory;
 import com.shunya.punter.utils.ClipBoardListener;
 import com.shunya.server.PunterMessage;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
@@ -47,6 +48,8 @@ public interface StaticDaoFacade {
     Document createDocument(String author) throws RemoteException;
 
     List<Document> getDocList(SearchQuery searchQuery) throws RemoteException;
+
+    void deleteAllForCategory(String category) throws IOException;
 
     Document saveDocument(Document doc) throws RemoteException;
 
