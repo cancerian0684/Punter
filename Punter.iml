@@ -235,7 +235,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="jedi-core" level="project" />
-    <orderEntry type="library" name="tools" level="project" />
     <orderEntry type="library" name="junit" level="project" />
     <orderEntry type="module-library">
       <library>

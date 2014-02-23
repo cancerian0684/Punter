@@ -20,7 +20,7 @@
     <target name="compile" depends="clean">
         <tstamp/>
         <mkdir dir="${build}"/>
-        <javac srcdir="${src}" destdir="${build}" debug="on" source="1.6" target="1.6"
+        <javac srcdir="${src}" destdir="${build}" debug="on" source="1.8" target="1.8"
                excludes="com/shunya/punter/tasks/chat/**,com/shunya/punter/tasks/ChatTask.java">
             <classpath refid="lib.path.ref"/>
         </javac>
@@ -39,7 +39,7 @@
                 <include name="docs/*.html"/>
                 <include name="images/*.png"/>
                 <include name="META-INF/*.xml"/>
-                <include name="resources/*.properties"/>
+                <include name="resources/*.*"/>
                 <include name="sql/*.sql"/>
             </fileset>
         </jar>

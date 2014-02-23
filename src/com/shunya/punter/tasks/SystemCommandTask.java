@@ -4,7 +4,9 @@ import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.PunterTask;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @PunterTask(author = "munishc", name = "SystemCommandTask", documentation = "docs/SystemCommandTask.html")
 public class SystemCommandTask extends Tasks {
@@ -17,28 +19,54 @@ public class SystemCommandTask extends Tasks {
 
     @Override
     public boolean run() {
-        boolean status;
+        final boolean[] status = new boolean[1];
         try {
-            java.lang.Process process = Runtime.getRuntime().exec(systemCommand.split("[\n]"));
-            status = startOutputAndErrorReadThreads(process.getInputStream(), process.getErrorStream());
-            process.getOutputStream().close();
+            String[] commands = systemCommand.split("[\n]");
+            final java.lang.Process child = Runtime.getRuntime().exec("cmd /k");
+
+            final Logger logger = LOGGER.get();
+            Thread captureProcessStreams = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        status[0] = startOutputAndErrorReadThreads(child.getInputStream(), child.getErrorStream(), logger);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            captureProcessStreams.start();
+
+            OutputStream out = child.getOutputStream();
+
+            for (String command : commands) {
+                out.write((command + "\r\n").getBytes());
+                out.flush();
+            }
+
+//            out.write("exit\r\n".getBytes());
+//            out.flush();
+            out.close();
+
+            captureProcessStreams.join();
+
             if (waitForTerminate) {
                 LOGGER.get().log(Level.INFO, "Waiting for the process to terminate");
-                process.waitFor();
+                child.waitFor();
             }
         } catch (Exception e) {
-            status = false;
+            status[0] = false;
             LOGGER.get().log(Level.SEVERE, e.getMessage());
         }
-        return status;
+        return status[0];
     }
 
-    private boolean startOutputAndErrorReadThreads(InputStream processOutputStream, InputStream processErrorStream) throws Exception {
+    private boolean startOutputAndErrorReadThreads(InputStream processOutputStream, InputStream processErrorStream, Logger logger) throws Exception {
         StringBuffer commandOutputBuffer = new StringBuffer();
-        AsynchronousStreamReader asynchronousCommandOutputReaderThread = new AsynchronousStreamReader(processOutputStream, commandOutputBuffer, new MyLogDevice(LOGGER.get()), "OUTPUT");
+        AsynchronousStreamReader asynchronousCommandOutputReaderThread = new AsynchronousStreamReader(processOutputStream, commandOutputBuffer, new MyLogDevice(logger), "OUTPUT");
         asynchronousCommandOutputReaderThread.start();
         StringBuffer commandErrorBuffer = new StringBuffer();
-        AsynchronousStreamReader asynchronousCommandErrorReaderThread = new AsynchronousStreamReader(processErrorStream, commandErrorBuffer, new MyLogDevice(LOGGER.get()), "ERROR");
+        AsynchronousStreamReader asynchronousCommandErrorReaderThread = new AsynchronousStreamReader(processErrorStream, commandErrorBuffer, new MyLogDevice(logger), "ERROR");
         asynchronousCommandErrorReaderThread.start();
         asynchronousCommandOutputReaderThread.join();
         asynchronousCommandErrorReaderThread.join();
