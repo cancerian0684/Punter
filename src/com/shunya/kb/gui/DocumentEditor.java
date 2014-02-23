@@ -142,7 +142,7 @@ public class DocumentEditor extends JFrame {
         jTextPaneForEditing.setMargin(new Insets(5, 5, 5, 5));
         jTextPaneForEditing.setWrapStyleWord(true);
         jTextPaneForEditing.setLineWrap(true);
-        jTextPaneForEditing.setFont(new Font("Arial Unicode MS", Font.TRUETYPE_FONT, 12));
+        jTextPaneForEditing.setFont(new Font("Arial Unicode MS", Font.TRUETYPE_FONT, AppSettings.getInstance().getEditorEditSize()));
         jTextPaneForEditing.setText(new String(ldoc.getContent()));
 
         new TextCompletionHandler(jTextPaneForEditing, docService, wordService);
@@ -573,7 +573,7 @@ public class DocumentEditor extends JFrame {
     }
 
     private void setHtmlDocFont() {
-        Font font = new Font("Arial", Font.TRUETYPE_FONT, 15);
+        Font font = new Font("Arial", Font.TRUETYPE_FONT, AppSettings.getInstance().getEditorEditSize());
         String bodyRule = "body { font-family: " + font.getFamily() + "; " + "font-size: " + font.getSize() + "pt; }";
         ((HTMLDocument) jTextPane.getStyledDocument()).getStyleSheet().addRule(bodyRule);
     }

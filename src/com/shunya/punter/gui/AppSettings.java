@@ -35,6 +35,8 @@ public class AppSettings implements Serializable, AppSettingsMBean {
     private boolean schedulerEnabled = true;
     private String tempDirectory;
     private boolean showActiveTasks = false;
+    private int editorPreviewSize = 12;
+    private int editorEditSize = 12;
 
     @Override
     public String getServerHost() {
@@ -391,5 +393,25 @@ public class AppSettings implements Serializable, AppSettingsMBean {
     @Override
     public void setShowActiveTasks(boolean showActiveTasks) {
         this.showActiveTasks = showActiveTasks;
+    }
+
+    public int getEditorPreviewSize() {
+        if (editorPreviewSize < 5)
+            editorPreviewSize = 12;
+        return editorPreviewSize;
+    }
+
+    public void setEditorPreviewSize(int editorPreviewSize) {
+        this.editorPreviewSize = editorPreviewSize;
+    }
+
+    public int getEditorEditSize() {
+        if (editorEditSize < 5)
+            editorEditSize = 12;
+        return editorEditSize;
+    }
+
+    public void setEditorEditSize(int editorEditSize) {
+        this.editorEditSize = editorEditSize;
     }
 }
