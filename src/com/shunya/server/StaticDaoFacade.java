@@ -88,7 +88,7 @@ public class StaticDaoFacade {
         long t1 = System.currentTimeMillis();
         List<Document> result = LuceneIndexDao.getInstance().search(query.getQuery(), query.getCategory(), query.isAndFilter(), 0, query.getMaxResults());
         long t2 = System.currentTimeMillis();
-        System.err.println("time consumed : " + (t2 - t1));
+        System.err.println(query.getQuery() + " : " + (t2 - t1));
         return result;
     }
 

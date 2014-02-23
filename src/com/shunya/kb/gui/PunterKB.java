@@ -141,17 +141,25 @@ public class PunterKB extends JPanel {
                                 else {
                                     if (Desktop.isDesktopSupported()) {
                                         System.out.println("Opening up the file.." + doc.getTitle());
-                                        File temp = new File("Temp");
-                                        temp.mkdir();
-                                        File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
-                                        try {
-                                            FileOutputStream fos = new FileOutputStream(nf);
-                                            fos.write(doc.getContent());
-                                            fos.close();
-                                            nf.deleteOnExit();
-                                            Desktop.getDesktop().open(nf);
-                                        } catch (IOException e1) {
-                                            e1.printStackTrace();
+                                        if (doc.getContent() == null) {
+                                            try {
+                                                Desktop.getDesktop().open(new File("uploads/"+doc.getTitle()));
+                                            } catch (IOException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                        } else {
+                                            File temp = new File("Temp");
+                                            temp.mkdir();
+                                            File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
+                                            try {
+                                                FileOutputStream fos = new FileOutputStream(nf);
+                                                fos.write(doc.getContent());
+                                                fos.close();
+                                                nf.deleteOnExit();
+                                                Desktop.getDesktop().open(nf);
+                                            } catch (IOException e1) {
+                                                e1.printStackTrace();
+                                            }
                                         }
                                     }
                                 }
@@ -568,7 +576,7 @@ public class PunterKB extends JPanel {
                         doc = docService.getDocument(doc);
 //                        Base64.getEncoder().encode(doc.getTitle().getBytes())
                         docId = "uploads/" + doc.getTitle();
-                        docId=docId.replaceAll(" ", "%20");
+                        docId = docId.replaceAll(" ", "%20");
                     } else
                         docId = "" + doc.getId();
                     String url = "http://" + docService.getServerHostAddress().getHostAddress() + ":"
