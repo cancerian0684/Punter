@@ -12,7 +12,7 @@ public class WordService {
 
     public WordService() throws URISyntaxException {
         words = new ArrayList<>(80000);
-        init();
+//        init();
     }
 
     private void init() throws URISyntaxException {

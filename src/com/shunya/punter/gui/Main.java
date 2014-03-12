@@ -73,7 +73,7 @@ public class Main {
     }
 
     private void createAndShowGUI() throws Exception {
-        this.getAndSetUsername();
+        getAndSetUsername();
         KBFrame = new JFrame("Search");
         JFrame.setDefaultLookAndFeelDecorated(true);
         KBFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -122,21 +122,6 @@ public class Main {
 				new ConsoleOutputStream (new Document(), System.out), true));
 		System.setErr( new PrintStream(
 				new ConsoleOutputStream (wcw.getLogArea().getDocument (), null), true));*/
-    /*try{
-        AWTUtilities.setWindowOpacity(frame, 0.990f);
-		Shape shape = null;
-		shape =  new RoundRectangle2D.Float(0, 0, frame.getWidth(), frame.getHeight(), 30, 30);
-        shape = new Ellipse2D.Float(0, 0, frame.getWidth(), frame.getHeight());
-        AWTUtilities.setWindowShape(frame, shape);
-	}catch(Exception e){};*/
-   /* try {
-		//invoke AWTUtilities.setWindowOpacity(win, 0.0f); using reflection so that earlier jdk's don't give erros
-		Class awtutil = Class.forName("com.sun.awt.AWTUtilities");
-		Method setWindowOpaque = awtutil.getMethod("setWindowOpacity", Window.class, float.class);
-		setWindowOpaque.invoke(null, frame, (float)0.99);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}*/
         //Display the window.
         if (SystemTray.isSupported()) {
             final SystemTray tray = SystemTray.getSystemTray();
@@ -158,8 +143,8 @@ public class Main {
                         if (lastAccessed == null) {
                             lastAccessed = KBFrame;
                         }
-                        lastAccessed.setExtendedState(Frame.NORMAL);
                         lastAccessed.setVisible(true);
+                        lastAccessed.setExtendedState(Frame.NORMAL);
                     }
                 }
 
@@ -212,8 +197,8 @@ public class Main {
             openPunterMenuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    PunterGuiFrame.setExtendedState(Frame.NORMAL);
                     PunterGuiFrame.setVisible(true);
+                    PunterGuiFrame.setExtendedState(Frame.NORMAL);
                     lastAccessed = PunterGuiFrame;
                 }
             });
@@ -224,8 +209,8 @@ public class Main {
             openPunterMenuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    KBFrame.setExtendedState(Frame.NORMAL);
                     KBFrame.setVisible(true);
+                    KBFrame.setExtendedState(Frame.NORMAL);
                     lastAccessed = KBFrame;
                 }
             });
@@ -294,8 +279,8 @@ public class Main {
                     if (lastAccessed == null) {
                         lastAccessed = KBFrame;
                     }
-                    lastAccessed.setExtendedState(Frame.NORMAL);
                     lastAccessed.setVisible(true);
+                    lastAccessed.setExtendedState(Frame.NORMAL);
                 }
             };
             trayIcon.setImageAutoSize(true);
@@ -357,11 +342,8 @@ public class Main {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    if (AppSettings.getInstance().isNimbusLookNFeel())
-                        UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-                    else
-                        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    Main main = new Main();
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    new Main();
                 } catch (Throwable e) {
                     e.printStackTrace();
                     System.exit(1);

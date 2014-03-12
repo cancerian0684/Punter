@@ -1,6 +1,7 @@
 package com.shunya.server;
 
 import com.shunya.kb.jpa.Document;
+import com.shunya.punter.gui.PunterJobBasket;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -70,7 +71,7 @@ class MyProcessHandler implements HttpHandler {
             runMessage.setHostname(hostname);
             runMessage.setProcessId(Long.parseLong(processId));
             runMessage.setParams(parseQueryString(requestURI.toASCIIString()));
-            SessionFacade.getInstance().sendMessageToAll("http", runMessage);
+            PunterJobBasket.getInstance().addJobToBasket(runMessage);
             httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
             httpExchange.getResponseBody().write(new String("Process Submitted Successfully.").getBytes());
             httpExchange.getResponseBody().close();

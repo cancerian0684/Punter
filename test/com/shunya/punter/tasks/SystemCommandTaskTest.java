@@ -1,10 +1,9 @@
 package com.shunya.punter.tasks;
 
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertNotNull;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,6 +31,15 @@ public class SystemCommandTaskTest {
     public void testRunSystemCommand2() throws Exception {
         SystemCommandTask systemCommandTask = new SystemCommandTask();
         systemCommandTask.systemCommand = "ping www.google.com";
+        systemCommandTask.run();
+        String logs = systemCommandTask.getMemoryLogs();
+        assertNotNull(logs.length());
+    }
+
+    @Test
+    public void testRunSystemCommand3() throws Exception {
+        SystemCommandTask systemCommandTask = new SystemCommandTask();
+        systemCommandTask.systemCommand = "java -version";
         systemCommandTask.run();
         String logs = systemCommandTask.getMemoryLogs();
         assertNotNull(logs.length());

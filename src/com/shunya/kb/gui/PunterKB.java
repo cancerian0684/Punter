@@ -761,7 +761,7 @@ public class PunterKB extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Scanning directory for uploads - " + dir.getFileName());
+        System.out.println("Scanning directory for uploads - " + dir.toFile().getAbsolutePath());
         try {
             Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
                 @Override

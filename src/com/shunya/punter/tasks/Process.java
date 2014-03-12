@@ -29,7 +29,7 @@ public class Process implements Serializable {
     private StaticDaoFacade staticDaoFacade;
     private List<Tasks> taskList = new ArrayList<Tasks>();
     private Map sessionMap = new HashMap<String, Object>();
-    private transient TaskObserver ts;
+    private transient TaskObserver observer;
     private boolean failed = false;
     private FieldPropertiesMap inputParams;
     private FieldPropertiesMap overrideInputParams;
@@ -81,8 +81,6 @@ public class Process implements Serializable {
                     }
                 }
             }
-
-            ;
         };
         // System.err.println("Emails to notify : "+emailsToNotify);
         processHistory.setRunState(RunState.RUNNING);
@@ -178,12 +176,12 @@ public class Process implements Serializable {
 
                 th.setRunState(RunState.COMPLETED);
                 th.setLogs(task.getMemoryLogs());
-                ts.saveTaskHistory(th);
+                observer.saveTaskHistory(th);
             } else {
                 th.setRunState(RunState.NOT_RUN);
                 th.setRunStatus(RunStatus.NOT_RUN);
                 th.setLogs("");
-                ts.saveTaskHistory(th);
+                observer.saveTaskHistory(th);
             }
             progressCounter++;
             processHistory.setProgress(100 * progressCounter / processHistory.getTaskHistoryList().size());
@@ -202,7 +200,7 @@ public class Process implements Serializable {
     }
 
     public void setTaskObservable(TaskObserver ts) {
-        this.ts = ts;
+        this.observer = ts;
     }
 
     public static FieldPropertiesMap listInputParams() {
@@ -262,6 +260,10 @@ public class Process implements Serializable {
         process.processHistory = history;
         process.overrideInputParams=overrideInputParams;
         return process;
+    }
+
+    public Map getSessionMap() {
+        return sessionMap;
     }
 
     public static void main(String[] args) {

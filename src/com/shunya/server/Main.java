@@ -71,7 +71,7 @@ public class Main {
             System.err.println("RMI Server ready");
             MultiCastResponder.getInstance();
             punterHttpServer.start();
-            java.awt.Desktop.getDesktop().browse(new URI("http://localhost:8080/index.html"));
+            java.awt.Desktop.getDesktop().browse(new URI("http://localhost:"+context.getServerSettings().getWebServerPort()+"/index.html"));
             System.err.println("Web Server ready");
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
@@ -86,6 +86,7 @@ public class Main {
         long t2= System.currentTimeMillis();
         System.out.println("Server up in ["+(t2-t1)+"] ms, Press Enter to terminate");
         System.in.read();
+        System.out.println("Shutting down server");
         System.exit(0);
     }
 

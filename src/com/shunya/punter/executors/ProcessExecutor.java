@@ -6,11 +6,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProcessExecutor {
     private static ProcessExecutor processExecutor;
     private ExecutorService executor;
     private LinkedBlockingQueue<Runnable> workQueue;
+    private AtomicInteger jobCount = new AtomicInteger(0);
 
     public synchronized static ProcessExecutor getInstance() {
         if (processExecutor == null) {
@@ -31,17 +33,19 @@ public class ProcessExecutor {
             @Override
             public void run() {
                 try {
+                    jobCount.incrementAndGet();
                     process.execute();
                 } catch (Throwable te) {
                     te.printStackTrace();
+                }finally {
+                    jobCount.decrementAndGet();
                 }
             }
         });
     }
 
     public boolean isActive() {
-        return ((ThreadPoolExecutor) executor).getActiveCount() > 0;
-        //getQueueSize>0 && getActiveCount>0
+        return jobCount.get() > 0;
     }
 
     public void shutdown() {
