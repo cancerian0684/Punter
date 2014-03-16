@@ -13,6 +13,7 @@ public class DelayedQueueHandlerThread<T> extends Thread {
     DelayedQueueHandlerThread(CallBackHandler callBackHandler) {
         this.callBackHandler = callBackHandler;
         this.delaySkipQueue = new DelaySkipQueue<>(AppSettings.getInstance().getKeyStrokeFlush());
+        setName("DelayedQueueHandlerThread");
         setPriority(Thread.MIN_PRIORITY);
         setDaemon(true);
     }

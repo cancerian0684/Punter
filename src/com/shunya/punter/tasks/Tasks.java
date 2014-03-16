@@ -7,8 +7,6 @@ import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.utils.FieldProperties;
 import com.shunya.punter.utils.FieldPropertiesMap;
 
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import javax.xml.bind.JAXBException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -31,8 +29,8 @@ public abstract class Tasks implements Serializable {
     private transient MemoryHandler mHandler = null;
     private transient Level loggingLevel = Level.FINE;
     protected StringBuilder strLogger;
-    private Document logDocument;
     private boolean doVariableSubstitution = false;
+    private LogListener logListener;
 
     public void setDoVariableSubstitution(boolean doVariableSubstitution) {
         this.doVariableSubstitution = doVariableSubstitution;
@@ -60,12 +58,11 @@ public abstract class Tasks implements Serializable {
           });*/
         mHandler = new MemoryHandler(new Handler() {
             public void publish(LogRecord record) {
-                try {
-//                    String msg = new Date(record.getMillis()) + " [" + record.getLevel() + "] " + record.getMessage();
-                    strLogger.append(record.getMessage() + "\r");
-                    logDocument.insertString(logDocument.getLength(), record.getMessage() + "\n", null);
-                } catch (BadLocationException e) {
-                    e.printStackTrace();
+                //                    String msg = new Date(record.getMillis()) + " [" + record.getLevel() + "] " + record.getMessage();
+                final String msg = record.getMessage() + "\r";
+                strLogger.append(msg);
+                if (logListener != null) {
+                    logListener.log(msg);
                 }
             }
 
@@ -193,11 +190,9 @@ public abstract class Tasks implements Serializable {
                         }
                     }
                 } catch (IllegalArgumentException e) {
-//					e.printStackTrace();
 //					LOGGER.get().severe(e.toString());
                     throw e;
                 } catch (IllegalAccessException e) {
-//					e.printStackTrace();
 //					LOGGER.get().severe(e.toString());
                     throw e;
                 } catch (ParseException e) {
@@ -303,10 +298,6 @@ public abstract class Tasks implements Serializable {
         this.sessionMap = sessionMap;
     }
 
-    public void setLogDocument(Document logDocument) {
-        this.logDocument = logDocument;
-    }
-
     public Object getSessionObject(String key) {
         return sessionMap.get(key);
     }
@@ -322,5 +313,18 @@ public abstract class Tasks implements Serializable {
     public FieldPropertiesMap getOverrideInputParams() {
         return overrideInputParams;
     }
-}
 
+    public void setLogListener(LogListener logListener) {
+        this.logListener = logListener;
+    }
+
+    public void showLog() {
+        if (logListener != null)
+            logListener.showLog();
+    }
+
+    public void disposeLogs() {
+        if (logListener != null)
+            logListener.disposeLogs();
+    }
+}

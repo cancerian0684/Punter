@@ -1,13 +1,10 @@
 package com.shunya.punter.gui;
 
-import java.awt.Dimension;
-
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import java.awt.*;
 
 public class GUIUtils {
 	public static int [] getColumnWidth(JTable table){
@@ -32,9 +29,8 @@ public class GUIUtils {
 	        }
 	        header.setPreferredSize(new Dimension(30, 25));
         }
-        TableColumn column = null;
         for (int i = 0; i < size.length; i++) {
-            column = table.getColumnModel().getColumn(i);
+            TableColumn column = table.getColumnModel().getColumn(i);
             column.setPreferredWidth(size[i]);
         }
 	}

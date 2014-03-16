@@ -531,10 +531,6 @@ public class StaticDaoFacade {
             q.setParameter("pid", pid);
             q.setHint("eclipselink.refresh", "true");
             List<TaskData> taskList = q.getResultList();
-            System.err.println("Listing Tasks for process.");
-            for (TaskData task : taskList) {
-                System.out.println(task.getSequence() + " -- " + task.getName());
-            }
             resultHolder.setResult(taskList == null ? Collections.EMPTY_LIST : taskList);
         });
         return resultHolder.getResult();
@@ -549,10 +545,6 @@ public class StaticDaoFacade {
             q.setParameter("pid", pid);
             q.setHint("eclipselink.refresh", "true");
             List<TaskData> taskList = q.getResultList();
-            System.err.println("Listing Tasks for process.");
-            for (TaskData task : taskList) {
-                System.out.println(task.getSequence() + " -- " + task.getName());
-            }
             resultHolder.setResult(taskList);
         });
         return resultHolder.getResult();
@@ -568,10 +560,6 @@ public class StaticDaoFacade {
             List<ProcessData> processList = q.getResultList();
             System.out.println(processList.get(0).getDescription());
             List<TaskData> tl = processList.get(0).getTaskList();
-            System.err.println("Listing Tasks for process.");
-            for (TaskData task : tl) {
-                System.out.println(task.getName());
-            }
             resultHolder.setResult(tl);
         });
         return resultHolder.getResult();

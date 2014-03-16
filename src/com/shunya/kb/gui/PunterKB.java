@@ -140,14 +140,20 @@ public class PunterKB extends JPanel {
                                     DocumentEditor.showEditor(doc, docService, wordService);
                                 else {
                                     if (Desktop.isDesktopSupported()) {
-                                        System.out.println("Opening up the file.." + doc.getTitle());
-                                        if (doc.getContent() == null) {
+                                        String docId;
+                                        if (doc.getCategory().equalsIgnoreCase("/all/uploads")) {
+                                            docId = "uploads/" + doc.getTitle();
+                                            docId = docId.replaceAll(" ", "%20");
                                             try {
-                                                Desktop.getDesktop().open(new File("uploads/"+doc.getTitle()));
-                                            } catch (IOException e1) {
+                                                String url = "http://" + docService.getServerHostAddress().getHostAddress() + ":"
+                                                        + docService.getWebServerPort()
+                                                        + "/" + docId;
+                                                Desktop.getDesktop().browse(URI.create(url));
+                                            } catch (Exception e1) {
                                                 e1.printStackTrace();
                                             }
                                         } else {
+                                            System.out.println("Opening up the file.." + doc.getTitle());
                                             File temp = new File("Temp");
                                             temp.mkdir();
                                             File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
@@ -731,6 +737,7 @@ public class PunterKB extends JPanel {
                 }
             }
         };
+        thread.setName("Background.Document.Listener");
         thread.start();
 
         Thread uploadScanner = new Thread(new Runnable() {

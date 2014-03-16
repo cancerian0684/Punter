@@ -69,6 +69,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
                 }
             }
         };
+        thread.setName("Message.Listener");
         thread.setDaemon(true);
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();

@@ -3,6 +3,7 @@ package com.shunya.punter.tasks;
 import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.gui.AppSettings;
+import com.shunya.punter.gui.LogWindow;
 import com.shunya.punter.gui.ProcessObserver;
 import com.shunya.punter.gui.TaskObserver;
 import com.shunya.punter.jpa.ProcessHistory;
@@ -14,7 +15,6 @@ import com.shunya.punter.utils.FieldProperties;
 import com.shunya.punter.utils.FieldPropertiesMap;
 import com.shunya.punter.utils.StringUtils;
 
-import javax.swing.text.*;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.Serializable;
@@ -22,13 +22,16 @@ import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Process implements Serializable {
     private StaticDaoFacade staticDaoFacade;
-    private List<Tasks> taskList = new ArrayList<Tasks>();
-    private Map sessionMap = new HashMap<String, Object>();
+    private Map sessionMap = new ConcurrentHashMap<>(50);
     private transient TaskObserver observer;
     private boolean failed = false;
     private FieldPropertiesMap inputParams;
@@ -52,12 +55,8 @@ public class Process implements Serializable {
     private String scheduleString;
     protected transient ProcessObserver po;
     private int lineBufferSize = 1000;
-    private Document logDocument;
     private Logger processLogger;
-
-    public Document getLogDocument() {
-        return logDocument;
-    }
+    private ExecutorService executorService = Executors.newCachedThreadPool();
 
     public Process() {
     }
@@ -68,21 +67,7 @@ public class Process implements Serializable {
 
     public void beforeProcessStart() {
         sessionMap.putAll(AppSettings.getInstance().getSessionMap());
-        logDocument = new PlainDocument() {
-            protected void insertUpdate(DefaultDocumentEvent chng, AttributeSet attr) {
-                super.insertUpdate(chng, attr);
-                Element root = getDefaultRootElement();
-                while (root.getElementCount() > lineBufferSize) {
-                    Element firstLine = root.getElement(0);
-                    try {
-                        remove(0, firstLine.getEndOffset());
-                    } catch (BadLocationException ble) {
-                        System.out.println(ble + " = " + lineBufferSize);
-                    }
-                }
-            }
-        };
-        // System.err.println("Emails to notify : "+emailsToNotify);
+        System.err.println("Emails to notify : " + emailsToNotify);
         processHistory.setRunState(RunState.RUNNING);
         po.update(processHistory);
     }
@@ -113,7 +98,9 @@ public class Process implements Serializable {
     }
 
     private void setLoggingLevel(Logger processLogger) {
-        try{processLogger.setLevel(Level.parse(loggingLevel));}catch (Exception e){
+        try {
+            processLogger.setLevel(Level.parse(loggingLevel));
+        } catch (Exception e) {
             processLogger.setLevel(Level.INFO);
         }
     }
@@ -128,66 +115,32 @@ public class Process implements Serializable {
     private void executeProcessTasks() throws JAXBException {
         processHistory.setStartTime(new Date());
         processHistory.setRunStatus(RunStatus.RUNNING);
-        processHistory.setLogDocument(logDocument);
-        boolean keepRunning = true;
-        int progressCounter = 0;
-        for (TaskHistory th : processHistory.getTaskHistoryList()) {
-            Tasks task = Tasks.getTask(th.getTask());
-            task.setStaticDaoFacade(staticDaoFacade);
-            task.setTaskDao(th.getTask());
-            task.setSessionMap(sessionMap);
-            task.setOverrideInputParams(overrideInputParams);
-            task.setLogDocument(logDocument);
-            task.setDoVariableSubstitution(doVariableSubstitution);
-            th.setRunState(RunState.RUNNING);
-            th.setRunStatus(RunStatus.RUNNING);
-            th.setStartTime(new Date());
-            boolean status = false;
-            if ((keepRunning && !task.getTaskDao().isFailOver()) || (task.getTaskDao().isFailOver() && failed)) {
-                try {
-                    task.beforeTaskStart();
-                    processLogger = task.LOGGER.get();
-                    setLoggingLevel(processLogger);
-                    processLogger.log(Level.FINE, "started executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
-                    status = task.execute();
-                    processLogger.log(Level.FINE, "Finished executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
-                    th.setFinishTime(new Date());
-                    if (stopOnTaskFailure) {
-                        keepRunning = status;
+        AtomicBoolean keepRunning = new AtomicBoolean(true);
+        AtomicInteger progressCounter = new AtomicInteger(0);
+        final Map<Integer, List<TaskHistory>> collect = processHistory.getTaskHistoryList().stream().collect(Collectors.groupingBy(t -> t.getSequence()));
+        final TreeMap<Integer, List<TaskHistory>> treeMap = new TreeMap(collect);
+        treeMap.forEach((k, ol) -> {
+            if (ol.size() > 1) {
+                System.out.println("Running Tasks in parallel " + ol);
+                List<Future> futures = new ArrayList<>();
+                ol.forEach(th -> {
+                    futures.add(executorService.submit(() -> runTask(keepRunning, progressCounter, th)));
+                });
+                futures.forEach(f -> {
+                    try {
+                        f.get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
                     }
-                    if (!status) {
-                        failed = true;
-                    }
-                } catch (Throwable e) {
-                    failed = true;
-                    if (stopOnTaskFailure) {
-                        keepRunning = false;
-                    }
-                    task.LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
-                    task.LOGGER.get().log(Level.FINE, "Finished executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
-                } finally {
-                    task.afterTaskFinish();
-                }
-                th.setStatus(status);
-                if (status)
-                    th.setRunStatus(RunStatus.SUCCESS);
-                else
-                    th.setRunStatus(RunStatus.FAILURE);
-
-                th.setRunState(RunState.COMPLETED);
-                th.setLogs(task.getMemoryLogs());
-                observer.saveTaskHistory(th);
+                });
             } else {
-                th.setRunState(RunState.NOT_RUN);
-                th.setRunStatus(RunStatus.NOT_RUN);
-                th.setLogs("");
-                observer.saveTaskHistory(th);
+                System.out.println("Running Task Sequentially " + ol);
+                runTask(keepRunning, progressCounter, ol.get(0));
             }
-            progressCounter++;
-            processHistory.setProgress(100 * progressCounter / processHistory.getTaskHistoryList().size());
-            po.update(processHistory);
-
-        }
+        });
+        executorService.shutdown();
         processHistory.setRunState(RunState.COMPLETED);
         if (!failed) {
             processHistory.setRunStatus(RunStatus.SUCCESS);
@@ -197,6 +150,65 @@ public class Process implements Serializable {
             processHistory.setRunStatus(RunStatus.FAILURE);
         }
         processHistory.setFinishTime(new Date());
+    }
+
+    private void runTask(AtomicBoolean keepRunning, AtomicInteger progressCounter, TaskHistory th) {
+        Tasks task = Tasks.getTask(th.getTask());
+        task.setStaticDaoFacade(staticDaoFacade);
+        task.setTaskDao(th.getTask());
+        task.setSessionMap(sessionMap);
+        task.setOverrideInputParams(overrideInputParams);
+        task.setDoVariableSubstitution(doVariableSubstitution);
+        task.setLogListener(new LogWindow(5000, th.getId() + " - " + th.getTask().getDescription() + " Logs"));
+        th.setRunState(RunState.RUNNING);
+        th.setRunStatus(RunStatus.RUNNING);
+        th.setStartTime(new Date());
+        th.setTasks(task);
+        boolean status = false;
+        if ((keepRunning.get() && !task.getTaskDao().isFailOver()) || (task.getTaskDao().isFailOver() && failed)) {
+            try {
+                task.beforeTaskStart();
+                processLogger = task.LOGGER.get();
+                setLoggingLevel(processLogger);
+                processLogger.log(Level.FINE, "started executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
+                status = task.execute();
+                processLogger.log(Level.FINE, "Finished executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
+                th.setFinishTime(new Date());
+                if (stopOnTaskFailure & !status) {
+                    keepRunning.set(false);
+                }
+                if (!status) {
+                    failed = true;
+                }
+            } catch (Throwable e) {
+                failed = true;
+                if (stopOnTaskFailure) {
+                    keepRunning.set(false);
+                }
+                task.LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+                task.LOGGER.get().log(Level.FINE, "Finished executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
+            } finally {
+                task.afterTaskFinish();
+            }
+            th.setStatus(status);
+            if (status)
+                th.setRunStatus(RunStatus.SUCCESS);
+            else
+                th.setRunStatus(RunStatus.FAILURE);
+            th.setRunState(RunState.COMPLETED);
+            th.setLogs(task.getMemoryLogs());
+            observer.saveTaskHistory(th);
+        } else {
+            th.setRunState(RunState.NOT_RUN);
+            th.setRunStatus(RunStatus.NOT_RUN);
+            th.setLogs("");
+            observer.saveTaskHistory(th);
+        }
+        progressCounter.incrementAndGet();
+        processHistory.setProgress(100 * progressCounter.get() / processHistory.getTaskHistoryList().size());
+        po.update(processHistory);
+        th.setTasks(null);
+        task.setLogListener(null);
     }
 
     public void setTaskObservable(TaskObserver ts) {
@@ -258,7 +270,7 @@ public class Process implements Serializable {
         process.staticDaoFacade = staticDaoFacade;
         process.inputParams = props;
         process.processHistory = history;
-        process.overrideInputParams=overrideInputParams;
+        process.overrideInputParams = overrideInputParams;
         return process;
     }
 
@@ -266,7 +278,5 @@ public class Process implements Serializable {
         return sessionMap;
     }
 
-    public static void main(String[] args) {
-        listInputParams();
-    }
+    public static void main(String[] args) { listInputParams(); }
 }

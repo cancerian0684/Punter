@@ -1,25 +1,9 @@
 package com.shunya.punter.jpa;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.TableGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import javax.swing.text.Document;
-import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 @TableGenerator(name="seqGen",table="ID_GEN",pkColumnName="GEN_KEY",valueColumnName="GEN_VALUE",pkColumnValue="SEQ_ID",allocationSize=1)
@@ -39,8 +23,6 @@ public class ProcessHistory implements Serializable{
 	private ProcessData process;
 	@Transient
 	private int progress;
-	@Transient
-	private transient Document logDocument;
 //	@Basic(optional = false)
 //	@Column(nullable = false, columnDefinition = "char(1) default 'A'")
 	@Enumerated(EnumType.STRING)
@@ -112,20 +94,6 @@ public class ProcessHistory implements Serializable{
 	public void setProgress(int progress) {
 		this.progress = progress;
 	}
-	@XmlTransient()
-	public Document getLogDocument() {
-		return logDocument;
-	}
-	public void setLogDocument(Document logDocument) {
-		this.logDocument = logDocument;
-	}
-	
-	/*public Long getVersion() {
-		return version;
-	}
-	public void setVersion(Long version) {
-		this.version = version;
-	}*/
 	@Override
 	public int hashCode() {
 		final int prime = 31;

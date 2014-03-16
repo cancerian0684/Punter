@@ -29,17 +29,14 @@ public class ProcessExecutor {
     }
 
     public void submitProcess(final com.shunya.punter.tasks.Process process) {
-        executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    jobCount.incrementAndGet();
-                    process.execute();
-                } catch (Throwable te) {
-                    te.printStackTrace();
-                }finally {
-                    jobCount.decrementAndGet();
-                }
+        executor.submit(() -> {
+            try {
+                jobCount.incrementAndGet();
+                process.execute();
+            } catch (Throwable te) {
+                te.printStackTrace();
+            } finally {
+                jobCount.decrementAndGet();
             }
         });
     }

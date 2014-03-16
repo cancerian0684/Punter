@@ -1,5 +1,7 @@
 package com.shunya.punter.jpa;
 
+import com.shunya.punter.tasks.Tasks;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -30,6 +32,8 @@ public class TaskHistory implements Serializable {
     private RunState runState = RunState.NEW;
     @Enumerated(EnumType.STRING)
     private RunStatus runStatus = RunStatus.NOT_RUN;
+    @Transient
+    private Tasks tasks;
 
     public long getId() {
         return id;
@@ -136,5 +140,13 @@ public class TaskHistory implements Serializable {
 
     public void setFinishTime(Date finishTime) {
         this.finishTime = finishTime;
+    }
+
+    public void setTasks(Tasks tasks) {
+        this.tasks = tasks;
+    }
+
+    public Tasks getTasks() {
+        return tasks;
     }
 }

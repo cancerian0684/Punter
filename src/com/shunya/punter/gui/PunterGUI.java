@@ -16,7 +16,6 @@ import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.event.*;
 import javax.swing.table.*;
-import javax.swing.text.PlainDocument;
 import javax.xml.bind.*;
 import javax.xml.transform.stream.StreamSource;
 import java.awt.*;
@@ -49,7 +48,6 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
     private final JTable runningProcessTable;
     private final JTable runningTaskTable;
     private TextAreaFIFO appLogArea;
-    private TextAreaFIFO procLogArea;
     private int selectedRow = -1;
     private final Timer timer;
     private static Properties taskProps = new Properties();
@@ -74,7 +72,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
 
     public PunterGUI(final StaticDaoFacade staticDaoFacade) throws Exception {
         super(new GridLayout(1, 0));
-        this.staticDaoFacade=staticDaoFacade;
+        this.staticDaoFacade = staticDaoFacade;
         clipBoardListener = new ClipBoardListener(staticDaoFacade);
         staticDaoFacade.setClipBoardListener((ClipBoardListener) clipBoardListener);
         tableSearchFilter = new TableSearchFilter();
@@ -121,8 +119,6 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     ProcessHistory ph = (ProcessHistory) ((RunningProcessTableModel) runningProcessTable.getModel()).getRow(firstSelectedRow).get(0);
                     if (!ph.getRunState().equals(RunState.NEW)) {
                         List<TaskHistory> thList = ph.getTaskHistoryList();
-                        procLogArea.setDocument(ph.getLogDocument());
-                        procLogArea.setEditable(false);
                         ((RunningTaskTableModel) runningTaskTable.getModel()).clearTable();
                         for (TaskHistory taskHistory : thList) {
                             final ArrayList<Object> newRequest = new ArrayList<Object>();
@@ -130,7 +126,6 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             ((RunningTaskTableModel) runningTaskTable.getModel()).insertRow(newRequest);
                         }
                     } else {
-                        procLogArea.setDocument(new PlainDocument());
                         ((RunningTaskTableModel) runningTaskTable.getModel()).clearTable();
                     }
                 }
@@ -153,15 +148,23 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     }
                     if (mEvent.getClickCount() == 2) {
                         RunningTaskTableModel phtm = ((RunningTaskTableModel) runningTaskTable.getModel());
-                        TaskHistory ph = (TaskHistory) phtm.getRow(runningTaskTable.convertRowIndexToModel(runningTaskTable.getSelectedRow())).get(0);
+                        TaskHistory taskHistory = (TaskHistory) phtm.getRow(runningTaskTable.convertRowIndexToModel(runningTaskTable.getSelectedRow())).get(0);
                         EditPanel editor;
-                        if (ph.getLogs() != null)
+                        if (taskHistory.getLogs() != null) {
+                            //Task has completed
                             try {
-                                editor = new EditPanel(ph.getLogs());
+                                editor = new EditPanel(taskHistory.getLogs());
                                 editor.openWindow();
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }
+                        } else {
+                            final Tasks tasks = taskHistory.getTasks();
+                            if (tasks != null) {
+                                //Task is currently running
+                                tasks.showLog();
+                            }
+                        }
                         return false;
                     } else if (!table.isRowSelected(row)) {
                         return false;
@@ -194,15 +197,13 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         header.setPreferredSize(new Dimension(30, 20));
         JTabbedPane jtb = new JTabbedPane();
         jtb.addTab("Tasks", new JScrollPane(runningTaskTable));
-        procLogArea = new TextAreaFIFO();
-        jtb.addTab("Logs", new JScrollPane(procLogArea));
         JSplitPane splitRunningProcessPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(runningProcessTable), jtb);
         splitRunningProcessPane.setDividerSize(1);
 //        splitRunningProcessPane.setBorder(new TitledBorder("Process Explorer"));
         ProcessTableModel model = new ProcessTableModel(staticDaoFacade);
         sorter = new TableRowSorter<ProcessTableModel>(model);
         processTable = new JTable(model);/*{
-    	         public boolean editCellAt(int row, int column, java.util.EventObject e) {
+                 public boolean editCellAt(int row, int column, java.util.EventObject e) {
     	        	 column=convertColumnIndexToModel(column);
     	        	 if(column==0||column==5){
     	        		 	if(isEditing()) {
@@ -662,20 +663,10 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
             public void actionPerformed(ActionEvent e) {
                 int row = runningProcessTable.getSelectedRow();
                 if (row != -1) {
-//					System.out.println("Timer running");
-                    int rows = runningTaskTable.getRowCount();
-                    for (int r = 0; r < rows; r++) {
-                        final ArrayList<?> newRequest = ((RunningTaskTableModel) runningTaskTable.getModel()).getRow(runningTaskTable.convertRowIndexToModel(r));
-                        /*TaskHistory cr=(TaskHistory)newRequest.get(0);
-                              newRequest.set(0,""+ cr.getSequence());
-                              newRequest.set(2,""+ cr.getRunState());
-                              newRequest.set(3, cr.getLogs()!=null?cr.getLogs():"");*/
-                    }
                     ((RunningTaskTableModel) runningTaskTable.getModel()).refreshTable();
                 } else {
-                    if (((RunningTaskTableModel) runningTaskTable.getModel()).getRowCount() > 0) {
+                    if (runningTaskTable.getModel().getRowCount() > 0) {
                         ((RunningTaskTableModel) runningTaskTable.getModel()).clearTable();
-                        procLogArea.setDocument(new PlainDocument());
                     }
                 }
             }
@@ -1139,7 +1130,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         processAlertTable.getColumn("<html><b>Clear").setPreferredWidth(50);
         processAlertTable.getColumn("<html><b>Run ID").setCellRenderer(new ProcessAlertTableRenderer());
         if (AppSettings.getInstance().getObject("processAlertTable") != null)
-                    GUIUtils.initilializeTableColumns(processAlertTable, (int[]) AppSettings.getInstance().getObject("processAlertTable"));
+            GUIUtils.initilializeTableColumns(processAlertTable, (int[]) AppSettings.getInstance().getObject("processAlertTable"));
         JScrollPane processAlertPane = new JScrollPane(processAlertTable);
 
         processTaskAlertTable = new JTable(new ProcessTaskHistoryTableModel()) {
@@ -1273,7 +1264,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                 }
             }
         });
-        appLogArea = new TextAreaFIFO();
+        appLogArea = new TextAreaFIFO(5000);
         appLogArea.setEditable(false);
         tabbedPane.addTab("App Logs", null, new JScrollPane(appLogArea), "Application Wide Logging");
         jTextArea = new JTextArea();
@@ -1366,8 +1357,8 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         };
     }
 
-    public boolean isClipboardListenerRunning(){
-        if(clipBoardListener!=null){
+    public boolean isClipboardListenerRunning() {
+        if (clipBoardListener != null) {
             return clipBoardListener.isStarted();
         }
         return false;
@@ -1382,12 +1373,12 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
     }
 
     public void stopClipBoardListener() {
-            if (clipBoardListener != null && clipBoardListener.isStarted()) {
-                synchronized (this) {
-                    clipBoardListener.stopComponent();
-                }
+        if (clipBoardListener != null && clipBoardListener.isStarted()) {
+            synchronized (this) {
+                clipBoardListener.stopComponent();
             }
         }
+    }
 
     public void startPunterJobScheduler() {
         if (!schedulerRunning) {
@@ -1483,6 +1474,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                 }
             }
         };
+        thread.setName("CreateAndRunProcess");
         thread.start();
     }
 
@@ -1634,7 +1626,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                                                        Object value, boolean isSelected, boolean hasFocus, int row,
                                                        int column) {
             try {
-                TaskData taskData=(TaskData) ((InputParamTableModel)table.getModel()).getValueAt(row, 2);
+                TaskData taskData = (TaskData) ((InputParamTableModel) table.getModel()).getValueAt(row, 2);
                 FieldProperties fieldProperties = (FieldProperties) taskData.getInputParams().get((String) table.getModel().getValueAt(row, 0));
                 setToolTipText(fieldProperties.getDescription());
             } catch (JAXBException e) {

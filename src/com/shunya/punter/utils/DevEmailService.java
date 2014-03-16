@@ -84,7 +84,7 @@ public class DevEmailService {
 //            transport.sendMessage(message, message.getAllRecipients());
 //            transport.close();
             Transport.send(message);
-            System.out.println("Sent Expense successfully....");
+            System.out.println("Email sent successfully....");
         } catch (MessagingException mex) {
             throw new RuntimeException(mex);
         }
