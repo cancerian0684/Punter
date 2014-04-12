@@ -1555,8 +1555,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
             GUIUtils.initilializeTableColumns(inputParamTable, InputParamTableModel.width);
     }
 
-    public void setUpSportColumn(JTable table,
-                                 TableColumn sportColumn) {
+    public void setUpSportColumn(JTable table, TableColumn sportColumn) {
         //Set up the editor for the sport cells.
         JComboBox comboBox = new JComboBox();
         comboBox.addItem("Snowboarding");

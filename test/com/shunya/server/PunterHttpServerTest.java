@@ -16,7 +16,8 @@ public class PunterHttpServerTest {
 
     @BeforeClass
     public static void startServer() throws IOException {
-        httpServer = new PunterHttpServer(null);
+        httpServer = new PunterHttpServer(new ServerContext(null,null,null,null, new ServerSettings()));
+        httpServer.start();
         System.out.println("server started.");
     }
 
@@ -55,7 +56,7 @@ public class PunterHttpServerTest {
 
     @Test
     public void ShouldDownloadFileFromServer() throws IOException {
-        URL url = new URL("http://localhost:8080/index.html");
+        URL url = new URL("http://localhost:8080/?filePath=d:/ebooks/puzzlers%20and%20name.pdf&barcode=1000415331");
         java.net.URLConnection conn = url.openConnection();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         IOUtils.copy(conn.getInputStream(), output);

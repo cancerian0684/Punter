@@ -23,7 +23,7 @@ public class MultiCastResponder {
 	    final MulticastSocket socket = new MulticastSocket(4446);
 	    final InetAddress address = InetAddress.getByName("230.0.0.1");
 		socket.joinGroup(address);
-	    Thread t=new Thread(){
+	    Thread thread=new Thread(){
 			public void run() {		
 				try {
 					checkForPause();
@@ -52,9 +52,9 @@ public class MultiCastResponder {
 				}
 			};
 		};
-		t.setPriority(Thread.MIN_PRIORITY);
-		t.setDaemon(true);
-		t.start();
+		thread.setPriority(Thread.MIN_PRIORITY);
+		thread.setDaemon(true);
+		thread.start();
 	}
 	public void shutdown(){
 		keepRunning=false;

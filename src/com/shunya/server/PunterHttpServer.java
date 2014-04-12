@@ -175,6 +175,11 @@ class MyDataHandler implements HttpHandler {
 
     private String getFileNameFromURI(HttpExchange httpExchange) {
         URI requestURI = httpExchange.getRequestURI();
+        try {
+            final Map<String, String> urlParameters = getUrlParameters(requestURI.getQuery());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         String fname = requestURI.getPath().substring(PunterHttpServer.DATA.length() - 1).replace('/', File.separatorChar);
         if (fname.startsWith(File.separator)) {
             fname = fname.substring(1);
@@ -278,5 +283,25 @@ class MyDataHandler implements HttpHandler {
             }
         }
         ps.println("<P><HR><BR><I>" + (new Date()) + "</I>");
+    }
+
+    public static Map<String, String> getUrlParameters(String query)
+            throws UnsupportedEncodingException {
+        Map<String, String> params = new HashMap<>();
+        for (String param : query.split("[&]")) {
+            String pair[] = param.split("=");
+            if (pair.length < 2)
+                continue;
+            String key = URLDecoder.decode(pair[0].replaceAll("&", ""), "utf-8");
+            String value = "";
+            if (pair.length > 1) {
+                try {
+                    value = URLDecoder.decode(pair[1], "utf-8");
+                } catch (Exception e) {value = pair[1];}
+            }
+            if (key != null && !key.trim().isEmpty())
+                params.put(key.toLowerCase(), value);
+        }
+        return params;
     }
 }

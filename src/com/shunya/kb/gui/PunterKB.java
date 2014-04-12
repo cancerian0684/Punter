@@ -208,7 +208,7 @@ public class PunterKB extends JPanel {
 //		 table.setPreferredScrollableViewportSize(new Dimension(800, 700));
 //		 table.setMinimumSize(new Dimension(600, 600));
         searchResultTable.setFillsViewportHeight(true);
-        searchResultTable.setAutoCreateRowSorter(true);
+        searchResultTable.setAutoCreateRowSorter(false);
         searchResultTable.setRowHeight(60);
         searchResultTable.setRowMargin(0);
         searchResultTable.setDragEnabled(true);

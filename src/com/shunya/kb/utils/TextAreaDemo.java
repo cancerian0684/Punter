@@ -31,16 +31,11 @@
 
 package com.shunya.kb.utils;
 
-/*
- * TextAreaDemo.java requires no other files.
- */
-
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
 import java.net.URISyntaxException;
-
 
 public class TextAreaDemo extends JFrame{
 

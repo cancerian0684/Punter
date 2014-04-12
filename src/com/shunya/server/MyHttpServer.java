@@ -1,14 +1,11 @@
 package com.shunya.server;
 
-/*
- * myHTTPServer.java
- * Author: S.Prasanna
- * @version 1.00
-*/
-
 import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URLDecoder;
+import java.util.StringTokenizer;
 
 public class MyHttpServer extends Thread {
 
@@ -31,24 +28,18 @@ public class MyHttpServer extends Thread {
 
 	public void run() {
 		try {
-
 			System.out.println( "The Client "+
             connectedClient.getInetAddress() + ":" + connectedClient.getPort() + " is connected");
-
             inFromClient = new BufferedReader(new InputStreamReader (connectedClient.getInputStream()));
             outToClient = new DataOutputStream(connectedClient.getOutputStream());
-
 			String requestString = inFromClient.readLine();
             String headerLine = requestString;
-
             StringTokenizer tokenizer = new StringTokenizer(headerLine);
 			String httpMethod = tokenizer.nextToken();
 			String httpQueryString = tokenizer.nextToken();
-
 			StringBuffer responseBuffer = new StringBuffer();
 			responseBuffer.append("<b> This is the HTTP Server Home Page.... </b><BR>");
             responseBuffer.append("The HTTP Client request is ....<BR>");
-
             System.out.println("The HTTP request string is ....");
            	while (inFromClient.ready())
             {
@@ -57,7 +48,6 @@ public class MyHttpServer extends Thread {
 				System.out.println(requestString);
 				requestString = inFromClient.readLine();
 			}
-
 			if (httpMethod.equals("GET")) {
 			  if (httpQueryString.equals("/")) {
 		       	// The default home page
@@ -83,19 +73,16 @@ public class MyHttpServer extends Thread {
 	}
 
 	public void sendResponse (int statusCode, String responseString, boolean isFile) throws Exception {
-
-		String statusLine = null;
+		String statusLine;
 		String serverdetails = "Server: Java HTTPServer";
-		String contentLengthLine = null;
-		String fileName = null;
+		String contentLengthLine;
+		String fileName;
 		String contentTypeLine = "Content-Type: text/html" + "\r\n";
 		FileInputStream fin = null;
-
 		if (statusCode == 200)
 			statusLine = "HTTP/1.1 200 OK" + "\r\n";
 		else
 			statusLine = "HTTP/1.1 404 Not Found" + "\r\n";
-
 		if (isFile) {
 			fileName = responseString;
 			fin = new FileInputStream(fileName);
@@ -107,14 +94,12 @@ public class MyHttpServer extends Thread {
 			responseString = MyHttpServer.HTML_START + responseString + MyHttpServer.HTML_END;
 			contentLengthLine = "Content-Length: " + responseString.length() + "\r\n";
 		}
-
 		outToClient.writeBytes(statusLine);
 		outToClient.writeBytes(serverdetails);
 		outToClient.writeBytes(contentTypeLine);
 		outToClient.writeBytes(contentLengthLine);
 		outToClient.writeBytes("Connection: close\r\n");
 		outToClient.writeBytes("\r\n");
-
 		if (isFile) sendFile(fin, outToClient);
 		else outToClient.writeBytes(responseString);
 

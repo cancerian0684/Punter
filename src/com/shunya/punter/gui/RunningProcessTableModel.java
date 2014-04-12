@@ -1,23 +1,20 @@
 package com.shunya.punter.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.table.AbstractTableModel;
-
 import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.RunStatus;
 import jedi.functional.Filter;
+
+import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import static jedi.functional.FunctionalPrimitives.select;
 
 public class RunningProcessTableModel extends AbstractTableModel {
     public final int[] width = {28, 68, 77, 77};
     private static final long serialVersionUID = 1L;
-    /**
-     * Holds the table data in a two dimensional ArrayList datastructure
-     */
-    private ArrayList<Object> data = new ArrayList<Object>();
+    private LinkedList<Object> data = new LinkedList<>();
 
     /**
      * Holds the column names
@@ -217,7 +214,7 @@ public class RunningProcessTableModel extends AbstractTableModel {
     }
 
     public void clearTable() {
-        data = new ArrayList<Object>();
+        data = new LinkedList<>();
         super.fireTableDataChanged();
     }
 

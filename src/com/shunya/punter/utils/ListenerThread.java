@@ -1,17 +1,16 @@
 package com.shunya.punter.utils;
 
-import java.awt.TrayIcon;
+import com.shunya.punter.gui.Main;
+
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import com.shunya.punter.gui.Main;
-
 public class ListenerThread extends Thread {
    public void run() {
       try {
-    	
          ServerSocket server = new ServerSocket(Launcher.socketPort);
          while (true) {
             System.out.println("about to listen");
