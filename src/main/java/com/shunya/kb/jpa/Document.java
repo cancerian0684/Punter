@@ -45,7 +45,7 @@ public class Document implements Serializable{
 	@OneToMany(fetch=FetchType.EAGER)
     private Collection<Document> relatedDocs;
     @JsonManagedReference("document")
-	@OneToMany(mappedBy="document",fetch=FetchType.EAGER,cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="document", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
     private Collection<Attachment> attachments;
 	@ManyToMany(fetch=FetchType.EAGER)
 	private Collection<Document> referenceDocs; 

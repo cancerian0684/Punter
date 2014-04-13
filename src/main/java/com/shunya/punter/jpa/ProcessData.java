@@ -1,5 +1,6 @@
 package com.shunya.punter.jpa;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.shunya.punter.utils.FieldPropertiesMap;
 
@@ -43,6 +44,7 @@ public class ProcessData implements Serializable{
 	@OneToMany(cascade={CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.LAZY)
 	@XmlTransient
     @JsonManagedReference("process")
+    @JsonIgnore
 	private List<ProcessHistory> processHistoryList;
 	public long getId() {
 		return id;

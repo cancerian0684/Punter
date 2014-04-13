@@ -2,7 +2,7 @@ package com.shunya.server.component;
 
 import com.shunya.kb.jpa.Document;
 import com.shunya.kb.jpa.StaticDaoFacadeLocal;
-import com.shunya.punter.jpa.ProcessHistory;
+import com.shunya.punter.jpa.ProcessData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +31,8 @@ public class PunterController {
 
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     @ResponseBody
-    public List<ProcessHistory> index(@ModelAttribute("model") ModelMap model) {
-        List<ProcessHistory> historyList = service.getDaoFacade().getMySortedProcessHistoryList("Munish");
+    public List<ProcessData> index(@ModelAttribute("model") ModelMap model) throws Exception {
+        List<ProcessData> historyList = service.getDaoFacade().getProcessList("Munish");
         System.out.println("historyList = " + historyList);
         return historyList;
     }
