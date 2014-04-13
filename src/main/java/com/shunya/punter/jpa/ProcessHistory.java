@@ -1,5 +1,7 @@
 package com.shunya.punter.jpa;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -22,9 +24,11 @@ public class ProcessHistory implements Serializable{
 	private Date finishTime;
     @Fetch(FetchMode.SELECT)
 //    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonManagedReference("ProcessHistory")
 	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy="processHistory",fetch=FetchType.EAGER)
 	private List<TaskHistory> taskHistoryList;
 	@ManyToOne
+    @JsonBackReference("process")
 	private ProcessData process;
 	@Transient
 	private int progress;

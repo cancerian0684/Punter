@@ -1,5 +1,6 @@
 package com.shunya.punter.jpa;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.shunya.punter.tasks.Tasks;
 
 import javax.persistence.*;
@@ -25,6 +26,7 @@ public class TaskHistory implements Serializable {
     @ManyToOne
     private TaskData task;
     @ManyToOne
+    @JsonBackReference("ProcessHistory")
     private ProcessHistory processHistory;
     //	@Basic(optional = false)
 //	@Column(nullable = false, columnDefinition = "char(1) default 'A'")

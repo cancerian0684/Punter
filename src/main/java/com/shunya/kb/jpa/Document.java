@@ -1,5 +1,7 @@
 package com.shunya.kb.jpa;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
@@ -42,6 +44,7 @@ public class Document implements Serializable{
 	private float score;
 	@OneToMany(fetch=FetchType.EAGER)
     private Collection<Document> relatedDocs;
+    @JsonManagedReference("document")
 	@OneToMany(mappedBy="document",fetch=FetchType.EAGER,cascade=CascadeType.ALL)
     private Collection<Attachment> attachments;
 	@ManyToMany(fetch=FetchType.EAGER)

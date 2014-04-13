@@ -1,5 +1,7 @@
 package com.shunya.kb.jpa;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -33,6 +35,7 @@ public class Attachment implements Serializable{
 	@Column(columnDefinition="blob(10M)",table = "ATTACHMENT_LOB")
 	private byte[] content;
 	@ManyToOne
+    @JsonBackReference("document")
 	private Document document;
 	@Version
 	@Column(name = "OPT_LOCK")

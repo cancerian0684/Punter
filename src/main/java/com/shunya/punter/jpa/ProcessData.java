@@ -1,5 +1,6 @@
 package com.shunya.punter.jpa;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.shunya.punter.utils.FieldPropertiesMap;
 
 import javax.persistence.*;
@@ -23,9 +24,6 @@ import java.util.List;
     "taskList"
 })
 public class ProcessData implements Serializable{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 3450975996342231267L;
 	@Id
 	@XmlTransient
@@ -40,9 +38,11 @@ public class ProcessData implements Serializable{
 	@Basic(fetch=FetchType.EAGER)
 	private String inputParams;
 	@OneToMany(cascade={CascadeType.REMOVE,CascadeType.PERSIST},mappedBy = "process",fetch=FetchType.EAGER)
+    @JsonManagedReference("taskList")
 	private List<TaskData> taskList;
 	@OneToMany(cascade={CascadeType.REMOVE},mappedBy = "process",fetch=FetchType.LAZY)
 	@XmlTransient
+    @JsonManagedReference("process")
 	private List<ProcessHistory> processHistoryList;
 	public long getId() {
 		return id;

@@ -1,5 +1,6 @@
 package com.shunya.punter.jpa;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.shunya.punter.utils.FieldPropertiesMap;
 
 import javax.persistence.*;
@@ -24,9 +25,6 @@ import java.io.Serializable;
 })
 @XmlRootElement
 public class TaskData implements Serializable {
-    /**
-     *
-     */
     private static final long serialVersionUID = 1907841119637052268L;
     @Id
     @XmlTransient
@@ -48,6 +46,7 @@ public class TaskData implements Serializable {
     private String outputParams;
     @ManyToOne
     @XmlTransient
+    @JsonBackReference("taskList")
     private ProcessData process;
 
     public long getId() {
