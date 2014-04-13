@@ -13,7 +13,7 @@ public class LocalJettyRunner {
         WebAppContext context = new WebAppContext();
         context.setDescriptor(webApp + "/WEB-INF/web.xml");
         context.setResourceBase("src/main/webapp");
-//        context.setWar("C:\\Users\\munichan\\Downloads\\opengrok-0.12-rc4\\lib\\source.war");
+//        contextK.setWar("C:\\Users\\munichan\\Downloads\\opengrok-0.12-rc4\\lib\\source.war");
         context.setContextPath("/");
         context.setParentLoaderPriority(true);
 

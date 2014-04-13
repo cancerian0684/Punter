@@ -5,7 +5,7 @@ public class StaticDaoFacadeStrategy {
 
     public StaticDaoFacadeStrategy(Strategy strategy) {
         if (strategy == Strategy.LOCAL) {
-            sdf = new StaticDaoFacadeLocal();
+            sdf = StaticDaoFacadeLocal.getInstance();
         }else{
             sdf = new StaticDaoFacadeRMI();
         }

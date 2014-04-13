@@ -8,6 +8,8 @@ import com.shunya.punter.utils.GlobalHotKeyListener;
 import com.shunya.punter.utils.JavaScreenCapture;
 import com.shunya.punter.utils.Launcher;
 import com.shunya.punter.utils.StackWindow;
+import com.shunya.server.component.PunterService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -19,6 +21,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main {
+    @Autowired
+    private PunterService punterService;
     private static BufferedImage currentImage;
     private static BufferedImage busyImage;
     private static BufferedImage dsctImage;
@@ -66,7 +70,6 @@ public class Main {
         }
         try {
             createAndShowGUI();
-            timer.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -286,7 +289,6 @@ public class Main {
             trayIcon.setImageAutoSize(true);
             trayIcon.addActionListener(actionListener);
             trayIcon.addMouseListener(mouseListener);
-
             try {
                 tray.add(trayIcon);
                 trayIcon.displayMessage("My Assistant",
@@ -295,12 +297,10 @@ public class Main {
             } catch (AWTException e) {
                 logger.log(Level.WARNING, "TrayIcon could not be added.");
             }
-
         } else {
-
             //  System Tray is not supported
-
         }
+        timer.start();
     }
 
     private void getAndSetUsername() {

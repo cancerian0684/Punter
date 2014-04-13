@@ -13,7 +13,6 @@ import com.shunya.punter.utils.FieldPropertiesMap;
 import com.shunya.server.model.JPATransatomatic;
 import com.shunya.server.model.ResultHolder;
 import com.shunya.server.model.SessionCache;
-import com.shunya.server.model.Transatomatic;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -43,7 +42,7 @@ public class StaticDaoFacade {
     }
 
     public List<String> getCategories() {
-        List<String> categories = new ArrayList<String>(20);
+        List<String> categories = new ArrayList<>(20);
         Scanner scanner = new Scanner(StaticDaoFacade.class.getClassLoader().getResourceAsStream("resources/categories.properties"));
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
@@ -67,22 +66,19 @@ public class StaticDaoFacade {
 
     public Document createDocument(final String author) {
         final ResultHolder<Document> resultHolder = new ResultHolder<>();
-        transatomatic.run(new Transatomatic.UnitOfWork() {
-            @Override
-            public void run() {
-                Session em = getSession();
-                Document doc = new Document();
-                doc.setTitle("test title");
-                doc.setContent("".getBytes());
-                doc.setDateCreated(new Date());
-                doc.setDateUpdated(new Date());
-                doc.setCategory("/all");
-                doc.setAuthor(author);
-                em.persist(doc);
-                em.flush();
-                LuceneIndexDao.getInstance().indexDocs(doc);
-                resultHolder.setResult(doc);
-            }
+        transatomatic.run(() -> {
+            Session em = getSession();
+            Document doc = new Document();
+            doc.setTitle("test title");
+            doc.setContent("".getBytes());
+            doc.setDateCreated(new Date());
+            doc.setDateUpdated(new Date());
+            doc.setCategory("/all");
+            doc.setAuthor(author);
+            em.persist(doc);
+            em.flush();
+            LuceneIndexDao.getInstance().indexDocs(doc);
+            resultHolder.setResult(doc);
         });
         return resultHolder.getResult();
     }

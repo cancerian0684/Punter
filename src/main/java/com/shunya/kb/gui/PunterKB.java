@@ -1117,10 +1117,8 @@ public class PunterKB extends JPanel {
         JFrame.setDefaultLookAndFeelDecorated(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
-
         //Create and set up the content pane.
         frame.setContentPane(this);
-
         frame.pack();
         frame.setVisible(true);
     }

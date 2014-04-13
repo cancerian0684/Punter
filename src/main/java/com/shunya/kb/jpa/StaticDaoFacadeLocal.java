@@ -22,10 +22,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class StaticDaoFacadeLocal implements StaticDaoFacade {
+    private static final StaticDaoFacadeLocal instance = new StaticDaoFacadeLocal();
+
+    public synchronized static StaticDaoFacadeLocal getInstance() {
+        return instance;
+    }
 
     private PunterSearch stub;
     private ClipBoardListener clipBoardListener;
-
     private SingleInstanceFileLock singleInstanceFileLock;
     private com.shunya.server.StaticDaoFacade staticDaoFacade;
     private SessionFacade sessionFacade;
@@ -34,6 +38,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     private PunterHttpServer punterHttpServer;
     private ServerSettings serverSettings;
     private ServerContext context;
+    private LocalJettyRunner jettyRunner;
 
     @Override
     public void setClipBoardListener(ClipBoardListener clipBoardListener) {
@@ -100,8 +105,6 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
         return stub.getMessage(getSessionId());
     }
 
-
-
     @Override
     public void ping() throws RemoteException {
 //        stub.ping(getSessionId());
@@ -135,16 +138,19 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
         punterHttpServer = new PunterHttpServer(context);
         stub = new PunterSearchServer(staticDaoFacade, sessionFacade, serverSettings);
         staticDaoFacade.buildSynonymsCacheLocal();
+        jettyRunner = new LocalJettyRunner();
         try {
             punterHttpServer.start();
+            jettyRunner.start();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
     public void setSessionId(String sessionId) {
-
         this.sessionId = sessionId;
     }
 

@@ -4,12 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SessionFacade {
-    Map<String, PunterSession> sessionMap = new HashMap<String, PunterSession>(10);
-    TopicHandler topicHandler = TopicHandler.getInstance();
+    private Map<String, PunterSession> sessionMap = new HashMap<String, PunterSession>(10);
+    private TopicHandler topicHandler = TopicHandler.getInstance();
     private static SessionFacade instance;
 
     private SessionFacade() {
-
     }
 
     public static SessionFacade getInstance() {
