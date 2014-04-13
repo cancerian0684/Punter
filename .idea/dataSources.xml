@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="3764391601">
-    <data-source source="LOCAL" name="H2 - Punter Local" uuid="6b874ce4-b96b-4e40-ae25-bf5257018d35">
+  <component name="DataSourceManagerImpl" format="xml" hash="807249870">
+    <data-source source="LOCAL" name="hibernate.cfg.xml" uuid="626ce88a-0122-46b0-bf3d-b3f4f4d7deeb">
       <driver-ref>h2.embedded</driver-ref>
-      <synchronize>true</synchronize>
       <jdbc-driver>org.h2.Driver</jdbc-driver>
-      <jdbc-url>jdbc:h2:file:///D:\workspace\Punter\punterDB</jdbc-url>
+      <jdbc-url>jdbc:h2:file:$PROJECT_DIR$/punterDB</jdbc-url>
       <user-name>sa</user-name>
       <user-password>dfd9dfcb</user-password>
-      <libraries />
+      <schema-pattern>PUNTERDB.PUBLIC</schema-pattern>
+      <libraries>
+        <library>
+          <url>file://C:\Users\Munish\.m2\repository\com\h2database\h2\1.3.175\h2-1.3.175.jar</url>
+        </library>
+      </libraries>
     </data-source>
   </component>
 </project>

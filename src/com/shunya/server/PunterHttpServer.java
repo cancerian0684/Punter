@@ -175,11 +175,11 @@ class MyDataHandler implements HttpHandler {
 
     private String getFileNameFromURI(HttpExchange httpExchange) {
         URI requestURI = httpExchange.getRequestURI();
-        try {
+        /*try {
             final Map<String, String> urlParameters = getUrlParameters(requestURI.getQuery());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-        }
+        }*/
         String fname = requestURI.getPath().substring(PunterHttpServer.DATA.length() - 1).replace('/', File.separatorChar);
         if (fname.startsWith(File.separator)) {
             fname = fname.substring(1);

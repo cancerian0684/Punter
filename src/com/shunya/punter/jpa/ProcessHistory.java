@@ -1,5 +1,8 @@
 package com.shunya.punter.jpa;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -17,6 +20,8 @@ public class ProcessHistory implements Serializable{
 	private Date startTime;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date finishTime;
+    @Fetch(FetchMode.SELECT)
+//    @LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(cascade={CascadeType.PERSIST,CascadeType.REMOVE},mappedBy="processHistory",fetch=FetchType.EAGER)
 	private List<TaskHistory> taskHistoryList;
 	@ManyToOne

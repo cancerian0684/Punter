@@ -1,7 +1,7 @@
 package com.shunya.server.model;
 
-import javax.persistence.EntityManager;
+import org.hibernate.Session;
 
 public interface SessionCache {
-    public EntityManager getUnderlyingEntityManager();
+    public Session getUnderlyingEntityManager();
 }

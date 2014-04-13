@@ -1,23 +1,26 @@
 package com.shunya.server.model;
 
-import javax.persistence.EntityManager;
+import org.hibernate.Session;
 
 public class ThreadLocalSession implements SessionCache {
     @Override
-    public EntityManager getUnderlyingEntityManager() {
+    public Session getUnderlyingEntityManager() {
         return threadLocalJPASession.get();
     }
-    private static class ThreadLocalJPASession extends ThreadLocal<EntityManager>{
+
+    private static class ThreadLocalJPASession extends ThreadLocal<Session> {
         @Override
-        protected EntityManager initialValue() {
-            return com.shunya.server.model.JPASessionFactory.getInstance().getSession();
+        protected Session initialValue() {
+            return com.shunya.server.model.JPASessionFactory.getSession();
         }
     }
+
     public final ThreadLocalJPASession threadLocalJPASession = new ThreadLocalJPASession();
 
-    public void set(EntityManager em){
+    public void set(Session em) {
         threadLocalJPASession.set(em);
     }
+
     public void clear() {
         threadLocalJPASession.get().close();
         threadLocalJPASession.remove();

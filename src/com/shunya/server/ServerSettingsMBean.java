@@ -25,7 +25,7 @@ public interface ServerSettingsMBean {
 
 	public abstract String toggleMultiCastResponder();
 
-	public abstract void deleteStaleProcessHistory(int staleDays);
+	public abstract int deleteStaleProcessHistory(int staleDays);
 
 	public abstract void compressTables();
 

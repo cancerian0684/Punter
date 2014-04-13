@@ -1,7 +1,7 @@
 package com.shunya.server.model;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class JPATransatomatic implements Transatomatic {
     private ThreadLocalSession threadLocalSession;
@@ -12,8 +12,8 @@ public class JPATransatomatic implements Transatomatic {
 
     @Override
     public void run(UnitOfWork unitOfWork) {
-        final EntityManager em = threadLocalSession.getUnderlyingEntityManager();
-        EntityTransaction tx = null;
+        final Session em = threadLocalSession.getUnderlyingEntityManager();
+        Transaction tx = null;
         try {
             tx = em.getTransaction();
             tx.begin();

@@ -1,45 +1,66 @@
 package com.shunya.server.model;
 
-import org.h2.tools.Server;
+import com.shunya.punter.jpa.ProcessHistory;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.service.ServiceRegistry;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import java.util.HashMap;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 public class JPASessionFactory {
-    private static JPASessionFactory instance;
-    private EntityManagerFactory emf;
+    private static final SessionFactory ourSessionFactory;
+    private static final ServiceRegistry serviceRegistry;
 
-    private JPASessionFactory() {
+    static {
         try {
-            final Server server = Server.createTcpServer().start();
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        emf.close();
-                        System.out.println("Shutting down DB server.");
-                        server.stop();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            Configuration configuration = new Configuration();
+            configuration.configure();
+            serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
+            ourSessionFactory = configuration.buildSessionFactory(serviceRegistry);
+        } catch (Throwable ex) {
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+
+    public static Session getSession() throws HibernateException {
+        return ourSessionFactory.openSession();
+    }
+
+    public static void main(final String[] args) throws Exception {
+        final Session session = getSession();
+        try {
+           /* System.out.println("querying all the managed entities...");
+            final Map metadataMap = session.getSessionFactory().getAllClassMetadata();
+            for (Object key : metadataMap.keySet()) {
+                final ClassMetadata classMetadata = (ClassMetadata) metadataMap.get(key);
+                final String entityName = classMetadata.getEntityName();
+                final Query query = session.createQuery("from " + entityName);
+                System.out.println("executing: " + query.getQueryString());
+                for (Object o : query.list()) {
+                    System.out.println("  " + o);
                 }
-            });
-            emf = Persistence.createEntityManagerFactory("punter", new HashMap());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+            }*/
 
-    public synchronized static JPASessionFactory getInstance() {
-        if (instance == null) {
-            instance = new JPASessionFactory();
+            try {
+                Calendar cal = GregorianCalendar.getInstance();
+                cal.set(cal.DATE, cal.get(cal.DATE) - 10);
+                List<ProcessHistory> processHistoryList = session.createCriteria(ProcessHistory.class).setMaxResults(100).add(Restrictions.lt("startTime", cal.getTime())).list();
+                for (ProcessHistory processHistory : processHistoryList) {
+                    ProcessHistory ph = (ProcessHistory) session.get(ProcessHistory.class, processHistory.getId());
+                    session.delete(ph);
+                    System.out.println("Removed : " + ph.getId());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } finally {
+            session.close();
         }
-        return instance;
-    }
-
-    public EntityManager getSession() {
-        return emf.createEntityManager();
     }
 }

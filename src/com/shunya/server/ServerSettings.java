@@ -227,8 +227,8 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
     }
 
     @Override
-    public void deleteStaleProcessHistory(int staleDays) {
-        staticDaoFacade.deleteStaleHistory(staleDays);
+    public int deleteStaleProcessHistory(int staleDays) {
+       return staticDaoFacade.deleteStaleHistory(staleDays);
     }
 
     @Override

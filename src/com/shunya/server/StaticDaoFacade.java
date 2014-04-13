@@ -14,12 +14,15 @@ import com.shunya.server.model.JPATransatomatic;
 import com.shunya.server.model.ResultHolder;
 import com.shunya.server.model.SessionCache;
 import com.shunya.server.model.Transatomatic;
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
-import javax.persistence.*;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class StaticDaoFacade {
     private SessionCache sessionCache;
@@ -35,7 +38,7 @@ public class StaticDaoFacade {
         this.transatomatic = transatomatic;
     }
 
-    public EntityManager getSession() {
+    public Session getSession() {
         return sessionCache.getUnderlyingEntityManager();
     }
 
@@ -54,7 +57,7 @@ public class StaticDaoFacade {
     }
 
     public void updateAccessCounter(Document doc) {
-        /*EntityManager em = emf.createEntityManager();
+        /*Session em = emf.createEntityManager();
           DocumentService service = new DocumentService(em);
           em.getTransaction().begin();
           service.updateAccessCounter(doc);
@@ -67,7 +70,7 @@ public class StaticDaoFacade {
         transatomatic.run(new Transatomatic.UnitOfWork() {
             @Override
             public void run() {
-                EntityManager em = getSession();
+                Session em = getSession();
                 Document doc = new Document();
                 doc.setTitle("test title");
                 doc.setContent("".getBytes());
@@ -114,11 +117,11 @@ public class StaticDaoFacade {
     public SynonymWord create(final SynonymWord words) {
         final ResultHolder<SynonymWord> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            em.persist(words);
-            em.flush();
-            resultHolder.setResult(words);
-        }
+                    Session em = getSession();
+                    em.persist(words);
+                    em.flush();
+                    resultHolder.setResult(words);
+                }
         );
         return resultHolder.getResult();
     }
@@ -126,8 +129,8 @@ public class StaticDaoFacade {
     public SynonymWord saveSynonymWords(final SynonymWord doc) {
         final ResultHolder<SynonymWord> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            SynonymWord document = em.merge(doc);
+            Session em = getSession();
+            SynonymWord document = (SynonymWord) em.merge(doc);
             SynonymService.getService().addWords(document.getWords());
             resultHolder.setResult(document);
         });
@@ -137,10 +140,10 @@ public class StaticDaoFacade {
     public Document saveDocument(final Document doc) {
         final ResultHolder<Document> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Document document = em.merge(doc);
-            LuceneIndexDao.getInstance().indexDocs(document);
-            resultHolder.setResult(document);
+            Session em = getSession();
+            em.saveOrUpdate(doc);
+            LuceneIndexDao.getInstance().indexDocs(doc);
+            resultHolder.setResult(doc);
         });
         return resultHolder.getResult();
     }
@@ -148,11 +151,11 @@ public class StaticDaoFacade {
     public Attachment mergeAttachment(final Attachment attach) {
         final ResultHolder<Attachment> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Attachment attachment = em.merge(attach);
+            Session em = getSession();
+            Attachment attachment = (Attachment) em.merge(attach);
             em.flush();
             Document doc = attachment.getDocument();
-            doc = em.find(Document.class, doc.getId());
+            doc = (Document) em.get(Document.class, doc.getId());
             em.refresh(doc);
             em.getTransaction().commit();
             LuceneIndexDao.getInstance().indexDocs(doc);
@@ -164,11 +167,11 @@ public class StaticDaoFacade {
     public Attachment saveAttachment(final Attachment attach) {
         final ResultHolder<Attachment> resultHolder = new ResultHolder<Attachment>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
+            Session em = getSession();
             em.persist(attach);
             em.flush();
             Document doc = attach.getDocument();
-            doc = em.find(Document.class, doc.getId());
+            doc = (Document) em.get(Document.class, doc.getId());
             em.refresh(doc);
             em.getTransaction().commit();
             LuceneIndexDao.getInstance().indexDocs(doc);
@@ -180,8 +183,8 @@ public class StaticDaoFacade {
     public Document getDocument(final Document doc) {
         final ResultHolder<Document> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Document document = em.find(Document.class, doc.getId());
+            Session em = getSession();
+            Document document = (Document) em.get(Document.class, doc.getId());
             em.refresh(document);
             resultHolder.setResult(document);
         });
@@ -191,8 +194,8 @@ public class StaticDaoFacade {
     public Attachment getAttachment(final Attachment attachment) {
         final ResultHolder<Attachment> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Attachment persisted = em.find(Attachment.class, attachment.getId());
+            Session em = getSession();
+            Attachment persisted = (Attachment) em.get(Attachment.class, attachment.getId());
             em.refresh(persisted);
             resultHolder.setResult(persisted);
         });
@@ -201,12 +204,12 @@ public class StaticDaoFacade {
 
     public boolean deleteAttachment(final Attachment attch) {
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Attachment attchment = em.find(Attachment.class, attch.getId());
-            em.remove(attchment);
+            Session em = getSession();
+            Attachment attchment = (Attachment) em.get(Attachment.class, attch.getId());
+            em.delete(attchment);
             em.flush();
             Document doc = attchment.getDocument();
-            doc = em.find(Document.class, doc.getId());
+            doc = (Document) em.get(Document.class, doc.getId());
             em.refresh(doc);
             LuceneIndexDao.getInstance().indexDocs(doc);
         });
@@ -215,9 +218,9 @@ public class StaticDaoFacade {
 
     public boolean deleteDocument(final Document doc) {
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Document document = em.find(Document.class, doc.getId());
-            em.remove(document);
+            Session em = getSession();
+            Document document = (Document) em.get(Document.class, doc.getId());
+            em.delete(document);
             em.flush();
             LuceneIndexDao.getInstance().deleteIndexForDoc(document);
         });
@@ -227,9 +230,9 @@ public class StaticDaoFacade {
     public void buildSynonymCache() {
         transatomatic.run(() -> {
             System.out.println("Rebuilding Synonym Cache");
-            EntityManager em = getSession();
+            Session em = getSession();
             Query query = em.createQuery("SELECT e FROM SynonymWord e");
-            List<SynonymWord> allDocs = query.getResultList();
+            List<SynonymWord> allDocs = query.list();
             for (SynonymWord synonymWord : allDocs) {
                 System.out.println(synonymWord.getWords());
                 SynonymService.getService().addWords(synonymWord.getWords());
@@ -251,9 +254,9 @@ public class StaticDaoFacade {
         transatomatic.run(() -> {
             System.out.println("Clearing old index");
             LuceneIndexDao.getInstance().deleteIndex();
-            EntityManager em = getSession();
+            Session em = getSession();
             Query query = em.createQuery("SELECT e FROM Document e");
-            List<Document> allDocs = query.getResultList();
+            List<Document> allDocs = query.list();
             for (Document emp : allDocs) {
                 System.out.println(emp.getCategory());
                 LuceneIndexDao.getInstance().indexDocs(emp);
@@ -263,9 +266,9 @@ public class StaticDaoFacade {
 
     public void removeTask(final TaskData task) throws Exception {
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            TaskData tmp = em.find(TaskData.class, task.getId());
-            em.remove(tmp);
+            Session em = getSession();
+            TaskData tmp = (TaskData) em.get(TaskData.class, task.getId());
+            em.delete(tmp);
             em.flush();
         });
 
@@ -273,9 +276,9 @@ public class StaticDaoFacade {
 
     public void removeProcess(final ProcessData proc) throws Exception {
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            ProcessData tmp = em.find(ProcessData.class, proc.getId());
-            em.remove(tmp);
+            Session em = getSession();
+            ProcessData tmp = (ProcessData) em.get(ProcessData.class, proc.getId());
+            em.delete(tmp);
             em.flush();
         });
 
@@ -283,7 +286,7 @@ public class StaticDaoFacade {
 
     public void saveAll(final Object... objects) throws Exception {
         transatomatic.run(() -> {
-            EntityManager em = getSession();
+            Session em = getSession();
             for (Object object : objects) {
                 em.persist(object);
             }
@@ -295,7 +298,7 @@ public class StaticDaoFacade {
     public Object save(final Object object) throws Exception {
         final ResultHolder<Object> resultHolder = new ResultHolder<Object>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
+            Session em = getSession();
             em.persist(object);
             em.flush();
             em.clear();
@@ -306,8 +309,8 @@ public class StaticDaoFacade {
 
     public void saveTaskHistory(final TaskHistory t) throws Exception {
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            TaskHistory taskHistory = em.find(TaskHistory.class, t.getId());
+            Session em = getSession();
+            TaskHistory taskHistory = (TaskHistory) em.get(TaskHistory.class, t.getId());
             taskHistory.setRunState(t.getRunState());
             taskHistory.setRunStatus(t.getRunStatus());
             taskHistory.setSequence(t.getSequence());
@@ -322,8 +325,8 @@ public class StaticDaoFacade {
     public void saveProcessHistory(final ProcessHistory procHistory)
             throws Exception {
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            ProcessHistory ph = em.find(ProcessHistory.class, procHistory.getId());
+            Session em = getSession();
+            ProcessHistory ph = (ProcessHistory) em.get(ProcessHistory.class, procHistory.getId());
             ph.setRunState(procHistory.getRunState());
             ph.setRunStatus(procHistory.getRunStatus());
             ph.setStartTime(procHistory.getStartTime());
@@ -336,8 +339,8 @@ public class StaticDaoFacade {
     public TaskData saveTask(final TaskData t) throws Exception {
         final ResultHolder<TaskData> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            TaskData tmp = em.find(TaskData.class, t.getId());
+            Session em = getSession();
+            TaskData tmp = (TaskData) em.get(TaskData.class, t.getId());
             //			em.lock(tmp, LockModeType.READ);
             tmp.setActive(t.isActive());
             tmp.setAuthor(t.getAuthor());
@@ -364,8 +367,8 @@ public class StaticDaoFacade {
         final ResultHolder<ProcessData> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
             try {
-                EntityManager em = getSession();
-                ProcessData tmp = em.find(ProcessData.class, p.getId());
+                Session em = getSession();
+                ProcessData tmp = (ProcessData) em.get(ProcessData.class, p.getId());
                 //			em.lock(tmp, LockModeType.READ);
                 tmp.setName(p.getName());
                 tmp.setInputParams(p.getInputParams());
@@ -382,8 +385,8 @@ public class StaticDaoFacade {
 
     public void listTask(final long id) throws Exception {
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            TaskData task = em.find(TaskData.class, id);
+            Session em = getSession();
+            TaskData task = (TaskData) em.get(TaskData.class, id);
             try {
                 if (task != null) {
                     System.out.println("Listing task for " + task.getId());
@@ -404,11 +407,11 @@ public class StaticDaoFacade {
     public List<ProcessData> getScheduledProcessList(final String username) throws Exception {
         final ResultHolder<List<ProcessData>> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Query q = em.createQuery("select p from ProcessData p where p.username=:username");
+            Session em = getSession();
+            Query q = em.createQuery("from ProcessData p where p.username=:username");
             q.setParameter("username", username);
-            q.setHint("eclipselink.refresh", "true");
-            List<ProcessData> dbProcList = q.getResultList();
+//            q.setHint("eclipselink.refresh", "true");
+            List<ProcessData> dbProcList = q.list();
             List<ProcessData> processList = new ArrayList<ProcessData>();
             for (ProcessData processDao : dbProcList) {
                 String ss;
@@ -429,27 +432,27 @@ public class StaticDaoFacade {
     public List<ProcessData> getProcessList(final String username) throws Exception {
         final ResultHolder<List<ProcessData>> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Query q = em.createQuery("select p from ProcessData p where p.username=:username order by p.id asc");
+            Session em = getSession();
+            Query q = em.createQuery("from ProcessData p where p.username=:username order by p.id asc");
             q.setParameter("username", username);
-            q.setHint("eclipselink.refresh", "true");
-            resultHolder.setResult(q.getResultList());
+//            q.setHint("eclipselink.refresh", "true");
+            resultHolder.setResult(q.list());
         });
         return resultHolder.getResult();
     }
 
     public void updateAllProcessProperties() {
         transatomatic.run(() -> {
-            EntityManager em = getSession();
+            Session em = getSession();
             try {
-                Query q = em.createQuery("select p from ProcessData p");
-                q.setHint("eclipselink.refresh", "true");
-                List<ProcessData> processList = q.getResultList();
+                Query q = em.createQuery("from ProcessData p");
+//                q.setHint("eclipselink.refresh", "true");
+                List<ProcessData> processList = q.list();
                 for (ProcessData processData : processList) {
                     FieldPropertiesMap inProp = Process.listInputParams();
                     processData.setInputParams(inProp);
                     try {
-                        ProcessData tmp = em.find(ProcessData.class, processData.getId());
+                        ProcessData tmp = (ProcessData) em.get(ProcessData.class, processData.getId());
                         tmp.setInputParams(processData.getInputParams());
                         em.flush();
                     } catch (Exception e) {
@@ -465,8 +468,8 @@ public class StaticDaoFacade {
     public ProcessData getProcess(final long id) throws Exception {
         final ResultHolder<ProcessData> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            ProcessData proc = em.find(ProcessData.class, id);
+            Session em = getSession();
+            ProcessData proc = (ProcessData) em.get(ProcessData.class, id);
             em.refresh(proc);
             resultHolder.setResult(proc);
         });
@@ -476,8 +479,8 @@ public class StaticDaoFacade {
     public TaskHistory getTaskDao(final TaskHistory td) throws Exception {
         final ResultHolder<TaskHistory> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            TaskHistory proc = em.find(TaskHistory.class, td.getId());
+            Session em = getSession();
+            TaskHistory proc = (TaskHistory) em.get(TaskHistory.class, td.getId());
             em.refresh(proc);
             resultHolder.setResult(proc);
         });
@@ -487,11 +490,10 @@ public class StaticDaoFacade {
     public List<ProcessHistory> getProcessHistoryListForProcessId(final long id) throws Exception {
         final ResultHolder<List<ProcessHistory>> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            ProcessData proc = em.find(ProcessData.class, id);
+            Session em = getSession();
+            ProcessData proc = (ProcessData) em.get(ProcessData.class, id);
             em.refresh(proc);
-            List<ProcessHistory> phl = proc.getProcessHistoryList();
-            resultHolder.setResult(phl);
+            resultHolder.setResult(proc.getProcessHistoryList());
         });
         return resultHolder.getResult();
 
@@ -500,13 +502,13 @@ public class StaticDaoFacade {
     public List<ProcessHistory> getSortedProcessHistoryListForProcessId(final long id) throws Exception {
         final ResultHolder<List<ProcessHistory>> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.id = :pid order by ph.id desc");
-            q.setHint("eclipselink.refresh", "true");
+            Session em = getSession();
+            Query q = em.createQuery("from ProcessHistory ph where ph.process.id = :pid order by ph.id desc");
+//            q.setHint("eclipselink.refresh", "true");
             q.setParameter("pid", id);
             q.setFirstResult(0);
             q.setMaxResults(settings.getMaxProcessHistory());
-            List<ProcessHistory> processHistoryList = q.getResultList();
+            List<ProcessHistory> processHistoryList = q.list();
             resultHolder.setResult(processHistoryList);
         });
         return resultHolder.getResult();
@@ -515,49 +517,47 @@ public class StaticDaoFacade {
     public ProcessHistory getProcessHistoryById(final long id) throws Exception {
         final ResultHolder<ProcessHistory> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            ProcessHistory proc = em.find(ProcessHistory.class, id);
+            Session em = getSession();
+            ProcessHistory proc = (ProcessHistory) em.get(ProcessHistory.class, id);
             em.refresh(proc);
             resultHolder.setResult(proc);
         });
         return resultHolder.getResult();
     }
 
-    public List<TaskData> getProcessTasksById(final long pid) throws UnknownHostException, Exception {
+    public List<TaskData> getProcessTasksById(final long pid) throws Exception {
         final ResultHolder<List<TaskData>> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Query q = em.createQuery("select t from TaskData t where t.process.id=:pid order by t.sequence");
+            Session em = getSession();
+            Query q = em.createQuery("from TaskData t where t.process.id=:pid order by t.sequence");
             q.setParameter("pid", pid);
-            q.setHint("eclipselink.refresh", "true");
-            List<TaskData> taskList = q.getResultList();
+//            q.setHint("eclipselink.refresh", "true");
+            List<TaskData> taskList = q.list();
             resultHolder.setResult(taskList == null ? Collections.EMPTY_LIST : taskList);
         });
         return resultHolder.getResult();
 
     }
 
-    public List<TaskData> getSortedTasksByProcessId(final long pid) throws UnknownHostException, Exception {
+    public List<TaskData> getSortedTasksByProcessId(final long pid) throws Exception {
         final ResultHolder<List<TaskData>> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Query q = em.createQuery("select t from TaskData t where t.process.id=:pid and t.active=true order by t.sequence");
+            Session em = getSession();
+            Query q = em.createQuery("from TaskData t where t.process.id=:pid and t.active=true order by t.sequence");
             q.setParameter("pid", pid);
-            q.setHint("eclipselink.refresh", "true");
-            List<TaskData> taskList = q.getResultList();
+            List<TaskData> taskList = q.list();
             resultHolder.setResult(taskList);
         });
         return resultHolder.getResult();
     }
 
-    public List<TaskData> getProcessTasks(final long pid) throws UnknownHostException, Exception {
+    public List<TaskData> getProcessTasks(final long pid) throws Exception {
         final ResultHolder<List<TaskData>> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Query q = em.createQuery("select p from ProcessData p where p.id=:pid");
+            Session em = getSession();
+            Query q = em.createQuery("from ProcessData p where p.id=:pid");
             q.setParameter("pid", pid);
-            q.setHint("eclipselink.refresh", "true");
-            List<ProcessData> processList = q.getResultList();
+            List<ProcessData> processList = q.list();
             System.out.println(processList.get(0).getDescription());
             List<TaskData> tl = processList.get(0).getTaskList();
             resultHolder.setResult(tl);
@@ -566,59 +566,41 @@ public class StaticDaoFacade {
 
     }
 
-    public void deleteTeam() {
-        String aTeamName = "Anaheim Angels";
-
-        // Create the EntityManager
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("league");
-        EntityManager em = emf.createEntityManager();
-
-        @SuppressWarnings({"JpaQlInspection"})
-        Query q = em.createQuery("delete from Team t where t.teamName = :name");
-        q.setParameter("name", aTeamName);
-
-        em.getTransaction().begin();
-        q.executeUpdate();
-        em.getTransaction().commit();
-
-        em.close();
-        emf.close();
-    }
-
-    public void deleteStaleHistory(final int days) {
+    public int deleteStaleHistory(final int days) {
+        AtomicInteger counter =  new AtomicInteger(0);
         transatomatic.run(() -> {
             try {
-                EntityManager em = getSession();
-                Query q = em.createQuery("select ph from ProcessHistory ph where ph.startTime <= :staledate");
+                Session session = getSession();
                 Calendar cal = GregorianCalendar.getInstance();
                 cal.set(cal.DATE, cal.get(cal.DATE) - days);
-                q.setHint("eclipselink.refresh", "true");
-                q.setParameter("staledate", cal, TemporalType.TIMESTAMP);
-                q.setFirstResult(0);
-                q.setMaxResults(100);
-                List<ProcessHistory> processHistoryList = q.getResultList();
+                List<ProcessHistory> processHistoryList = session.createCriteria(ProcessHistory.class)
+                        .setMaxResults(100)
+                        .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                        .add(Restrictions.lt("startTime", cal.getTime()))
+                        .list();
                 for (ProcessHistory processHistory : processHistoryList) {
-                    ProcessHistory ph = em.find(ProcessHistory.class, processHistory.getId());
-                    em.remove(ph);
-                    System.out.println("Removed : " + ph.getId());
+                    session.delete(processHistory);
+                    counter.incrementAndGet();
+                    System.out.println("Removed : " + processHistory.getId());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+        return counter.get();
     }
 
     public List<ProcessHistory> getMySortedProcessHistoryList(final String username) {
         final ResultHolder<List<ProcessHistory>> resultHolder = new ResultHolder<>();
         transatomatic.run(() -> {
-            EntityManager em = getSession();
-            Query q = em.createQuery("select ph from ProcessHistory ph where ph.process.username = :username AND ph.clearAlert=false order by ph.startTime desc");
-            q.setHint("eclipselink.refresh", "true");
+            Session em = getSession();
+            Query q = em.createQuery("from ProcessHistory ph where ph.process.username = :username AND ph.clearAlert=false order by ph.startTime desc");
+//            q.setHint("eclipselink.refresh", "true");
             q.setParameter("username", username);
             //    q.setParameter("runStatus", RunStatus.SUCCESS);
             q.setFirstResult(0);
             q.setMaxResults(settings.getMaxProcessAlerts());
-            List<ProcessHistory> processHistoryList = q.getResultList();
+            List<ProcessHistory> processHistoryList = q.list();
             resultHolder.setResult(processHistoryList);
         });
         return resultHolder.getResult();
@@ -626,12 +608,16 @@ public class StaticDaoFacade {
 
     public void compressTables() {
         transatomatic.run(() -> {
-            String[] tables = {"PROCESSHISTORY", "PROCESS", "TASK", "TASKHISTORY", "DOCUMENT", "DOCUMENT_LOB", "ATTACHMENT", "ATTACHMENT_LOB"};
-            EntityManager em = getSession();
-            for (String string : tables) {
-                Query q = em.createNativeQuery("call SYSCS_UTIL.SYSCS_COMPRESS_TABLE('PUNTER', '" + string + "', 1)");
-                q.executeUpdate();
-                em.flush();
+            try {
+                String[] tables = {"PROCESSHISTORY", "PROCESS", "TASK", "TASKHISTORY", "DOCUMENT", "DOCUMENT_LOB", "ATTACHMENT", "ATTACHMENT_LOB"};
+                Session em = getSession();
+                for (String string : tables) {
+                    Query q = em.createQuery("call SYSCS_UTIL.SYSCS_COMPRESS_TABLE('PUNTER', '" + string + "', 1)");
+                    q.executeUpdate();
+                    em.flush();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
