@@ -2,7 +2,9 @@ package com.shunya.server.component;
 
 import com.shunya.kb.jpa.Document;
 import com.shunya.kb.jpa.StaticDaoFacadeLocal;
+import com.shunya.punter.gui.PunterJobBasket;
 import com.shunya.punter.jpa.ProcessData;
+import com.shunya.server.PunterProcessRunMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/punter")
@@ -49,5 +52,12 @@ public class PunterController {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @RequestMapping(value = "/run", method = RequestMethod.POST)
+    @ResponseBody
+    public Map getDocument(@RequestBody PunterProcessRunMessage runMessage) throws InterruptedException {
+        PunterJobBasket.getInstance().addJobToBasket(runMessage);
+        return runMessage.get();
     }
 }

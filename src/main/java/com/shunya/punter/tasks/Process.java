@@ -105,11 +105,12 @@ public class Process implements Serializable {
         }
     }
 
-    public void execute() throws Exception {
+    public Map execute() throws Exception {
         substituteParams();
         beforeProcessStart();
         executeProcessTasks();
         afterProcessFinish();
+        return sessionMap;
     }
 
     private void executeProcessTasks() throws JAXBException {

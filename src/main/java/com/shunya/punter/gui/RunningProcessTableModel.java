@@ -15,6 +15,7 @@ public class RunningProcessTableModel extends AbstractTableModel {
     public final int[] width = {28, 68, 77, 77};
     private static final long serialVersionUID = 1L;
     private LinkedList<Object> data = new LinkedList<>();
+    private int maxRows = 10;
 
     /**
      * Holds the column names
@@ -132,6 +133,8 @@ public class RunningProcessTableModel extends AbstractTableModel {
     public synchronized ArrayList<?> insertRowAtBeginning(ArrayList<?> newrow) {
         data.add(0, newrow);
         super.fireTableRowsInserted(0, 0);
+        if(data.size() > maxRows)
+            deleteRow((ArrayList<Object>) data.getLast());
         return (ArrayList<?>) data.get(0);
     }
 

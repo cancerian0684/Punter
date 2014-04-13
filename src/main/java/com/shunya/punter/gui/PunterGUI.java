@@ -27,6 +27,8 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import static com.shunya.punter.utils.FieldPropertiesMap.parseStringMap;
 import static jedi.functional.FunctionalPrimitives.select;
@@ -1419,58 +1421,18 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
     }
 
     public void createAndRunProcess(final PunterProcessRunMessage processRunMessage) throws Exception {
-        final ProcessData processData = staticDaoFacade.getProcess(processRunMessage.getProcessId());
-        final ProcessHistory processHistory = ProcessHistoryBuilder.build(processData, staticDaoFacade);
         Thread thread = new Thread() {
             @Override
             public void run() {
+                Future<Map> future = createAndRunProcessSync(processRunMessage);
                 try {
-                    final ProcessHistory ph1 = staticDaoFacade.createProcessHistory(processHistory);
-                    final ArrayList<Object> newRequest = new ArrayList<>();
-                    newRequest.add(ph1);
-                    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            try {
-                                if (processTable.getSelectedRow() != -1) {
-                                    ProcessData pd = (ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
-                                    if (pd.getId() == processData.getId()) {
-                                        ((ProcessHistoryTableModel) processHistoryTable.getModel()).insertRowAtBeginning(newRequest);
-                                        processHistoryTable.setRowSelectionInterval(0, 0);
-                                    }
-                                }
-                                final com.shunya.punter.tasks.Process process = com.shunya.punter.tasks.Process.getProcess(staticDaoFacade, processData.getInputParams(), ph1, parseStringMap(processRunMessage.getParams()));
-                                process.setTaskObservable(PunterGUI.this);
-                                // Adding row to running process table model
-                                final RunningProcessTableModel rptm = (RunningProcessTableModel) runningProcessTable.getModel();
-                                ArrayList<Object> newRequest1 = new ArrayList<>();
-                                newRequest1.add(ph1);
-                                rptm.insertRowAtBeginning(newRequest1);
-                                process.addObserver(new ProcessObserver() {
-                                    @Override
-                                    public void update(ProcessHistory ph) {
-                                        ((ProcessHistoryTableModel) processHistoryTable.getModel()).refreshTable();
-                                        rptm.refreshTable();
-                                    }
-
-                                    @Override
-                                    public void processCompleted() {
-                                        if (rptm.getRowCount() > 0 && runningProcessTable.getSelectedRow() == -1) {
-                                            runningProcessTable.setRowSelectionInterval(0, 0);
-                                        }
-                                        if (ph1.getRunStatus().equals(RunStatus.SUCCESS))
-                                            Main.displayMsg("" + ph1.getName() + " Success", TrayIcon.MessageType.INFO);
-                                        else
-                                            Main.displayMsg("" + ph1.getName() + " Failed", TrayIcon.MessageType.WARNING);
-                                    }
-                                });
-                                runProcess(process);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                } catch (Exception e) {
+                    processRunMessage.setResults(future.get());
+                } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }finally {
+                    processRunMessage.markDone();
                 }
             }
         };
@@ -1478,8 +1440,60 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         thread.start();
     }
 
-    public void runProcess(com.shunya.punter.tasks.Process process) {
-        ProcessExecutor.getInstance().submitProcess(process);
+    public Future<Map> createAndRunProcessSync(PunterProcessRunMessage processRunMessage) {
+        try {
+            final ProcessData processData = staticDaoFacade.getProcess(processRunMessage.getProcessId());
+            final ProcessHistory processHistory = ProcessHistoryBuilder.build(processData, staticDaoFacade);
+            final ProcessHistory ph1 = staticDaoFacade.createProcessHistory(processHistory);
+            final ArrayList<Object> newRequest = new ArrayList<>();
+            newRequest.add(ph1);
+            final com.shunya.punter.tasks.Process process = com.shunya.punter.tasks.Process.getProcess(staticDaoFacade, processData.getInputParams(), ph1, parseStringMap(processRunMessage.getParams()));
+            process.setTaskObservable(this);
+            SwingUtilities.invokeAndWait(() -> {
+                try {
+                    if (processTable.getSelectedRow() != -1) {
+                        ProcessData pd = (ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
+                        if (pd.getId() == processData.getId()) {
+                            ((ProcessHistoryTableModel) processHistoryTable.getModel()).insertRowAtBeginning(newRequest);
+                            processHistoryTable.setRowSelectionInterval(0, 0);
+                        }
+                    }
+                    // Adding row to running process table model
+                    final RunningProcessTableModel rptm = (RunningProcessTableModel) runningProcessTable.getModel();
+                    ArrayList<Object> newRequest1 = new ArrayList<>();
+                    newRequest1.add(ph1);
+                    rptm.insertRowAtBeginning(newRequest1);
+                    process.addObserver(new ProcessObserver() {
+                        @Override
+                        public void update(ProcessHistory ph) {
+                            ((ProcessHistoryTableModel) processHistoryTable.getModel()).refreshTable();
+                            rptm.refreshTable();
+                        }
+
+                        @Override
+                        public void processCompleted() {
+                            if (rptm.getRowCount() > 0 && runningProcessTable.getSelectedRow() == -1) {
+                                runningProcessTable.setRowSelectionInterval(0, 0);
+                            }
+                            if (ph1.getRunStatus().equals(RunStatus.SUCCESS))
+                                Main.displayMsg("" + ph1.getName() + " Success", TrayIcon.MessageType.INFO);
+                            else
+                                Main.displayMsg("" + ph1.getName() + " Failed", TrayIcon.MessageType.WARNING);
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            return runProcess(process);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Future<Map> runProcess(com.shunya.punter.tasks.Process process) {
+        return ProcessExecutor.getInstance().submitProcess(process);
     }
 
     @Override
@@ -1615,7 +1629,6 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
     }
 
     static class DefaultStringRenderer extends DefaultTableCellRenderer {
-
         public DefaultStringRenderer() {
             super();
         }
@@ -1625,8 +1638,8 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                                                        Object value, boolean isSelected, boolean hasFocus, int row,
                                                        int column) {
             try {
-                TaskData taskData = (TaskData) ((InputParamTableModel) table.getModel()).getValueAt(row, 2);
-                FieldProperties fieldProperties = (FieldProperties) taskData.getInputParams().get((String) table.getModel().getValueAt(row, 0));
+                TaskData taskData = (TaskData) table.getModel().getValueAt(row, 2);
+                FieldProperties fieldProperties = taskData.getInputParams().get((String) table.getModel().getValueAt(row, 0));
                 setToolTipText(fieldProperties.getDescription());
             } catch (JAXBException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

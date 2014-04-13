@@ -2,10 +2,9 @@ package com.shunya.punter.executors;
 
 import com.shunya.punter.gui.AppSettings;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProcessExecutor {
@@ -22,19 +21,19 @@ public class ProcessExecutor {
     }
 
     public ProcessExecutor() {
-        workQueue = new LinkedBlockingQueue<>(10);
+        workQueue = new LinkedBlockingQueue<>(100);
         executor = new ThreadPoolExecutor(AppSettings.getInstance().getMaxExecutorSize(), AppSettings.getInstance().getMaxExecutorSize(),
-                0L, TimeUnit.MILLISECONDS,
-                workQueue);
+                0L, TimeUnit.MILLISECONDS, workQueue);
     }
 
-    public void submitProcess(final com.shunya.punter.tasks.Process process) {
-        executor.submit(() -> {
+    public Future<Map> submitProcess(final com.shunya.punter.tasks.Process process) {
+        return executor.submit(() -> {
             try {
                 jobCount.incrementAndGet();
-                process.execute();
+                return process.execute();
             } catch (Throwable te) {
                 te.printStackTrace();
+                return new HashMap();
             } finally {
                 jobCount.decrementAndGet();
             }
