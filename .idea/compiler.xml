@@ -14,7 +14,6 @@
       <entry name="?*.dtd" />
       <entry name="?*.tld" />
       <entry name="?*.ftl" />
-      <entry name="?*.txt" />
     </wildcardResourcePatterns>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="false">
@@ -28,7 +27,7 @@
         <module name="Punter" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.8">
       <module name="Punter" target="1.8" />
     </bytecodeTargetLevel>
   </component>
