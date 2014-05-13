@@ -12,6 +12,7 @@ import com.shunya.punter.utils.ClipBoardListener;
 import com.shunya.server.*;
 import com.shunya.server.model.JPASessionFactory;
 import com.shunya.server.model.JPATransatomatic;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -20,13 +21,8 @@ import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.List;
 
+@Service
 public class StaticDaoFacadeLocal implements StaticDaoFacade {
-    private static final StaticDaoFacadeLocal instance = new StaticDaoFacadeLocal();
-
-    public synchronized static StaticDaoFacadeLocal getInstance() {
-        return instance;
-    }
-
     private PunterSearch stub;
     private ClipBoardListener clipBoardListener;
     private SingleInstanceFileLock singleInstanceFileLock;
@@ -135,10 +131,8 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
         punterHttpServer = new PunterHttpServer(context);
         stub = new PunterSearchServer(staticDaoFacade, sessionFacade, serverSettings);
         staticDaoFacade.buildSynonymsCacheLocal();
-        jettyRunner = new LocalJettyRunner();
         try {
             punterHttpServer.start();
-            jettyRunner.start();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {

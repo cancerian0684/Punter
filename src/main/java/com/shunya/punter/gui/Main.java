@@ -2,13 +2,11 @@ package com.shunya.punter.gui;
 
 import com.shunya.kb.gui.PunterKB;
 import com.shunya.kb.jpa.StaticDaoFacade;
-import com.shunya.kb.jpa.StaticDaoFacadeStrategy;
 import com.shunya.punter.executors.ProcessExecutor;
 import com.shunya.punter.utils.GlobalHotKeyListener;
 import com.shunya.punter.utils.JavaScreenCapture;
 import com.shunya.punter.utils.Launcher;
 import com.shunya.punter.utils.StackWindow;
-import com.shunya.server.component.PunterService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.imageio.ImageIO;
@@ -22,7 +20,7 @@ import java.util.logging.Logger;
 
 public class Main {
     @Autowired
-    private PunterService punterService;
+    private StaticDaoFacade staticDaoFacade;
     private static BufferedImage currentImage;
     private static BufferedImage busyImage;
     private static BufferedImage dsctImage;
@@ -33,7 +31,7 @@ public class Main {
     public static JFrame lastAccessed;
     private static Logger logger = Logger.getLogger(Main.class.getName());
     private GlobalHotKeyListener globalHotKeyListener;
-    private final StaticDaoFacade staticDaoFacade;
+
     private SingleInstanceFileLock singleInstanceFileLock = new SingleInstanceFileLock("PunterClient.lock");
     private Timer timer = new Timer(3000, new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -61,21 +59,29 @@ public class Main {
     private PunterGUI punterGUI;
 
     public Main() {
-        StaticDaoFacadeStrategy strategy = new StaticDaoFacadeStrategy(StaticDaoFacadeStrategy.Strategy.LOCAL);
-        staticDaoFacade = strategy.getInstance();
+
+    }
+
+    public void init() {
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    createAndShowGUI();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+            }
+        });
+    }
+
+    private void createAndShowGUI() throws Exception {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         try {
             globalHotKeyListener = new GlobalHotKeyListener();
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        try {
-            createAndShowGUI();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void createAndShowGUI() throws Exception {
         getAndSetUsername();
         KBFrame = new JFrame("Search");
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -336,19 +342,5 @@ public class Main {
         if (trayIcon != null) {
             trayIcon.displayMessage("My Punter", msg, msgType);
         }
-    }
-
-    public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    new Main();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
-            }
-        });
     }
 }

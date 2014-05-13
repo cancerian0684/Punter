@@ -1,7 +1,7 @@
 package com.shunya.server.component;
 
 import com.shunya.kb.jpa.Document;
-import com.shunya.kb.jpa.StaticDaoFacadeLocal;
+import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.gui.PunterJobBasket;
 import com.shunya.punter.jpa.ProcessData;
 import com.shunya.server.PunterProcessRunMessage;
@@ -25,7 +25,7 @@ import java.util.Map;
 public class PunterController {
     final Logger logger = LoggerFactory.getLogger(PunterController.class);
     @Autowired
-    private PunterService service;
+    private StaticDaoFacade service;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -35,7 +35,7 @@ public class PunterController {
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     @ResponseBody
     public List<ProcessData> index(@ModelAttribute("model") ModelMap model) throws Exception {
-        List<ProcessData> historyList = service.getDaoFacade().getProcessList("Munish");
+        List<ProcessData> historyList = service.getProcessList("Munish");
         System.out.println("historyList = " + historyList);
         return historyList;
     }
@@ -46,7 +46,7 @@ public class PunterController {
         try {
             Document document = new Document();
             document.setId(id);
-            document = StaticDaoFacadeLocal.getInstance().getDocument(document);
+            document = service.getDocument(document);
             return document;
         } catch (RemoteException e) {
             e.printStackTrace();
