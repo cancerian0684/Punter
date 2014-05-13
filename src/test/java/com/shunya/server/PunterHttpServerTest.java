@@ -16,7 +16,7 @@ public class PunterHttpServerTest {
 
     @BeforeClass
     public static void startServer() throws IOException {
-        httpServer = new PunterHttpServer(new ServerContext(null,null,null,null, new ServerSettings()));
+        httpServer = new PunterHttpServer(new ServerContext(null,null, null, new ServerSettings()));
         httpServer.start();
         System.out.println("server started.");
     }

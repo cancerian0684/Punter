@@ -4,20 +4,20 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class JPATransatomatic implements Transatomatic {
-    private ThreadLocalSession threadLocalSession;
+    private JPASessionFactory jpaSessionFactory;
 
-    public JPATransatomatic(ThreadLocalSession threadLocalSession) {
-        this.threadLocalSession = threadLocalSession;
+    public JPATransatomatic(JPASessionFactory jpaSessionFactory) {
+        this.jpaSessionFactory = jpaSessionFactory;
     }
 
     @Override
     public void run(UnitOfWork unitOfWork) {
-        final Session em = threadLocalSession.getUnderlyingEntityManager();
+        final Session session = jpaSessionFactory.getSession();
         Transaction tx = null;
         try {
-            tx = em.getTransaction();
+            tx = session.getTransaction();
             tx.begin();
-            unitOfWork.run();
+            unitOfWork.run(session);
             if (tx != null && tx.isActive()) {
                 tx.commit();
             }
@@ -25,7 +25,7 @@ public class JPATransatomatic implements Transatomatic {
             if (tx != null && tx.isActive()) {
                 tx.rollback();
             }
-            threadLocalSession.clear();
+//            session.close();
         }
     }
 }

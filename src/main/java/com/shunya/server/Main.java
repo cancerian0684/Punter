@@ -1,9 +1,8 @@
 package com.shunya.server;
 
 import com.shunya.punter.gui.SingleInstanceFileLock;
+import com.shunya.server.model.JPASessionFactory;
 import com.shunya.server.model.JPATransatomatic;
-import com.shunya.server.model.SessionCache;
-import com.shunya.server.model.ThreadLocalSession;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +17,6 @@ public class Main {
     private SingleInstanceFileLock singleInstanceFileLock;
     private StaticDaoFacade staticDaoFacade;
     private SessionFacade sessionFacade;
-    private SessionCache sessionCache;
     private JPATransatomatic transatomatic;
     private PunterHttpServer punterHttpServer;
     private ServerSettings serverSettings;
@@ -27,13 +25,12 @@ public class Main {
     Main() {
         singleInstanceFileLock = new SingleInstanceFileLock("PunterServer.lock");
         sessionFacade = SessionFacade.getInstance();
-        sessionCache = new ThreadLocalSession();
-        transatomatic = new JPATransatomatic((ThreadLocalSession) sessionCache);
+        transatomatic = new JPATransatomatic(new JPASessionFactory());
         serverSettings = new ServerSettings();
-        staticDaoFacade = new StaticDaoFacade(sessionCache, transatomatic);
+        staticDaoFacade = new StaticDaoFacade(transatomatic);
         serverSettings.setStaticDaoFacade(staticDaoFacade);
         staticDaoFacade.setSettings(serverSettings);
-        context = new ServerContext(staticDaoFacade, sessionFacade, sessionCache, transatomatic, serverSettings);
+        context = new ServerContext(staticDaoFacade, sessionFacade, transatomatic, serverSettings);
         punterHttpServer = new PunterHttpServer(context);
         staticDaoFacade.buildSynonymCache();
     }

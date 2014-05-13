@@ -14,10 +14,10 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 public class JPASessionFactory {
-    private static final SessionFactory ourSessionFactory;
-    private static final ServiceRegistry serviceRegistry;
+    private final SessionFactory ourSessionFactory;
+    private final ServiceRegistry serviceRegistry;
 
-    static {
+    public JPASessionFactory() {
         try {
             Configuration configuration = new Configuration();
             configuration.configure();
@@ -28,12 +28,13 @@ public class JPASessionFactory {
         }
     }
 
-    public static Session getSession() throws HibernateException {
-        return ourSessionFactory.openSession();
+    public Session getSession() throws HibernateException {
+        return ourSessionFactory.getCurrentSession();
     }
 
     public static void main(final String[] args) throws Exception {
-        final Session session = getSession();
+        JPASessionFactory jpaSessionFactory = new JPASessionFactory();
+        final Session session = jpaSessionFactory.getSession();
         try {
            /* System.out.println("querying all the managed entities...");
             final Map metadataMap = session.getSessionFactory().getAllClassMetadata();

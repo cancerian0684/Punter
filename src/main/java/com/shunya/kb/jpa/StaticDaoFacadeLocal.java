@@ -10,9 +10,8 @@ import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
 import com.shunya.punter.utils.ClipBoardListener;
 import com.shunya.server.*;
+import com.shunya.server.model.JPASessionFactory;
 import com.shunya.server.model.JPATransatomatic;
-import com.shunya.server.model.SessionCache;
-import com.shunya.server.model.ThreadLocalSession;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -33,7 +32,6 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     private SingleInstanceFileLock singleInstanceFileLock;
     private com.shunya.server.StaticDaoFacade staticDaoFacade;
     private SessionFacade sessionFacade;
-    private SessionCache sessionCache;
     private JPATransatomatic transatomatic;
     private PunterHttpServer punterHttpServer;
     private ServerSettings serverSettings;
@@ -128,13 +126,12 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     public StaticDaoFacadeLocal() {
         singleInstanceFileLock = new SingleInstanceFileLock("PunterServer.lock");
         sessionFacade = SessionFacade.getInstance();
-        sessionCache = new ThreadLocalSession();
-        transatomatic = new JPATransatomatic((ThreadLocalSession) sessionCache);
+        transatomatic = new JPATransatomatic(new JPASessionFactory());
         serverSettings = new ServerSettings();
-        staticDaoFacade = new com.shunya.server.StaticDaoFacade(sessionCache, transatomatic);
+        staticDaoFacade = new com.shunya.server.StaticDaoFacade(transatomatic);
         serverSettings.setStaticDaoFacade(staticDaoFacade);
         staticDaoFacade.setSettings(serverSettings);
-        context = new ServerContext(staticDaoFacade, sessionFacade, sessionCache, transatomatic, serverSettings);
+        context = new ServerContext(staticDaoFacade, sessionFacade, transatomatic, serverSettings);
         punterHttpServer = new PunterHttpServer(context);
         stub = new PunterSearchServer(staticDaoFacade, sessionFacade, serverSettings);
         staticDaoFacade.buildSynonymsCacheLocal();

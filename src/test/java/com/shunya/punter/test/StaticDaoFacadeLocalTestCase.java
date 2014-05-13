@@ -8,9 +8,8 @@ import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
 import com.shunya.server.StaticDaoFacade;
+import com.shunya.server.model.JPASessionFactory;
 import com.shunya.server.model.JPATransatomatic;
-import com.shunya.server.model.SessionCache;
-import com.shunya.server.model.ThreadLocalSession;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,14 +22,12 @@ import static org.junit.Assert.fail;
 
 public class StaticDaoFacadeLocalTestCase {
     private StaticDaoFacade staticDaoFacade;
-    private SessionCache sessionCache;
     private JPATransatomatic transatomatic;
 
     @BeforeClass
     public void setUp() {
-        sessionCache = new ThreadLocalSession();
-        transatomatic = new JPATransatomatic((ThreadLocalSession) sessionCache);
-        staticDaoFacade = new StaticDaoFacade(sessionCache, transatomatic);
+        transatomatic = new JPATransatomatic(new JPASessionFactory());
+        staticDaoFacade = new StaticDaoFacade(transatomatic);
     }
 
 
