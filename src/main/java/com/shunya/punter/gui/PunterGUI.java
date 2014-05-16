@@ -9,7 +9,6 @@ import com.shunya.punter.jpa.*;
 import com.shunya.punter.tasks.Tasks;
 import com.shunya.punter.utils.*;
 import com.shunya.server.PunterProcessRunMessage;
-import jedi.functional.Filter;
 import neoe.ne.EditPanel;
 
 import javax.swing.*;
@@ -31,7 +30,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static com.shunya.punter.utils.FieldPropertiesMap.parseStringMap;
-import static jedi.functional.FunctionalPrimitives.select;
+import static java.util.stream.Collectors.toList;
 
 public class PunterGUI extends JPanel implements TaskObserver, Observer {
     public static final String WIN_A = "WIN_A";
@@ -580,8 +579,8 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             FieldPropertiesMap inProp = Tasks.listInputParams((Tasks) cls.newInstance());
 
                             TaskData task = new TaskData();
-                            task.setInputParams(inProp);
-                            task.setOutputParams(outProp);
+                            task.setInputParamsAsObject(inProp);
+                            task.setOutputParamsAsObject(outProp);
                             task.setName(s);
                             task.setClassName(taskProps.getProperty(s));
                             ProcessData p = new ProcessData();
@@ -880,7 +879,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
 //        			System.out.println("Row " + selectedRow + " is now selected.");
                     TaskData t = (TaskData) ((TaskTableModel) taskTable.getModel()).getRow(taskTable.convertRowIndexToModel(selectedRow)).get(0);
                     try {
-                        if (t.getInputParams() != null) {
+                        if (t.getInputParamsAsObject() != null) {
                             inputParamTable.setModel(new InputParamTableModel(t, staticDaoFacade));
                             inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
                             initColumnSizesInputParamTable();
@@ -893,7 +892,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                         e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                     }
                     try {
-                        if (t.getOutputParams() != null) {
+                        if (t.getOutputParamsAsObject() != null) {
                             outputParamTable.setModel(new OutputParamTableModel(t, staticDaoFacade));
                             initColumnSizesOutputParamTable();
                         } else {
@@ -959,7 +958,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                         }
                         //populate task table
                         List<TaskData> taskList = staticDaoFacade.getProcessTasksById(procId);
-                        taskList = select(taskList, ActiveTaskFilter(AppSettings.getInstance().isShowActiveTasks()));
+                        taskList = taskList.stream().filter(task ->task.isActive() == AppSettings.getInstance().isShowActiveTasks() || task.isActive() == true).collect(toList());
                         ProcessData process = staticDaoFacade.getProcess(procId);
                         TaskTableModel model = (TaskTableModel) taskTable.getModel();
                         model.clearTable();
@@ -1350,15 +1349,6 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         setErrAndOutStreamToLogDocument();
     }
 
-    private Filter<TaskData> ActiveTaskFilter(final boolean activeOnly) {
-        return new Filter<TaskData>() {
-            @Override
-            public Boolean execute(TaskData taskData) {
-                return taskData.isActive() == activeOnly || taskData.isActive() == true;
-            }
-        };
-    }
-
     public boolean isClipboardListenerRunning() {
         if (clipBoardListener != null) {
             return clipBoardListener.isStarted();
@@ -1639,7 +1629,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                                                        int column) {
             try {
                 TaskData taskData = (TaskData) table.getModel().getValueAt(row, 2);
-                FieldProperties fieldProperties = taskData.getInputParams().get((String) table.getModel().getValueAt(row, 0));
+                FieldProperties fieldProperties = taskData.getInputParamsAsObject().get((String) table.getModel().getValueAt(row, 0));
                 setToolTipText(fieldProperties.getDescription());
             } catch (JAXBException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

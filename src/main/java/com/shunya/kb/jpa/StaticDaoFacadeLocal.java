@@ -128,16 +128,8 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
         serverSettings.setStaticDaoFacade(staticDaoFacade);
         staticDaoFacade.setSettings(serverSettings);
         context = new ServerContext(staticDaoFacade, sessionFacade, transatomatic, serverSettings);
-        punterHttpServer = new PunterHttpServer(context);
         stub = new PunterSearchServer(staticDaoFacade, sessionFacade, serverSettings);
         staticDaoFacade.buildSynonymsCacheLocal();
-        try {
-            punterHttpServer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -201,7 +193,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     }
 
     @Override
-    public Document getDocument(Document doc) throws RemoteException {
+    public Document getDocument(Document doc) {
         return stub.getDocument(doc);
     }
 

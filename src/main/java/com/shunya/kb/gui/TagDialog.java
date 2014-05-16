@@ -22,12 +22,8 @@ public class TagDialog extends JDialog{
 	    		tagDialog=new TagDialog();
 	    	}
 	    	tagDialog.docService=docService;
-	    	try {
-				tagDialog.doc=docService.getDocument(doc);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
-	    	tagDialog.textArea.setText(tagDialog.doc.getTag());
+            tagDialog.doc=docService.getDocument(doc);
+            tagDialog.textArea.setText(tagDialog.doc.getTag());
 	    	tagDialog.setLocationRelativeTo(Main.KBFrame);
 	    	tagDialog.pack();
 	    	tagDialog.setVisible(true);

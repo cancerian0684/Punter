@@ -3,6 +3,7 @@ package com.shunya.punter.tasks;
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.annotations.PunterTask;
+import com.shunya.punter.utils.StringUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -29,8 +30,10 @@ public class CopyTableDataTask extends Tasks {
 	private String preparedStatementForInsert;
 	@InputParam(required = false)
 	private int fetchSize;
+    @InputParam(required = false)
+    private String driverClass;
 
-	@OutputParam
+    @OutputParam
 	private String rowsUpdated;
 
 	@Override
@@ -39,7 +42,10 @@ public class CopyTableDataTask extends Tasks {
 		try{
 			if(fetchSize<10)
 				fetchSize=10;
-			Class.forName("oracle.jdbc.driver.OracleDriver");
+            if(driverClass==null || driverClass.isEmpty()){
+                driverClass="oracle.jdbc.driver.OracleDriver";
+            }
+			Class.forName(driverClass);
 			Connection sourceCon = DriverManager.getConnection(sourceDbURL, sourceDbUsername, sourceDbPassword);
 			Connection targetCon = DriverManager.getConnection(targetDbURL, targetDbUsername, targetDbPassword);
 			sourceCon.setReadOnly(true);
@@ -83,7 +89,7 @@ public class CopyTableDataTask extends Tasks {
 			LOGGER.get().log(Level.INFO, "Successfully Rows updated : "+rows);
 			status=true;
 		}catch (Exception e) {
-			e.printStackTrace();
+            LOGGER.get().severe(StringUtils.getExceptionStackTrace(e));
 		}
 		return status;
 	}

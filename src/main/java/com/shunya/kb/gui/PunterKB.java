@@ -129,12 +129,7 @@ public class PunterKB extends JPanel {
                             } catch (RemoteException e2) {
                                 e2.printStackTrace();
                             }
-                            Document doc = null;
-                            try {
-                                doc = docService.getDocument(luceneDoc);
-                            } catch (RemoteException e2) {
-                                e2.printStackTrace();
-                            }
+                            Document doc = docService.getDocument(luceneDoc);
                             if (column == 1) {
                                 if (doc.getExt().isEmpty())
                                     DocumentEditor.showEditor(doc, docService, wordService);
@@ -296,36 +291,32 @@ public class PunterKB extends JPanel {
                 for (int selectedRow : selectedRows) {
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
                     Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(selectedRow)).get(0);
-                    try {
-                        doc = docService.getDocument(doc);
-                        //Punter Doc
-                        if (doc.getExt().isEmpty()) {
-                            files.add(createZipFromDocument(doc));
-                        }
-                        //System Doc
-                        else {
-                            System.out.println("Opening up the file.." + doc.getTitle());
-                            File temp = new File("Temp");
-                            temp.mkdir();
-                            String filename = "D_" + doc.getId() + doc.getExt();
-                            if (!doc.getExt().isEmpty()) {
-                                filename = doc.getTitle();
-                                if (filename.lastIndexOf(".") == -1) {
-                                    filename += doc.getExt();
-                                }
-                            }
-                            File nf = new File(temp, filename);
-                            try {
-                                FileOutputStream fos = new FileOutputStream(nf);
-                                fos.write(doc.getContent());
-                                fos.close();
-                                files.add(nf);
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
+                    doc = docService.getDocument(doc);
+                    //Punter Doc
+                    if (doc.getExt().isEmpty()) {
+                        files.add(createZipFromDocument(doc));
+                    }
+                    //System Doc
+                    else {
+                        System.out.println("Opening up the file.." + doc.getTitle());
+                        File temp = new File("Temp");
+                        temp.mkdir();
+                        String filename = "D_" + doc.getId() + doc.getExt();
+                        if (!doc.getExt().isEmpty()) {
+                            filename = doc.getTitle();
+                            if (filename.lastIndexOf(".") == -1) {
+                                filename += doc.getExt();
                             }
                         }
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
+                        File nf = new File(temp, filename);
+                        try {
+                            FileOutputStream fos = new FileOutputStream(nf);
+                            fos.write(doc.getContent());
+                            fos.close();
+                            files.add(nf);
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
                     }
                 }
                 if (files.size() > 0) {
@@ -451,29 +442,25 @@ public class PunterKB extends JPanel {
                 System.out.println("Opening Document");
                 if (searchResultTable.getSelectedRow() >= 0) {
                     Document doc = (Document) ((DocumentTableModel) searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-                    try {
-                        doc = docService.getDocument(doc);
-                        if (doc.getExt().isEmpty())
-                            DocumentEditor.showEditor(doc, docService, wordService);
-                        else {
-                            if (Desktop.isDesktopSupported()) {
-                                System.out.println("Opening up the file.." + doc.getExt());
-                                File temp = new File("Temp");
-                                temp.mkdir();
-                                File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
-                                try {
-                                    FileOutputStream fos = new FileOutputStream(nf);
-                                    fos.write(doc.getContent());
-                                    fos.close();
-                                    nf.deleteOnExit();
-                                    Desktop.getDesktop().open(nf);
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                }
+                    doc = docService.getDocument(doc);
+                    if (doc.getExt().isEmpty())
+                        DocumentEditor.showEditor(doc, docService, wordService);
+                    else {
+                        if (Desktop.isDesktopSupported()) {
+                            System.out.println("Opening up the file.." + doc.getExt());
+                            File temp = new File("Temp");
+                            temp.mkdir();
+                            File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
+                            try {
+                                FileOutputStream fos = new FileOutputStream(nf);
+                                fos.write(doc.getContent());
+                                fos.close();
+                                nf.deleteOnExit();
+                                Desktop.getDesktop().open(nf);
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
                             }
                         }
-                    } catch (RemoteException e1) {
-                        e1.printStackTrace();
                     }
                 }
             }
@@ -587,7 +574,7 @@ public class PunterKB extends JPanel {
                         docId = "" + doc.getId();
                     String url = "http://" + docService.getServerHostAddress().getHostAddress() + ":"
                             + docService.getWebServerPort()
-                            + "/" + docId;
+                            + "/rest/punter/get/" + docId;
                     System.out.println(url);
                     StringSelection stringSelection = new StringSelection(url);
                     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -889,7 +876,7 @@ public class PunterKB extends JPanel {
                     doc.setDateCreated(new Date());
                     doc.setDateUpdated(new Date());
                     doc.setCategory(getSelectedCategory());
-                    doc = docService.saveDocument(doc);
+                    docService.saveDocument(doc);
                     System.err.println("Document added : test");
                     return true;
                 } catch (UnsupportedFlavorException e) {

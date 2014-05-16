@@ -2,14 +2,13 @@ package com.shunya.punter.gui;
 
 import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.RunStatus;
-import jedi.functional.Filter;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static jedi.functional.FunctionalPrimitives.select;
+import static java.util.stream.Collectors.toList;
 
 public class RunningProcessTableModel extends AbstractTableModel {
     public final int[] width = {28, 68, 77, 77};
@@ -226,19 +225,11 @@ public class RunningProcessTableModel extends AbstractTableModel {
     }
 
     public synchronized void deleteRowNumbers(List<Long> processIdsToDelete) {
-        List<Object> rowsToRemove = select(data, processIdFilter(processIdsToDelete));
+        List<Object> rowsToRemove= data.stream().filter(o -> {
+            ProcessHistory ph = (ProcessHistory) ((ArrayList<?>) o).get(0);
+            return processIdsToDelete.contains(ph.getId());
+        }).collect(toList());
         data.removeAll(rowsToRemove);
         super.fireTableDataChanged();
-    }
-
-    private Filter<Object> processIdFilter(final List<Long> processIdsToDelete) {
-        return new Filter<Object>() {
-            @Override
-            public Boolean execute(Object o) {
-                ArrayList<?> colArrayList = (ArrayList<?>) o;
-                ProcessHistory ph = (ProcessHistory) colArrayList.get(0);
-                return processIdsToDelete.contains(ph.getId());
-            }
-        };
     }
 }

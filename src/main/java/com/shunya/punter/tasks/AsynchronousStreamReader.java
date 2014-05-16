@@ -56,7 +56,6 @@ class AsynchronousStreamReader extends Thread
             printToDisplayDevice(line);
         }
         bufOut.close();
-//			printToConsole("END OF: " + fThreadId); //DEBUG
     }
 
     public void stopReading() {
@@ -79,12 +78,10 @@ class AsynchronousStreamReader extends Thread
     }
 
     private synchronized void printToConsole(String line) {
-//			System.out.println(line);
         DBExportTask.LOGGER.get().log(Level.INFO, line);
     }
 
     private synchronized void printToConsole2(String line) {
         DBExportTask.LOGGER.get().log(Level.WARNING, line);
-//			System.err.println(line);
     }
 }

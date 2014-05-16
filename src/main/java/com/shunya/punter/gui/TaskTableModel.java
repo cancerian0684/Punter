@@ -20,9 +20,9 @@ public class TaskTableModel extends AbstractTableModel {
      * Holds the column names
      */
     private String[] columnNames = new String[]
-            {"<html><b>Seq.", "<html><b>Task Name", "<html><b>Description", "<html><b>Active", "<html><b>FailOver"};
+            {"<html><b>Seq.", "<html><b>Task Name", "<html><b>Description", "<html><b>Active", "<html><b>FO","<html><b>Hosts"};
     private Class[] columnClasses = new Class[]
-            {Integer.class, String.class, String.class, Boolean.class, Boolean.class};
+            {Integer.class, String.class, String.class, Boolean.class, Boolean.class, String.class};
 
     /**
      * Constructor: Initializes the table structure, including number of columns
@@ -38,7 +38,6 @@ public class TaskTableModel extends AbstractTableModel {
     }
 
     public TaskTableModel(StaticDaoFacade staticDaoFacade) {
-
         this.staticDaoFacade = staticDaoFacade;
     }
 
@@ -91,6 +90,8 @@ public class TaskTableModel extends AbstractTableModel {
                 return task.isActive();
             case 4:
                 return task.isFailOver();
+            case 5:
+                return task.getHosts();
         }
         return null;
     }
@@ -133,6 +134,9 @@ public class TaskTableModel extends AbstractTableModel {
                         break;
                     case 4:
                         task.setFailOver(Boolean.parseBoolean(obj.toString()));
+                        break;
+                    case 5:
+                        task.setHosts(obj.toString());
                         break;
                     default:
                         break;

@@ -1,6 +1,7 @@
 package com.shunya.punter.jpa;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.shunya.punter.utils.FieldPropertiesMap;
 
 import javax.persistence.*;
@@ -21,7 +22,8 @@ import java.io.Serializable;
         "active",
         "failOver",
         "inputParams",
-        "outputParams"
+        "outputParams",
+        "hosts"
 })
 @XmlRootElement
 public class TaskData implements Serializable {
@@ -48,6 +50,7 @@ public class TaskData implements Serializable {
     @XmlTransient
     @JsonBackReference("taskList")
     private ProcessData process;
+    private String hosts;
 
     public long getId() {
         return id;
@@ -97,19 +100,37 @@ public class TaskData implements Serializable {
         this.author = author;
     }
 
-    public FieldPropertiesMap getInputParams() throws JAXBException {
+    public String getInputParams() {
+        return inputParams;
+    }
+
+    public void setInputParams(String inputParams) {
+        this.inputParams = inputParams;
+    }
+
+    public String getOutputParams() {
+        return outputParams;
+    }
+
+    public void setOutputParams(String outputParams) {
+        this.outputParams = outputParams;
+    }
+
+    public FieldPropertiesMap getInputParamsAsObject() throws JAXBException {
         return FieldPropertiesMap.convertXmlToObject(inputParams);
     }
 
-    public void setInputParams(FieldPropertiesMap inputParams) throws JAXBException {
+    @JsonIgnore
+    public void setInputParamsAsObject(FieldPropertiesMap inputParams) throws JAXBException {
         this.inputParams = FieldPropertiesMap.convertObjectToXml(inputParams);
     }
 
-    public FieldPropertiesMap getOutputParams() throws JAXBException {
+    public FieldPropertiesMap getOutputParamsAsObject() throws JAXBException {
         return FieldPropertiesMap.convertXmlToObject(outputParams);
     }
 
-    public void setOutputParams(FieldPropertiesMap outputParams) throws JAXBException {
+    @JsonIgnore
+    public void setOutputParamsAsObject(FieldPropertiesMap outputParams) throws JAXBException {
         this.outputParams = FieldPropertiesMap.convertObjectToXml(outputParams);
     }
 
@@ -157,5 +178,22 @@ public class TaskData implements Serializable {
 
     public void setFailOver(boolean failOver) {
         this.failOver = failOver;
+    }
+
+    public String getHosts() {
+        return hosts;
+    }
+
+    public void setHosts(String hosts) {
+        this.hosts = hosts;
+    }
+
+    @Override
+    public String toString() {
+        return "TaskData{" +
+                "id=" + id +
+                ", name='" + description + '\'' +
+                ", sequence=" + sequence +
+                '}';
     }
 }

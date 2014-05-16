@@ -6,6 +6,7 @@ import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.utils.FieldProperties;
 import com.shunya.punter.utils.FieldPropertiesMap;
+import com.shunya.server.component.RestClient;
 
 import javax.xml.bind.JAXBException;
 import java.io.Serializable;
@@ -31,6 +32,8 @@ public abstract class Tasks implements Serializable {
     protected StringBuilder strLogger;
     private boolean doVariableSubstitution = false;
     private LogListener logListener;
+    private String hosts;
+    protected RestClient restClient = new RestClient();
 
     public void setDoVariableSubstitution(boolean doVariableSubstitution) {
         this.doVariableSubstitution = doVariableSubstitution;
@@ -107,7 +110,7 @@ public abstract class Tasks implements Serializable {
 
     public static FieldPropertiesMap listInputParams(Tasks task) {
         Field[] fields = task.getClass().getDeclaredFields();
-        Map<String, FieldProperties> fieldPropertiesMap = new HashMap<String, FieldProperties>();
+        Map<String, FieldProperties> fieldPropertiesMap = new HashMap<>();
         for (Field field : fields) {
             if (field.isAnnotationPresent(InputParam.class)) {
                 InputParam ann = field.getAnnotation(InputParam.class);
@@ -121,7 +124,7 @@ public abstract class Tasks implements Serializable {
     public static FieldPropertiesMap listOutputParams(Tasks task) {
         Field[] fields = task.getClass().getDeclaredFields();
 //		System.out.println("Listing output params");
-        Map<String, FieldProperties> fieldPropertiesMap = new HashMap<String, FieldProperties>();
+        Map<String, FieldProperties> fieldPropertiesMap = new HashMap<>();
         for (Field field : fields) {
             if (field.isAnnotationPresent(OutputParam.class)) {
                 OutputParam ann = field.getAnnotation(OutputParam.class);
@@ -135,8 +138,8 @@ public abstract class Tasks implements Serializable {
         try {
             Class<?> clz = Class.forName(taskData.getClassName());
             Tasks task = (Tasks) clz.newInstance();
-            task.setOutputParams(taskData.getOutputParams());
-            task.setInputParams(taskData.getInputParams());
+            task.setOutputParams(taskData.getOutputParamsAsObject());
+            task.setInputParams(taskData.getInputParamsAsObject());
             return task;
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -154,6 +157,9 @@ public abstract class Tasks implements Serializable {
         substituteParams(getInputParams());
         if (getOverrideInputParams() != null)
             substituteParams(getOverrideInputParams());
+        if (taskDao.getHosts()!=null && taskDao.getHosts().contains("#{")) {
+            taskDao.setHosts(substituteVariables(taskDao.getHosts(), sessionMap));
+        }
     }
 
     private void substituteParams(FieldPropertiesMap inputParams) throws Exception {
@@ -187,6 +193,7 @@ public abstract class Tasks implements Serializable {
                                 boolean tmp = Boolean.parseBoolean(fieldValue);
                                 field.set(this, tmp);
                             }
+                            inputParams.get(field.getName()).setValue(fieldValue);
                         }
                     }
                 } catch (IllegalArgumentException e) {
@@ -236,9 +243,18 @@ public abstract class Tasks implements Serializable {
     public abstract boolean run();
 
     public boolean execute() throws Exception {
+        boolean status;
         substituteParams();
-        boolean status = run();
-        substituteResult();
+        if (getHosts() == null || getHosts().trim().isEmpty()) {
+            status = run();
+            substituteResult();
+        }else{
+            taskDao.setInputParamsAsObject(getInputParams());
+            Map<String, Object> resultsMap = restClient.executeRemoteTask(taskDao, taskDao.getHosts());
+            status = (boolean) resultsMap.get("status");
+            sessionMap.putAll(resultsMap);
+            strLogger.append(resultsMap.get("logs"));
+        }
         return status;
     }
 
@@ -326,5 +342,13 @@ public abstract class Tasks implements Serializable {
     public void disposeLogs() {
         if (logListener != null)
             logListener.disposeLogs();
+    }
+
+    public String getHosts() {
+        return hosts;
+    }
+
+    public void setHosts(String hosts) {
+        this.hosts = hosts;
     }
 }

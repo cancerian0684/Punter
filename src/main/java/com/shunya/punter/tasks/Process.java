@@ -155,6 +155,7 @@ public class Process implements Serializable {
 
     private void runTask(AtomicBoolean keepRunning, AtomicInteger progressCounter, TaskHistory th) {
         Tasks task = Tasks.getTask(th.getTask());
+        task.setHosts(th.getTask().getHosts());
         task.setStaticDaoFacade(staticDaoFacade);
         task.setTaskDao(th.getTask());
         task.setSessionMap(sessionMap);
@@ -279,5 +280,7 @@ public class Process implements Serializable {
         return sessionMap;
     }
 
-    public static void main(String[] args) { listInputParams(); }
+    public static void main(String[] args) {
+        listInputParams();
+    }
 }

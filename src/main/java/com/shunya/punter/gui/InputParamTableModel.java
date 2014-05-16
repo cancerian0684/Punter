@@ -19,7 +19,7 @@ class InputParamTableModel extends AbstractTableModel {
     public InputParamTableModel(TaskData t, StaticDaoFacade staticDaoFacade) throws JAXBException {
         this.staticDaoFacade = staticDaoFacade;
         FieldPropertiesMap prop;
-        prop = t.getInputParams();
+        prop = t.getInputParamsAsObject();
         int size = prop.keySet().size();
         this.data = new Object[size][3];
         int i = 0;
@@ -89,10 +89,10 @@ class InputParamTableModel extends AbstractTableModel {
         data[row][col] = value;
         try {
             TaskData taskData = (TaskData) data[row][2];
-            FieldPropertiesMap propertiesMap = taskData.getInputParams();
+            FieldPropertiesMap propertiesMap = taskData.getInputParamsAsObject();
             FieldProperties fieldProperties = propertiesMap.get((String) data[row][0]);
             fieldProperties.setValue((String) value);
-            taskData.setInputParams(propertiesMap);
+            taskData.setInputParamsAsObject(propertiesMap);
             taskData = staticDaoFacade.saveTask(taskData);
             BeanUtils.copyProperties(data[row][2], taskData);
         } catch (Exception e) {

@@ -24,11 +24,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="punter" />
         <module name="Punter" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
       <module name="Punter" target="1.8" />
+      <module name="punter" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

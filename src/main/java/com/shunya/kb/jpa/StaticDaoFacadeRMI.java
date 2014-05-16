@@ -206,7 +206,7 @@ public class StaticDaoFacadeRMI implements StaticDaoFacade {
     }
 
     @Override
-    public Document getDocument(Document doc) throws RemoteException {
+    public Document getDocument(Document doc) {
         return stub.getDocument(doc);
     }
 

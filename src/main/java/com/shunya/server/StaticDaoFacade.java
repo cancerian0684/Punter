@@ -316,8 +316,8 @@ public class StaticDaoFacade {
             tmp.setClassName(t.getClassName());
             tmp.setDescription(t.getDescription());
             try {
-                tmp.setInputParams(t.getInputParams());
-                tmp.setOutputParams(t.getOutputParams());
+                tmp.setInputParamsAsObject(t.getInputParamsAsObject());
+                tmp.setOutputParamsAsObject(t.getOutputParamsAsObject());
             } catch (JAXBException e) {
                 e.printStackTrace();
             }
@@ -325,6 +325,7 @@ public class StaticDaoFacade {
             tmp.setProcess(t.getProcess());
             tmp.setSequence(t.getSequence());
             tmp.setFailOver(t.isFailOver());
+            tmp.setHosts(t.getHosts());
             session.merge(tmp);
             session.flush();
             resultHolder.setResult(tmp);
@@ -357,12 +358,12 @@ public class StaticDaoFacade {
             try {
                 if (task != null) {
                     System.out.println("Listing task for " + task.getId());
-                    Set<String> keySet = task.getInputParams().keySet();
+                    Set<String> keySet = task.getInputParamsAsObject().keySet();
                     for (String object : keySet) {
                         System.out.println(object.toString() + " -- "
-                                + task.getInputParams().get(object));
+                                + task.getInputParamsAsObject().get(object));
                     }
-                    task.getOutputParams();
+                    task.getOutputParamsAsObject();
                 }
             } catch (Exception e) {
                 e.printStackTrace();

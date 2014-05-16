@@ -30,5 +30,6 @@ public class LocalJettyRunner {
         server.start();
         System.in.read();
         server.stop();
+        System.exit(0);
     }
 }

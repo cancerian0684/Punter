@@ -20,7 +20,7 @@ class OutputParamTableModel extends AbstractTableModel {
 
     public OutputParamTableModel(TaskData t, StaticDaoFacade staticDaoFacade) throws JAXBException {
         this.staticDaoFacade = staticDaoFacade;
-        FieldPropertiesMap prop = t.getOutputParams();
+        FieldPropertiesMap prop = t.getOutputParamsAsObject();
         int size = prop.keySet().size();
         this.data = new Object[size][3];
         int i = 0;
@@ -95,10 +95,10 @@ class OutputParamTableModel extends AbstractTableModel {
         if (true) {
             try {
                 TaskData taskData = (TaskData) data[row][2];
-                FieldPropertiesMap propertiesMap = taskData.getOutputParams();
+                FieldPropertiesMap propertiesMap = taskData.getOutputParamsAsObject();
                 FieldProperties opv = propertiesMap.get((String) data[row][0]);
                 opv.setValue((String) value);
-                taskData.setOutputParams(propertiesMap);
+                taskData.setOutputParamsAsObject(propertiesMap);
                 staticDaoFacade.saveTask(taskData);
                 BeanUtils.copyProperties(data[row][2], taskData);
             } catch (Exception e) {
