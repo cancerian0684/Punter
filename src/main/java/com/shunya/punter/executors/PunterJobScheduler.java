@@ -1,10 +1,10 @@
 package com.shunya.punter.executors;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.PunterJobBasket;
 import com.shunya.punter.jpa.ProcessData;
 import com.shunya.server.PunterProcessRunMessage;
+import com.shunya.server.component.StaticDaoFacade;
 import it.sauronsoftware.cron4j.SchedulingPattern;
 
 import java.util.Date;

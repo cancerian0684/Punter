@@ -1,6 +1,5 @@
 package com.shunya.punter.tasks;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.LogWindow;
@@ -14,6 +13,7 @@ import com.shunya.punter.utils.DevEmailService;
 import com.shunya.punter.utils.FieldProperties;
 import com.shunya.punter.utils.FieldPropertiesMap;
 import com.shunya.punter.utils.StringUtils;
+import com.shunya.server.component.StaticDaoFacade;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;

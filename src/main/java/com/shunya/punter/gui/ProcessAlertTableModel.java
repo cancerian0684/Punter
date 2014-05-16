@@ -1,7 +1,7 @@
 package com.shunya.punter.gui;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.jpa.ProcessHistory;
+import com.shunya.server.component.StaticDaoFacade;
 
 import javax.swing.table.AbstractTableModel;
 import java.text.SimpleDateFormat;

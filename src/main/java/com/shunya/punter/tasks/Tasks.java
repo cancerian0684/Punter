@@ -1,12 +1,12 @@
 package com.shunya.punter.tasks;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.annotations.InputParam;
 import com.shunya.punter.annotations.OutputParam;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.utils.FieldProperties;
 import com.shunya.punter.utils.FieldPropertiesMap;
 import com.shunya.server.component.RestClient;
+import com.shunya.server.component.StaticDaoFacade;
 
 import javax.xml.bind.JAXBException;
 import java.io.Serializable;

@@ -1,12 +1,12 @@
 package com.shunya.punter.gui;
 
 import com.shunya.kb.gui.PunterKB;
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.executors.ProcessExecutor;
 import com.shunya.punter.utils.GlobalHotKeyListener;
 import com.shunya.punter.utils.JavaScreenCapture;
 import com.shunya.punter.utils.Launcher;
 import com.shunya.punter.utils.StackWindow;
+import com.shunya.server.component.StaticDaoFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.imageio.ImageIO;

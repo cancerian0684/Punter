@@ -1,8 +1,8 @@
 package com.shunya.kb.gui;
 
 import com.shunya.kb.jpa.Document;
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.gui.Main;
+import com.shunya.server.component.StaticDaoFacade;
 
 import javax.swing.*;
 import java.awt.*;

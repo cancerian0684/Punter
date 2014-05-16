@@ -1,7 +1,7 @@
 package com.shunya.punter.gui;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.jpa.TaskData;
+import com.shunya.server.component.StaticDaoFacade;
 import org.apache.commons.beanutils.BeanUtils;
 
 import javax.swing.table.AbstractTableModel;

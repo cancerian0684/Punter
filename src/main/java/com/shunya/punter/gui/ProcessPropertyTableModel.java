@@ -1,8 +1,8 @@
 package com.shunya.punter.gui;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.jpa.ProcessData;
 import com.shunya.punter.utils.FieldPropertiesMap;
+import com.shunya.server.component.StaticDaoFacade;
 import it.sauronsoftware.cron4j.Predictor;
 import org.apache.commons.beanutils.BeanUtils;
 

@@ -3,8 +3,8 @@ package com.shunya.kb.jpa;
 import javax.persistence.*;
 
 @Entity
-@Table(name="SYNONYM_WORD")
-@TableGenerator(name="seqGen",table="ID_GEN",pkColumnName="GEN_KEY",valueColumnName="GEN_VALUE",pkColumnValue="SEQ_ID",allocationSize=1)
+@Table(name="SYNONYM_WORD", uniqueConstraints = @UniqueConstraint(columnNames = {"id"}))
+@TableGenerator(name="seqGen",table="ID_GEN",pkColumnName="GEN_KEY",valueColumnName="GEN_VALUE",pkColumnValue="SEQ_ID",allocationSize=10)
 @Cacheable
 public class SynonymWord {
     @Id

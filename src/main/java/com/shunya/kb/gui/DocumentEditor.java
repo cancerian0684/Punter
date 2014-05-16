@@ -2,12 +2,12 @@ package com.shunya.kb.gui;
 
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.kb.utils.TextCompletionHandler;
 import com.shunya.kb.utils.WordService;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.GUIUtils;
 import com.shunya.punter.gui.PunterGUI;
+import com.shunya.server.component.StaticDaoFacade;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;

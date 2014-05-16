@@ -1,6 +1,5 @@
 package com.shunya.punter.gui;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.annotations.PunterTask;
 import com.shunya.punter.executors.ProcessExecutor;
 import com.shunya.punter.executors.PunterJobScheduler;
@@ -9,6 +8,7 @@ import com.shunya.punter.jpa.*;
 import com.shunya.punter.tasks.Tasks;
 import com.shunya.punter.utils.*;
 import com.shunya.server.PunterProcessRunMessage;
+import com.shunya.server.component.StaticDaoFacade;
 import neoe.ne.EditPanel;
 
 import javax.swing.*;

@@ -1,6 +1,5 @@
 package com.shunya.server.component;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.tasks.Tasks;
 import org.eclipse.jdt.internal.compiler.util.Util;

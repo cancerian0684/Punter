@@ -1,4 +1,4 @@
-package com.shunya.kb.jpa;
+package com.shunya.kb.utils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

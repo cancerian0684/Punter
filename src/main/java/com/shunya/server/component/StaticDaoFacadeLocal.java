@@ -1,6 +1,8 @@
-package com.shunya.kb.jpa;
+package com.shunya.server.component;
 
 import com.shunya.kb.gui.SearchQuery;
+import com.shunya.kb.jpa.Attachment;
+import com.shunya.kb.jpa.Document;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.PunterJobBasket;
 import com.shunya.punter.gui.SingleInstanceFileLock;

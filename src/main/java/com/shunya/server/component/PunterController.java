@@ -1,7 +1,6 @@
 package com.shunya.server.component;
 
 import com.shunya.kb.jpa.Document;
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.punter.gui.PunterJobBasket;
 import com.shunya.punter.jpa.ProcessData;
 import com.shunya.punter.jpa.TaskData;

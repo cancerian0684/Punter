@@ -2,12 +2,12 @@ package com.shunya.kb.gui;
 
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
-import com.shunya.kb.jpa.StaticDaoFacade;
 import com.shunya.kb.jpa.StaticDaoFacadeStrategy;
 import com.shunya.kb.utils.WordService;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.Main;
 import com.shunya.punter.utils.DevEmailService;
+import com.shunya.server.component.StaticDaoFacade;
 import org.apache.commons.io.IOUtils;
 import org.markdown4j.Markdown4jProcessor;
 

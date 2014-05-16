@@ -1,6 +1,6 @@
 package com.shunya.kb.utils;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.server.component.StaticDaoFacade;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

@@ -1,6 +1,6 @@
 package com.shunya.punter.jpa;
 
-import com.shunya.kb.jpa.StaticDaoFacade;
+import com.shunya.server.component.StaticDaoFacade;
 
 import java.util.ArrayList;
 import java.util.Date;
