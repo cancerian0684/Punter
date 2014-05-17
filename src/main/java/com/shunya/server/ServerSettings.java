@@ -20,10 +20,10 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
     private int maxWebServerThread = 5;
     private String tempDirectory;
 
-    private transient StaticDaoFacade staticDaoFacade;
+    private transient HibernateDaoFacade hibernateDaoFacade;
 
-    public void setStaticDaoFacade(StaticDaoFacade staticDaoFacade) {
-        this.staticDaoFacade = staticDaoFacade;
+    public void setHibernateDaoFacade(HibernateDaoFacade hibernateDaoFacade) {
+        this.hibernateDaoFacade = hibernateDaoFacade;
     }
     public ServerSettings() {
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -95,15 +95,15 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
     public void addSynonym(String words){
         SynonymWord synonymWord = new SynonymWord();
         synonymWord.setWords(words);
-        staticDaoFacade.create(synonymWord);
+        hibernateDaoFacade.create(synonymWord);
         System.out.println("synonymWord = " + synonymWord.getWords());
     }
 
     @Override
     public void refreshIndexes() {
         System.err.println("Refreshing indexe's");
-        staticDaoFacade.buildSynonymsCacheLocal();
-        staticDaoFacade.rebuildIndex();
+        hibernateDaoFacade.buildSynonymsCacheLocal();
+        hibernateDaoFacade.rebuildIndex();
         System.err.println("Indexes refreshed");
     }
 
@@ -223,19 +223,19 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 
     @Override
     public void updateAllProcessProperties() {
-        staticDaoFacade.updateAllProcessProperties();
+        hibernateDaoFacade.updateAllProcessProperties();
     }
 
     @Override
     public int deleteStaleProcessHistory(int staleDays) {
-       return staticDaoFacade.deleteStaleHistory(staleDays);
+       return hibernateDaoFacade.deleteStaleHistory(staleDays);
     }
 
     @Override
     public void deleteDocument(int docId) {
         Document doc = new Document();
         doc.setId(docId);
-        staticDaoFacade.deleteDocument(doc);
+        hibernateDaoFacade.deleteDocument(doc);
     }
 
     @Override
@@ -250,7 +250,7 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 
     @Override
     public void compressTables() {
-        staticDaoFacade.compressTables();
+        hibernateDaoFacade.compressTables();
     }
 
     @Override

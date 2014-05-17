@@ -10,8 +10,6 @@ import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
 import com.shunya.punter.tasks.Process;
 import com.shunya.punter.utils.FieldPropertiesMap;
-import com.shunya.server.model.JPATransatomatic;
-import com.shunya.server.model.ResultHolder;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
@@ -21,7 +19,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class StaticDaoFacade {
+public class HibernateDaoFacade {
     private JPATransatomatic transatomatic;
     private ServerSettings settings;
 
@@ -29,13 +27,13 @@ public class StaticDaoFacade {
         this.settings = settings;
     }
 
-    public StaticDaoFacade(JPATransatomatic transatomatic) {
+    public HibernateDaoFacade(JPATransatomatic transatomatic) {
         this.transatomatic = transatomatic;
     }
 
     public List<String> getCategories() {
         List<String> categories = new ArrayList<>(20);
-        Scanner scanner = new Scanner(StaticDaoFacade.class.getClassLoader().getResourceAsStream("resources/categories.properties"));
+        Scanner scanner = new Scanner(HibernateDaoFacade.class.getClassLoader().getResourceAsStream("resources/categories.properties"));
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             StringTokenizer stk = new StringTokenizer(line, ",");
@@ -219,7 +217,7 @@ public class StaticDaoFacade {
 
     public void buildSynonymsCacheLocal() {
         System.out.println("Rebuilding Synonym Cache Local");
-        Scanner scanner = new Scanner(StaticDaoFacade.class.getClassLoader().getResourceAsStream("resources/synonyms.properties"));
+        Scanner scanner = new Scanner(HibernateDaoFacade.class.getClassLoader().getResourceAsStream("resources/synonyms.properties"));
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             SynonymService.getService().addWords(line);

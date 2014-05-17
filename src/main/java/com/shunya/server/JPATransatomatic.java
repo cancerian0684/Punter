@@ -1,4 +1,4 @@
-package com.shunya.server.model;
+package com.shunya.server;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;

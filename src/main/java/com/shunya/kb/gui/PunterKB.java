@@ -2,7 +2,6 @@ package com.shunya.kb.gui;
 
 import com.shunya.kb.jpa.Attachment;
 import com.shunya.kb.jpa.Document;
-import com.shunya.kb.jpa.StaticDaoFacadeStrategy;
 import com.shunya.kb.utils.WordService;
 import com.shunya.punter.gui.AppSettings;
 import com.shunya.punter.gui.Main;
@@ -1108,20 +1107,5 @@ public class PunterKB extends JPanel {
         frame.setContentPane(this);
         frame.pack();
         frame.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-                    StaticDaoFacadeStrategy strategy = new StaticDaoFacadeStrategy(StaticDaoFacadeStrategy.Strategy.LOCAL);
-                    PunterKB punterKB = new PunterKB(strategy.getInstance());
-                    punterKB.createAndShowGUI();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 }

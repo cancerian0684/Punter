@@ -43,7 +43,7 @@ public interface StaticDaoFacade {
 
     List<String> getCategories();
 
-    List<String> getAllTerms() throws RemoteException;
+    List<String> getAllTerms() throws IOException;
 
     void updateAccessCounter(Document doc) throws RemoteException;
 

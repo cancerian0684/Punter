@@ -37,7 +37,7 @@ public class PunterHttpServer {
     public void start() throws IOException {
         webServerPort = context.getServerSettings().getWebServerPort();
         server = HttpServer.create(new InetSocketAddress(webServerPort), 0);
-        server.createContext(DATA, new MyDataHandler(context.getStaticDaoFacade()));
+        server.createContext(DATA, new MyDataHandler(context.getHibernateDaoFacade()));
         server.createContext(UPLOADS, new MyFileUploadHandler());
         server.createContext(PROCESS, new MyProcessHandler());
         server.setExecutor(Executors.newCachedThreadPool());
@@ -142,14 +142,14 @@ class MyDataHandler implements HttpHandler {
     final static int BUF_SIZE = 2048;
     static final byte[] EOL = {(byte) '\r', (byte) '\n'};
     byte[] buf;
-    private StaticDaoFacade staticDaoFacade;
+    private HibernateDaoFacade hibernateDaoFacade;
 
     static {
         fillMap();
     }
 
-    MyDataHandler(StaticDaoFacade staticDaoFacade) {
-        this.staticDaoFacade = staticDaoFacade;
+    MyDataHandler(HibernateDaoFacade hibernateDaoFacade) {
+        this.hibernateDaoFacade = hibernateDaoFacade;
         buf = new byte[BUF_SIZE];
     }
 
@@ -224,7 +224,7 @@ class MyDataHandler implements HttpHandler {
         else if (isLong(fname)) {
             Document doc = new Document();
             doc.setId(Long.parseLong(fname));
-            doc = staticDaoFacade.getDocument(doc);
+            doc = hibernateDaoFacade.getDocument(doc);
             targetFile = PunterWebDocumentHandler.process(doc);
         }
         return targetFile;

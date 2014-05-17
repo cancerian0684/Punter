@@ -28,7 +28,7 @@ public class LuceneIndexDao {
     static final File INDEX_DIR = new File("LuceneIndex");
     private Directory directory;
     private IndexWriter indexWriter;
-    private Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_45);
+    private Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_48);
     private static LuceneIndexDao luceneIndexDao;
     private final QueryParser parser1;
     private final QueryParser parser2;
@@ -221,8 +221,8 @@ public class LuceneIndexDao {
         try {
             directory = NIOFSDirectory.open(INDEX_DIR);
             directory.clearLock("write.lock");
-            Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_45);
-            IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_45, analyzer);
+            Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_48);
+            IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_48, analyzer);
             iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
             iwc.setIndexDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
             iwc.setMergePolicy(new TieredMergePolicy());

@@ -1,22 +1,20 @@
 package com.shunya.server;
 
-import com.shunya.server.model.JPATransatomatic;
-
 public class ServerContext {
-    private final StaticDaoFacade staticDaoFacade;
+    private final HibernateDaoFacade hibernateDaoFacade;
     private final SessionFacade sessionFacade;
     private final JPATransatomatic transatomatic;
     private final ServerSettings serverSettings;
 
-    public ServerContext(StaticDaoFacade staticDaoFacade, SessionFacade sessionFacade, JPATransatomatic transatomatic, ServerSettings serverSettings) {
-        this.staticDaoFacade = staticDaoFacade;
+    public ServerContext(HibernateDaoFacade hibernateDaoFacade, SessionFacade sessionFacade, JPATransatomatic transatomatic, ServerSettings serverSettings) {
+        this.hibernateDaoFacade = hibernateDaoFacade;
         this.sessionFacade = sessionFacade;
         this.transatomatic = transatomatic;
         this.serverSettings = serverSettings;
     }
 
-    public StaticDaoFacade getStaticDaoFacade() {
-        return staticDaoFacade;
+    public HibernateDaoFacade getHibernateDaoFacade() {
+        return hibernateDaoFacade;
     }
 
     public SessionFacade getSessionFacade() {

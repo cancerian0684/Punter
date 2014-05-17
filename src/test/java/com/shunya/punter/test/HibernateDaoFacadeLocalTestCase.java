@@ -7,9 +7,9 @@ import com.shunya.punter.jpa.ProcessData;
 import com.shunya.punter.jpa.ProcessHistory;
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
-import com.shunya.server.StaticDaoFacade;
-import com.shunya.server.model.JPASessionFactory;
-import com.shunya.server.model.JPATransatomatic;
+import com.shunya.server.HibernateDaoFacade;
+import com.shunya.server.JPASessionFactory;
+import com.shunya.server.JPATransatomatic;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -20,34 +20,34 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class StaticDaoFacadeLocalTestCase {
-    private StaticDaoFacade staticDaoFacade;
+public class HibernateDaoFacadeLocalTestCase {
+    private HibernateDaoFacade hibernateDaoFacade;
     private JPATransatomatic transatomatic;
 
     @BeforeClass
     public void setUp() {
         transatomatic = new JPATransatomatic(new JPASessionFactory());
-        staticDaoFacade = new StaticDaoFacade(transatomatic);
+        hibernateDaoFacade = new HibernateDaoFacade(transatomatic);
     }
 
 
     @Test
     public void createDocumentTest() throws RemoteException {
-        Document document = staticDaoFacade.createDocument("Munish chandel");
+        Document document = hibernateDaoFacade.createDocument("Munish chandel");
         System.out.println("document = " + document.getCategory() + " - " + document.getId());
         document.setCategory("retro daisy");
-        document = staticDaoFacade.saveDocument(document);
+        document = hibernateDaoFacade.saveDocument(document);
         System.out.println("document = " + document.getCategory() + " - " + document.getId());
     }
 
     @Test
     public void addAttachmentToDocument() {
-        Document document = staticDaoFacade.createDocument("Munish chandel");
+        Document document = hibernateDaoFacade.createDocument("Munish chandel");
         document.setCategory("retro daisy");
         Attachment attachment = new Attachment();
         attachment.setAuthor("Munish Chandel");
         attachment.setDocument(document);
-        staticDaoFacade.saveAttachment(attachment);
+        hibernateDaoFacade.saveAttachment(attachment);
     }
 
     @Test
@@ -58,10 +58,10 @@ public class StaticDaoFacadeLocalTestCase {
             TaskData task = new TaskData();
             task.setProcess(process);
             task.setName("Test Task");
-            task = (TaskData) staticDaoFacade.save(task);
+            task = (TaskData) hibernateDaoFacade.save(task);
             System.out.println(task.getId());
-            staticDaoFacade.removeTask(task);
-            staticDaoFacade.listTask(task.getId());
+            hibernateDaoFacade.removeTask(task);
+            hibernateDaoFacade.listTask(task.getId());
         }
     }
 
@@ -73,7 +73,7 @@ public class StaticDaoFacadeLocalTestCase {
         ph.setName("Test-1");
         ph.setStartTime(new Date());
         ph.setProcess(proc);
-        staticDaoFacade.save(ph);
+        hibernateDaoFacade.save(ph);
         TaskData task = new TaskData();
         task.setId(1602L);
         for (int i = 0; i <= 10; i++) {
@@ -83,13 +83,13 @@ public class StaticDaoFacadeLocalTestCase {
             th.setSequence(1);
             th.setStatus(true);
             th.setLogs("dummy logs");
-            staticDaoFacade.save(th);
+            hibernateDaoFacade.save(th);
         }
     }
 
     @Test
     public void testGetProcessHistoryForProcessId() throws Exception {
-        List<ProcessHistory> phl = staticDaoFacade.getProcessHistoryListForProcessId(1603L);
+        List<ProcessHistory> phl = hibernateDaoFacade.getProcessHistoryListForProcessId(1603L);
         for (ProcessHistory processHistory : phl) {
             System.out.println(processHistory.getId());
         }
@@ -97,7 +97,7 @@ public class StaticDaoFacadeLocalTestCase {
 
     @Test
     public void testGetProcessTaskHistoryForProcessHistoryId() throws Exception {
-        List<ProcessHistory> phl = staticDaoFacade.getProcessHistoryListForProcessId(1603L);
+        List<ProcessHistory> phl = hibernateDaoFacade.getProcessHistoryListForProcessId(1603L);
         for (ProcessHistory processHistory : phl) {
             System.out.println(processHistory.getId());
         }
@@ -107,12 +107,12 @@ public class StaticDaoFacadeLocalTestCase {
     public void testListTask() throws Exception {
         com.shunya.punter.jpa.ProcessData process = new com.shunya.punter.jpa.ProcessData();
         process.setId(712L);
-        List<TaskData> t1 = staticDaoFacade.getProcessTasks(712L);
+        List<TaskData> t1 = hibernateDaoFacade.getProcessTasks(712L);
         TaskData task = new TaskData();
         task.setProcess(process);
         task.setName("Test Task");
-        task = (TaskData) staticDaoFacade.save(task);
-        List<TaskData> t2 = staticDaoFacade.getProcessTasks(712L);
+        task = (TaskData) hibernateDaoFacade.save(task);
+        List<TaskData> t2 = hibernateDaoFacade.getProcessTasks(712L);
         assertEquals(1, (t2.size() - t1.size()));
     }
 
@@ -120,15 +120,15 @@ public class StaticDaoFacadeLocalTestCase {
     public void testGetProcessList() throws Exception {
         com.shunya.punter.jpa.ProcessData process = new com.shunya.punter.jpa.ProcessData();
         process.setName("UBS-101");
-        List<ProcessData> pl1 = staticDaoFacade.getProcessList(AppSettings.getInstance().getUsername());
-        staticDaoFacade.save(process);
-        List<ProcessData> pl2 = staticDaoFacade.getProcessList(AppSettings.getInstance().getUsername());
+        List<ProcessData> pl1 = hibernateDaoFacade.getProcessList(AppSettings.getInstance().getUsername());
+        hibernateDaoFacade.save(process);
+        List<ProcessData> pl2 = hibernateDaoFacade.getProcessList(AppSettings.getInstance().getUsername());
         assertEquals(1, (pl2.size() - pl1.size()));
     }
 
     @Test
     public void testGetProcess() throws Exception {
-        List<ProcessData> pl1 = staticDaoFacade.getProcessList(AppSettings.getInstance().getUsername());
+        List<ProcessData> pl1 = hibernateDaoFacade.getProcessList(AppSettings.getInstance().getUsername());
         for (ProcessData process : pl1) {
             System.out.println(process.getId() + " -- " + process.getName());
         }

@@ -1,4 +1,4 @@
-package com.shunya.server.model;
+package com.shunya.server;
 
 import com.shunya.punter.jpa.ProcessHistory;
 import org.hibernate.HibernateException;

@@ -12,8 +12,6 @@ import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.jpa.TaskHistory;
 import com.shunya.punter.utils.ClipBoardListener;
 import com.shunya.server.*;
-import com.shunya.server.model.JPASessionFactory;
-import com.shunya.server.model.JPATransatomatic;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -25,16 +23,13 @@ import java.util.List;
 
 @Service
 public class StaticDaoFacadeLocal implements StaticDaoFacade {
-    private PunterSearch stub;
     private ClipBoardListener clipBoardListener;
     private SingleInstanceFileLock singleInstanceFileLock;
-    private com.shunya.server.StaticDaoFacade staticDaoFacade;
+    private HibernateDaoFacade hibernateDaoFacade;
     private SessionFacade sessionFacade;
     private JPATransatomatic transatomatic;
-    private PunterHttpServer punterHttpServer;
     private ServerSettings serverSettings;
     private ServerContext context;
-    private LocalJettyRunner jettyRunner;
 
     @Override
     public void setClipBoardListener(ClipBoardListener clipBoardListener) {
@@ -98,17 +93,17 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
 
     @Override
     public PunterMessage getMessage() throws InterruptedException, RemoteException {
-        return stub.getMessage(getSessionId());
+        return sessionFacade.getMessage(getSessionId());
     }
 
     @Override
     public void ping() throws RemoteException {
-//        stub.ping(getSessionId());
+//        hibernateDaoFacade.ping(getSessionId());
     }
 
     @Override
     public InetAddress getServerHostAddress() throws Exception {
-        return stub.getServerHostAddress();
+        return InetAddress.getLocalHost();
     }
 
     @Override
@@ -118,7 +113,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
 
     @Override
     public long getWebServerPort() throws RemoteException {
-        return stub.getWebServerPort();
+        return serverSettings.getWebServerPort();
     }
 
     public StaticDaoFacadeLocal() {
@@ -126,12 +121,12 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
         sessionFacade = SessionFacade.getInstance();
         transatomatic = new JPATransatomatic(new JPASessionFactory());
         serverSettings = new ServerSettings();
-        staticDaoFacade = new com.shunya.server.StaticDaoFacade(transatomatic);
-        serverSettings.setStaticDaoFacade(staticDaoFacade);
-        staticDaoFacade.setSettings(serverSettings);
-        context = new ServerContext(staticDaoFacade, sessionFacade, transatomatic, serverSettings);
-        stub = new PunterSearchServer(staticDaoFacade, sessionFacade, serverSettings);
-        staticDaoFacade.buildSynonymsCacheLocal();
+        hibernateDaoFacade = new HibernateDaoFacade(transatomatic);
+        serverSettings.setHibernateDaoFacade(hibernateDaoFacade);
+        hibernateDaoFacade.setSettings(serverSettings);
+        context = new ServerContext(hibernateDaoFacade, sessionFacade, transatomatic, serverSettings);
+//        hibernateDaoFacade = new PunterSearchServer(hibernateDaoFacade, sessionFacade, serverSettings);
+        hibernateDaoFacade.buildSynonymsCacheLocal();
     }
 
     @Override
@@ -146,33 +141,28 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
 
     @Override
     public List<String> getCategories() {
-        try {
-            return stub.getCategories();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
+        return hibernateDaoFacade.getCategories();
     }
 
     @Override
-    public List<String> getAllTerms() throws RemoteException {
-        return stub.getAllTerms();
+    public List<String> getAllTerms() throws IOException {
+        return hibernateDaoFacade.getAllTerms();
     }
 
     @Override
     public void updateAccessCounter(Document doc) throws RemoteException {
-        stub.updateAccessCounter(doc);
+        hibernateDaoFacade.updateAccessCounter(doc);
     }
 
     @Override
     public Document createDocument(String author) throws RemoteException {
-        return stub.createDocument(author);
+        return hibernateDaoFacade.createDocument(author);
     }
 
     @Override
     public List<Document> getDocList(SearchQuery searchQuery) throws RemoteException {
         try {
-            return stub.getDocList(searchQuery);
+            return hibernateDaoFacade.getDocList(searchQuery);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RemoteException(e.getMessage());
@@ -181,48 +171,48 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
 
     @Override
     public void deleteAllForCategory(String category) throws IOException {
-        stub.deleteAllForCategory(category);
+        hibernateDaoFacade.deleteAllForCategory(category);
     }
 
     @Override
     public Document saveDocument(Document doc) throws RemoteException {
-        return stub.saveDocument(doc);
+        return hibernateDaoFacade.saveDocument(doc);
     }
 
     @Override
     public Attachment saveAttachment(Attachment attach) throws RemoteException {
-        return stub.saveAttachment(attach);
+        return hibernateDaoFacade.saveAttachment(attach);
     }
 
     @Override
     public Document getDocument(Document doc) {
-        return stub.getDocument(doc);
+        return hibernateDaoFacade.getDocument(doc);
     }
 
     @Override
     public Attachment getAttachment(Attachment doc) {
-        return staticDaoFacade.getAttachment(doc);
+        return hibernateDaoFacade.getAttachment(doc);
     }
 
     @Override
     public boolean deleteAttachment(Attachment attch) throws RemoteException {
-        return stub.deleteAttachment(attch);
+        return hibernateDaoFacade.deleteAttachment(attch);
     }
 
     @Override
     public boolean deleteDocument(Document attch) throws RemoteException {
-        return stub.deleteDocument(attch);
+        return hibernateDaoFacade.deleteDocument(attch);
     }
 
     @Override
     public void rebuildIndex() throws RemoteException {
-        stub.rebuildIndex();
+        hibernateDaoFacade.rebuildIndex();
     }
 
     @Override
     public void removeTask(TaskData task) {
         try {
-            stub.removeTask(task);
+            hibernateDaoFacade.removeTask(task);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -232,7 +222,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public void removeProcess(ProcessData proc) {
         try {
-            stub.removeProcess(proc);
+            hibernateDaoFacade.removeProcess(proc);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -242,7 +232,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public TaskData createTask(TaskData task) {
         try {
-            return stub.createTask(task);
+            return (TaskData) hibernateDaoFacade.save(task);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -253,7 +243,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public ProcessData createProcess(ProcessData proc) {
         try {
-            return stub.createProcess(proc);
+            return (ProcessData) hibernateDaoFacade.save(proc);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -264,7 +254,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public ProcessHistory createProcessHistory(ProcessHistory ph) {
         try {
-            return stub.createProcessHistory(ph);
+            return (ProcessHistory) hibernateDaoFacade.save(ph);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -275,7 +265,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public TaskHistory createTaskHistory(TaskHistory th) {
         try {
-            return stub.createTaskHistory(th);
+            return (TaskHistory) hibernateDaoFacade.save(th);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -286,7 +276,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public void saveTaskHistory(TaskHistory t) {
         try {
-            stub.saveTaskHistory(t);
+            hibernateDaoFacade.saveTaskHistory(t);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -296,7 +286,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public void saveProcessHistory(ProcessHistory procHistory) {
         try {
-            stub.saveProcessHistory(procHistory);
+            hibernateDaoFacade.saveProcessHistory(procHistory);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -306,7 +296,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public TaskData saveTask(TaskData t) throws Exception {
         try {
-            return stub.saveTask(t);
+            return hibernateDaoFacade.saveTask(t);
         } catch (Exception e) {
             throw e;
         }
@@ -316,7 +306,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public ProcessData saveProcess(ProcessData p) {
         try {
-            return stub.saveProcess(p);
+            return hibernateDaoFacade.saveProcess(p);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -327,7 +317,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public void listTask(long id) {
         try {
-            stub.listTask(id);
+            hibernateDaoFacade.listTask(id);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -338,7 +328,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public List<ProcessData> getScheduledProcessList(String username) {
         try {
-            return stub.getScheduledProcessList(username);
+            return hibernateDaoFacade.getScheduledProcessList(username);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -349,7 +339,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public List<ProcessData> getProcessList(String username) throws Exception {
         try {
-            return stub.getProcessList(username);
+            return hibernateDaoFacade.getProcessList(username);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -360,7 +350,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public ProcessData getProcess(long id) {
         try {
-            return stub.getProcess(id);
+            return hibernateDaoFacade.getProcess(id);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -371,7 +361,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public TaskHistory getTaskDao(TaskHistory td) {
         try {
-            return stub.getTaskDao(td);
+            return hibernateDaoFacade.getTaskDao(td);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -382,7 +372,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public List<ProcessHistory> getProcessHistoryListForProcessId(long id) {
         try {
-            return stub.getProcessHistoryListForProcessId(id);
+            return hibernateDaoFacade.getProcessHistoryListForProcessId(id);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -393,7 +383,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public List<ProcessHistory> getSortedProcessHistoryListForProcessId(long id) {
         try {
-            return stub.getSortedProcessHistoryListForProcessId(id);
+            return hibernateDaoFacade.getSortedProcessHistoryListForProcessId(id);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -403,7 +393,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public List<ProcessHistory> getMySortedProcessHistoryList(String username) {
         try {
-            return stub.getMySortedProcessHistoryList(username);
+            return hibernateDaoFacade.getMySortedProcessHistoryList(username);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -414,7 +404,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public ProcessHistory getProcessHistoryById(long id) {
         try {
-            return stub.getProcessHistoryById(id);
+            return hibernateDaoFacade.getProcessHistoryById(id);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -425,7 +415,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public List<TaskData> getProcessTasksById(long pid) {
         try {
-            return stub.getProcessTasksById(pid);
+            return hibernateDaoFacade.getProcessTasksById(pid);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -436,7 +426,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public List<TaskData> getSortedTasksByProcessId(long pid) {
         try {
-            return stub.getSortedTasksByProcessId(pid);
+            return hibernateDaoFacade.getSortedTasksByProcessId(pid);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -446,7 +436,7 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
     @Override
     public List<TaskData> getProcessTasks(long pid) {
         try {
-            return stub.getProcessTasks(pid);
+            return hibernateDaoFacade.getProcessTasks(pid);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -460,11 +450,11 @@ public class StaticDaoFacadeLocal implements StaticDaoFacade {
 
     @Override
     public void sendMessageToPeer(PunterMessage punterMessage) throws InterruptedException, RemoteException {
-        stub.sendMessage(getSessionId(), punterMessage, getUsername());
+        sessionFacade.sendMessage(getSessionId(), punterMessage, getUsername());
     }
 
     @Override
     public String getDevEmailCSV() throws RemoteException {
-        return stub.getDevEmailCSV();
+        return serverSettings.getDevEmailCSV();
     }
 }

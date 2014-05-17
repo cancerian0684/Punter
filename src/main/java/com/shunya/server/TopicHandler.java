@@ -20,7 +20,7 @@ public class TopicHandler {
 
     public synchronized void subscribe(PunterSession punterSession, String queue) {
         if (topicSessionMap.get(queue) == null) {
-            topicSessionMap.put(queue, new ArrayList<PunterSession>());
+            topicSessionMap.put(queue, new ArrayList<>());
         }
         topicSessionMap.get(queue).add(punterSession);
     }
