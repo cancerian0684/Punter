@@ -4,12 +4,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class PunterSession implements Comparable<String> {
-    String username;
-    String sessionId;
-    String hostname;
-    BlockingQueue<PunterMessage> myQueue;
-    long lastAccessed;
-    long age;
+    private String username;
+    private String sessionId;
+    private String hostname;
+    private BlockingQueue<PunterMessage> myQueue;
+    private long lastAccessed;
+    private long age;
 
     public PunterSession(String sessionId, String username) {
         this.sessionId = sessionId;
@@ -30,7 +30,8 @@ public class PunterSession implements Comparable<String> {
     public void sendMessage(PunterMessage punterMessage){
         myQueue.offer(punterMessage);
     }
-    PunterMessage getMessage() throws InterruptedException {
+
+    public PunterMessage getMessage() throws InterruptedException {
         return myQueue.take();
     }
 

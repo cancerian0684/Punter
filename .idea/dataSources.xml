@@ -4,7 +4,7 @@
     <data-source source="LOCAL" name="hibernate.cfg.xml" uuid="626ce88a-0122-46b0-bf3d-b3f4f4d7deeb">
       <driver-ref>h2.embedded</driver-ref>
       <jdbc-driver>org.h2.Driver</jdbc-driver>
-      <jdbc-url>jdbc:h2:punterDB</jdbc-url>
+      <jdbc-url>jdbc:h2:~/punterDB</jdbc-url>
       <user-name>sa</user-name>
       <user-password>dfd9dfcb</user-password>
       <schema-pattern>PUNTERDB.PUBLIC</schema-pattern>

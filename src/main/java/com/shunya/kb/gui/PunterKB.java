@@ -98,11 +98,7 @@ public class PunterKB extends JPanel {
         punterDelayedQueueHandlerThread = new DelayedQueueHandlerThread<>(new DelayedQueueHandlerThread.CallBackHandler<SearchQuery>() {
             @Override
             public void process(SearchQuery query) {
-                try {
-                    populateDocumentsInTable((DocumentTableModel) searchResultTable.getModel(), docService.getDocList(query));
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+                populateDocumentsInTable((DocumentTableModel) searchResultTable.getModel(), docService.getDocList(query));
             }
         });
 
@@ -123,11 +119,7 @@ public class PunterKB extends JPanel {
                         }
                         if (mEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
                             Document luceneDoc = (Document) ((DocumentTableModel) table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow())).get(0);
-                            try {
-                                docService.updateAccessCounter(luceneDoc);
-                            } catch (RemoteException e2) {
-                                e2.printStackTrace();
-                            }
+                            docService.updateAccessCounter(luceneDoc);
                             Document doc = docService.getDocument(luceneDoc);
                             if (column == 1) {
                                 if (doc.getExt().isEmpty())
@@ -425,12 +417,8 @@ public class PunterKB extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Adding Document");
                 Document doc = null;
-                try {
-                    doc = docService.createDocument(docService.getUsername());
-                    doc.setCategory(getSelectedCategory());
-                } catch (RemoteException e1) {
-                    e1.printStackTrace();
-                }
+                doc = docService.createDocument(docService.getUsername());
+                doc.setCategory(getSelectedCategory());
                 DocumentEditor.showEditor(doc, docService, wordService);
             }
         });
@@ -503,12 +491,8 @@ public class PunterKB extends JPanel {
                         int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete?", "Confirm",
                                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                         if (response == JOptionPane.YES_OPTION) {
-                            try {
-                                docService.deleteDocument(doc);
-                                dtm.deleteRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
-                            } catch (RemoteException e1) {
-                                e1.printStackTrace();
-                            }
+                            docService.deleteDocument(doc);
+                            dtm.deleteRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
                         }
                     } else {
                         JOptionPane.showMessageDialog(null, "You do not have rights to delete this doc.");

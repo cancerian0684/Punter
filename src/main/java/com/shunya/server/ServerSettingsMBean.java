@@ -1,5 +1,6 @@
 package com.shunya.server;
 
+import javax.annotation.PreDestroy;
 import java.net.UnknownHostException;
 
 public interface ServerSettingsMBean {
@@ -39,17 +40,12 @@ public interface ServerSettingsMBean {
 
     public void setTempDirectory(String tempDirectory);
 
+    @PreDestroy
+    void saveState();
+
     String getDevEmailCSV();
 
     void setDevEmailCSV(String devEmailCSV);
 
-    void restartAllClient();
-
     String getServerHostAddress() throws UnknownHostException;
-
-    String getJNLPURL() throws UnknownHostException;
-
-    int getMaxWebServerThread();
-
-    void setMaxWebServerThread(int maxWebServerThread);
 }

@@ -316,7 +316,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                                 for (TaskData taskData : tl) {
                                     taskData.setProcess(processData);
                                 }
-                                processData = staticDaoFacade.createProcess(processData);
+                                processData = staticDaoFacade.create(processData);
                                 ArrayList<Object> newrow = new ArrayList<Object>();
                                 newrow.add(processData);
                                 ((ProcessTableModel) processTable.getModel()).insertRow(newrow);
@@ -467,7 +467,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                                 TaskData taskData = root.getValue();
                                 ProcessData procDao = (ProcessData) ((ProcessTableModel) processTable.getModel()).getRow(processTable.convertRowIndexToModel(processTable.getSelectedRow())).get(0);
                                 taskData.setProcess(procDao);
-                                taskData = staticDaoFacade.createTask(taskData);
+                                taskData = staticDaoFacade.create(taskData);
                                 if (procDao.getTaskList() == null) {
                                     procDao.setTaskList(new ArrayList<TaskData>());
                                 }
@@ -586,7 +586,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             ProcessData p = new ProcessData();
                             p.setId(procId);
                             task.setProcess(p);
-                            task = staticDaoFacade.createTask(task);
+                            task = staticDaoFacade.create(task);
                             TaskTableModel model = (TaskTableModel) taskTable.getModel();
                             final ArrayList<Object> newRequest = new ArrayList<Object>();
                             newRequest.add(task);
@@ -650,7 +650,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     FieldPropertiesMap inProp = com.shunya.punter.tasks.Process.listInputParams();
                     proc.setInputParams(inProp);
                     proc.setUsername(AppSettings.getInstance().getUsername());
-                    proc = staticDaoFacade.createProcess(proc);
+                    proc = staticDaoFacade.create(proc);
                     ProcessTableModel model = (ProcessTableModel) processTable.getModel();
                     final ArrayList<Object> newRequest = new ArrayList<Object>();
                     newRequest.add(proc);
@@ -691,7 +691,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             for (TaskData taskData : tl) {
                                 taskData.setProcess(procDao);
                             }
-                            procDao = staticDaoFacade.createProcess(procDao);
+                            procDao = staticDaoFacade.create(procDao);
                             ArrayList<Object> newrow = new ArrayList<Object>();
                             newrow.add(procDao);
                             ((ProcessTableModel) processTable.getModel()).insertRow(newrow);
@@ -1434,7 +1434,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         try {
             final ProcessData processData = staticDaoFacade.getProcess(processRunMessage.getProcessId());
             final ProcessHistory processHistory = ProcessHistoryBuilder.build(processData, staticDaoFacade);
-            final ProcessHistory ph1 = staticDaoFacade.createProcessHistory(processHistory);
+            final ProcessHistory ph1 = staticDaoFacade.create(processHistory);
             final ArrayList<Object> newRequest = new ArrayList<>();
             newRequest.add(ph1);
             final com.shunya.punter.tasks.Process process = com.shunya.punter.tasks.Process.getProcess(staticDaoFacade, processData.getInputParams(), ph1, parseStringMap(processRunMessage.getParams()));
