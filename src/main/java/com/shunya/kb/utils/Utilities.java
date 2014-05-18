@@ -15,8 +15,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
 
 public class Utilities {
     static final Logger logger = LoggerFactory.getLogger(Utilities.class);
@@ -71,5 +70,41 @@ public class Utilities {
             e.printStackTrace();
         }
         return clazz.newInstance();
+    }
+
+    public static String substituteVariables(String inputString, Map<String, Object> variables) {
+        List<String> vars = getVariablesFromString(inputString);
+        for (String string : vars) {
+            String variable = "#{" + string + "}";
+            if (null == variables.get(string)) {
+                throw new RuntimeException("Variable Binding not Found :" + variable);
+            }
+            String variableBinding = variables.get(string).toString();
+            inputString = inputString.replace(variable, variableBinding);
+        }
+        return inputString;
+    }
+
+    private static List<String> getVariablesFromString(String test) {
+        char prevChar = ' ';
+        String var = "";
+        List<String> vars = new ArrayList<>();
+        boolean found = false;
+        for (int i = 0; i < test.length(); i++) {
+            char ch = test.charAt(i);
+            if (ch == '{' && prevChar == '#') {
+                var = "";
+                found = true;
+            } else if (ch == '}') {
+                found = false;
+                if (!var.isEmpty())
+                    vars.add(var);
+                var = "";
+            } else if (found) {
+                var += ch;
+            }
+            prevChar = ch;
+        }
+        return vars;
     }
 }

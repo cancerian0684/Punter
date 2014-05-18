@@ -274,7 +274,7 @@ public abstract class Tasks implements Serializable {
     private static List<String> getVariablesFromString(String test) {
         char prevChar = ' ';
         String var = "";
-        List<String> vars = new ArrayList<String>();
+        List<String> vars = new ArrayList<>();
         boolean found = false;
         for (int i = 0; i < test.length(); i++) {
             char ch = test.charAt(i);

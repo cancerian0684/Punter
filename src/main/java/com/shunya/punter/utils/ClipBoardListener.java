@@ -1,21 +1,29 @@
 package com.shunya.punter.utils;
 
 import com.shunya.server.ClipboardPunterMessage;
+import com.shunya.server.component.PunterService;
 import com.shunya.server.component.StaticDaoFacade;
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.datatransfer.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class ClipBoardListener implements ClipboardOwner, PunterComponent {
     private final StaticDaoFacade staticDaoFacade;
-    Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
+    private final PunterService punterService;
+    private final Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
     private boolean listening = true;
     private boolean started = false;
 
-    public ClipBoardListener(StaticDaoFacade staticDaoFacade) {
+    public ClipBoardListener(StaticDaoFacade staticDaoFacade, PunterService punterService) {
         this.staticDaoFacade = staticDaoFacade;
-//        startComponent();
+        this.punterService = punterService;
+        startComponent();
     }
 
     public void run() {
@@ -38,26 +46,51 @@ public class ClipBoardListener implements ClipboardOwner, PunterComponent {
     }
 
     public void handleContent(ClipboardPunterMessage punterMessage) {
-        String contents = punterMessage.getContents();
-        System.out.println(contents);
-        StringSelection ss = new StringSelection(contents);
-        sysClip.setContents(ss, this);
+        if(punterMessage.getType().equals("string")) {
+            Object contents = punterMessage.getContents();
+            System.out.println(contents);
+            StringSelection ss = new StringSelection((String) contents);
+            sysClip.setContents(ss, this);
+        }else if(punterMessage.getType().equals("image")){
+            try {
+                byte[] bytearray = Base64.decode(punterMessage.getContents());
+                BufferedImage imag = ImageIO.read(new ByteArrayInputStream(bytearray));
+                ImageSelection ss = new ImageSelection(imag);
+                sysClip.setContents(ss, this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     void processContents(Transferable transferable) {
-        if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-            try {
-                String s = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-                System.out.println(s);
-                ClipboardPunterMessage punterMessage = new ClipboardPunterMessage();
-                punterMessage.setContents(s);
-                staticDaoFacade.sendMessageToPeer(punterMessage);
-            } catch (UnsupportedFlavorException e2) {
-                e2.printStackTrace();
-            } catch (IOException e2) {
-                e2.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        if(listening) {
+            if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                try {
+                    String transferData = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+                    System.out.println(transferData);
+                    ClipboardPunterMessage punterMessage = new ClipboardPunterMessage();
+                    punterMessage.setType("string");
+                    punterMessage.setContents(transferData);
+                    punterService.sendMessageToPeers(punterMessage);
+                } catch (UnsupportedFlavorException | IOException | InterruptedException e2) {
+                    e2.printStackTrace();
+                }
+            }else if(transferable.isDataFlavorSupported(DataFlavor.imageFlavor)){
+                try {
+                    BufferedImage img = (BufferedImage) transferable.getTransferData(DataFlavor.imageFlavor);
+                    ByteArrayOutputStream baos=new ByteArrayOutputStream(1000);
+                    ImageIO.write(img, "png", baos);
+                    baos.flush();
+                    String base64String= Base64.encode(baos.toByteArray());
+                    baos.close();
+                    ClipboardPunterMessage punterMessage = new ClipboardPunterMessage();
+                    punterMessage.setType("image");
+                    punterMessage.setContents(base64String);
+                    punterService.sendMessageToPeers(punterMessage);
+                } catch (UnsupportedFlavorException | IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

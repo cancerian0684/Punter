@@ -1,11 +1,15 @@
 package com.shunya.punter.utils;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class JavaScreenCapture extends JFrame implements MouseListener, MouseMotionListener {
@@ -186,11 +190,16 @@ public class JavaScreenCapture extends JFrame implements MouseListener, MouseMot
             ImageIO.write(screenCapture, "png", file);*/
 //            ImageIO.write(screencapture, "jpg", file);
             ImageSelection.copyImageToClipboard(screenCapture);
-        } catch (AWTException e) {
+            JFileChooser fc = new JFileChooser();
+            fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG Image Files", "png"));
+            int returnVal = fc.showDialog(JavaScreenCapture.this, "Save Image");
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                ImageIO.write(screenCapture, "png", file);
+            }
+        } catch (AWTException | IOException e) {
             e.printStackTrace();
-        } /*catch (IOException e) {
-            e.printStackTrace();
-        }*/
+        }
     }
 
     public static void main(final String args[]) {

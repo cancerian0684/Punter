@@ -2,6 +2,7 @@ package com.shunya.server.component;
 
 import com.shunya.punter.jpa.TaskData;
 import com.shunya.punter.tasks.Tasks;
+import com.shunya.server.PunterMessage;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,12 @@ public class RestClient {
     public void downloadFile(String baseUri, String id, String localPath) throws Exception {
         String uri = baseUri + "/punter/get/" + id;
         restTemplate.execute(uri, HttpMethod.GET, ACCEPT_CALLBACK, new FileResponseExtractor(new File(localPath, "test file.txt")));
+    }
+
+    public void sendClipBoardMessage(String baseUri, PunterMessage punterMessage) {
+        logger.info("sending clipboard message : "+ punterMessage);
+        String uri = baseUri + "/punter/clipboard";
+        restTemplate.postForEntity(uri, punterMessage, String.class);
     }
 
     public void acceptHeaderUsingHttpEntity2() throws Exception {

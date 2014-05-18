@@ -8,6 +8,7 @@ import com.shunya.punter.jpa.*;
 import com.shunya.punter.tasks.Tasks;
 import com.shunya.punter.utils.*;
 import com.shunya.server.PunterProcessRunMessage;
+import com.shunya.server.component.PunterService;
 import com.shunya.server.component.StaticDaoFacade;
 import neoe.ne.EditPanel;
 
@@ -62,6 +63,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
     private PunterJobBasket punterJobBasket;
     private GlobalHotKeyListener globalHotKeyListener;
     private final StaticDaoFacade staticDaoFacade;
+    private final PunterService punterService;
 
     static {
         try {
@@ -71,10 +73,11 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         }
     }
 
-    public PunterGUI(final StaticDaoFacade staticDaoFacade) throws Exception {
+    public PunterGUI(final StaticDaoFacade staticDaoFacade, PunterService punterService) throws Exception {
         super(new GridLayout(1, 0));
         this.staticDaoFacade = staticDaoFacade;
-        clipBoardListener = new ClipBoardListener(staticDaoFacade);
+        this.punterService = punterService;
+        clipBoardListener = new ClipBoardListener(staticDaoFacade, punterService);
         staticDaoFacade.setClipBoardListener((ClipBoardListener) clipBoardListener);
         tableSearchFilter = new TableSearchFilter();
         DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
@@ -1216,7 +1219,8 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     try {
                         properties.load(new ByteArrayInputStream(string.getBytes()));
                         AppSettings.getInstance().setSessionMap((Map) properties);
-                        AppSettings.getInstance().setObject("appProperties", string);
+                        AppSettings.getInstance().setObject(AppConstants.APP_PROPERTIES, string);
+                        AppSettings.getInstance().setObject(AppConstants.APP_PROPERTIES_MAP, properties);
                         try {
                             int id = Integer.parseInt(properties.getProperty(WIN_A, "0"));
                             globalHotKeyListener.setTaskIdToRun(id);
@@ -1224,7 +1228,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                         }
                         // System.err.println("Properties Loaded to the System.");
                     } catch (IOException e) {
-                        System.err.println("Error Loading properties into the system.");
+                        System.err.println("Error Loading app properties into the system.");
                         e.printStackTrace();
                     }
                 }

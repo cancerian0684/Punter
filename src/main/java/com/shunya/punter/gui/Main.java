@@ -6,6 +6,7 @@ import com.shunya.punter.utils.GlobalHotKeyListener;
 import com.shunya.punter.utils.JavaScreenCapture;
 import com.shunya.punter.utils.Launcher;
 import com.shunya.punter.utils.StackWindow;
+import com.shunya.server.component.PunterService;
 import com.shunya.server.component.StaticDaoFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,6 +22,8 @@ import java.util.logging.Logger;
 public class Main {
     @Autowired
     private StaticDaoFacade staticDaoFacade;
+    @Autowired
+    private PunterService punterService;
     private static BufferedImage currentImage;
     private static BufferedImage busyImage;
     private static BufferedImage dsctImage;
@@ -105,7 +108,7 @@ public class Main {
 
         PunterGuiFrame = new JFrame("My Personal Assistant");
         PunterGuiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        punterGUI = new PunterGUI(staticDaoFacade);
+        punterGUI = new PunterGUI(staticDaoFacade, punterService);
         punterGUI.setGlobalHotKeyListener(globalHotKeyListener);
         PunterGuiFrame.setContentPane(punterGUI);
 
@@ -173,7 +176,6 @@ public class Main {
             rt.addShutdownHook(new Thread() {
                 public void run() {
                     globalHotKeyListener.cleanup();
-                    staticDaoFacade.disconnect();
                     timer.stop();
                     logger.log(Level.INFO, "Exiting...");
                 }
@@ -190,13 +192,6 @@ public class Main {
                         tray.remove(trayIcon);
                         Launcher.programQuit();
                     }
-                }
-            };
-
-            ActionListener restartListener = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    staticDaoFacade.restartClient();
                 }
             };
 

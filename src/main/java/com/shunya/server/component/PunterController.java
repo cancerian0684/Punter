@@ -4,8 +4,8 @@ import com.shunya.kb.jpa.Document;
 import com.shunya.punter.gui.PunterJobBasket;
 import com.shunya.punter.jpa.ProcessData;
 import com.shunya.punter.jpa.TaskData;
+import com.shunya.server.ClipboardPunterMessage;
 import com.shunya.server.PunterProcessRunMessage;
-import com.shunya.server.PunterWebDocumentHandler;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +27,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 @Controller
 @RequestMapping(value = "/punter")
 public class PunterController {
     final Logger logger = LoggerFactory.getLogger(PunterController.class);
     @Autowired
-    private StaticDaoFacade service;
+    private StaticDaoFacade daoService;
 
     @Autowired
     private PunterService punterService;
@@ -46,7 +47,7 @@ public class PunterController {
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     @ResponseBody
     public List<ProcessData> index(@ModelAttribute("model") ModelMap model) throws Exception {
-        List<ProcessData> historyList = service.getProcessList("Munish");
+        List<ProcessData> historyList = daoService.getProcessList("Munish");
         System.out.println("historyList = " + historyList);
         return historyList;
     }
@@ -56,7 +57,7 @@ public class PunterController {
     public Document getDocument(@ModelAttribute("model") ModelMap model, @PathVariable("id") long id) {
         Document document = new Document();
         document.setId(id);
-        document = service.getDocument(document);
+        document = daoService.getDocument(document);
         return document;
     }
 
@@ -67,21 +68,23 @@ public class PunterController {
         return runMessage.get();
     }
 
+    @RequestMapping(value = "/clipboard", method = RequestMethod.POST)
+    @ResponseBody
+    public void processClipboardMsg(@RequestBody ClipboardPunterMessage copyMessage) throws InterruptedException {
+        logger.info("received clipboard message");
+        daoService.process(copyMessage);
+    }
+
     @RequestMapping(value = "/runTask", method = RequestMethod.POST)
     @ResponseBody
-    public Map runTask(@RequestBody TaskData taskData) throws InterruptedException {
+    public Map runTask(@RequestBody TaskData taskData) throws InterruptedException, ExecutionException {
         return punterService.runTask(taskData);
     }
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
     @ResponseBody
-    public FileSystemResource get(@PathVariable("id") Long id) throws IOException {
-        logger.info("Serving file : " + id);
-        Document doc = new Document();
-        doc.setId(id);
-        doc = service.getDocument(doc);
-        File targetFile = PunterWebDocumentHandler.process(doc);
-        return new FileSystemResource(targetFile);
+    public FileSystemResource getFile(@PathVariable("id") Long id) throws IOException {
+        return punterService.getFile(id);
     }
 
     @RequestMapping(value = "/run/{host}/{id}", method = RequestMethod.GET)

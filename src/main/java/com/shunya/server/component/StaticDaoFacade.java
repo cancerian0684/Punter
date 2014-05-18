@@ -35,6 +35,7 @@ public class StaticDaoFacade {
     private JPATransatomatic transatomatic;
     @Autowired
     private ServerSettings serverSettings;
+    private RestClient restClient = new RestClient();
 
     public void setClipBoardListener(ClipBoardListener clipBoardListener) {
         this.clipBoardListener = clipBoardListener;
@@ -72,11 +73,9 @@ public class StaticDaoFacade {
         thread.start();
     }
 
-    private void process(PunterMessage message) {
+    public void process(PunterMessage message) {
         if (message instanceof ClipboardPunterMessage && clipBoardListener != null) {
             clipBoardListener.handleContent((ClipboardPunterMessage) message);
-        } else if (message instanceof PunterRestartMessage) {
-            restartClient();
         } else if (message instanceof PunterProcessRunMessage) {
             try {
                 if (((PunterProcessRunMessage) message).getHostname().equalsIgnoreCase(getLocalHostAddress().getHostName())) {
@@ -217,7 +216,7 @@ public class StaticDaoFacade {
     public Attachment saveAttachment(Attachment attach) throws RemoteException {
         final ResultHolder<Attachment> resultHolder = new ResultHolder<>();
         transatomatic.run(session -> {
-            session.persist(attach);
+            session.save(attach);
             session.flush();
             Document doc = attach.getDocument();
             doc = (Document) session.get(Document.class, doc.getId());
@@ -693,14 +692,6 @@ public class StaticDaoFacade {
             e.printStackTrace();
         }
         return Collections.EMPTY_LIST;
-    }
-
-    public void disconnect() {
-        //do nothing to disconnect
-    }
-
-    public void sendMessageToPeer(PunterMessage punterMessage) throws InterruptedException, RemoteException {
-        sessionFacade.sendMessage(getSessionId(), punterMessage, getUsername());
     }
 
     public String getDevEmailCSV() throws RemoteException {
