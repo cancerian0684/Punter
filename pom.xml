@@ -3,11 +3,10 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>org.shunya</groupId>
     <artifactId>punter</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <description>Punter Version 2.0</description>
     <properties>
         <spring.version>4.0.3.RELEASE</spring.version>
@@ -210,12 +209,6 @@
             <artifactId>spring-test</artifactId>
             <version>4.0.2.RELEASE</version>
         </dependency>
-        <!--<dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <version>1.0.0.Final</version>
-        </dependency>
--->
         <dependency>
             <groupId>bouncycastle</groupId>
             <artifactId>bcprov-jdk16</artifactId>
@@ -236,12 +229,6 @@
             <artifactId>hibernate-validator</artifactId>
             <version>5.1.0.CR1</version>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-annotations</artifactId>
-            <version>3.5.6-Final</version>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
@@ -409,7 +396,7 @@
                     </platforms>
                     <programs>
                         <program>
-                            <mainClass>com.shunya.server.LocalJettyRunner</mainClass>
+                            <mainClass>org.shunya.server.LocalJettyRunner</mainClass>
                             <id>app</id>
                             <platforms>
                                 <platform>windows</platform>

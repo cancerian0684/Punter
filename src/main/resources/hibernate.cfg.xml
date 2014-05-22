@@ -12,16 +12,19 @@
         <property name="connection.password">sa</property>
         <property name="hibernate.show_sql">false</property>
         <property name="hibernate.format_sql">false</property>
+        <property name="hibernate.cache.use_query_cache">false</property>
+        <property name="hibernate.cache.use_second_level_cache">false</property>
+        <property name="hibernate.connection.pool_size">2</property>
         <!-- DB schema will be updated if needed -->
         <property name="hbm2ddl.auto">update</property>
 
-        <mapping class="com.shunya.punter.jpa.TaskData"/>
-        <mapping class="com.shunya.punter.jpa.ProcessData"/>
-        <mapping class="com.shunya.punter.jpa.ProcessHistory"/>
-        <mapping class="com.shunya.punter.jpa.TaskHistory"/>
-        <mapping class="com.shunya.kb.jpa.Document"/>
-        <mapping class="com.shunya.kb.jpa.Category"/>
-        <mapping class="com.shunya.kb.jpa.Attachment"/>
-        <mapping class="com.shunya.kb.jpa.SynonymWord"/>
+        <mapping class="org.shunya.punter.jpa.TaskData"/>
+        <mapping class="org.shunya.punter.jpa.ProcessData"/>
+        <mapping class="org.shunya.punter.jpa.ProcessHistory"/>
+        <mapping class="org.shunya.punter.jpa.TaskHistory"/>
+        <mapping class="org.shunya.kb.model.Document"/>
+        <mapping class="org.shunya.kb.model.Category"/>
+        <mapping class="org.shunya.kb.model.Attachment"/>
+        <mapping class="org.shunya.kb.model.SynonymWord"/>
     </session-factory>
 </hibernate-configuration>
