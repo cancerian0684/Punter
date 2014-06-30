@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
-
 public class ParallelTaskRunner {
     final ExecutorService pool = Executors.newFixedThreadPool(3);
     final ExecutorCompletionService<Map<String,Object>> completionService = new ExecutorCompletionService<>(pool);

@@ -120,7 +120,7 @@ public class PunterKB extends JPanel {
                         if (mEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
                             Document luceneDoc = (Document) ((DocumentTableModel) table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow())).get(0);
                             docService.updateAccessCounter(luceneDoc);
-                            Document doc = docService.getDocument(luceneDoc);
+                            Document doc = docService.getDocument(luceneDoc.getId());
                             if (column == 1) {
                                 if (doc.getExt().isEmpty())
                                     DocumentEditor.showEditor(doc, docService, wordService);
@@ -282,7 +282,7 @@ public class PunterKB extends JPanel {
                 for (int selectedRow : selectedRows) {
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
                     Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(selectedRow)).get(0);
-                    doc = docService.getDocument(doc);
+                    doc = docService.getDocument(doc.getId());
                     //Punter Doc
                     if (doc.getExt().isEmpty()) {
                         files.add(createZipFromDocument(doc));
@@ -429,7 +429,7 @@ public class PunterKB extends JPanel {
                 System.out.println("Opening Document");
                 if (searchResultTable.getSelectedRow() >= 0) {
                     Document doc = (Document) ((DocumentTableModel) searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-                    doc = docService.getDocument(doc);
+                    doc = docService.getDocument(doc.getId());
                     if (doc.getExt().isEmpty())
                         DocumentEditor.showEditor(doc, docService, wordService);
                     else {
@@ -463,7 +463,7 @@ public class PunterKB extends JPanel {
                             .getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
                     Document persisted = null;
                     try {
-                        persisted = docService.getDocument(localDoc);
+                        persisted = docService.getDocument(localDoc.getId());
                         final String newTitle = JOptionPane.showInputDialog(Main.KBFrame, "rename title to - ", persisted.getTitle());
                         if (newTitle != null) {
                             persisted.setTitle(newTitle);
@@ -549,7 +549,7 @@ public class PunterKB extends JPanel {
                     Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
                     String docId;
                     if (doc.getCategory().equalsIgnoreCase("/all/uploads")) {
-                        doc = docService.getDocument(doc);
+                        doc = docService.getDocument(doc.getId());
 //                        Base64.getEncoder().encode(doc.getTitle().getBytes())
                         docId = "uploads/" + doc.getTitle();
                         docId = docId.replaceAll(" ", "%20");
@@ -582,7 +582,7 @@ public class PunterKB extends JPanel {
                             File temp = new File("Temp");
                             if (!temp.exists())
                                 temp.mkdir();
-                            doc = docService.getDocument(doc);
+                            doc = docService.getDocument(doc.getId());
                             //Punter Doc
                             if (doc.getExt().isEmpty()) {
                                 Collection<Attachment> attchs = doc.getAttachments();
@@ -677,8 +677,7 @@ public class PunterKB extends JPanel {
                                 try {
                                     System.err.println("Picked file :" + path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
                                     int id = Integer.parseInt(path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
-                                    doc.setId(id);
-                                    doc = docService.getDocument(doc);
+                                    doc = docService.getDocument((long) id);
                                     doc.setContent(getBytesFromFile(path.toFile()));
                                     docService.saveDocument(doc);
                                 } catch (Exception e2) {
@@ -1052,12 +1051,9 @@ public class PunterKB extends JPanel {
         if (temp.exists()) {
             File[] files = temp.listFiles();
             for (File file : files) {
-                Document doc = new Document();
                 try {
                     System.err.println("Picked file :" + file.getName().substring(1, file.getName().indexOf("_")));
-                    int id = Integer.parseInt(file.getName().substring(1, file.getName().indexOf("_")));
-                    doc.setId(id);
-                    doc = docService.getDocument(doc);
+                    Document doc = docService.getDocument(Long.parseLong(file.getName().substring(1, file.getName().indexOf("_"))));
                     doc.setContent(getBytesFromFile(file));
                     docService.saveDocument(doc);
                 } catch (Exception e2) {

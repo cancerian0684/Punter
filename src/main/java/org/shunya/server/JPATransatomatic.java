@@ -31,7 +31,7 @@ public class JPATransatomatic implements Transatomatic {
             if (tx != null && tx.isActive()) {
                 tx.rollback();
             }
-//            session.close();
+            session.close();
         }
     }
 }

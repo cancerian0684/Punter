@@ -29,7 +29,7 @@ public class JPASessionFactory {
     }
 
     public Session getSession() throws HibernateException {
-        return ourSessionFactory.getCurrentSession();
+        return ourSessionFactory.openSession();
     }
 
     public static void main(final String[] args) throws Exception {

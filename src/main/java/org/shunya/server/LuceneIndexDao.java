@@ -22,10 +22,11 @@ import org.shunya.kb.model.Document;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.FileSystems;
 import java.util.*;
 
 public class LuceneIndexDao {
-    static final File INDEX_DIR = new File("LuceneIndex");
+    static final File INDEX_DIR = FileSystems.getDefault().getPath(System.getProperty("user.home")).resolve("LuceneIndex").toFile();
     private Directory directory;
     private IndexWriter indexWriter;
     private Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_48);

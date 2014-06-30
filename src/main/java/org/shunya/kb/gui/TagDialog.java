@@ -22,7 +22,7 @@ public class TagDialog extends JDialog{
 	    		tagDialog=new TagDialog();
 	    	}
 	    	tagDialog.docService=docService;
-            tagDialog.doc=docService.getDocument(doc);
+            tagDialog.doc=docService.getDocument(doc.getId());
             tagDialog.textArea.setText(tagDialog.doc.getTag());
 	    	tagDialog.setLocationRelativeTo(Main.KBFrame);
 	    	tagDialog.pack();

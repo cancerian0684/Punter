@@ -1,6 +1,7 @@
 package org.shunya.server.component;
 
 import org.eclipse.jdt.internal.compiler.util.Util;
+import org.markdown4j.Markdown4jProcessor;
 import org.shunya.kb.model.Document;
 import org.shunya.kb.utils.Utilities;
 import org.shunya.punter.gui.AppConstants;
@@ -27,11 +28,12 @@ import java.util.concurrent.Future;
 
 @Service
 public class PunterService {
-    final Logger logger = LoggerFactory.getLogger(PunterService.class);
+    private final Logger logger = LoggerFactory.getLogger(PunterService.class);
     @Autowired
     private StaticDaoFacade daoFacade;
-    private ExecutorService executorService = Executors.newCachedThreadPool();
-    private RestClient restClient = new RestClient();
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final RestClient restClient = new RestClient();
+    private final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
 
     public Map<String, Object> runTask(TaskData taskData) throws ExecutionException, InterruptedException {
         final Map<String, Object> resultsMap = new HashMap<>();
@@ -43,10 +45,10 @@ public class PunterService {
                 task.setHosts(null);
                 task.setSessionMap(resultsMap);
                 task.beforeTaskStart();
-                task.execute();
+                boolean status = task.execute();
                 task.afterTaskFinish();
                 resultsMap.put("logs", task.getMemoryLogs());
-                resultsMap.put("status", true);
+                resultsMap.put("status", status);
             } catch (Exception e) {
                 logger.info("runTask failed - ", e);
                 resultsMap.put("status", false);
@@ -59,16 +61,15 @@ public class PunterService {
 
     public FileSystemResource getFile(Long id) throws IOException {
         logger.info("Serving file : " + id);
-        Document doc = new Document();
-        doc.setId(id);
-        doc = daoFacade.getDocument(doc);
+        Document doc = daoFacade.getDocument(id);
+//        String html = markdown4jProcessor.process(new String(doc.getContent()));
         File targetFile = PunterWebDocumentHandler.process(doc);
         return new FileSystemResource(targetFile);
     }
 
     public void sendMessageToPeers(PunterMessage punterMessage) throws InterruptedException, RemoteException {
         Map<String, Object> appProperties = (Map<String, Object>) AppSettings.getInstance().getObject(AppConstants.APP_PROPERTIES_MAP);
-        if(appProperties.get(AppConstants.CLIPBOARD_PEERS)==null)
+        if(appProperties.get(AppConstants.CLIPBOARD_PEERS)==null || appProperties.get(AppConstants.CLIPBOARD_PEERS).toString().trim().isEmpty())
             return;
         String peersCsv = (String) appProperties.get(AppConstants.CLIPBOARD_PEERS);
         if (peersCsv != null && !peersCsv.isEmpty()) {

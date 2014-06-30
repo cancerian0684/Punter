@@ -244,8 +244,6 @@ public class DocumentEditor extends JFrame {
         attachmentTable.setDragEnabled(true);
         TableCellRenderer dcr = attachmentTable.getDefaultRenderer(Long.class);
         if (dcr instanceof JLabel) {
-//            ((JLabel) dcr).setVerticalAlignment(SwingConstants.TOP);
-//            ((JLabel) dcr).setBorder(new EmptyBorder(0, 0, 0, 0));
             ((JLabel) dcr).setHorizontalAlignment(JLabel.LEFT);
         }
         GUIUtils.initilializeTableColumns(attachmentTable, AttachmentTableModel.longValues);
@@ -267,7 +265,7 @@ public class DocumentEditor extends JFrame {
                                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                         if (response == JOptionPane.YES_OPTION) {
                             try {
-                                docService.deleteAttachment(attch);
+                                docService.deleteAttachment(attch.getId());
                             } catch (RemoteException e1) {
                                 e1.printStackTrace();
                             }
@@ -382,19 +380,12 @@ public class DocumentEditor extends JFrame {
                                 atm.insertRow(newRow);
                             }
                             f.delete();
-//                  fileListerWorker.getFileListQueue().add(f);
                             System.out.println(f.getAbsolutePath());
-                  /*for (File f : l) {
-                       fileListerWorker.getFileListQueue().add(f);
-                   	System.err.println(f.getName());
-                   }*/
                             return true;
                         } catch (UnsupportedFlavorException e) {
                             System.out.println("UnsupportedFlavorException");
-                            //  return false;
                         } catch (IOException e) {
                             System.out.println("IOException");
-                            //  return false;
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
                         }

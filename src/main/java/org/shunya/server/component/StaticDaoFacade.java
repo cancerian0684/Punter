@@ -7,6 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.shunya.kb.gui.SearchQuery;
 import org.shunya.kb.model.Attachment;
+import org.shunya.kb.model.Category;
 import org.shunya.kb.model.Document;
 import org.shunya.punter.gui.AppSettings;
 import org.shunya.punter.gui.PunterJobBasket;
@@ -230,10 +231,10 @@ public class StaticDaoFacade {
         return resultHolder.getResult();
     }
 
-    public Document getDocument(Document doc) {
+    public Document getDocument(Long id) {
         final ResultHolder<Document> resultHolder = new ResultHolder<>();
         transatomatic.run(session -> {
-            Document document = (Document) session.get(Document.class, doc.getId());
+            Document document = (Document) session.get(Document.class, id);
             session.refresh(document);
             Hibernate.initialize(document.getContent());
             resultHolder.setResult(document);
@@ -251,9 +252,9 @@ public class StaticDaoFacade {
         return resultHolder.getResult();
     }
 
-    public boolean deleteAttachment(Attachment attch) throws RemoteException {
+    public boolean deleteAttachment(long id) throws RemoteException {
         transatomatic.run(session -> {
-            Attachment attchment = (Attachment) session.get(Attachment.class, attch.getId());
+            Attachment attchment = (Attachment) session.get(Attachment.class, id);
             session.delete(attchment);
             session.flush();
             Document doc = attchment.getDocument();
@@ -320,6 +321,34 @@ public class StaticDaoFacade {
         return counter.get();
     }
 
+    public List<Category> getCategoryList() {
+        final ResultHolder<List<Category>> resultHolder = new ResultHolder<>();
+        transatomatic.run(session -> {
+            resultHolder.setResult(session.createCriteria(Category.class)
+                    .setMaxResults(100)
+                    .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                    .list());
+        });
+        return resultHolder.getResult();
+    }
+
+    public Category saveCategory(Category category) throws RemoteException {
+        final ResultHolder<Category> resultHolder = new ResultHolder<>();
+        transatomatic.run(session -> {
+            session.saveOrUpdate(category);
+            resultHolder.setResult(category);
+        });
+        return resultHolder.getResult();
+    }
+
+    public boolean deleteCategory(long id) throws RemoteException {
+        transatomatic.run(session -> {
+            Category category = (Category) session.get(Category.class, id);
+            session.delete(category);
+        });
+        return true;
+    }
+
     public void compressTables() {
         transatomatic.run(session -> {
             try {
@@ -367,9 +396,9 @@ public class StaticDaoFacade {
             LuceneIndexDao.getInstance().deleteIndex();
             Query query = session.createQuery("SELECT e FROM Document e");
             List<Document> allDocs = query.list();
-            for (Document emp : allDocs) {
-                System.out.println(emp.getCategory());
-                LuceneIndexDao.getInstance().indexDocs(emp);
+            for (Document doc : allDocs) {
+                System.out.println(doc.getCategory());
+                LuceneIndexDao.getInstance().indexDocs(doc);
             }
         });
     }

@@ -56,10 +56,7 @@ public class PunterController {
     @RequestMapping(value = "/doc/{id}", method = RequestMethod.GET)
     @ResponseBody
     public Document getDocument(@ModelAttribute("model") ModelMap model, @PathVariable("id") long id) {
-        Document document = new Document();
-        document.setId(id);
-        document = daoService.getDocument(document);
-        return document;
+        return daoService.getDocument(id);
     }
 
     @RequestMapping(value = "/run", method = RequestMethod.POST)
