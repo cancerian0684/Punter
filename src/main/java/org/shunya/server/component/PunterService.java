@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
@@ -93,4 +94,10 @@ public class PunterService {
         }
     }
 
+    public int getPercentFree(String drive){
+        long freeSpace = Paths.get(drive).toFile().getUsableSpace();
+        long totalSpace = Paths.get(drive).toFile().getTotalSpace();
+        int percentFree = (int) (100 * freeSpace / totalSpace);
+        return percentFree;
+    }
 }

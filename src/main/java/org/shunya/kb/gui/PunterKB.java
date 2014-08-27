@@ -121,6 +121,10 @@ public class PunterKB extends JPanel {
                             Document luceneDoc = (Document) ((DocumentTableModel) table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow())).get(0);
                             docService.updateAccessCounter(luceneDoc);
                             Document doc = docService.getDocument(luceneDoc.getId());
+                            if(doc==null) {
+                                JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
+                                return false;
+                            }
                             if (column == 1) {
                                 if (doc.getExt().isEmpty())
                                     DocumentEditor.showEditor(doc, docService, wordService);
@@ -283,30 +287,32 @@ public class PunterKB extends JPanel {
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
                     Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(selectedRow)).get(0);
                     doc = docService.getDocument(doc.getId());
-                    //Punter Doc
-                    if (doc.getExt().isEmpty()) {
-                        files.add(createZipFromDocument(doc));
-                    }
-                    //System Doc
-                    else {
-                        System.out.println("Opening up the file.." + doc.getTitle());
-                        File temp = new File("Temp");
-                        temp.mkdir();
-                        String filename = "D_" + doc.getId() + doc.getExt();
-                        if (!doc.getExt().isEmpty()) {
-                            filename = doc.getTitle();
-                            if (filename.lastIndexOf(".") == -1) {
-                                filename += doc.getExt();
-                            }
+                    if (doc!=null) {
+                        //Punter Doc
+                        if (doc.getExt().isEmpty()) {
+                            files.add(createZipFromDocument(doc));
                         }
-                        File nf = new File(temp, filename);
-                        try {
-                            FileOutputStream fos = new FileOutputStream(nf);
-                            fos.write(doc.getContent());
-                            fos.close();
-                            files.add(nf);
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
+                        //System Doc
+                        else {
+                            System.out.println("Opening up the file.." + doc.getTitle());
+                            File temp = new File("Temp");
+                            temp.mkdir();
+                            String filename = "D_" + doc.getId() + doc.getExt();
+                            if (!doc.getExt().isEmpty()) {
+                                filename = doc.getTitle();
+                                if (filename.lastIndexOf(".") == -1) {
+                                    filename += doc.getExt();
+                                }
+                            }
+                            File nf = new File(temp, filename);
+                            try {
+                                FileOutputStream fos = new FileOutputStream(nf);
+                                fos.write(doc.getContent());
+                                fos.close();
+                                files.add(nf);
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -430,6 +436,10 @@ public class PunterKB extends JPanel {
                 if (searchResultTable.getSelectedRow() >= 0) {
                     Document doc = (Document) ((DocumentTableModel) searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
                     doc = docService.getDocument(doc.getId());
+                    if(doc == null){
+                       JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
+                        return;
+                    }
                     if (doc.getExt().isEmpty())
                         DocumentEditor.showEditor(doc, docService, wordService);
                     else {

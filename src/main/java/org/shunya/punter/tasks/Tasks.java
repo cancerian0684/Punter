@@ -68,8 +68,8 @@ public abstract class Tasks implements Serializable {
           });*/
         mHandler = new MemoryHandler(new Handler() {
             public void publish(LogRecord record) {
-                //                    String msg = new Date(record.getMillis()) + " [" + record.getLevel() + "] " + record.getMessage();
-                final String msg = record.getMessage() + "\r";
+                //String msg = new Date(record.getMillis()) + " [" + record.getLevel() + "] " + record.getMessage();
+                final String msg = record.getMessage() + "\n";
                 strLogger.append(msg);
                 if (logListener != null) {
                     logListener.log(msg);

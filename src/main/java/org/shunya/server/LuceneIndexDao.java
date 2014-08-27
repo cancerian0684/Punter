@@ -208,9 +208,9 @@ public class LuceneIndexDao {
         }
     }
 
-    public void deleteIndexForDoc(Document doc) {
+    public void deleteIndexForDoc(long id) {
         try {
-            indexWriter.deleteDocuments(new Term("id", QueryParser.escape("" + doc.getId())));
+            indexWriter.deleteDocuments(new Term("id", QueryParser.escape("" + id)));
             indexWriter.deleteUnusedFiles();
             indexWriter.commit();
         } catch (Exception e) {

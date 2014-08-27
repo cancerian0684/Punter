@@ -22,7 +22,7 @@ public class EmailService {
 
     private EmailService() {
         properties = System.getProperties();
-        properties.setProperty("mail.smtp.host", "");
+        properties.setProperty("mail.smtp.host", "email.edifecs.com");
         properties.setProperty("mail.smtp.auth", "false");
     }
 
@@ -33,7 +33,7 @@ public class EmailService {
             // Create a default MimeMessage object.
             SMTPMessage message = new SMTPMessage(session);
             // Set From: header field of the header.
-            message.setFrom(new InternetAddress("munish.chandel@ms.com"));
+            message.setFrom(new InternetAddress("munish.chandel@edifecs.com"));
             String[] recipients = commaSeparatedRecipients.split("[,;]");
             InternetAddress[] addresses = new InternetAddress[recipients.length];
             for (int i = 0; i < recipients.length; i++) {
@@ -59,7 +59,7 @@ public class EmailService {
         Session session = Session.getDefaultInstance(properties);
         try {
             SMTPMessage message = new SMTPMessage(session);
-            fromAddress = fromAddress == null ? "munish.chandel@ms.com" : fromAddress;
+            fromAddress = fromAddress == null ? "munish.chandel@edifecs.com" : fromAddress;
             message.setFrom(new InternetAddress(fromAddress));
             String[] recipients = commaSeparatedRecipients.split("[,;]");
             InternetAddress[] addresses = new InternetAddress[recipients.length];
@@ -82,8 +82,10 @@ public class EmailService {
             multipart.addBodyPart(messageBodyPart);
             // Part two is attachment
             for (String file : attachments) {
-                if (file == null || file.isEmpty() || !new File(file).exists())
+                if (file == null || file.isEmpty() || !new File(file).exists()) {
+                    System.err.println("Skipping file as it does not exist - "+file);
                     continue;
+                }
                 messageBodyPart = new MimeBodyPart();
                 messageBodyPart.setDataHandler(new DataHandler(new FileDataSource(file)));
                 messageBodyPart.setFileName(new File(file).getName());
@@ -105,6 +107,6 @@ public class EmailService {
 
     public static void main(String[] args) {
         String[] attachments = new String[]{"alerts-new.xls", "alerts-new.xls"};
-        EmailService.getInstance().sendEMail("Hi Test mail-2", "munish.chandel@ubs.com,munish235.chandel@ubs.com", "Hi<br/>This is Munish", attachments, "munish.chandel@ubs.com", "");
+        EmailService.getInstance().sendEMail("Hi Test mail-2", "munish.chandel@edifecs.com", "Hi<br/>This is Munish", attachments, "munish.chandel@edifecs.com", "");
     }
 }

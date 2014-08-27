@@ -137,4 +137,10 @@ public class PunterController {
         }
         return paramMap;
     }
+
+    @RequestMapping(value = "/discSpace/{drive}", method = RequestMethod.GET)
+    @ResponseBody
+    public int getDocument(@ModelAttribute("model") ModelMap model, @PathVariable("drive") String drive) {
+        return punterService.getPercentFree(drive);
+    }
 }

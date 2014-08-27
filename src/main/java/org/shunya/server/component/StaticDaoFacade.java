@@ -199,7 +199,7 @@ public class StaticDaoFacade {
                 Document document1 = (Document) session.get(Document.class, document.getId());
                 session.delete(document1);
                 session.flush();
-                LuceneIndexDao.getInstance().deleteIndexForDoc(document1);
+                LuceneIndexDao.getInstance().deleteIndexForDoc(document1.getId());
             });
         }
         long t2 = System.currentTimeMillis();
@@ -235,9 +235,11 @@ public class StaticDaoFacade {
         final ResultHolder<Document> resultHolder = new ResultHolder<>();
         transatomatic.run(session -> {
             Document document = (Document) session.get(Document.class, id);
-            session.refresh(document);
-            Hibernate.initialize(document.getContent());
-            resultHolder.setResult(document);
+            if (document != null) {
+                session.refresh(document);
+                Hibernate.initialize(document.getContent());
+                resultHolder.setResult(document);
+            }
         });
         return resultHolder.getResult();
     }
@@ -265,12 +267,13 @@ public class StaticDaoFacade {
         return true;
     }
 
-    public boolean deleteDocument(Document attch) {
+    public boolean deleteDocument(final Document document) {
         transatomatic.run(session -> {
-            Document document = (Document) session.get(Document.class, attch.getId());
-            session.delete(document);
-            session.flush();
-            LuceneIndexDao.getInstance().deleteIndexForDoc(document);
+            Document doc = (Document) session.get(Document.class, document.getId());
+            if (doc != null) {
+                session.delete(doc);
+            }
+            LuceneIndexDao.getInstance().deleteIndexForDoc(document.getId());
         });
         return true;
     }
@@ -406,8 +409,8 @@ public class StaticDaoFacade {
     public void removeTask(TaskData task) {
         transatomatic.run(session -> {
             TaskData tmp = (TaskData) session.get(TaskData.class, task.getId());
+            tmp.getProcess().getTaskList().remove(tmp);
             session.delete(tmp);
-            session.flush();
         });
     }
 
@@ -415,7 +418,6 @@ public class StaticDaoFacade {
         transatomatic.run(session -> {
             ProcessData tmp = (ProcessData) session.get(ProcessData.class, proc.getId());
             session.delete(tmp);
-            session.flush();
         });
     }
 

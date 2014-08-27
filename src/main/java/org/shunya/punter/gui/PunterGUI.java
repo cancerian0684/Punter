@@ -1,6 +1,5 @@
 package org.shunya.punter.gui;
 
-import neoe.ne.EditPanel;
 import org.shunya.punter.annotations.PunterTask;
 import org.shunya.punter.executors.ProcessExecutor;
 import org.shunya.punter.executors.PunterJobScheduler;
@@ -153,12 +152,12 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     if (mEvent.getClickCount() == 2) {
                         RunningTaskTableModel phtm = ((RunningTaskTableModel) runningTaskTable.getModel());
                         TaskHistory taskHistory = (TaskHistory) phtm.getRow(runningTaskTable.convertRowIndexToModel(runningTaskTable.getSelectedRow())).get(0);
-                        EditPanel editor;
                         if (taskHistory.getLogs() != null) {
                             //Task has completed
                             try {
-                                editor = new EditPanel(taskHistory.getLogs());
-                                editor.openWindow();
+                                LogWindow logWindow = new LogWindow(10000, taskHistory.getTask().getName());
+                                logWindow.log(taskHistory.getLogs());
+                                logWindow.showLog();
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }
@@ -431,11 +430,11 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     ArrayList<Object> selectedRowsData = new ArrayList<>();
                     for (int selectedRow : selectedRows) {
                         ArrayList<?> request = tableModel.getRow(taskTable.convertRowIndexToModel(selectedRow));
-                        selectedRowsData.add(request);
                         TaskData task = (TaskData) request.get(0);
                         try {
                             System.err.println("removing task : " + task.getId());
                             staticDaoFacade.removeTask(task);
+                            selectedRowsData.add(request);
                         } catch (Exception e1) {
                             e1.printStackTrace();
                         }
@@ -1035,11 +1034,11 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     if (mEvent.getClickCount() == 2) {
                         ProcessTaskHistoryTableModel phtm = ((ProcessTaskHistoryTableModel) processTaskHistoryTable.getModel());
                         TaskHistory ph = (TaskHistory) phtm.getRow(processTaskHistoryTable.convertRowIndexToModel(processTaskHistoryTable.getSelectedRow())).get(0);
-                        EditPanel editor;
                         if (ph.getLogs() != null)
                             try {
-                                editor = new EditPanel(ph.getLogs());
-                                editor.openWindow();
+                                LogWindow logWindow = new LogWindow(10000, ph.getTask().getName());
+                                logWindow.log(ph.getLogs());
+                                logWindow.showLog();
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }
@@ -1154,11 +1153,11 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     if (mEvent.getClickCount() == 2) {
                         ProcessTaskHistoryTableModel phtm = ((ProcessTaskHistoryTableModel) processTaskAlertTable.getModel());
                         TaskHistory ph = (TaskHistory) phtm.getRow(processTaskAlertTable.convertRowIndexToModel(processTaskAlertTable.getSelectedRow())).get(0);
-                        EditPanel editor;
                         if (ph.getLogs() != null)
                             try {
-                                editor = new EditPanel(ph.getLogs());
-                                editor.openWindow();
+                                LogWindow logWindow = new LogWindow(10000, ph.getTask().getName());
+                                logWindow.log(ph.getLogs());
+                                logWindow.showLog();
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }

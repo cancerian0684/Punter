@@ -21,8 +21,9 @@ public class LogWindow extends JFrame implements LogListener{
         pack();
     }
 
-    public void log(final String line) {
-        SwingUtilities.invokeLater(() -> logArea.append(line + "\n"));
+    public void log(String line) {
+       final String replaced = line.replaceAll("\r","\n");
+        SwingUtilities.invokeLater(() -> logArea.append(replaced + "\n"));
     }
 
     @Override

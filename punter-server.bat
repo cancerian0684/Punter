@@ -1,2 +1,2 @@
-java -Xms128M -Xmx128M -cp bin/.;lib/*; com.shunya.server.Main
+java -Xms128M -Xmx128M -cp bin/.;lib/*; org.shunya.server.Main
 pause

@@ -30,6 +30,9 @@ public class SystemCommandTask extends Tasks {
             Thread captureProcessStreams = new Thread(() -> {
                 try {
                     startOutputAndErrorReadThreads(child.getInputStream(), child.getErrorStream(), logger);
+                } catch (AssertionMessageException e) {
+                    status.set(false);
+                    logger.log(Level.SEVERE, e.getMessage());
                 } catch (Exception e) {
                     status.set(false);
                     logger.log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
@@ -61,7 +64,7 @@ public class SystemCommandTask extends Tasks {
         return status.get();
     }
 
-    private void startOutputAndErrorReadThreads(InputStream processOutputStream, InputStream processErrorStream, Logger logger) throws Exception {
+    private void startOutputAndErrorReadThreads(InputStream processOutputStream, InputStream processErrorStream, Logger logger) throws AssertionMessageException, Exception {
         StringBuffer commandOutputBuffer = new StringBuffer();
         AsynchronousStreamReader asynchronousCommandOutputReaderThread = new AsynchronousStreamReader(processOutputStream, commandOutputBuffer, new MyLogDevice(logger), "OUTPUT");
         asynchronousCommandOutputReaderThread.start();
@@ -71,7 +74,7 @@ public class SystemCommandTask extends Tasks {
         asynchronousCommandOutputReaderThread.join();
         asynchronousCommandErrorReaderThread.join();
         if (!assertMessage(commandOutputBuffer, commandErrorBuffer))
-            throw new RuntimeException("output does not contain required message string");
+            throw new AssertionMessageException("output does not contain required message string - ["+successMessage+"]");
     }
 
     private boolean assertMessage(StringBuffer commandOutputBuffer, StringBuffer commandErrorBuffer) {

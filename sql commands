@@ -1,5 +1,0 @@
-select * from process
-
-select * from task
-
-delete from task where process_id is null
