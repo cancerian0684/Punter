@@ -1,6 +1,7 @@
 package org.shunya.kb.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -15,6 +16,7 @@ import java.util.Date;
 public class Attachment implements Serializable{
 	@Id
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="seqGen")
+    @JsonIgnore
 	private long id;
 	private long accessCount;
 	private float priority;

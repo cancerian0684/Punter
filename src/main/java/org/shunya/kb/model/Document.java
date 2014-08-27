@@ -22,6 +22,7 @@ import static org.shunya.kb.model.Document.DocumentType.*;
 public class Document implements Serializable{
 	@Id
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="seqGen")
+    @JsonIgnore
 	private long id;
 	private long accessCount;
 	private float priority;
