@@ -6,6 +6,7 @@ import org.shunya.kb.model.Document;
 import org.shunya.kb.utils.Utilities;
 import org.shunya.punter.gui.AppConstants;
 import org.shunya.punter.gui.AppSettings;
+import org.shunya.punter.gui.Main;
 import org.shunya.punter.jpa.TaskData;
 import org.shunya.punter.tasks.Tasks;
 import org.shunya.server.PunterMessage;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -40,9 +42,12 @@ public class PunterService {
         Long[] remoteDocList = restClient.getRemoteDocList(baseUri);
         System.out.println("remoteDocList = " + remoteDocList);
         for (Long docId : remoteDocList) {
-            Document remoteDoc = restClient.getRemoteDoc(baseUri, docId);
-            daoFacade.saveDocument(remoteDoc);
-            System.out.println("copied remote remoteDoc = " + remoteDoc);
+            int answer = JOptionPane.showConfirmDialog(Main.KBFrame, "Do you want to copy " + docId, "Confirm Copy" ,JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if(answer == JOptionPane.YES_OPTION) {
+                Document remoteDoc = restClient.getRemoteDoc(baseUri, docId);
+                daoFacade.saveDocument(remoteDoc);
+                System.out.println("copied remote remoteDoc = " + docId);
+            }
         }
     }
 
