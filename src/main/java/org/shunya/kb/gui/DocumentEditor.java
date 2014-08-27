@@ -581,9 +581,6 @@ public class DocumentEditor extends JFrame {
             converter.setLenient(true);
             ConvertUtils.register(converter, java.util.Date.class);
             BeanUtils.copyProperties(doc, tmpDoc);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            throw e;
         } catch (OptimisticLockException ole) {
             throw ole;
         } catch (Exception e) {

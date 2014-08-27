@@ -174,11 +174,7 @@ public class PunterKB extends JPanel {
                                     System.err.println("updating category.");
                                     doc.setCategory(s);
                                     luceneDoc.setCategory(s);
-                                    try {
-                                        docService.saveDocument(doc);
-                                    } catch (RemoteException e1) {
-                                        e1.printStackTrace();
-                                    }
+                                    docService.saveDocument(doc);
                                 }
                             }
                             return false;
@@ -472,17 +468,13 @@ public class PunterKB extends JPanel {
                     Document localDoc = (Document) ((DocumentTableModel) searchResultTable.getModel())
                             .getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
                     Document persisted = null;
-                    try {
-                        persisted = docService.getDocument(localDoc.getId());
-                        final String newTitle = JOptionPane.showInputDialog(Main.KBFrame, "rename title to - ", persisted.getTitle());
-                        if (newTitle != null) {
-                            persisted.setTitle(newTitle);
-                            docService.saveDocument(persisted);
-                            localDoc.setTitle(persisted.getTitle());
-                            ((DocumentTableModel) searchResultTable.getModel()).refreshTable();
-                        }
-                    } catch (RemoteException e1) {
-                        e1.printStackTrace();
+                    persisted = docService.getDocument(localDoc.getId());
+                    final String newTitle = JOptionPane.showInputDialog(Main.KBFrame, "rename title to - ", persisted.getTitle());
+                    if (newTitle != null) {
+                        persisted.setTitle(newTitle);
+                        docService.saveDocument(persisted);
+                        localDoc.setTitle(persisted.getTitle());
+                        ((DocumentTableModel) searchResultTable.getModel()).refreshTable();
                     }
 
                 }

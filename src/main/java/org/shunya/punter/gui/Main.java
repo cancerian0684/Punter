@@ -181,17 +181,15 @@ public class Main {
                 }
             });
 
-            ActionListener exitListener = new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    int option = JOptionPane.showConfirmDialog(PunterGuiFrame, "Exit Punter?", "Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
-                    if (option == JOptionPane.OK_OPTION) {
-                        AppSettings.getInstance().KBFrameLocation = KBFrame.getLocation();
-                        AppSettings.getInstance().setKBFrameDimension(KBFrame.getSize());
-                        AppSettings.getInstance().PunterGuiFrameLocation = PunterGuiFrame.getLocation();
-                        logger.log(Level.INFO, "Removing tray icon : " + KBFrame.getSize());
-                        tray.remove(trayIcon);
-                        Launcher.programQuit();
-                    }
+            ActionListener exitListener = e -> {
+                int option = JOptionPane.showConfirmDialog(PunterGuiFrame, "Exit Punter?", "Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
+                if (option == JOptionPane.OK_OPTION) {
+                    AppSettings.getInstance().KBFrameLocation = KBFrame.getLocation();
+                    AppSettings.getInstance().setKBFrameDimension(KBFrame.getSize());
+                    AppSettings.getInstance().PunterGuiFrameLocation = PunterGuiFrame.getLocation();
+                    logger.log(Level.INFO, "Removing tray icon : " + KBFrame.getSize());
+                    tray.remove(trayIcon);
+                    Launcher.programQuit();
                 }
             };
 
@@ -267,6 +265,15 @@ public class Main {
                 }
             });
             popup.add(screenShotItem);
+
+            MenuItem remoteSync = new MenuItem("Sync Remote");
+            remoteSync.addActionListener(e -> {
+                String remoteAddress = JOptionPane.showInputDialog("Enter remote base Url");
+                if(remoteAddress!=null && !remoteAddress.isEmpty()){
+                    punterService.syncRemoteDocuments(remoteAddress);
+                }
+            });
+            popup.add(remoteSync);
 
             popup.addSeparator();
 

@@ -8,7 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.rmi.RemoteException;
 
 public class TagDialog extends JDialog{
 	private static TagDialog tagDialog;
@@ -58,12 +57,8 @@ public class TagDialog extends JDialog{
 				public void actionPerformed(ActionEvent e) {
 					System.err.println("saving Tags..");
 					doc.setTag(textArea.getText());
-					try {
-						docService.saveDocument(doc);
-					} catch (RemoteException e1) {
-						e1.printStackTrace();
-					}
-					dispose();
+                    docService.saveDocument(doc);
+                    dispose();
 				}
 			});
 	    	 

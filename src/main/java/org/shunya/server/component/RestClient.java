@@ -1,6 +1,7 @@
 package org.shunya.server.component;
 
 import org.apache.commons.io.IOUtils;
+import org.shunya.kb.model.Document;
 import org.shunya.punter.jpa.TaskData;
 import org.shunya.punter.tasks.Tasks;
 import org.shunya.server.PunterMessage;
@@ -40,6 +41,29 @@ public class RestClient {
         headers.set("Accept", "application/json; charset=utf-8");
         HttpEntity httpEntity = new HttpEntity<>(taskData, headers);
         ResponseEntity<Map> response = restTemplate.postForEntity(uri, httpEntity, Map.class);
+        Tasks.LOGGER.get().info("response.getBody() = " + response.getBody());
+        return response.getBody();
+    }
+
+    public Long[] getRemoteDocList(String baseUri){
+        String uri = baseUri + "/punter/doc/list";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Content-Type", "application/json; charset=utf-8");
+        headers.set("Accept", "application/json; charset=utf-8");
+//        ParameterizedTypeReference<List<Long>> listLong = new ParameterizedTypeReference<List<Long>>() {};
+        ResponseEntity<Long[]> response = restTemplate.getForEntity(uri, Long[].class );
+        Tasks.LOGGER.get().info("response.getBody() = " + response.getBody());
+        return response.getBody();
+    }
+
+    public Document getRemoteDoc(String baseUri, long id){
+        String uri = baseUri + "/punter/doc/"+id;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Content-Type", "application/json; charset=utf-8");
+        headers.set("Accept", "application/json; charset=utf-8");
+        ResponseEntity<Document> response = restTemplate.getForEntity(uri, Document.class);
         Tasks.LOGGER.get().info("response.getBody() = " + response.getBody());
         return response.getBody();
     }

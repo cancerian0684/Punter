@@ -1,6 +1,7 @@
 package org.shunya.kb.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -192,10 +193,12 @@ public class Document implements Serializable{
 	public void setExt(String ext) {
 		this.ext = ext;
 	}
+    @JsonIgnore
 	public int getLength(){
 		return content.length;
 	}
     @Transient
+    @JsonIgnore
 	public DocumentType getDocumentType(){
         if(getExt().isEmpty() && getAttachments().size()>0)
             return PUNTER_DOC_WITH_ATTACHMENT;

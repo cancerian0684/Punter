@@ -206,7 +206,7 @@ public class StaticDaoFacade {
         System.err.println("time consumed : " + (t2 - t1));
     }
 
-    public Document saveDocument(Document doc) throws RemoteException {
+    public Document saveDocument(Document doc) {
         final ResultHolder<Document> resultHolder = new ResultHolder<>();
         transatomatic.run(session -> {
             session.saveOrUpdate(doc);
@@ -216,7 +216,7 @@ public class StaticDaoFacade {
         return resultHolder.getResult();
     }
 
-    public Attachment saveAttachment(Attachment attach) throws RemoteException {
+    public Attachment saveAttachment(Attachment attach){
         final ResultHolder<Attachment> resultHolder = new ResultHolder<>();
         transatomatic.run(session -> {
             session.save(attach);
@@ -240,6 +240,19 @@ public class StaticDaoFacade {
                 Hibernate.initialize(document.getContent());
                 resultHolder.setResult(document);
             }
+        });
+        return resultHolder.getResult();
+    }
+
+    public List<Long> getDocumentIds() {
+        final ResultHolder<List<Long>> resultHolder = new ResultHolder<>();
+        transatomatic.run(session -> {
+            List<Document> documents = session.createCriteria(Document.class).list();
+            List<Long> ids = new ArrayList<>();
+            for (Document o : documents) {
+                ids.add(o.getId());
+            }
+            resultHolder.setResult(ids);
         });
         return resultHolder.getResult();
     }

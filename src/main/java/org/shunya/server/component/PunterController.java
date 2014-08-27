@@ -59,6 +59,12 @@ public class PunterController {
         return daoService.getDocument(id);
     }
 
+    @RequestMapping(value = "/doc/list", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Long> getDocument(@ModelAttribute("model") ModelMap model) {
+        return daoService.getDocumentIds();
+    }
+
     @RequestMapping(value = "/run", method = RequestMethod.POST)
     @ResponseBody
     public Map runRemoteProcess(@RequestBody PunterProcessRunMessage runMessage) throws InterruptedException {

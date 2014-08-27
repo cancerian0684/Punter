@@ -36,6 +36,16 @@ public class PunterService {
     private final RestClient restClient = new RestClient();
     private final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
 
+    public void syncRemoteDocuments(String baseUri){
+        Long[] remoteDocList = restClient.getRemoteDocList(baseUri);
+        System.out.println("remoteDocList = " + remoteDocList);
+        for (Long docId : remoteDocList) {
+            Document remoteDoc = restClient.getRemoteDoc(baseUri, docId);
+            daoFacade.saveDocument(remoteDoc);
+            System.out.println("copied remote remoteDoc = " + remoteDoc);
+        }
+    }
+
     public Map<String, Object> runTask(TaskData taskData) throws ExecutionException, InterruptedException {
         final Map<String, Object> resultsMap = new HashMap<>();
         Future<?> future = executorService.submit(() -> {
