@@ -270,6 +270,7 @@ public class StaticDaoFacade {
     public boolean deleteAttachment(long id) throws RemoteException {
         transatomatic.run(session -> {
             Attachment attchment = (Attachment) session.get(Attachment.class, id);
+            attchment.getDocument().getAttachments().remove(attchment);
             session.delete(attchment);
             session.flush();
             Document doc = attchment.getDocument();
