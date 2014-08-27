@@ -64,7 +64,7 @@ public class RestClient {
         headers.set("Content-Type", "application/json; charset=utf-8");
         headers.set("Accept", "application/json; charset=utf-8");
         ResponseEntity<Document> response = restTemplate.getForEntity(uri, Document.class);
-        Tasks.LOGGER.get().info("response.getBody() = " + response.getBody());
+        Tasks.LOGGER.get().info("response.getBody() = " + response.getBody().getTitle());
         return response.getBody();
     }
 
