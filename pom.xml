@@ -11,6 +11,7 @@
     <properties>
         <spring.version>4.0.6.RELEASE</spring.version>
         <jetty.version>9.2.2.v20140723</jetty.version>
+        <hibernate.version>4.3.6.Final</hibernate.version>
     </properties>
 
     <dependencies>
@@ -97,7 +98,12 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>4.3.6.Final</version>
+            <version>${hibernate.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -196,20 +202,12 @@
             <version>4.0.2.RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>bouncycastle</groupId>
-            <artifactId>bcprov-jdk16</artifactId>
-            <version>146</version>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.51</version>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>4.3.1.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>4.3.1.Final</version>
-        </dependency>
+
+
 
         <dependency>
             <groupId>org.json</groupId>
@@ -347,7 +345,9 @@
         <finalName>punter</finalName>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -362,6 +362,7 @@
                     <configurationSourceDirectory>src\main\webapp</configurationSourceDirectory>
                     <copyConfigurationDirectory>true</copyConfigurationDirectory>
                     <assembleDirectory>${project.build.directory}/punter-assemble</assembleDirectory>
+                    <extraJvmArguments>-Xms128m -Dfile.encoding=UTF-8</extraJvmArguments>
                     <platforms>
                         <platform>windows</platform>
                         <platform>unix</platform>
@@ -369,6 +370,9 @@
                     <programs>
                         <program>
                             <mainClass>org.shunya.server.LocalJettyRunner</mainClass>
+                            <!--<commandLineArguments>
+                                <commandLineArgument></commandLineArgument>
+                            </commandLineArguments>-->
                             <id>app</id>
                             <platforms>
                                 <platform>windows</platform>

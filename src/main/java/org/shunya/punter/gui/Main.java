@@ -80,11 +80,11 @@ public class Main {
 
     private void createAndShowGUI() throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        try {
+        /*try {
             globalHotKeyListener = new GlobalHotKeyListener();
         } catch (Throwable t) {
             t.printStackTrace();
-        }
+        }*/
         getAndSetUsername();
         KBFrame = new JFrame("Search");
         JFrame.setDefaultLookAndFeelDecorated(true);

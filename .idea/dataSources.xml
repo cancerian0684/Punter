@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="3194444541">
+  <component name="DataSourceManagerImpl" format="xml" hash="4037403095">
     <data-source source="LOCAL" name="hibernate.cfg.xml" uuid="626ce88a-0122-46b0-bf3d-b3f4f4d7deeb">
       <driver-ref>h2.embedded</driver-ref>
       <jdbc-driver>org.h2.Driver</jdbc-driver>

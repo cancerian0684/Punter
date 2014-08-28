@@ -121,7 +121,7 @@ public class PunterKB extends JPanel {
                             Document luceneDoc = (Document) ((DocumentTableModel) table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow())).get(0);
                             docService.updateAccessCounter(luceneDoc);
                             Document doc = docService.getDocument(luceneDoc.getId());
-                            if (doc == null) {
+                            if(doc==null) {
                                 JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
                                 return false;
                             }
@@ -283,7 +283,7 @@ public class PunterKB extends JPanel {
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
                     Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(selectedRow)).get(0);
                     doc = docService.getDocument(doc.getId());
-                    if (doc != null) {
+                    if (doc!=null) {
                         //Punter Doc
                         if (doc.getExt().isEmpty()) {
                             files.add(createZipFromDocument(doc));
@@ -432,8 +432,8 @@ public class PunterKB extends JPanel {
                 if (searchResultTable.getSelectedRow() >= 0) {
                     Document doc = (Document) ((DocumentTableModel) searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
                     doc = docService.getDocument(doc.getId());
-                    if (doc == null) {
-                        JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
+                    if(doc == null){
+                       JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
                         return;
                     }
                     if (doc.getExt().isEmpty())
