@@ -11,52 +11,56 @@ public class StackWindow extends JFrame implements Thread.UncaughtExceptionHandl
 
     private final String devEmailCSV;
     private JTextArea textArea;
+    private volatile int count = 0;
 
-	public static void main(String[] args) {
-		Thread.UncaughtExceptionHandler handler = new StackWindow("Unhandled Exception", 500, 400, "munishc@xxx.com");
-		Thread.setDefaultUncaughtExceptionHandler(handler);
-		throw new RuntimeException("should be caught");
-	}
+    public static void main(String[] args) {
+        Thread.UncaughtExceptionHandler handler = new StackWindow("Unhandled Exception", 500, 400, "munishc@xxx.com");
+        Thread.setDefaultUncaughtExceptionHandler(handler);
+        throw new RuntimeException("should be caught");
+    }
 
-	public StackWindow(String title, final int width, final int height, String devEmailCSV) {
-		super(title);
+    public StackWindow(String title, final int width, final int height, String devEmailCSV) {
+        super(title);
         this.devEmailCSV = devEmailCSV;
         setSize(width, height);
-		textArea = new JTextArea();
-		JScrollPane pane = new JScrollPane(textArea);
-		textArea.setEditable(false);
-		getContentPane().add(pane);
-		setLocationRelativeTo(null);
-	}
+        textArea = new JTextArea();
+        JScrollPane pane = new JScrollPane(textArea);
+        textArea.setEditable(false);
+        getContentPane().add(pane);
+        setLocationRelativeTo(null);
+    }
 
-	public void uncaughtException(Thread t, Throwable e) {
-		addStackInfo(e);
-	}
+    public void uncaughtException(Thread t, Throwable e) {
+        ++count;
+        addStackInfo(e);
+    }
 
-	public void addStackInfo(final Throwable t) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				final StringWriter sw = new StringWriter();
-				PrintWriter out = new PrintWriter(sw);
-				t.printStackTrace(out);
-				t.printStackTrace();
-				new Thread() {
-					@Override
-					public void run() {
-						try {
-                            EmailService.getInstance().sendEMail("Unknown Exception : [" + AppSettings.getInstance().getUsername() + "] ", devEmailCSV, sw.toString());
+    public void addStackInfo(final Throwable t) {
+        EventQueue.invokeLater(() -> {
+            final StringWriter sw = new StringWriter();
+            PrintWriter out = new PrintWriter(sw);
+            t.printStackTrace(out);
+            t.printStackTrace();
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        if (count > 10) {
+                            JOptionPane.showMessageDialog(null, "Punter will exit now");
                             Thread.sleep(500);
                             System.exit(0);
-						} catch (Throwable E) {
-							System.err.println(E.toString());
-						}
-					}
-				}.start();
-                setVisible(true);
-				toFront();
-                textArea.setText(sw.toString());
-			}
-		});
+                        } else {
+                            EmailService.getInstance().sendEMail("Unknown Exception : [" + AppSettings.getInstance().getUsername() + "] ", devEmailCSV, sw.toString());
+                        }
+                    } catch (Throwable E) {
+                        System.err.println(E.toString());
+                    }
+                }
+            }.start();
+            setVisible(true);
+            toFront();
+            textArea.setText(sw.toString());
+        });
 
-	}
+    }
 }
