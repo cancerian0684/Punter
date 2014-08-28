@@ -219,7 +219,7 @@ public class StaticDaoFacade {
     public Attachment saveAttachment(Attachment attach){
         final ResultHolder<Attachment> resultHolder = new ResultHolder<>();
         transatomatic.run(session -> {
-            session.save(attach);
+            session.saveOrUpdate(attach);
             session.flush();
             Document doc = attach.getDocument();
             doc = (Document) session.get(Document.class, doc.getId());
