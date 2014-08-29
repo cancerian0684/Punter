@@ -305,7 +305,7 @@ public class LuceneIndexDao {
             CachingWrapperFilter cwf = new CachingWrapperFilter(queryFilter);
             hits = searcher.search(query, cwf, start + batch);
             int numTotalHits = hits.totalHits;
-            System.out.println("time = " + (System.currentTimeMillis() - t1));
+//            System.out.println("time = " + (System.currentTimeMillis() - t1));
             List<Document> resultDocs = new ArrayList<>(50);
             for (int i = start; i < numTotalHits && i < (start + batch); i++) {
 //				Explanation exp = isearcher.explain(query, i);

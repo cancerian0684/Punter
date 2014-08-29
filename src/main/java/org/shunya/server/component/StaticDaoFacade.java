@@ -146,7 +146,7 @@ public class StaticDaoFacade {
         long t1 = System.currentTimeMillis();
         List<String> result = LuceneIndexDao.getInstance().listAllTermsForTitle();
         long t2 = System.currentTimeMillis();
-        System.err.println("time consumed : " + (t2 - t1));
+//        System.err.println("time consumed : " + (t2 - t1));
         return result;
     }
 
@@ -182,7 +182,7 @@ public class StaticDaoFacade {
             long t1 = System.currentTimeMillis();
             List<Document> result = LuceneIndexDao.getInstance().search(searchQuery.getQuery(), searchQuery.getCategory(), searchQuery.isAndFilter(), 0, searchQuery.getMaxResults());
             long t2 = System.currentTimeMillis();
-            System.err.println("time consumed : " + (t2 - t1));
+//            System.err.println("time consumed : " + (t2 - t1));
             return result;
         } catch (IOException e) {
             e.printStackTrace();
@@ -203,7 +203,7 @@ public class StaticDaoFacade {
             });
         }
         long t2 = System.currentTimeMillis();
-        System.err.println("time consumed : " + (t2 - t1));
+//        System.err.println("time consumed : " + (t2 - t1));
     }
 
     public Document saveDocument(Document doc) {
