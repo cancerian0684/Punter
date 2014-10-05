@@ -4,7 +4,7 @@ import it.sauronsoftware.cron4j.Predictor;
 import org.apache.commons.beanutils.BeanUtils;
 import org.shunya.punter.jpa.ProcessData;
 import org.shunya.punter.utils.FieldPropertiesMap;
-import org.shunya.server.component.StaticDaoFacade;
+import org.shunya.server.component.DBService;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class ProcessPropertyTableModel extends AbstractTableModel {
 	public final int[] width = {150,206};
 	private static final long serialVersionUID = 1L;
-    private final StaticDaoFacade staticDaoFacade;
+    private final DBService dbService;
     /** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
 
@@ -26,9 +26,9 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
 	  ArrayList<Object>  newdata=new ArrayList<Object>(data); 
 	  return newdata;
   }
-  public ProcessPropertyTableModel(StaticDaoFacade staticDaoFacade) {
+  public ProcessPropertyTableModel(DBService dbService) {
 
-      this.staticDaoFacade = staticDaoFacade;
+      this.dbService = dbService;
   }
 
   /**
@@ -67,7 +67,7 @@ public class ProcessPropertyTableModel extends AbstractTableModel {
         FieldPropertiesMap propertiesMap = processData.getInputParams();
         propertiesMap.get((String) colArrayList.get(0)).setValue((String) obj);
         processData.setInputParams(propertiesMap);
-    	processData = staticDaoFacade.saveProcess(processData);
+    	processData = dbService.saveProcess(processData);
     	BeanUtils.copyProperties(colArrayList.get(2), processData);
     	try{
     	if("scheduleString".equalsIgnoreCase((String)colArrayList.get(0))){

@@ -33,7 +33,7 @@ import java.util.concurrent.Future;
 public class PunterService {
     private final Logger logger = LoggerFactory.getLogger(PunterService.class);
     @Autowired
-    private StaticDaoFacade daoFacade;
+    private DBService daoFacade;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final RestClient restClient = new RestClient();
     private final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();

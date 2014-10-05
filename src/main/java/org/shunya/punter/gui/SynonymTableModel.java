@@ -1,28 +1,30 @@
 package org.shunya.punter.gui;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.shunya.punter.jpa.TaskData;
+import org.shunya.kb.model.SynonymWord;
 import org.shunya.server.component.DBService;
+import org.shunya.server.component.SynonymService;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 
-public class TaskTableModel extends AbstractTableModel {
-    public final int[] width = {45, 74, 225, 46, 46};
+public class SynonymTableModel extends AbstractTableModel {
+    public final int[] width = {45, 225};
     private static final long serialVersionUID = 1L;
     private final DBService dbService;
+    private final SynonymService synonymService;
     /**
      * Holds the table data in a two dimensional ArrayList datastructure
      */
-    private ArrayList<Object> data = new ArrayList<Object>();
+    private ArrayList<Object> data = new ArrayList<>();
 
     /**
      * Holds the column names
      */
     private String[] columnNames = new String[]
-            {"<html><b>Seq.", "<html><b>Task Name", "<html><b>Description", "<html><b>Active", "<html><b>FO","<html><b>Hosts"};
+            {"<html><b>Synonym Words (csv)"};
     private Class[] columnClasses = new Class[]
-            {Integer.class, String.class, String.class, Boolean.class, Boolean.class, String.class};
+            {String.class};
 
     /**
      * Constructor: Initializes the table structure, including number of columns
@@ -37,8 +39,9 @@ public class TaskTableModel extends AbstractTableModel {
         return newdata;
     }
 
-    public TaskTableModel(DBService dbService) {
+    public SynonymTableModel(DBService dbService, SynonymService synonymService) {
         this.dbService = dbService;
+        this.synonymService = synonymService;
     }
 
     /**
@@ -78,20 +81,10 @@ public class TaskTableModel extends AbstractTableModel {
      */
     public Object getValueAt(int row, int col) {
         ArrayList<?> colArrayList = (ArrayList<?>) data.get(row);
-        TaskData task = (TaskData) colArrayList.get(0);
+        SynonymWord task = (SynonymWord) colArrayList.get(0);
         switch (col) {
             case 0:
-                return task.getSequence();
-            case 1:
-                return task.getName();
-            case 2:
-                return task.getDescription();
-            case 3:
-                return task.isActive();
-            case 4:
-                return task.isFailOver();
-            case 5:
-                return task.getHosts();
+                return task.getWords();
         }
         return null;
     }
@@ -121,28 +114,15 @@ public class TaskTableModel extends AbstractTableModel {
 //    colArrayList.set( col, obj);
         if (obj != null) {
             try {
-                TaskData task = (TaskData) colArrayList.get(0);
+                SynonymWord synonymWord = (SynonymWord) colArrayList.get(0);
                 switch (col) {
                     case 0:
-                        task.setSequence(Integer.parseInt(obj.toString()));
-                        break;
-                    case 2:
-                        task.setDescription(obj.toString());
-                        break;
-                    case 3:
-                        task.setActive(Boolean.parseBoolean(obj.toString()));
-                        break;
-                    case 4:
-                        task.setFailOver(Boolean.parseBoolean(obj.toString()));
-                        break;
-                    case 5:
-                        task.setHosts(obj.toString());
-                        break;
-                    default:
+                        synonymWord.setWords(obj.toString());
+                        synonymService.addWordsToCache(synonymWord.getWords());
                         break;
                 }
-                task = dbService.saveTask(task);
-                BeanUtils.copyProperties(colArrayList.get(0), task);
+                dbService.saveSynonym(synonymWord);
+                BeanUtils.copyProperties(colArrayList.get(0), synonymWord);
             } catch (Exception e) {
                 e.printStackTrace();
             }

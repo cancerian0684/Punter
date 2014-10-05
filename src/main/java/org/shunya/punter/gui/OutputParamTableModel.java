@@ -4,22 +4,22 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.shunya.punter.jpa.TaskData;
 import org.shunya.punter.utils.FieldProperties;
 import org.shunya.punter.utils.FieldPropertiesMap;
-import org.shunya.server.component.StaticDaoFacade;
+import org.shunya.server.component.DBService;
 
 import javax.swing.table.AbstractTableModel;
 import javax.xml.bind.JAXBException;
 
 class OutputParamTableModel extends AbstractTableModel {
-    private final StaticDaoFacade staticDaoFacade;
+    private final DBService dbService;
     private String[] columnNames = {"<html><b>Property",
             "<html><b>Value"};
 
-    public OutputParamTableModel(StaticDaoFacade staticDaoFacade) {
-        this.staticDaoFacade = staticDaoFacade;
+    public OutputParamTableModel(DBService dbService) {
+        this.dbService = dbService;
     }
 
-    public OutputParamTableModel(TaskData t, StaticDaoFacade staticDaoFacade) throws JAXBException {
-        this.staticDaoFacade = staticDaoFacade;
+    public OutputParamTableModel(TaskData t, DBService dbService) throws JAXBException {
+        this.dbService = dbService;
         FieldPropertiesMap prop = t.getOutputParamsAsObject();
         int size = prop.keySet().size();
         this.data = new Object[size][3];
@@ -99,7 +99,7 @@ class OutputParamTableModel extends AbstractTableModel {
                 FieldProperties opv = propertiesMap.get((String) data[row][0]);
                 opv.setValue((String) value);
                 taskData.setOutputParamsAsObject(propertiesMap);
-                staticDaoFacade.saveTask(taskData);
+                dbService.saveTask(taskData);
                 BeanUtils.copyProperties(data[row][2], taskData);
             } catch (Exception e) {
                 e.printStackTrace();

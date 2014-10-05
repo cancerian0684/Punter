@@ -6,9 +6,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.shunya.kb.gui.SearchQuery;
-import org.shunya.kb.model.Attachment;
-import org.shunya.kb.model.Category;
-import org.shunya.kb.model.Document;
+import org.shunya.kb.model.*;
 import org.shunya.punter.gui.AppSettings;
 import org.shunya.punter.gui.PunterJobBasket;
 import org.shunya.punter.gui.SingleInstanceFileLock;
@@ -22,6 +20,7 @@ import org.shunya.server.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -31,13 +30,17 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
-public class StaticDaoFacade {
+public class DBService {
     private ClipBoardListener clipBoardListener;
     private SingleInstanceFileLock singleInstanceFileLock;
     private SessionFacade sessionFacade;
     private JPATransatomatic transatomatic;
     @Autowired
     private ServerSettings serverSettings;
+    @Autowired
+    private LuceneIndexService luceneIndexService;
+    @Autowired
+    private SynonymService synonymService;
     private RestClient restClient = new RestClient();
 
     public void setClipBoardListener(ClipBoardListener clipBoardListener) {
@@ -113,11 +116,27 @@ public class StaticDaoFacade {
         return serverSettings.getWebServerPort();
     }
 
-    public StaticDaoFacade() {
+    @PostConstruct
+    public void initialize() {
         singleInstanceFileLock = new SingleInstanceFileLock("PunterServer.lock");
         sessionFacade = SessionFacade.getInstance();
         transatomatic = new JPATransatomatic(new JPASessionFactory());
-        buildSynonymsCacheLocal();
+        synonymService.loadFromDB();
+    }
+
+    public void incrementCounter(final Document document) {
+        transatomatic.run(session -> {
+            List<AccessCounter> dbDocList = session.createQuery("from AccessCounter ac where ac.documentId = :docId").setParameter("docId", document.getId()).list();
+            if (dbDocList.size() > 0) {
+                dbDocList.get(0).setCounter(dbDocList.get(0).getCounter() + 1);
+                session.saveOrUpdate(dbDocList.get(0));
+            } else {
+                AccessCounter ac = new AccessCounter();
+                ac.setDocumentId(document.getId());
+                ac.setCounter(0);
+                session.saveOrUpdate(ac);
+            }
+        });
     }
 
     public void setSessionId(String sessionId) {
@@ -130,7 +149,7 @@ public class StaticDaoFacade {
 
     public List<String> getCategories() {
         List<String> categories = new ArrayList<>(20);
-        Scanner scanner = new Scanner(StaticDaoFacade.class.getClassLoader().getResourceAsStream("resources/categories.properties"));
+        Scanner scanner = new Scanner(DBService.class.getClassLoader().getResourceAsStream("resources/categories.properties"));
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             StringTokenizer stk = new StringTokenizer(line, ",");
@@ -144,19 +163,10 @@ public class StaticDaoFacade {
 
     public List<String> getAllTerms() throws IOException {
         long t1 = System.currentTimeMillis();
-        List<String> result = LuceneIndexDao.getInstance().listAllTermsForTitle();
+        List<String> result = luceneIndexService.listAllTermsForTitle();
         long t2 = System.currentTimeMillis();
 //        System.err.println("time consumed : " + (t2 - t1));
         return result;
-    }
-
-    public void updateAccessCounter(Document doc) {
-        /*Session em = emf.createEntityManager();
-          DocumentService service = new DocumentService(em);
-          em.getTransaction().begin();
-          service.updateAccessCounter(doc);
-          em.getTransaction().commit();
-          em.close();*/
     }
 
     public Document createDocument(String author) {
@@ -171,7 +181,7 @@ public class StaticDaoFacade {
             doc.setAuthor(author);
             session.persist(doc);
             session.flush();
-            LuceneIndexDao.getInstance().indexDocs(doc);
+            luceneIndexService.indexDocs(doc);
             resultHolder.setResult(doc);
         });
         return resultHolder.getResult();
@@ -179,9 +189,9 @@ public class StaticDaoFacade {
 
     public List<Document> getDocList(SearchQuery searchQuery) {
         try {
-            long t1 = System.currentTimeMillis();
-            List<Document> result = LuceneIndexDao.getInstance().search(searchQuery.getQuery(), searchQuery.getCategory(), searchQuery.isAndFilter(), 0, searchQuery.getMaxResults());
-            long t2 = System.currentTimeMillis();
+//            long t1 = System.currentTimeMillis();
+            List<Document> result = luceneIndexService.search(searchQuery.getQuery(), searchQuery.getCategory(), searchQuery.isAndFilter(), 0, searchQuery.getMaxResults());
+//            long t2 = System.currentTimeMillis();
 //            System.err.println("time consumed : " + (t2 - t1));
             return result;
         } catch (IOException e) {
@@ -192,14 +202,14 @@ public class StaticDaoFacade {
 
     public void deleteAllForCategory(String category) throws IOException {
         long t1 = System.currentTimeMillis();
-        List<Document> result = LuceneIndexDao.getInstance().search("*", category, true, 0, 100);
+        List<Document> result = luceneIndexService.search("*", category, true, 0, 100);
         for (Document document : result) {
             System.out.println("Deleting document - " + document);
             transatomatic.run(session -> {
                 Document document1 = (Document) session.get(Document.class, document.getId());
                 session.delete(document1);
                 session.flush();
-                LuceneIndexDao.getInstance().deleteIndexForDoc(document1.getId());
+                luceneIndexService.deleteIndexForDoc(document1.getId());
             });
         }
         long t2 = System.currentTimeMillis();
@@ -210,13 +220,13 @@ public class StaticDaoFacade {
         final ResultHolder<Document> resultHolder = new ResultHolder<>();
         transatomatic.run(session -> {
             session.saveOrUpdate(doc);
-            LuceneIndexDao.getInstance().indexDocs(doc);
+            luceneIndexService.indexDocs(doc);
             resultHolder.setResult(doc);
         });
         return resultHolder.getResult();
     }
 
-    public Attachment saveAttachment(Attachment attach){
+    public Attachment saveAttachment(Attachment attach) {
         final ResultHolder<Attachment> resultHolder = new ResultHolder<>();
         transatomatic.run(session -> {
             session.saveOrUpdate(attach);
@@ -225,7 +235,7 @@ public class StaticDaoFacade {
             doc = (Document) session.get(Document.class, doc.getId());
             session.refresh(doc);
             session.getTransaction().commit();
-            LuceneIndexDao.getInstance().indexDocs(doc);
+            luceneIndexService.indexDocs(doc);
             resultHolder.setResult(attach);
         });
         return resultHolder.getResult();
@@ -240,6 +250,28 @@ public class StaticDaoFacade {
                 Hibernate.initialize(document.getContent());
                 resultHolder.setResult(document);
             }
+        });
+        return resultHolder.getResult();
+    }
+
+    public List<SynonymWord> getSynonymWords() {
+        final ResultHolder<List<SynonymWord>> resultHolder = new ResultHolder<>();
+        transatomatic.run(session -> {
+            List<SynonymWord> synonymWords = session.createCriteria(SynonymWord.class).setMaxResults(100).list();
+            resultHolder.setResult(synonymWords);
+        });
+        return resultHolder.getResult();
+    }
+
+    public List<SynonymWord> getSynonymWords(String filter) {
+        final ResultHolder<List<SynonymWord>> resultHolder = new ResultHolder<>();
+        transatomatic.run(session -> {
+            List<SynonymWord> synonymWords = session.createCriteria(SynonymWord.class)
+                    .add(Restrictions.ilike("words", "%"+filter+"%"))
+                    .setMaxResults(100)
+                    .setCacheable(true)
+                    .list();
+            resultHolder.setResult(synonymWords);
         });
         return resultHolder.getResult();
     }
@@ -276,7 +308,7 @@ public class StaticDaoFacade {
             Document doc = attchment.getDocument();
             doc = (Document) session.get(Document.class, doc.getId());
             session.refresh(doc);
-            LuceneIndexDao.getInstance().indexDocs(doc);
+            luceneIndexService.indexDocs(doc);
         });
         return true;
     }
@@ -287,7 +319,7 @@ public class StaticDaoFacade {
             if (doc != null) {
                 session.delete(doc);
             }
-            LuceneIndexDao.getInstance().deleteIndexForDoc(document.getId());
+            luceneIndexService.deleteIndexForDoc(document.getId());
         });
         return true;
     }
@@ -383,15 +415,15 @@ public class StaticDaoFacade {
 
     public void refreshIndexes() {
         System.err.println("Refreshing Index's");
-        buildSynonymsCacheLocal();
+//        buildSynonymsCacheLocal();
         transatomatic.run(session -> {
             System.out.println("Clearing old index");
-            LuceneIndexDao.getInstance().deleteIndex();
+            luceneIndexService.deleteIndex();
             org.hibernate.Query query = session.createQuery("SELECT e FROM Document e");
             List<Document> allDocs = query.list();
             for (Document emp : allDocs) {
                 System.out.println(emp.getCategory());
-                LuceneIndexDao.getInstance().indexDocs(emp);
+                luceneIndexService.indexDocs(emp);
             }
         });
         System.err.println("Indexes Refreshed");
@@ -399,10 +431,10 @@ public class StaticDaoFacade {
 
     public void buildSynonymsCacheLocal() {
         System.out.println("Rebuilding Synonym Cache Local");
-        Scanner scanner = new Scanner(StaticDaoFacade.class.getClassLoader().getResourceAsStream("resources/synonyms.properties"));
+        Scanner scanner = new Scanner(DBService.class.getClassLoader().getResourceAsStream("resources/synonyms.properties"));
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            SynonymService.getService().addWords(line);
+//            synonymService.addWordsToCache(line);
         }
         scanner.close();
     }
@@ -410,12 +442,12 @@ public class StaticDaoFacade {
     public void rebuildIndex() throws RemoteException {
         transatomatic.run(session -> {
             System.out.println("Clearing old index");
-            LuceneIndexDao.getInstance().deleteIndex();
+            luceneIndexService.deleteIndex();
             Query query = session.createQuery("SELECT e FROM Document e");
             List<Document> allDocs = query.list();
             for (Document doc : allDocs) {
                 System.out.println(doc.getCategory());
-                LuceneIndexDao.getInstance().indexDocs(doc);
+                luceneIndexService.indexDocs(doc);
             }
         });
     }
@@ -696,5 +728,13 @@ public class StaticDaoFacade {
 
     public String getDevEmailCSV() throws RemoteException {
         return serverSettings.getDevEmailCSV();
+    }
+
+    public void saveSynonym(SynonymWord word) {
+        transatomatic.run(session -> {
+            SynonymWord o = (SynonymWord) session.get(SynonymWord.class, word.getId());
+            o.setWords(word.getWords());
+            session.saveOrUpdate(o);
+        });
     }
 }

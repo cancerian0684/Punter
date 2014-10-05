@@ -10,6 +10,7 @@ public class Category {
     @Id
     @GeneratedValue(strategy= GenerationType.TABLE, generator="seqGen")
     private long id;
+    private int sequence;
     private String category;
 
     public long getId() {
@@ -26,5 +27,13 @@ public class Category {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }

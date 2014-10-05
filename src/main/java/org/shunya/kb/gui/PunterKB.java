@@ -8,7 +8,7 @@ import org.shunya.kb.utils.WordService;
 import org.shunya.punter.gui.AppSettings;
 import org.shunya.punter.gui.Main;
 import org.shunya.punter.utils.DevEmailService;
-import org.shunya.server.component.StaticDaoFacade;
+import org.shunya.server.component.DBService;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -43,7 +43,7 @@ public class PunterKB extends JPanel {
     private JTable searchResultTable;
     private JComboBox categoryComboBox;
     private JToggleButton andOrToggleButton = new JToggleButton("O");
-    private final StaticDaoFacade docService;
+    private final DBService dbService;
     private final List<String> categories;
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -71,13 +71,13 @@ public class PunterKB extends JPanel {
 
     private DelayedQueueHandlerThread<SearchQuery> punterDelayedQueueHandlerThread;
 
-    public PunterKB(StaticDaoFacade staticDaoFacade) throws ClassNotFoundException, RemoteException, URISyntaxException {
+    public PunterKB(DBService DBService) throws ClassNotFoundException, RemoteException, URISyntaxException {
         wordService = new WordService();
-        docService = staticDaoFacade;
-        docService.getDocList(new SearchQuery.SearchQueryBuilder().query("").build());
+        dbService = DBService;
+        dbService.getDocList(new SearchQuery.SearchQueryBuilder().query("").build());
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        categories = docService.getCategories();
+        categories = dbService.getCategories();
         searchTextField = new JTextField(20);
         searchTextField.setFont(new Font("Arial Unicode MS", Font.TRUETYPE_FONT, 12));
         searchTextField.setPreferredSize(new Dimension(searchTextField.getWidth(), 30));
@@ -95,12 +95,7 @@ public class PunterKB extends JPanel {
                         updateSearchResult();
                     }
                 });
-        punterDelayedQueueHandlerThread = new DelayedQueueHandlerThread<>(new DelayedQueueHandlerThread.CallBackHandler<SearchQuery>() {
-            @Override
-            public void process(SearchQuery query) {
-                populateDocumentsInTable((DocumentTableModel) searchResultTable.getModel(), docService.getDocList(query));
-            }
-        });
+        punterDelayedQueueHandlerThread = new DelayedQueueHandlerThread<>(query -> populateDocumentsInTable((DocumentTableModel) searchResultTable.getModel(), dbService.getDocList(query)));
 
         punterDelayedQueueHandlerThread.start();
         searchResultTable = new JTable(new DocumentTableModel()) {
@@ -119,15 +114,17 @@ public class PunterKB extends JPanel {
                         }
                         if (mEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
                             Document luceneDoc = (Document) ((DocumentTableModel) table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow())).get(0);
-                            docService.updateAccessCounter(luceneDoc);
-                            Document doc = docService.getDocument(luceneDoc.getId());
+                            long t1 = System.currentTimeMillis();
+                            dbService.incrementCounter(luceneDoc);
+                            System.out.println("time taken for access counter "+(System.currentTimeMillis()-t1)+" ms");
+                            Document doc = dbService.getDocument(luceneDoc.getId());
                             if(doc==null) {
                                 JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
                                 return false;
                             }
                             if (column == 1) {
                                 if (doc.getExt().isEmpty())
-                                    DocumentEditor.showEditor(doc, docService, wordService);
+                                    DocumentEditor.showEditor(doc, dbService, wordService);
                                 else {
                                     if (Desktop.isDesktopSupported()) {
                                         String docId;
@@ -135,8 +132,8 @@ public class PunterKB extends JPanel {
                                             docId = "uploads/" + doc.getTitle();
                                             docId = docId.replaceAll(" ", "%20");
                                             try {
-                                                String url = "http://" + docService.getServerHostAddress().getHostAddress() + ":"
-                                                        + docService.getWebServerPort()
+                                                String url = "http://" + dbService.getServerHostAddress().getHostAddress() + ":"
+                                                        + dbService.getWebServerPort()
                                                         + "/" + docId;
                                                 Desktop.getDesktop().browse(URI.create(url));
                                             } catch (Exception e1) {
@@ -174,7 +171,7 @@ public class PunterKB extends JPanel {
                                     System.err.println("updating category.");
                                     doc.setCategory(s);
                                     luceneDoc.setCategory(s);
-                                    docService.saveDocument(doc);
+                                    dbService.saveDocument(doc);
                                 }
                             }
                             return false;
@@ -282,7 +279,7 @@ public class PunterKB extends JPanel {
                 for (int selectedRow : selectedRows) {
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
                     Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(selectedRow)).get(0);
-                    doc = docService.getDocument(doc.getId());
+                    doc = dbService.getDocument(doc.getId());
                     if (doc!=null) {
                         //Punter Doc
                         if (doc.getExt().isEmpty()) {
@@ -360,12 +357,7 @@ public class PunterKB extends JPanel {
         });
         categoryComboBox = new JComboBox(categories.toArray());
         categoryComboBox.setPreferredSize(new Dimension((int) categoryComboBox.getPreferredSize().getWidth(), 30));
-        categoryComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateSearchResult();
-            }
-        });
+        categoryComboBox.addActionListener(e -> updateSearchResult());
 
         andOrToggleButton.setOpaque(true);
         andOrToggleButton.setFocusPainted(true);
@@ -373,16 +365,13 @@ public class PunterKB extends JPanel {
         andOrToggleButton.setContentAreaFilled(true);
         andOrToggleButton.setPreferredSize(new Dimension(22, 32));
         andOrToggleButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        andOrToggleButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (andOrToggleButton.isSelected()) {
-                    andOrToggleButton.setText("A");
-                } else {
-                    andOrToggleButton.setText("O");
-                }
-                updateSearchResult();
+        andOrToggleButton.addActionListener(e -> {
+            if (andOrToggleButton.isSelected()) {
+                andOrToggleButton.setText("A");
+            } else {
+                andOrToggleButton.setText("O");
             }
+            updateSearchResult();
         });
 
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -419,9 +408,9 @@ public class PunterKB extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Adding Document");
                 Document doc = null;
-                doc = docService.createDocument(docService.getUsername());
+                doc = dbService.createDocument(dbService.getUsername());
                 doc.setCategory(getSelectedCategory());
-                DocumentEditor.showEditor(doc, docService, wordService);
+                DocumentEditor.showEditor(doc, dbService, wordService);
             }
         });
         popupProcess.add(addProcessMenu);
@@ -431,13 +420,13 @@ public class PunterKB extends JPanel {
                 System.out.println("Opening Document");
                 if (searchResultTable.getSelectedRow() >= 0) {
                     Document doc = (Document) ((DocumentTableModel) searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-                    doc = docService.getDocument(doc.getId());
+                    doc = dbService.getDocument(doc.getId());
                     if(doc == null){
                        JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
                         return;
                     }
                     if (doc.getExt().isEmpty())
-                        DocumentEditor.showEditor(doc, docService, wordService);
+                        DocumentEditor.showEditor(doc, dbService, wordService);
                     else {
                         if (Desktop.isDesktopSupported()) {
                             System.out.println("Opening up the file.." + doc.getExt());
@@ -468,11 +457,11 @@ public class PunterKB extends JPanel {
                     Document localDoc = (Document) ((DocumentTableModel) searchResultTable.getModel())
                             .getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
                     Document persisted = null;
-                    persisted = docService.getDocument(localDoc.getId());
+                    persisted = dbService.getDocument(localDoc.getId());
                     final String newTitle = JOptionPane.showInputDialog(Main.KBFrame, "rename title to - ", persisted.getTitle());
                     if (newTitle != null) {
                         persisted.setTitle(newTitle);
-                        docService.saveDocument(persisted);
+                        dbService.saveDocument(persisted);
                         localDoc.setTitle(persisted.getTitle());
                         ((DocumentTableModel) searchResultTable.getModel()).refreshTable();
                     }
@@ -492,7 +481,7 @@ public class PunterKB extends JPanel {
                     int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete?", "Confirm",
                             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                     if (response == JOptionPane.YES_OPTION) {
-                        docService.deleteDocument(doc);
+                        dbService.deleteDocument(doc);
                         dtm.deleteRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
                     }
                 }
@@ -507,7 +496,7 @@ public class PunterKB extends JPanel {
                 if (searchResultTable.getSelectedRow() >= 0) {
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
                     Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-                    TagDialog.getInstance(doc, docService);
+                    TagDialog.getInstance(doc, dbService);
                 }
             }
         });
@@ -529,7 +518,7 @@ public class PunterKB extends JPanel {
                 System.out.println("Rebuilding Index");
                 PunterKB.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 try {
-                    docService.rebuildIndex();
+                    dbService.rebuildIndex();
                 } catch (RemoteException e1) {
                     e1.printStackTrace();
                 }
@@ -547,14 +536,14 @@ public class PunterKB extends JPanel {
                     Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
                     String docId;
                     if (doc.getCategory().equalsIgnoreCase("/all/uploads")) {
-                        doc = docService.getDocument(doc.getId());
+                        doc = dbService.getDocument(doc.getId());
 //                        Base64.getEncoder().encode(doc.getTitle().getBytes())
                         docId = "uploads/" + doc.getTitle();
                         docId = docId.replaceAll(" ", "%20");
                     } else
                         docId = "get/" + doc.getId();
-                    String url = "http://" + docService.getServerHostAddress().getHostAddress() + ":"
-                            + docService.getWebServerPort()
+                    String url = "http://" + dbService.getServerHostAddress().getHostAddress() + ":"
+                            + dbService.getWebServerPort()
                             + "/rest/punter/" + docId;
                     StringSelection stringSelection = new StringSelection(url);
                     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -580,7 +569,7 @@ public class PunterKB extends JPanel {
                             File temp = new File("Temp");
                             if (!temp.exists())
                                 temp.mkdir();
-                            doc = docService.getDocument(doc.getId());
+                            doc = dbService.getDocument(doc.getId());
                             //Punter Doc
                             if (doc.getExt().isEmpty()) {
                                 Collection<Attachment> attchs = doc.getAttachments();
@@ -675,9 +664,9 @@ public class PunterKB extends JPanel {
                                 try {
                                     System.err.println("Picked file :" + path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
                                     int id = Integer.parseInt(path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
-                                    doc = docService.getDocument((long) id);
+                                    doc = dbService.getDocument((long) id);
                                     doc.setContent(getBytesFromFile(path.toFile()));
-                                    docService.saveDocument(doc);
+                                    dbService.saveDocument(doc);
                                 } catch (Exception e2) {
                                     e2.printStackTrace();
                                 }
@@ -687,9 +676,9 @@ public class PunterKB extends JPanel {
                                     System.err.println("Picked Attachment for saving :" + path.toFile().getName());
                                     int id = Integer.parseInt(path.toFile().getName().substring(2, path.toFile().getName().lastIndexOf(".")));
                                     attachment.setId(id);
-                                    attachment = docService.getAttachment(attachment);
+                                    attachment = dbService.getAttachment(attachment);
                                     attachment.setContent(getBytesFromFile(path.toFile()));
-                                    docService.saveAttachment(attachment);
+                                    dbService.saveAttachment(attachment);
                                 } catch (Exception e2) {
                                     e2.printStackTrace();
                                 }
@@ -730,7 +719,7 @@ public class PunterKB extends JPanel {
         Path dir = Paths.get("uploads");
         try {
             System.out.println("Deleting all for category");
-            docService.deleteAllForCategory("/all/uploads");
+            dbService.deleteAllForCategory("/all/uploads");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -750,7 +739,7 @@ public class PunterKB extends JPanel {
                     doc.setDateCreated(new Date(path.toFile().lastModified()));
                     doc.setDateUpdated(new Date());
                     doc.setCategory("/all/uploads");
-                    docService.saveDocument(doc);
+                    dbService.saveDocument(doc);
                     System.err.println("Document added : " + fileName);
                     return CONTINUE;
                 }
@@ -778,7 +767,7 @@ public class PunterKB extends JPanel {
                         doc.setDateCreated(new Date());
                         doc.setDateUpdated(new Date());
                         doc.setCategory(getSelectedCategory());
-                        doc = docService.saveDocument(doc);
+                        doc = dbService.saveDocument(doc);
                         System.err.println("Document added : " + file.getName());
                     }
                     return true;
@@ -813,7 +802,7 @@ public class PunterKB extends JPanel {
                         doc.setExt(".txt");
                     doc.setDateCreated(new Date());
                     doc.setDateUpdated(new Date());
-                    doc = docService.saveDocument(doc);
+                    doc = dbService.saveDocument(doc);
                     System.err.println("Document added : test");
 //                      fileListerWorker.getFileListQueue().add(f);
 //                       System.out.println(f.getAbsolutePath());
@@ -855,7 +844,7 @@ public class PunterKB extends JPanel {
                     doc.setDateCreated(new Date());
                     doc.setDateUpdated(new Date());
                     doc.setCategory(getSelectedCategory());
-                    docService.saveDocument(doc);
+                    dbService.saveDocument(doc);
                     System.err.println("Document added : test");
                     return true;
                 } catch (UnsupportedFlavorException e) {
@@ -879,7 +868,7 @@ public class PunterKB extends JPanel {
                     doc.setDateCreated(new Date());
                     doc.setDateUpdated(new Date());
                     doc.setCategory(getSelectedCategory());
-                    doc = docService.saveDocument(doc);
+                    doc = dbService.saveDocument(doc);
                     System.err.println("Document added : " + newTitle);
                 }
             } else if (transferable.isDataFlavorSupported(Linux)) {
@@ -903,7 +892,7 @@ public class PunterKB extends JPanel {
                     doc.setDateCreated(new Date());
                     doc.setDateUpdated(new Date());
                     doc.setCategory(getSelectedCategory());
-                    doc = docService.saveDocument(doc);
+                    doc = dbService.saveDocument(doc);
                     System.err.println("Document added : " + file.getName());
                 }
             } else {
@@ -1051,9 +1040,9 @@ public class PunterKB extends JPanel {
             for (File file : files) {
                 try {
                     System.err.println("Picked file :" + file.getName().substring(1, file.getName().indexOf("_")));
-                    Document doc = docService.getDocument(Long.parseLong(file.getName().substring(1, file.getName().indexOf("_"))));
+                    Document doc = dbService.getDocument(Long.parseLong(file.getName().substring(1, file.getName().indexOf("_"))));
                     doc.setContent(getBytesFromFile(file));
-                    docService.saveDocument(doc);
+                    dbService.saveDocument(doc);
                 } catch (Exception e2) {
                     e2.printStackTrace();
                 }

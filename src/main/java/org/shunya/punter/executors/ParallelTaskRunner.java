@@ -1,5 +1,8 @@
 package org.shunya.punter.executors;
 
+import org.shunya.punter.utils.StringUtils;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -20,6 +23,10 @@ public class ParallelTaskRunner {
                 resultProcessor.process(resultsMap);
             } catch (ExecutionException e) {
                 e.printStackTrace();
+                final Map<String, Object> resultsMap = new HashMap<>();
+                resultsMap.put("status", false);
+                resultsMap.put("logs", StringUtils.getExceptionStackTrace(e));
+                resultProcessor.process(resultsMap);
             }
         }
         return this;

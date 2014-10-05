@@ -1,4 +1,4 @@
-package org.shunya.server;
+package org.shunya.server.component;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
@@ -18,6 +18,9 @@ import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Version;
 import org.shunya.kb.model.Attachment;
 import org.shunya.kb.model.Document;
+import org.shunya.server.PunterTextExtractor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,25 +28,20 @@ import java.io.StringReader;
 import java.nio.file.FileSystems;
 import java.util.*;
 
-public class LuceneIndexDao {
+@Service
+public class LuceneIndexService {
     static final File INDEX_DIR = FileSystems.getDefault().getPath(System.getProperty("user.home")).resolve("LuceneIndex").toFile();
     private Directory directory;
     private IndexWriter indexWriter;
     private Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_48);
-    private static LuceneIndexDao luceneIndexDao;
     private final QueryParser parser1;
     private final QueryParser parser2;
 
     private SearcherManager searcherManager;
+    @Autowired
+    private SynonymService synonymService;
 
-    public static LuceneIndexDao getInstance() {
-        if (luceneIndexDao == null) {
-            luceneIndexDao = new LuceneIndexDao();
-        }
-        return luceneIndexDao;
-    }
-
-    public static org.apache.lucene.document.Document createLuceneDocument(Document pDoc) {
+    public org.apache.lucene.document.Document createLuceneDocument(Document pDoc) {
         org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
         doc.add(new StringField("id", "" + pDoc.getId(), Field.Store.YES));
         doc.add(new TextField("title", getPunterParsedText2(pDoc.getTitle()), Field.Store.NO));
@@ -75,7 +73,7 @@ public class LuceneIndexDao {
             while (stk.hasMoreTokens()) {
                 final String s = stk.nextToken();
                 tags.append(s + " ");
-                final String[] synonym = SynonymService.getService().getSynonym(s);
+                final String[] synonym = synonymService.getSynonymArray(s);
                 if (synonym != null) {
                     for (String s1 : synonym) {
                         tags.append(s1 + " ");
@@ -87,12 +85,12 @@ public class LuceneIndexDao {
         return doc;
     }
 
-    public static String getPunterParsedText2(String inText) {
+    public String getPunterParsedText2(String inText) {
         StringTokenizer stk = new StringTokenizer(inText, " ,");
         Set<String> words = new HashSet<>(1000);
         while (stk.hasMoreTokens()) {
             String token = stk.nextToken();
-            final String[] synonym = SynonymService.getService().getSynonym(token);
+            final String[] synonym = synonymService.getSynonymArray(token);
             if (synonym != null) {
                 for (String s : synonym) {
                     words.add(s);
@@ -218,7 +216,7 @@ public class LuceneIndexDao {
         }
     }
 
-    private LuceneIndexDao() {
+    private LuceneIndexService() {
         try {
             directory = NIOFSDirectory.open(INDEX_DIR);
             directory.clearLock("write.lock");
@@ -256,12 +254,12 @@ public class LuceneIndexDao {
         boostMap.put("id", 1.0f);
         boostMap.put("attachment", 2.0f);
         boostMap.put("tags", 3.8f);
-        parser1 = new MultiFieldQueryParser(Version.LUCENE_45, new String[]{"title", "contents", "id", "attachment", "tags"}, analyzer, boostMap);
+        parser1 = new MultiFieldQueryParser(Version.LUCENE_48, new String[]{"title", "contents", "id", "attachment", "tags"}, analyzer, boostMap);
         parser1.setAllowLeadingWildcard(true);
         parser1.setAnalyzeRangeTerms(true);
         parser1.setDefaultOperator(QueryParser.Operator.OR);
 
-        parser2 = new QueryParser(Version.LUCENE_45, "category", analyzer);
+        parser2 = new QueryParser(Version.LUCENE_48, "category", analyzer);
         parser2.setDefaultOperator(QueryParser.Operator.AND);
     }
 
@@ -283,7 +281,19 @@ public class LuceneIndexDao {
                 parser1.setDefaultOperator(QueryParser.OR_OPERATOR);
             Query query1;
             try {
-                query1 = parser1.parse(searchString + " " + itrim(getPunterParsedText(searchString)));
+                String punterText = itrim(getPunterParsedText(searchString)).trim();
+                StringBuilder queryText = new StringBuilder();
+                queryText.append(searchString);
+                if (!punterText.equalsIgnoreCase(searchString))
+                    queryText.append(" ").append(punterText);
+                String[] words = searchString.split("[,\\s*]");
+                for (String word : words) {
+                    String synonym = synonymService.getSynonym(word);
+                    if (synonym != null)
+                        queryText.append(" ").append(synonym);
+                }
+                System.out.println("Final Query = " + queryText.toString());
+                query1 = parser1.parse(queryText.toString());
             } catch (ParseException e) {
                 e.printStackTrace();
                 System.out.println("Parsing of input query failed, trying with the escaped syntax now.");

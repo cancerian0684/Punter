@@ -26,5 +26,6 @@
         <mapping class="org.shunya.kb.model.Category"/>
         <mapping class="org.shunya.kb.model.Attachment"/>
         <mapping class="org.shunya.kb.model.SynonymWord"/>
+        <mapping class="org.shunya.kb.model.AccessCounter"/>
     </session-factory>
 </hibernate-configuration>

@@ -35,7 +35,7 @@ import java.util.concurrent.ExecutionException;
 public class PunterController {
     final Logger logger = LoggerFactory.getLogger(PunterController.class);
     @Autowired
-    private StaticDaoFacade daoService;
+    private DBService daoService;
 
     @Autowired
     private PunterService punterService;

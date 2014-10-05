@@ -1,14 +1,14 @@
 package org.shunya.punter.jpa;
 
-import org.shunya.server.component.StaticDaoFacade;
+import org.shunya.server.component.DBService;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class ProcessHistoryBuilder {
-    public static ProcessHistory build(final ProcessData procDao, StaticDaoFacade staticDaoFacade) {
-        List<TaskData> sortedTasksByProcessId = staticDaoFacade.getSortedTasksByProcessId(procDao.getId());
+    public static ProcessHistory build(final ProcessData procDao, DBService dbService) {
+        List<TaskData> sortedTasksByProcessId = dbService.getSortedTasksByProcessId(procDao.getId());
         final List<TaskHistory> thList = new ArrayList<>(10);
         final ProcessHistory processHistory = new ProcessHistory();
         processHistory.setName(procDao.getName());

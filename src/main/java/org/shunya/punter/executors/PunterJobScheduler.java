@@ -5,7 +5,7 @@ import org.shunya.punter.gui.AppSettings;
 import org.shunya.punter.gui.PunterJobBasket;
 import org.shunya.punter.jpa.ProcessData;
 import org.shunya.server.PunterProcessRunMessage;
-import org.shunya.server.component.StaticDaoFacade;
+import org.shunya.server.component.DBService;
 
 import java.util.Date;
 import java.util.List;
@@ -15,11 +15,11 @@ import java.util.TimerTask;
 public class PunterJobScheduler extends Timer {
     private static long TIMER_PERIOD = 1000 * 60 * 1;
     private static long lastReferenceTimeLong;
-    private final StaticDaoFacade staticDaoFacade;
+    private final DBService dbService;
 
-    public PunterJobScheduler(StaticDaoFacade staticDaoFacade) {
+    public PunterJobScheduler(DBService dbService) {
         super(true);
-        this.staticDaoFacade = staticDaoFacade;
+        this.dbService = dbService;
     }
 
     public void start() {
@@ -27,7 +27,7 @@ public class PunterJobScheduler extends Timer {
             @Override
             public void run() {
                 try {
-                    List<ProcessData> scheduledProcList = staticDaoFacade.getScheduledProcessList(AppSettings.getInstance().getUsername());
+                    List<ProcessData> scheduledProcList = dbService.getScheduledProcessList(AppSettings.getInstance().getUsername());
                     if (lastReferenceTimeLong == 0L) {
                         lastReferenceTimeLong = System.currentTimeMillis();
                     }

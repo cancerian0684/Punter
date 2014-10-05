@@ -4,20 +4,20 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.shunya.punter.jpa.TaskData;
 import org.shunya.punter.utils.FieldProperties;
 import org.shunya.punter.utils.FieldPropertiesMap;
-import org.shunya.server.component.StaticDaoFacade;
+import org.shunya.server.component.DBService;
 
 import javax.swing.table.AbstractTableModel;
 import javax.xml.bind.JAXBException;
 
 class InputParamTableModel extends AbstractTableModel {
-    private final StaticDaoFacade staticDaoFacade;
+    private final DBService dbService;
     private String[] columnNames = {"<html><b>Property",
             "<html><b>Value"};
     private boolean inputParam;
 
 
-    public InputParamTableModel(TaskData t, StaticDaoFacade staticDaoFacade) throws JAXBException {
-        this.staticDaoFacade = staticDaoFacade;
+    public InputParamTableModel(TaskData t, DBService dbService) throws JAXBException {
+        this.dbService = dbService;
         FieldPropertiesMap prop;
         prop = t.getInputParamsAsObject();
         int size = prop.keySet().size();
@@ -37,8 +37,8 @@ class InputParamTableModel extends AbstractTableModel {
 
     public static int[] width = {60, 126};
 
-    public InputParamTableModel(StaticDaoFacade staticDaoFacade) {
-        this.staticDaoFacade = staticDaoFacade;
+    public InputParamTableModel(DBService dbService) {
+        this.dbService = dbService;
     }
 
     public int getColumnCount() {
@@ -93,7 +93,7 @@ class InputParamTableModel extends AbstractTableModel {
             FieldProperties fieldProperties = propertiesMap.get((String) data[row][0]);
             fieldProperties.setValue((String) value);
             taskData.setInputParamsAsObject(propertiesMap);
-            taskData = staticDaoFacade.saveTask(taskData);
+            taskData = dbService.saveTask(taskData);
             BeanUtils.copyProperties(data[row][2], taskData);
         } catch (Exception e) {
             e.printStackTrace();

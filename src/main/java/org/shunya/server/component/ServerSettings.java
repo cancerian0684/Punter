@@ -1,7 +1,6 @@
 package org.shunya.server.component;
 
 import org.shunya.kb.model.Document;
-import org.shunya.kb.model.SynonymWord;
 import org.shunya.kb.utils.Utilities;
 import org.shunya.server.MultiCastResponder;
 import org.shunya.server.ServerSettingsBean;
@@ -22,7 +21,10 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
     private ServerSettingsBean settingsBean;
 
     @Autowired
-    private StaticDaoFacade daoFacade;
+    private DBService daoFacade;
+
+    @Autowired
+    private SynonymService synonymService;
 
     @PostConstruct
     public void registerMbean() throws InstantiationException, IllegalAccessException {
@@ -55,10 +57,8 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
 
     @Override
     public void addSynonym(String words) {
-        SynonymWord synonymWord = new SynonymWord();
-        synonymWord.setWords(words);
-        daoFacade.create(synonymWord);
-        System.out.println("synonymWord = " + synonymWord.getWords());
+        synonymService.saveWord(words);
+        System.out.println("synonymWord = " + words);
     }
 
     @Override

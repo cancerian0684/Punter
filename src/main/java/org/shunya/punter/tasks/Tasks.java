@@ -7,8 +7,8 @@ import org.shunya.punter.gui.TaskObserver;
 import org.shunya.punter.jpa.TaskData;
 import org.shunya.punter.utils.FieldProperties;
 import org.shunya.punter.utils.FieldPropertiesMap;
+import org.shunya.server.component.DBService;
 import org.shunya.server.component.RestClient;
-import org.shunya.server.component.StaticDaoFacade;
 
 import javax.xml.bind.JAXBException;
 import java.io.Serializable;
@@ -31,7 +31,7 @@ public abstract class Tasks implements Serializable {
     private FieldPropertiesMap inputParams;
     private FieldPropertiesMap overrideInputParams;
     protected TaskData taskDao;
-    protected StaticDaoFacade staticDaoFacade;
+    protected DBService dbService;
     private transient ConsoleHandler cHandler = null;
     private transient MemoryHandler mHandler = null;
     private transient Level loggingLevel = Level.FINE;
@@ -93,12 +93,12 @@ public abstract class Tasks implements Serializable {
         this.loggingLevel = loggingLevel;
     }
 
-    public StaticDaoFacade getStaticDaoFacade() {
-        return staticDaoFacade;
+    public DBService getDbService() {
+        return dbService;
     }
 
-    public void setStaticDaoFacade(StaticDaoFacade staticDaoFacade) {
-        this.staticDaoFacade = staticDaoFacade;
+    public void setDbService(DBService dbService) {
+        this.dbService = dbService;
     }
 
     public String getMemoryLogs() {
@@ -121,7 +121,6 @@ public abstract class Tasks implements Serializable {
         for (Field field : fields) {
             if (field.isAnnotationPresent(InputParam.class)) {
                 InputParam ann = field.getAnnotation(InputParam.class);
-//				System.out.println(ann.required()==true?"*"+field.getName():""+field.getName());
                 fieldPropertiesMap.put(field.getName(), new FieldProperties(field.getName(), "", ann.description(), ann.required()));
             }
         }
@@ -130,7 +129,6 @@ public abstract class Tasks implements Serializable {
 
     public static FieldPropertiesMap listOutputParams(Tasks task) {
         Field[] fields = task.getClass().getDeclaredFields();
-//		System.out.println("Listing output params");
         Map<String, FieldProperties> fieldPropertiesMap = new HashMap<>();
         for (Field field : fields) {
             if (field.isAnnotationPresent(OutputParam.class)) {
@@ -225,7 +223,6 @@ public abstract class Tasks implements Serializable {
                     field.setAccessible(true);
                     Object value = field.get(this);
                     sessionMap.put(outputParams.get(field.getName()).getValue(), value);
-//					System.out.println(field.getName()+" bound to "+outputParams.get(field.getName()).getValue()+" == "+value);
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {

@@ -1,13 +1,14 @@
 package org.shunya.punter.gui;
 
 import org.shunya.kb.gui.PunterKB;
+import org.shunya.kb.gui.SynonymPanel;
 import org.shunya.punter.executors.ProcessExecutor;
-import org.shunya.punter.utils.GlobalHotKeyListener;
 import org.shunya.punter.utils.JavaScreenCapture;
 import org.shunya.punter.utils.Launcher;
 import org.shunya.punter.utils.StackWindow;
+import org.shunya.server.component.DBService;
 import org.shunya.server.component.PunterService;
-import org.shunya.server.component.StaticDaoFacade;
+import org.shunya.server.component.SynonymService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.imageio.ImageIO;
@@ -21,9 +22,11 @@ import java.util.logging.Logger;
 
 public class Main {
     @Autowired
-    private StaticDaoFacade staticDaoFacade;
+    private DBService dbService;
     @Autowired
     private PunterService punterService;
+    @Autowired
+    private SynonymService synonymService;
     private static BufferedImage currentImage;
     private static BufferedImage busyImage;
     private static BufferedImage dsctImage;
@@ -32,8 +35,9 @@ public class Main {
     public static JFrame KBFrame;
     public static JFrame PunterGuiFrame;
     public static JFrame lastAccessed;
+    private static JFrame synonymFrame;
     private static Logger logger = Logger.getLogger(Main.class.getName());
-    private GlobalHotKeyListener globalHotKeyListener;
+//    private GlobalHotKeyListener globalHotKeyListener;
 
     private SingleInstanceFileLock singleInstanceFileLock = new SingleInstanceFileLock("PunterClient.lock");
     private Timer timer = new Timer(3000, new ActionListener() {
@@ -89,7 +93,7 @@ public class Main {
         KBFrame = new JFrame("Search");
         JFrame.setDefaultLookAndFeelDecorated(true);
         KBFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        KBFrame.setContentPane(new PunterKB(staticDaoFacade));
+        KBFrame.setContentPane(new PunterKB(dbService));
         if (AppSettings.getInstance().KBFrameLocation != null)
             KBFrame.setLocation(AppSettings.getInstance().KBFrameLocation);
         if (AppSettings.getInstance().getKBFrameDimension() != null)
@@ -108,8 +112,8 @@ public class Main {
 
         PunterGuiFrame = new JFrame("My Personal Assistant");
         PunterGuiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        punterGUI = new PunterGUI(staticDaoFacade, punterService);
-        punterGUI.setGlobalHotKeyListener(globalHotKeyListener);
+        punterGUI = new PunterGUI(dbService, punterService);
+//        punterGUI.setGlobalHotKeyListener(globalHotKeyListener);
         PunterGuiFrame.setContentPane(punterGUI);
 
         PunterGuiFrame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -126,9 +130,16 @@ public class Main {
         PunterGuiFrame.pack();
         if (AppSettings.getInstance().PunterGuiFrameLocation != null)
             PunterGuiFrame.setLocation(AppSettings.getInstance().PunterGuiFrameLocation);
-        Thread.UncaughtExceptionHandler handler = new StackWindow("Unhandled Exception", 500, 400, staticDaoFacade.getDevEmailCSV());
+        Thread.UncaughtExceptionHandler handler = new StackWindow("Unhandled Exception", 500, 400, dbService.getDevEmailCSV());
         Thread.setDefaultUncaughtExceptionHandler(handler);
-       
+
+        synonymFrame = new JFrame("Synonym Words");
+        synonymFrame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+        synonymFrame.setContentPane(new SynonymPanel(dbService, synonymService));
+        synonymFrame.pack();
+        if (AppSettings.getInstance().PunterGuiFrameLocation != null)
+            synonymFrame.setLocation(AppSettings.getInstance().PunterGuiFrameLocation);
+
       /* 
        System.setOut( new PrintStream(
 				new ConsoleOutputStream (new Document(), System.out), true));
@@ -175,7 +186,7 @@ public class Main {
             Runtime rt = Runtime.getRuntime();
             rt.addShutdownHook(new Thread() {
                 public void run() {
-                    globalHotKeyListener.cleanup();
+//                    globalHotKeyListener.cleanup();
                     timer.stop();
                     logger.log(Level.INFO, "Exiting...");
                 }
@@ -258,13 +269,12 @@ public class Main {
             popup.add(clipboardMenuItem);
 
             MenuItem screenShotItem = new MenuItem("Capture Screen");
-            screenShotItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JavaScreenCapture.captureScreenShot();
-                }
-            });
+            screenShotItem.addActionListener(e -> JavaScreenCapture.captureScreenShot());
             popup.add(screenShotItem);
+
+            MenuItem synonymWords = new MenuItem("Synonym Words");
+            synonymWords.addActionListener(e -> synonymFrame.setVisible(true));
+            popup.add(synonymWords);
 
             MenuItem remoteSync = new MenuItem("Sync Remote");
             remoteSync.addActionListener(e -> {
@@ -325,13 +335,13 @@ public class Main {
 
     public boolean isConnected() {
         try {
-            staticDaoFacade.ping();
+            dbService.ping();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             logger.log(Level.WARNING, "connection to server lost.");
             try {
-                staticDaoFacade.makeConnection();
+                dbService.makeConnection();
                 logger.log(Level.WARNING, "connection to server restored.");
             } catch (Exception ee) {
                 // TODO: handle exception

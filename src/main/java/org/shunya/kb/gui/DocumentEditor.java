@@ -3,6 +3,7 @@ package org.shunya.kb.gui;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
+import org.hibernate.StaleStateException;
 import org.markdown4j.Markdown4jProcessor;
 import org.shunya.kb.model.Attachment;
 import org.shunya.kb.model.Document;
@@ -11,7 +12,9 @@ import org.shunya.kb.utils.WordService;
 import org.shunya.punter.gui.AppSettings;
 import org.shunya.punter.gui.GUIUtils;
 import org.shunya.punter.gui.PunterGUI;
-import org.shunya.server.component.StaticDaoFacade;
+import org.shunya.server.component.DBService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.persistence.OptimisticLockException;
@@ -47,12 +50,13 @@ import java.util.Date;
 import java.util.List;
 
 public class DocumentEditor extends JFrame {
+    private final Logger logger = LoggerFactory.getLogger(DocumentEditor.class);
     private final MyUndoableEditListener undoableEditListener = new MyUndoableEditListener();
     protected JTextField textField;
     private JTextPane jTextPane;
     private JTextArea jTextPaneForEditing;
     private Document doc;
-    private StaticDaoFacade docService;
+    private DBService dbService;
     private JTable attachmentTable;
     private String currentMD5;
     private boolean mayBeEdited = false;
@@ -88,7 +92,7 @@ public class DocumentEditor extends JFrame {
         }
     }
 
-    public static void showEditor(Document doc, StaticDaoFacade docService, WordService wordService) {
+    public static void showEditor(Document doc, DBService docService, WordService wordService) {
         DocumentEditor editor = new DocumentEditor(doc, docService, wordService);
         try {
             editor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
@@ -121,13 +125,13 @@ public class DocumentEditor extends JFrame {
         inputMap.put(key, redoAction);
     }
 
-    public DocumentEditor(final Document ldoc, StaticDaoFacade docServic, WordService wordService) {
+    public DocumentEditor(final Document ldoc, DBService docServic, WordService wordService) {
         setAlwaysOnTop(false);
         setIconImage(idleImage);
         setLayout(new GridBagLayout());
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.doc = ldoc;
-        this.docService = docServic;
+        this.dbService = docServic;
         jTextPane = new JTextPane();
         jTextPane.setContentType("text/html");
         jTextPane.setMargin(new Insets(5, 5, 5, 5));
@@ -145,7 +149,7 @@ public class DocumentEditor extends JFrame {
         jTextPaneForEditing.setFont(new Font("Arial Unicode MS", Font.TRUETYPE_FONT, AppSettings.getInstance().getEditorEditSize()));
         jTextPaneForEditing.setText(new String(ldoc.getContent()));
 
-        new TextCompletionHandler(jTextPaneForEditing, docService, wordService);
+        new TextCompletionHandler(jTextPaneForEditing, dbService, wordService);
 
         addBindings();
 
@@ -265,7 +269,7 @@ public class DocumentEditor extends JFrame {
                                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                         if (response == JOptionPane.YES_OPTION) {
                             try {
-                                docService.deleteAttachment(attch.getId());
+                                dbService.deleteAttachment(attch.getId());
                             } catch (RemoteException e1) {
                                 e1.printStackTrace();
                             }
@@ -337,7 +341,7 @@ public class DocumentEditor extends JFrame {
                                 attchment.setDocument(doc);
                                 attchment.setExt(getExtension(f));
                                 attchment.setLength(f.length());
-                                attchment = docService.saveAttachment(attchment);
+                                attchment = dbService.saveAttachment(attchment);
 
                                 AttachmentTableModel atm = ((AttachmentTableModel) attachmentTable.getModel());
                                 ArrayList<Object> newRow = new ArrayList<Object>();
@@ -372,7 +376,7 @@ public class DocumentEditor extends JFrame {
                                 attchment.setDocument(doc);
                                 attchment.setExt(getExtension(f));
                                 attchment.setLength(f.length());
-                                attchment = docService.saveAttachment(attchment);
+                                attchment = dbService.saveAttachment(attchment);
 
                                 AttachmentTableModel atm = ((AttachmentTableModel) attachmentTable.getModel());
                                 ArrayList<Object> newRow = new ArrayList<>();
@@ -526,13 +530,13 @@ public class DocumentEditor extends JFrame {
                             return;
                         }
                         doc = null;
-                        docService = null;
+                        dbService = null;
                     }
                 }
                 AppSettings.getInstance().setDocumentEditorLocation(getLocationOnScreen());
                 AppSettings.getInstance().setDocumentEditorLastDim(DocumentEditor.this.getSize());
                 DocumentEditor.this.doc = null;
-                DocumentEditor.this.docService = null;
+                DocumentEditor.this.dbService = null;
                 DocumentEditor.this.currentMD5 = null;
                 DocumentEditor.this.jTextPane = null;
                 DocumentEditor.this.jTextPaneForEditing = null;
@@ -542,20 +546,20 @@ public class DocumentEditor extends JFrame {
             }
         });
 
-        ActionListener actionListener = new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (isDocumentModified()) {
-                    try {
-                        saveDocument();
-                    } catch (OptimisticLockException e) {
-                        JOptionPane.showMessageDialog(DocumentEditor.this,
-                                "Document updated in parallel.",
-                                "update conflict", JOptionPane.ERROR_MESSAGE);
-                    } catch (Exception e) {
-                        JOptionPane.showMessageDialog(DocumentEditor.this,
-                                "Error saving the document." + e.getMessage(),
-                                "Error saving!", JOptionPane.ERROR_MESSAGE);
-                    }
+        ActionListener actionListener = actionEvent -> {
+            if (isDocumentModified()) {
+                try {
+                    saveDocument();
+                } catch (StaleStateException | OptimisticLockException e) {
+                    logger.error("parallel update error ", e);
+                    JOptionPane.showMessageDialog(DocumentEditor.this,
+                            "Document has been updated in parallel.",
+                            "save Failed due to conflict", JOptionPane.ERROR_MESSAGE);
+                } catch (Exception e) {
+                    logger.error("Error while saving objects", e);
+                    JOptionPane.showMessageDialog(DocumentEditor.this,
+                            "Error saving the document." + e.getMessage(),
+                            "Error saving!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         };
@@ -575,18 +579,12 @@ public class DocumentEditor extends JFrame {
         doc.setContent(jTextPaneForEditing.getText().getBytes());
         doc.setMd5(currentMD5);
         doc.setDateUpdated(new Date());
-        try {
-            Document tmpDoc = docService.saveDocument(doc);
-            DateLocaleConverter converter = new DateLocaleConverter();
-            converter.setLenient(true);
-            ConvertUtils.register(converter, java.util.Date.class);
-            BeanUtils.copyProperties(doc, tmpDoc);
-        } catch (OptimisticLockException ole) {
-            throw ole;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+        Document tmpDoc = dbService.saveDocument(doc);
+        DateLocaleConverter converter = new DateLocaleConverter();
+        converter.setLenient(true);
+        ConvertUtils.register(converter, java.util.Date.class);
+        BeanUtils.copyProperties(doc, tmpDoc);
+
     }
 
     public boolean isDocumentModified() {

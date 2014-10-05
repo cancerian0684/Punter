@@ -1,7 +1,7 @@
 package org.shunya.punter.gui;
 
 import org.shunya.punter.jpa.ProcessHistory;
-import org.shunya.server.component.StaticDaoFacade;
+import org.shunya.server.component.DBService;
 
 import javax.swing.table.AbstractTableModel;
 import java.text.SimpleDateFormat;
@@ -11,7 +11,7 @@ public class ProcessAlertTableModel extends AbstractTableModel {
 	public final Object[] longValues = {"Kathy123sdljflsdfl",Boolean.FALSE};
 	private static final long serialVersionUID = 1L;
 	private static SimpleDateFormat sdf=new SimpleDateFormat("dd, MMM hh:mm:ss aa");
-    private final StaticDaoFacade staticDaoFacade;
+    private final DBService dbService;
     /** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
 
@@ -32,9 +32,9 @@ public class ProcessAlertTableModel extends AbstractTableModel {
 	  ArrayList<Object>  newdata=new ArrayList<Object>(data); 
 	  return newdata;
   }
-  public ProcessAlertTableModel(StaticDaoFacade staticDaoFacade) {
+  public ProcessAlertTableModel(DBService dbService) {
 
-      this.staticDaoFacade = staticDaoFacade;
+      this.dbService = dbService;
   }
 
   /**
@@ -109,7 +109,7 @@ public class ProcessAlertTableModel extends AbstractTableModel {
         	ph.setClearAlert(Boolean.parseBoolean(obj.toString()));
         	break;
         }
-        staticDaoFacade.saveProcessHistory(ph);
+        dbService.saveProcessHistory(ph);
         }catch(Exception e){
         	e.printStackTrace();
         }

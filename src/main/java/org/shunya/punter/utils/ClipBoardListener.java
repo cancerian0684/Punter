@@ -2,8 +2,8 @@ package org.shunya.punter.utils;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.shunya.server.ClipboardPunterMessage;
+import org.shunya.server.component.DBService;
 import org.shunya.server.component.PunterService;
-import org.shunya.server.component.StaticDaoFacade;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -14,16 +14,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class ClipBoardListener implements ClipboardOwner, PunterComponent {
-    private final StaticDaoFacade staticDaoFacade;
+    private final DBService dbService;
     private final PunterService punterService;
     private final Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
     private boolean listening = true;
     private boolean started = false;
 
-    public ClipBoardListener(StaticDaoFacade staticDaoFacade, PunterService punterService) {
-        this.staticDaoFacade = staticDaoFacade;
+    public ClipBoardListener(DBService dbService, PunterService punterService) {
+        this.dbService = dbService;
         this.punterService = punterService;
-        startComponent();
+//        startComponent();
     }
 
     public void run() {

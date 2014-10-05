@@ -13,7 +13,7 @@ import org.shunya.punter.utils.DevEmailService;
 import org.shunya.punter.utils.FieldProperties;
 import org.shunya.punter.utils.FieldPropertiesMap;
 import org.shunya.punter.utils.StringUtils;
-import org.shunya.server.component.StaticDaoFacade;
+import org.shunya.server.component.DBService;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Process implements Serializable {
-    private StaticDaoFacade staticDaoFacade;
+    private DBService dbService;
     private Map sessionMap = new ConcurrentHashMap<>(50);
     private transient TaskObserver observer;
     private boolean failed = false;
@@ -73,7 +73,7 @@ public class Process implements Serializable {
     }
 
     public void afterProcessFinish() {
-        staticDaoFacade.saveProcessHistory(processHistory);
+        dbService.saveProcessHistory(processHistory);
         po.update(processHistory);
         po.processCompleted();
         sessionMap.put("status", processHistory.getRunStatus());
@@ -121,6 +121,7 @@ public class Process implements Serializable {
         AtomicInteger progressCounter = new AtomicInteger(0);
         final TreeMap<Integer, List<TaskHistory>> treeMap = new TreeMap(processHistory.getTaskHistoryList().stream().collect(Collectors.groupingBy(t -> t.getSequence())));
         treeMap.forEach((k, ol) -> {
+            System.out.println("running sequence = " + k);
             if (ol.size() > 1) {
                 System.out.println("Running Tasks in parallel " + ol);
                 List<Future> futures = new ArrayList<>();
@@ -157,7 +158,7 @@ public class Process implements Serializable {
         Tasks task = Tasks.getTask(th.getTask());
         task.setObserver(observer);
         task.setHosts(th.getTask().getHosts());
-        task.setStaticDaoFacade(staticDaoFacade);
+        task.setDbService(dbService);
         task.setTaskDao(th.getTask());
         task.setSessionMap(sessionMap);
         task.setOverrideInputParams(overrideInputParams);
@@ -173,9 +174,9 @@ public class Process implements Serializable {
                 task.beforeTaskStart();
                 processLogger = task.LOGGER.get();
                 setLoggingLevel(processLogger);
-                processLogger.log(Level.FINE, "started executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
+                processLogger.log(Level.INFO, "started executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
                 status = task.execute();
-                processLogger.log(Level.FINE, "Finished executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
+                processLogger.log(Level.INFO, "Finished executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
                 th.setFinishTime(new Date());
                 if (stopOnTaskFailure & !status) {
                     keepRunning.set(false);
@@ -268,9 +269,9 @@ public class Process implements Serializable {
         }
     }
 
-    public static Process getProcess(StaticDaoFacade staticDaoFacade, FieldPropertiesMap props, ProcessHistory history, FieldPropertiesMap overrideInputParams) {
+    public static Process getProcess(DBService DBService, FieldPropertiesMap props, ProcessHistory history, FieldPropertiesMap overrideInputParams) {
         Process process = new Process();
-        process.staticDaoFacade = staticDaoFacade;
+        process.dbService = DBService;
         process.inputParams = props;
         process.processHistory = history;
         process.overrideInputParams = overrideInputParams;

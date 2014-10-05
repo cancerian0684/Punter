@@ -2,7 +2,7 @@ package org.shunya.punter.gui;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.shunya.punter.jpa.ProcessData;
-import org.shunya.server.component.StaticDaoFacade;
+import org.shunya.server.component.DBService;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class ProcessTableModel extends AbstractTableModel {
 	public final int[]width={116};
 	private static final long serialVersionUID = 1L;
-    private final StaticDaoFacade staticDaoFacade;
+    private final DBService dbService;
     /** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
 
@@ -31,9 +31,9 @@ public class ProcessTableModel extends AbstractTableModel {
 	  ArrayList<Object>  newdata=new ArrayList<Object>(data); 
 	  return newdata;
   }
-  public ProcessTableModel(StaticDaoFacade staticDaoFacade) {
+  public ProcessTableModel(DBService dbService) {
 
-      this.staticDaoFacade = staticDaoFacade;
+      this.dbService = dbService;
   }
 
   /**
@@ -103,7 +103,7 @@ public class ProcessTableModel extends AbstractTableModel {
     try{
     	ProcessData p=(ProcessData) colArrayList.get(0);
     	p.setName((String)obj);
-    	p= staticDaoFacade.saveProcess(p);
+    	p= dbService.saveProcess(p);
     	BeanUtils.copyProperties(colArrayList.get(0), p);
     }catch (Exception e) {
     	e.printStackTrace();

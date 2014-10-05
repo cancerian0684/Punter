@@ -26,7 +26,7 @@ public class AppSettings implements Serializable, AppSettingsMBean {
     private String username;
     private int keystrokeFlush;
     private int maxKeyStrokeDelay;
-    private int maxExecutorSize;
+    private int maxExecutorSize = 3;
     private String smtpHost;
     private String smtpUsername;
     private String smtpPassword;
