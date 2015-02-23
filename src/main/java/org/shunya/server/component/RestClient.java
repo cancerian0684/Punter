@@ -33,15 +33,27 @@ public class RestClient {
         restTemplate = new RestTemplate(requestFactory);
     }
 
-    public Map executeRemoteTask(TaskData taskData, String baseUri) {
-        String uri = baseUri + "/punter/runTask";
+    public Map executeRemoteTask(TaskData taskData, String baseUri, long id) {
+        String uri = baseUri + "/punter/runTask/"+id;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Content-Type", "application/json; charset=utf-8");
         headers.set("Accept", "application/json; charset=utf-8");
         HttpEntity httpEntity = new HttpEntity<>(taskData, headers);
         ResponseEntity<Map> response = restTemplate.postForEntity(uri, httpEntity, Map.class);
+        response.getBody().put("host", baseUri);
         Tasks.LOGGER.get().info("response.getBody() = " + response.getBody());
+        return response.getBody();
+    }
+
+    public String getRemoteLogs(long taskId, String baseUri) {
+        String uri = baseUri + "/punter/getLogs/"+taskId;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Content-Type", "application/json; charset=utf-8");
+        headers.set("Accept", "application/json; charset=utf-8");
+        ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
+        Tasks.LOGGER.get().info("response memory logs = " + response.getBody());
         return response.getBody();
     }
 
@@ -68,12 +80,12 @@ public class RestClient {
         return response.getBody();
     }
 
-    public void fileUpload(String baseUri, String localFile, String name, String remotePath) throws Exception {
+    public void fileUpload(String baseUri, String localFilePath, String targetName, String targetFolder) throws Exception {
         String uri = baseUri + "/punter/upload";
         MultiValueMap<String, Object> mvm = new LinkedMultiValueMap<>();
-        mvm.add("file", new FileSystemResource(localFile));
-        mvm.add("name", name);
-        mvm.add("path", remotePath);
+        mvm.add("file", new FileSystemResource(localFilePath));
+        mvm.add("name", targetName);
+        mvm.add("path", targetFolder);
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(uri, mvm, String.class);
         Tasks.LOGGER.get().info("upload response from server  - " + responseEntity.getStatusCode());
         String body = responseEntity.getBody();

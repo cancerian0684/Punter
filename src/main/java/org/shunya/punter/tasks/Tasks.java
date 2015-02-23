@@ -5,6 +5,7 @@ import org.shunya.punter.annotations.OutputParam;
 import org.shunya.punter.executors.ParallelTaskRunner;
 import org.shunya.punter.gui.TaskObserver;
 import org.shunya.punter.jpa.TaskData;
+import org.shunya.punter.jpa.TaskHistory;
 import org.shunya.punter.utils.FieldProperties;
 import org.shunya.punter.utils.FieldPropertiesMap;
 import org.shunya.server.component.DBService;
@@ -26,6 +27,7 @@ import java.util.logging.*;
 import static java.util.Arrays.asList;
 
 public abstract class Tasks implements Serializable {
+    private TaskHistory taskHistory;
     protected Map<String, Object> sessionMap;
     private FieldPropertiesMap outputParams;
     private FieldPropertiesMap inputParams;
@@ -256,11 +258,13 @@ public abstract class Tasks implements Serializable {
             taskDao.setInputParamsAsObject(getInputParams());
             List<Callable> tasks = new ArrayList<>();
             List<Boolean> statuses = new ArrayList<>();
-            asList(taskDao.getHosts().split("[,;]")).forEach(host -> tasks.add(() -> restClient.executeRemoteTask(taskDao, host.trim())));
+            asList(taskDao.getHosts().split("[,;]")).forEach(host -> tasks.add(() -> restClient.executeRemoteTask(taskDao, host.trim(), getTaskHistory().getId())));
             new ParallelTaskRunner().execute(tasks, resultsMap -> {
                 boolean jobStatus = (boolean) resultsMap.get("status");
                 statuses.add(jobStatus);
                 sessionMap.putAll(resultsMap);
+                strLogger.append("\n-------------------------------------\n");
+                strLogger.append("Host = " + resultsMap.get("host") + "\n");
                 strLogger.append(resultsMap.get("logs"));
             }).shutdown();
             status.set(true);
@@ -350,6 +354,12 @@ public abstract class Tasks implements Serializable {
             logListener.showLog();
     }
 
+    public String getRemoteLog(long id){
+        final StringBuilder sb = new StringBuilder();
+        asList(taskDao.getHosts().split("[,;]")).forEach(host -> sb.append(restClient.getRemoteLogs(id, host.trim())));
+        return sb.toString();
+    }
+
     public void disposeLogs() {
         if (logListener != null)
             logListener.disposeLogs();
@@ -369,5 +379,13 @@ public abstract class Tasks implements Serializable {
 
     public TaskObserver getObserver() {
         return observer;
+    }
+
+    public TaskHistory getTaskHistory() {
+        return taskHistory;
+    }
+
+    public void setTaskHistory(TaskHistory taskHistory) {
+        this.taskHistory = taskHistory;
     }
 }

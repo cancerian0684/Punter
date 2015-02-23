@@ -33,7 +33,11 @@ import static org.shunya.punter.utils.FieldPropertiesMap.parseStringMap;
 
 public class PunterGUI extends JPanel implements TaskObserver, Observer {
     public static final String WIN_A = "WIN_A";
-    public static final String WIN_Q = "WIN_Q";
+    public static final String WIN_1 = "CTRL_ALT_1";
+    public static final String WIN_2 = "CTRL_ALT_2";
+    public static final String WIN_3 = "CTRL_ALT_3";
+    public static final String WIN_4 = "CTRL_ALT_4";
+    public static final String WIN_5 = "CTRL_ALT_5";
     private final JTable taskTable;
     private final JTable processPropertyTable;
     private TableRowSorter<ProcessTableModel> sorter;
@@ -161,10 +165,18 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                                 e1.printStackTrace();
                             }
                         } else {
-                            final Tasks tasks = taskHistory.getTasks();
-                            if (tasks != null) {
+                            final Tasks task = taskHistory.getTasks();
+                            if(task.getHosts()!=null && !task.getHosts().isEmpty()){
+                                try {
+                                    LogWindow logWindow = new LogWindow(10000, taskHistory.getTask().getName());
+                                    logWindow.log(task.getRemoteLog(taskHistory.getId()));
+                                    logWindow.showLog();
+                                } catch (Exception e1) {
+                                    e1.printStackTrace();
+                                }
+                            } else if (task != null) {
                                 //Task is currently running
-                                tasks.showLog();
+                                task.showLog();
                             }
                         }
                         return false;

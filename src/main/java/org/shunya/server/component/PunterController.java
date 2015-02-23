@@ -79,10 +79,16 @@ public class PunterController {
         daoService.process(copyMessage);
     }
 
-    @RequestMapping(value = "/runTask", method = RequestMethod.POST)
+    @RequestMapping(value = "/runTask/{taskId}", method = RequestMethod.POST)
     @ResponseBody
-    public Map runTask(@RequestBody TaskData taskData) throws InterruptedException, ExecutionException {
-        return punterService.runTask(taskData);
+    public Map runTask(@RequestBody TaskData taskData, @PathVariable("taskId") Long taskId) throws InterruptedException, ExecutionException {
+        return punterService.runTask(taskData, taskId);
+    }
+
+    @RequestMapping(value = "/getLogs/{id}", method = RequestMethod.GET, produces = {MediaType.TEXT_PLAIN_VALUE})
+    @ResponseBody
+    public String getMemoryLogs(@PathVariable("id") Long taskDataId) throws IOException {
+        return punterService.getMemoryLogs(taskDataId);
     }
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
@@ -146,7 +152,7 @@ public class PunterController {
 
     @RequestMapping(value = "/discSpace/{drive}", method = RequestMethod.GET)
     @ResponseBody
-    public int getDocument(@ModelAttribute("model") ModelMap model, @PathVariable("drive") String drive) {
+    public int getDiscSpace(@ModelAttribute("model") ModelMap model, @PathVariable("drive") String drive) {
         return punterService.getPercentFree(drive);
     }
 }

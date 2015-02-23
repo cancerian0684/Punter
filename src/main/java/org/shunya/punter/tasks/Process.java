@@ -157,6 +157,7 @@ public class Process implements Serializable {
     private void runTask(AtomicBoolean keepRunning, AtomicInteger progressCounter, TaskHistory th) {
         Tasks task = Tasks.getTask(th.getTask());
         task.setObserver(observer);
+        task.setTaskHistory(th);
         task.setHosts(th.getTask().getHosts());
         task.setDbService(dbService);
         task.setTaskDao(th.getTask());

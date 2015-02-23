@@ -16,6 +16,41 @@
 
     <dependencies>
         <dependency>
+            <artifactId>app</artifactId>
+            <groupId>telegram</groupId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/app-1.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <artifactId>mtproto</artifactId>
+            <groupId>telegram</groupId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/mtproto-1.0-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <dependency>
+            <artifactId>telegram-api</artifactId>
+            <groupId>telegram</groupId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/telegram-api-1.0-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <dependency>
+            <artifactId>tl-api</artifactId>
+            <groupId>telegram</groupId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/tl-api-v11.jar</systemPath>
+        </dependency>
+        <dependency>
+            <artifactId>tl-core</artifactId>
+            <groupId>telegram</groupId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/tl-core-1.0-SNAPSHOT.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
@@ -206,8 +241,6 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.51</version>
         </dependency>
-
-
 
         <dependency>
             <groupId>org.json</groupId>

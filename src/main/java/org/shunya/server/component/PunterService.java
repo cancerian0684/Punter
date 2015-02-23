@@ -24,10 +24,7 @@ import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 @Service
 public class PunterService {
@@ -37,26 +34,41 @@ public class PunterService {
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final RestClient restClient = new RestClient();
     private final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
+    private final ConcurrentMap<Long, Tasks> taskCache = new ConcurrentHashMap<>();
 
-    public void syncRemoteDocuments(String baseUri){
+    public void syncRemoteDocuments(String baseUri) {
         Long[] remoteDocList = restClient.getRemoteDocList(baseUri);
         System.out.println("remoteDocList = " + remoteDocList);
         for (Long docId : remoteDocList) {
-            int answer = JOptionPane.showConfirmDialog(Main.KBFrame, "Do you want to copy " + docId, "Confirm Copy" ,JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-            if(answer == JOptionPane.YES_OPTION) {
+            int answer = JOptionPane.showConfirmDialog(Main.KBFrame, "Do you want to copy " + docId, "Confirm Copy", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (answer == JOptionPane.YES_OPTION) {
                 Document remoteDoc = restClient.getRemoteDoc(baseUri, docId);
-                daoFacade.saveDocument(remoteDoc);
-                System.out.println("copied remote remoteDoc = " + docId);
+                Document existingMatchingDoc = daoFacade.getDocumentByMD5(remoteDoc.getMd5());
+                if (existingMatchingDoc == null) {
+                    daoFacade.saveDocument(remoteDoc);
+                    System.out.println("copied remote remoteDoc = " + docId);
+                } else {
+                    System.out.println("Ignored existing remote remoteDoc = " + docId);
+                }
             }
         }
     }
 
-    public Map<String, Object> runTask(TaskData taskData) throws ExecutionException, InterruptedException {
+    public String getMemoryLogs(long taskId) {
+        Tasks task = taskCache.get(taskId);
+        if (task != null) {
+            return task.getMemoryLogs();
+        }
+        return "";
+    }
+
+    public Map<String, Object> runTask(TaskData taskData, Long taskId) throws ExecutionException, InterruptedException {
         final Map<String, Object> resultsMap = new HashMap<>();
         Future<?> future = executorService.submit(() -> {
             System.out.println("task = " + taskData);
             Tasks task = Tasks.getTask(taskData);
             try {
+                taskCache.put(taskId, task);
                 task.setTaskDao(taskData);
                 task.setHosts(null);
                 task.setSessionMap(resultsMap);
@@ -69,6 +81,8 @@ public class PunterService {
                 logger.info("runTask failed - ", e);
                 resultsMap.put("status", false);
                 resultsMap.put("error", Util.getExceptionSummary(e));
+            } finally {
+                taskCache.remove(taskId);
             }
         });
         future.get();
@@ -85,7 +99,7 @@ public class PunterService {
 
     public void sendMessageToPeers(PunterMessage punterMessage) throws InterruptedException, RemoteException {
         Map<String, Object> appProperties = (Map<String, Object>) AppSettings.getInstance().getObject(AppConstants.APP_PROPERTIES_MAP);
-        if(appProperties.get(AppConstants.CLIPBOARD_PEERS)==null || appProperties.get(AppConstants.CLIPBOARD_PEERS).toString().trim().isEmpty())
+        if (appProperties.get(AppConstants.CLIPBOARD_PEERS) == null || appProperties.get(AppConstants.CLIPBOARD_PEERS).toString().trim().isEmpty())
             return;
         String peersCsv = (String) appProperties.get(AppConstants.CLIPBOARD_PEERS);
         if (peersCsv != null && !peersCsv.isEmpty()) {
@@ -93,7 +107,7 @@ public class PunterService {
             String[] peers = peersCsv.split("[,;]");
             for (String peer : peers) {
                 try {
-                    if (peer != null && !peer.trim().isEmpty()){
+                    if (peer != null && !peer.trim().isEmpty()) {
                         executorService.execute(() -> {
                             try {
                                 restClient.sendClipBoardMessage(peer.trim(), punterMessage);
@@ -109,7 +123,7 @@ public class PunterService {
         }
     }
 
-    public int getPercentFree(String drive){
+    public int getPercentFree(String drive) {
         long freeSpace = Paths.get(drive).toFile().getUsableSpace();
         long totalSpace = Paths.get(drive).toFile().getTotalSpace();
         int percentFree = (int) (100 * freeSpace / totalSpace);

@@ -254,6 +254,22 @@ public class DBService {
         return resultHolder.getResult();
     }
 
+    public Document getDocumentByMD5(String md5) {
+        final ResultHolder<Document> resultHolder = new ResultHolder<>();
+        transatomatic.run(session -> {
+            List<Document> documents = session.createCriteria(Document.class)
+                    .add(Restrictions.eq("md5", md5))
+                    .list();
+            if (documents != null && !documents.isEmpty()) {
+                Document document = documents.get(0);
+                session.refresh(document);
+                Hibernate.initialize(document.getContent());
+                resultHolder.setResult(document);
+            }
+        });
+        return resultHolder.getResult();
+    }
+
     public List<SynonymWord> getSynonymWords() {
         final ResultHolder<List<SynonymWord>> resultHolder = new ResultHolder<>();
         transatomatic.run(session -> {

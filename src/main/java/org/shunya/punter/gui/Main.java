@@ -3,6 +3,7 @@ package org.shunya.punter.gui;
 import org.shunya.kb.gui.PunterKB;
 import org.shunya.kb.gui.SynonymPanel;
 import org.shunya.punter.executors.ProcessExecutor;
+import org.shunya.punter.utils.GlobalHotKeyListener;
 import org.shunya.punter.utils.JavaScreenCapture;
 import org.shunya.punter.utils.Launcher;
 import org.shunya.punter.utils.StackWindow;
@@ -20,7 +21,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Main {
+public class Main implements PunterWindow{
     @Autowired
     private DBService dbService;
     @Autowired
@@ -37,7 +38,7 @@ public class Main {
     public static JFrame lastAccessed;
     private static JFrame synonymFrame;
     private static Logger logger = Logger.getLogger(Main.class.getName());
-//    private GlobalHotKeyListener globalHotKeyListener;
+    private GlobalHotKeyListener globalHotKeyListener;
 
     private SingleInstanceFileLock singleInstanceFileLock = new SingleInstanceFileLock("PunterClient.lock");
     private Timer timer = new Timer(3000, new ActionListener() {
@@ -84,11 +85,11 @@ public class Main {
 
     private void createAndShowGUI() throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        /*try {
+        try {
             globalHotKeyListener = new GlobalHotKeyListener();
         } catch (Throwable t) {
             t.printStackTrace();
-        }*/
+        }
         getAndSetUsername();
         KBFrame = new JFrame("Search");
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -113,7 +114,7 @@ public class Main {
         PunterGuiFrame = new JFrame("My Personal Assistant");
         PunterGuiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         punterGUI = new PunterGUI(dbService, punterService);
-//        punterGUI.setGlobalHotKeyListener(globalHotKeyListener);
+        punterGUI.setGlobalHotKeyListener(globalHotKeyListener);
         PunterGuiFrame.setContentPane(punterGUI);
 
         PunterGuiFrame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -133,6 +134,7 @@ public class Main {
         Thread.UncaughtExceptionHandler handler = new StackWindow("Unhandled Exception", 500, 400, dbService.getDevEmailCSV());
         Thread.setDefaultUncaughtExceptionHandler(handler);
 
+        try{globalHotKeyListener.setPunterGui(this);}catch (Exception e){}
         synonymFrame = new JFrame("Synonym Words");
         synonymFrame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
         synonymFrame.setContentPane(new SynonymPanel(dbService, synonymService));
@@ -210,9 +212,7 @@ public class Main {
             openPunterMenuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    PunterGuiFrame.setVisible(true);
-                    PunterGuiFrame.setExtendedState(Frame.NORMAL);
-                    lastAccessed = PunterGuiFrame;
+                    setGUIVisible();
                 }
             });
             popup.add(openPunterMenuItem);
@@ -319,6 +319,12 @@ public class Main {
             //  System Tray is not supported
         }
         timer.start();
+    }
+
+    public void setGUIVisible() {
+        PunterGuiFrame.setVisible(true);
+        PunterGuiFrame.setExtendedState(Frame.NORMAL);
+        lastAccessed = PunterGuiFrame;
     }
 
     private void getAndSetUsername() {

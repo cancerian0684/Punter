@@ -22,25 +22,19 @@ public class Test {
 
         }
 
-        ;
-
         protected void insertUpdate(DefaultDocumentEvent chng, AttributeSet attr) {
             super.insertUpdate(chng, attr);
             Element root = getDefaultRootElement();
             while (root.getElementCount() > lineBufferSize) {
                 Element firstLine = root.getElement(0);
-
                 try {
 //					System.err.println("removing");
                     remove(0, firstLine.getEndOffset());
-
                 } catch (BadLocationException ble) {
                     System.out.println(ble + " = " + lineBufferSize);
                 }
             }
         }
-
-        ;
     };
 
 
@@ -80,12 +74,9 @@ public class Test {
                 return false;
             return true;
         }
-
         private Test getOuterType() {
             return Test.this;
         }
-
-
     }
 
     public static void main1(String[] args) {
