@@ -34,7 +34,7 @@ public class Attachment implements Serializable{
 	private String comments;
 	@Lob
 	@Basic(fetch = FetchType.EAGER)
-	@Column(columnDefinition="blob(10M)",table = "ATTACHMENT_LOB")
+	@Column(columnDefinition="MEDIUMBLOB",table = "ATTACHMENT_LOB")
 	private byte[] content;
 	@ManyToOne
     @JsonBackReference("document")

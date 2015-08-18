@@ -44,7 +44,7 @@ public class Document implements Serializable{
 	@Lob
     @Fetch(FetchMode.SELECT)
 	@Basic(fetch = FetchType.LAZY)
-	@Column(columnDefinition = "blob(15M)", table = "DOCUMENT_LOB")
+	@Column(columnDefinition = "MEDIUMBLOB", table = "DOCUMENT_LOB")
 	private byte[] content;
 	private String md5;
 	@Transient

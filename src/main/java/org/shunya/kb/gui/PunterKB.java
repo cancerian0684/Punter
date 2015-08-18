@@ -1,7 +1,8 @@
 package org.shunya.kb.gui;
 
 import org.apache.commons.io.IOUtils;
-import org.markdown4j.Markdown4jProcessor;
+import org.pegdown.Extensions;
+import org.pegdown.PegDownProcessor;
 import org.shunya.kb.model.Attachment;
 import org.shunya.kb.model.Document;
 import org.shunya.kb.utils.WordService;
@@ -450,23 +451,21 @@ public class PunterKB extends JPanel {
         popupProcess.add(openDocMenu);
 
         renameMenu = new JMenuItem("Rename");
-        renameMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (searchResultTable.getSelectedRow() >= 0) {
-                    System.out.println("Renaming Document");
-                    Document localDoc = (Document) ((DocumentTableModel) searchResultTable.getModel())
-                            .getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-                    Document persisted = null;
-                    persisted = dbService.getDocument(localDoc.getId());
-                    final String newTitle = JOptionPane.showInputDialog(Main.KBFrame, "rename title to - ", persisted.getTitle());
-                    if (newTitle != null) {
-                        persisted.setTitle(newTitle);
-                        dbService.saveDocument(persisted);
-                        localDoc.setTitle(persisted.getTitle());
-                        ((DocumentTableModel) searchResultTable.getModel()).refreshTable();
-                    }
-
+        renameMenu.addActionListener(e -> {
+            if (searchResultTable.getSelectedRow() >= 0) {
+                System.out.println("Renaming Document");
+                Document localDoc = (Document) ((DocumentTableModel) searchResultTable.getModel())
+                        .getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                Document persisted = null;
+                persisted = dbService.getDocument(localDoc.getId());
+                final String newTitle = JOptionPane.showInputDialog(Main.KBFrame, "rename title to - ", persisted.getTitle());
+                if (newTitle != null) {
+                    persisted.setTitle(newTitle);
+                    dbService.saveDocument(persisted);
+                    localDoc.setTitle(persisted.getTitle());
+                    ((DocumentTableModel) searchResultTable.getModel()).refreshTable();
                 }
+
             }
         });
         popupProcess.add(renameMenu);
@@ -529,92 +528,86 @@ public class PunterKB extends JPanel {
 //        reindexDocsMenu.setEnabled(false);
 
         copyURL = new JMenuItem("Copy URL");
-        copyURL.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
-                    Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-                    String docId;
-                    if (doc.getCategory().equalsIgnoreCase("/all/uploads")) {
-                        doc = dbService.getDocument(doc.getId());
+        copyURL.addActionListener(e -> {
+            try {
+                DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
+                Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                String docId;
+                if (doc.getCategory().equalsIgnoreCase("/all/uploads")) {
+                    doc = dbService.getDocument(doc.getId());
 //                        Base64.getEncoder().encode(doc.getTitle().getBytes())
-                        docId = "uploads/" + doc.getTitle();
-                        docId = docId.replaceAll(" ", "%20");
-                    } else
-                        docId = "get/" + doc.getId();
-                    String url = "http://" + dbService.getServerHostAddress().getHostAddress() + ":"
-                            + dbService.getWebServerPort()
-                            + "/rest/punter/" + docId;
-                    StringSelection stringSelection = new StringSelection(url);
-                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                    clipboard.setContents(stringSelection, null);
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
+                    docId = "uploads/" + doc.getTitle();
+                    docId = docId.replaceAll(" ", "%20");
+                } else
+                    docId = "get/" + doc.getId();
+                String url = "http://" + dbService.getServerHostAddress().getHostAddress() + ":"
+                        + dbService.getWebServerPort()
+                        + "/rest/punter/" + docId;
+                StringSelection stringSelection = new StringSelection(url);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(stringSelection, null);
+            } catch (Exception e1) {
+                e1.printStackTrace();
             }
         });
         popupProcess.add(copyURL);
 
         emailMenu = new JMenuItem("Email");
-        emailMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                executorService.submit(new Runnable() {
-                    @Override
-                    public void run() {
+        emailMenu.addActionListener(e -> executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final PegDownProcessor markdown4jProcessor = new PegDownProcessor(Extensions.ALL);
+                    DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
+                    Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                    List<File> files = new ArrayList<>();
+                    File temp = new File("Temp");
+                    if (!temp.exists())
+                        temp.mkdir();
+                    doc = dbService.getDocument(doc.getId());
+                    //Punter Doc
+                    if (doc.getExt().isEmpty()) {
+                        Collection<Attachment> attchs = doc.getAttachments();
+                        for (Attachment attch : attchs) {
+                            File nf = new File(temp, attch.getTitle());
+                            try {
+                                FileOutputStream fos = new FileOutputStream(nf);
+                                fos.write(attch.getContent());
+                                fos.close();
+                                files.add(nf);
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                        final String htmlContent = markdown4jProcessor.markdownToHtml(new String(doc.getContent()));
+                        DevEmailService.getInstance().sendEmail(doc.getTitle(), "cancerian0684@gmail.com", htmlContent, files);
+                    }
+                    //System Doc
+                    else {
+                        System.out.println("Opening up the file.." + doc.getTitle());
+                        String filename = "D_" + doc.getId() + doc.getExt();
+                        if (!doc.getExt().isEmpty()) {
+                            filename = doc.getTitle();
+                            if (!filename.endsWith(doc.getExt())) {
+                                filename += doc.getExt();
+                            }
+                        }
+                        File nf = new File(temp, filename);
                         try {
-                            final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
-                            DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
-                            Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-                            List<File> files = new ArrayList<>();
-                            File temp = new File("Temp");
-                            if (!temp.exists())
-                                temp.mkdir();
-                            doc = dbService.getDocument(doc.getId());
-                            //Punter Doc
-                            if (doc.getExt().isEmpty()) {
-                                Collection<Attachment> attchs = doc.getAttachments();
-                                for (Attachment attch : attchs) {
-                                    File nf = new File(temp, attch.getTitle());
-                                    try {
-                                        FileOutputStream fos = new FileOutputStream(nf);
-                                        fos.write(attch.getContent());
-                                        fos.close();
-                                        files.add(nf);
-                                    } catch (IOException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                }
-                                final String htmlContent = markdown4jProcessor.process(new String(doc.getContent()));
-                                DevEmailService.getInstance().sendEmail(doc.getTitle(), "cancerian0684@gmail.com", htmlContent, files);
-                            }
-                            //System Doc
-                            else {
-                                System.out.println("Opening up the file.." + doc.getTitle());
-                                String filename = "D_" + doc.getId() + doc.getExt();
-                                if (!doc.getExt().isEmpty()) {
-                                    filename = doc.getTitle();
-                                    if (!filename.endsWith(doc.getExt())) {
-                                        filename += doc.getExt();
-                                    }
-                                }
-                                File nf = new File(temp, filename);
-                                try {
-                                    FileOutputStream fos = new FileOutputStream(nf);
-                                    fos.write(doc.getContent());
-                                    fos.close();
-                                    files.add(nf);
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                }
-                                DevEmailService.getInstance().sendEmail(doc.getTitle(), "cancerian0684@gmail.com", "PFA", files);
-                            }
-                        } catch (Exception e1) {
+                            FileOutputStream fos = new FileOutputStream(nf);
+                            fos.write(doc.getContent());
+                            fos.close();
+                            files.add(nf);
+                        } catch (IOException e1) {
                             e1.printStackTrace();
                         }
+                        DevEmailService.getInstance().sendEmail(doc.getTitle(), "cancerian0684@gmail.com", "PFA", files);
                     }
-                });
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
             }
-        });
+        }));
         popupProcess.add(emailMenu);
 
         registerKeyBindings();

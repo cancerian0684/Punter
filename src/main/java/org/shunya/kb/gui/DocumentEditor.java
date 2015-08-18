@@ -4,7 +4,8 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
 import org.hibernate.StaleStateException;
-import org.markdown4j.Markdown4jProcessor;
+import org.pegdown.Extensions;
+import org.pegdown.PegDownProcessor;
 import org.shunya.kb.model.Attachment;
 import org.shunya.kb.model.Document;
 import org.shunya.kb.utils.TextCompletionHandler;
@@ -75,7 +76,8 @@ public class DocumentEditor extends JFrame {
         }
     }
 
-    private final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
+    private final PegDownProcessor markdown4jProcessor = new PegDownProcessor(Extensions.ALL);
+//    private final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
 
     public static String getMD5(String input) {
         try {
@@ -97,7 +99,7 @@ public class DocumentEditor extends JFrame {
         try {
             editor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
             editor.textField.setText(doc.getTitle());
-            editor.jTextPane.setText(editor.markdown4jProcessor.process(new String(doc.getContent())));
+            editor.jTextPane.setText(editor.markdown4jProcessor.markdownToHtml(new String(doc.getContent(), "UTF-8")));
             editor.jTextPane.setCaretPosition(0);
         } catch (IOException e) {
             e.printStackTrace();
@@ -180,11 +182,7 @@ public class DocumentEditor extends JFrame {
 //                System.out.println("Tab: " + jtp.getSelectedIndex());
                 if (jtp.getSelectedIndex() == 0) {
                     setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
-                    try {
-                        jTextPane.setText(markdown4jProcessor.process(jTextPaneForEditing.getText()));
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
+                    jTextPane.setText(markdown4jProcessor.markdownToHtml(jTextPaneForEditing.getText()));
                 } else if (1 == jtp.getSelectedIndex()) {
                     mayBeEdited = true;
                     setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()) + "...editing");

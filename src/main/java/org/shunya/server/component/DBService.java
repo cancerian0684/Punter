@@ -293,6 +293,18 @@ public class DBService {
     }
 
     public List<Long> getDocumentIds() {
+		 /**
+		 try {
+            final List<Document> documents = luceneIndexService.search("**", "/all", false, 0, 1000);
+            List<Long> ids = new ArrayList<>();
+            for (Document o : documents) {
+                ids.add(o.getId());
+            }
+            return ids;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+		**/
         final ResultHolder<List<Long>> resultHolder = new ResultHolder<>();
         transatomatic.run(session -> {
             List<Document> documents = session.createCriteria(Document.class).list();

@@ -24,8 +24,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="punter" />
         <module name="Punter" />
+      </profile>
+      <profile default="false" name="Annotation profile for punter" enabled="true">
+        <sourceOutputDir name="target\generated-sources\annotations" />
+        <sourceTestOutputDir name="target\generated-test-sources\test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="punter" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
@@ -34,4 +40,3 @@
     </bytecodeTargetLevel>
   </component>
 </project>
-

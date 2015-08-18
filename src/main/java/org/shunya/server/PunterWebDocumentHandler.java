@@ -1,6 +1,7 @@
 package org.shunya.server;
 
-import org.markdown4j.Markdown4jProcessor;
+import org.pegdown.Extensions;
+import org.pegdown.PegDownProcessor;
 import org.shunya.kb.model.Document;
 
 import java.io.File;
@@ -32,8 +33,8 @@ public enum PunterWebDocumentHandler {
     PUNTER_DOC_WITHOUT_ATTACHMENT_HANDLER(Document.DocumentType.PUNTER_DOC_WITHOUT_ATTACHMENT) {
         @Override
         public File handle(Document document) throws IOException {
-            final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
-            return write(markdown4jProcessor.process(new String(document.getContent())).getBytes(), new File("" + document.getId() + ".html"), new File("Temp"));
+            final PegDownProcessor markdown4jProcessor = new PegDownProcessor(Extensions.ALL);
+            return write(markdown4jProcessor.markdownToHtml(new String(document.getContent())).getBytes(), new File("" + document.getId() + ".html"), new File("Temp"));
         }
     };
 

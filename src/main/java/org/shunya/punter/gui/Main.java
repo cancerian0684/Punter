@@ -278,7 +278,7 @@ public class Main implements PunterWindow{
 
             MenuItem remoteSync = new MenuItem("Sync Remote");
             remoteSync.addActionListener(e -> {
-                String remoteAddress = JOptionPane.showInputDialog("Enter remote base Url");
+                String remoteAddress = JOptionPane.showInputDialog("http://localhost:9991/rest/");
                 if(remoteAddress!=null && !remoteAddress.isEmpty()){
                     punterService.syncRemoteDocuments(remoteAddress);
                 }

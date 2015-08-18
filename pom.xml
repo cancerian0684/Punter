@@ -9,9 +9,9 @@
     <version>1.0</version>
     <description>Punter Version 2.0</description>
     <properties>
-        <spring.version>4.0.6.RELEASE</spring.version>
-        <jetty.version>9.2.2.v20140723</jetty.version>
-        <hibernate.version>4.3.6.Final</hibernate.version>
+        <spring.version>4.1.6.RELEASE</spring.version>
+        <jetty.version>9.3.1.v20150714</jetty.version>
+        <hibernate.version>4.3.8.Final</hibernate.version>
     </properties>
 
     <dependencies>
@@ -165,16 +165,9 @@
             <artifactId>jetty-webapp</artifactId>
             <version>${jetty.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-jsp</artifactId>
             <version>${jetty.version}</version>
         </dependency>
         <dependency>
@@ -258,9 +251,9 @@
             <version>1.8.3</version>
         </dependency>
         <dependency>
-            <groupId>org.commonjava.googlecode.markdown4j</groupId>
-            <artifactId>markdown4j</artifactId>
-            <version>2.2-cj-1.0</version>
+            <groupId>org.pegdown</groupId>
+            <artifactId>pegdown</artifactId>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>com.melloware</groupId>
@@ -275,7 +268,7 @@
         <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.1.51</version>
+            <version>0.1.53</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -379,6 +372,12 @@
             <version>8.0</version>
             <scope>system</scope>
             <systemPath>${java.home}/lib/javaws.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.35</version>
         </dependency>
     </dependencies>
 

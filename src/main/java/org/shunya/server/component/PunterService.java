@@ -1,14 +1,13 @@
 package org.shunya.server.component;
 
-import org.eclipse.jdt.internal.compiler.util.Util;
-import org.markdown4j.Markdown4jProcessor;
+import org.pegdown.PegDownProcessor;
 import org.shunya.kb.model.Document;
 import org.shunya.kb.utils.Utilities;
 import org.shunya.punter.gui.AppConstants;
 import org.shunya.punter.gui.AppSettings;
-import org.shunya.punter.gui.Main;
 import org.shunya.punter.jpa.TaskData;
 import org.shunya.punter.tasks.Tasks;
+import org.shunya.punter.utils.StringUtils;
 import org.shunya.server.PunterMessage;
 import org.shunya.server.PunterWebDocumentHandler;
 import org.slf4j.Logger;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -33,15 +31,16 @@ public class PunterService {
     private DBService daoFacade;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final RestClient restClient = new RestClient();
-    private final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
+    private final PegDownProcessor markdown4jProcessor = new PegDownProcessor();
     private final ConcurrentMap<Long, Tasks> taskCache = new ConcurrentHashMap<>();
 
     public void syncRemoteDocuments(String baseUri) {
         Long[] remoteDocList = restClient.getRemoteDocList(baseUri);
         System.out.println("remoteDocList = " + remoteDocList);
         for (Long docId : remoteDocList) {
-            int answer = JOptionPane.showConfirmDialog(Main.KBFrame, "Do you want to copy " + docId, "Confirm Copy", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-            if (answer == JOptionPane.YES_OPTION) {
+//            int answer = JOptionPane.showConfirmDialog(Main.KBFrame, "Do you want to copy " + docId, "Confirm Copy", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+//            if (answer == JOptionPane.YES_OPTION) {
+            try {
                 Document remoteDoc = restClient.getRemoteDoc(baseUri, docId);
                 Document existingMatchingDoc = daoFacade.getDocumentByMD5(remoteDoc.getMd5());
                 if (existingMatchingDoc == null) {
@@ -50,7 +49,10 @@ public class PunterService {
                 } else {
                     System.out.println("Ignored existing remote remoteDoc = " + docId);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+//            }
         }
     }
 
@@ -80,7 +82,7 @@ public class PunterService {
             } catch (Exception e) {
                 logger.info("runTask failed - ", e);
                 resultsMap.put("status", false);
-                resultsMap.put("error", Util.getExceptionSummary(e));
+                resultsMap.put("error", StringUtils.getExceptionStackTrace(e));
             } finally {
                 taskCache.remove(taskId);
             }

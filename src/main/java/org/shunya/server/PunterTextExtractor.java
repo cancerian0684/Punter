@@ -13,7 +13,7 @@ import org.apache.poi.hsmf.MAPIMessage;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.markdown4j.Markdown4jProcessor;
+import org.pegdown.PegDownProcessor;
 
 import javax.swing.text.Document;
 import javax.swing.text.rtf.RTFEditorKit;
@@ -24,14 +24,14 @@ import java.util.*;
 public class PunterTextExtractor {
 
     public static String getText(byte[] contents, String title, String ext) {
-        final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
+        final PegDownProcessor markdown4jProcessor = new PegDownProcessor();
         StringBuilder text = new StringBuilder();
         ByteArrayInputStream bais = new ByteArrayInputStream(contents);
         String tt = title.toLowerCase();
         text.append(tt + " ");
         try {
             if (ext.isEmpty()) {
-                Source source = new Source(new StringReader(markdown4jProcessor.process(new String(contents))));
+                Source source = new Source(new StringReader(markdown4jProcessor.markdownToHtml(new String(contents, "UTF-8"))));
                 TextExtractor te = new TextExtractor(source);
                 text.append(te.toString());
             } else if (ext.equalsIgnoreCase(".txt")) {
