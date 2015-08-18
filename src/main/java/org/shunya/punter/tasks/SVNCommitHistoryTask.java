@@ -59,7 +59,7 @@ public class SVNCommitHistoryTask extends Tasks {
 	    {
 	       Project project =new Project();
 	       repository = SVNRepositoryFactory.create(SVNURL.parseURIEncoded(urls[project_counter]));
-	       ISVNAuthenticationManager authManager = SVNWCUtil.createDefaultAuthenticationManager(username, password);
+	       ISVNAuthenticationManager authManager = SVNWCUtil.createDefaultAuthenticationManager(username,new String(password.toCharArray()));
 	       repository.setAuthenticationManager(authManager);
 	       endRevision = repository.getLatestRevision();
 	       Collection logEntries = null;
@@ -124,7 +124,7 @@ public class SVNCommitHistoryTask extends Tasks {
         	Marshaller m = context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			m.marshal(revisions, baos);
-//			m.marshal(revisions, System.out);
+			m.marshal(revisions, System.out);
 			TransformerFactory tFactory = TransformerFactory.newInstance();
 			Transformer transformer =tFactory.newTransformer(new javax.xml.transform.stream.StreamSource(SVNCommitHistoryTask.class.getResourceAsStream("svncommit.xsl")));
 			transformer.transform(new javax.xml.transform.stream.StreamSource(new ByteArrayInputStream(baos.toByteArray())),new javax.xml.transform.stream.StreamResult(baosHtml));

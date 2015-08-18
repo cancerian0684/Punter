@@ -88,6 +88,11 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Maven: org.tmatesoft.svnkit:svnkit:1.8.3" level="project" />
+    <orderEntry type="library" name="Maven: net.java.dev.jna:jna:3.5.2" level="project" />
+    <orderEntry type="library" name="Maven: net.java.dev.jna:platform:3.5.2" level="project" />
+    <orderEntry type="library" name="Maven: de.regnis.q.sequence:sequence-library:1.0.2" level="project" />
+    <orderEntry type="library" name="Maven: com.trilead:trilead-ssh2:1.0.0-build217" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: telegram:app:1.0">
         <CLASSES>
@@ -247,7 +252,7 @@
     <orderEntry type="module-library">
       <library name="Maven: javax.jnlp:jnlp-api:8.0">
         <CLASSES>
-          <root url="jar://C:/Program Files/Java/jdk1.8.0_51/jre/lib/javaws.jar!/" />
+          <root url="jar://C:/Program Files/Java/jdk1.8.0_45/jre/lib/javaws.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
