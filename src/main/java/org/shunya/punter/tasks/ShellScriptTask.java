@@ -20,10 +20,14 @@ import java.util.logging.Level;
 public class ShellScriptTask extends Tasks {
     @InputParam(required = true, description = "Hostname of Unix machine")
     private String hostname;
+    @InputParam(required = true, description = "SSH port number, default 22")
+    private int port;
     @InputParam(required = true)
     private String username;
     @InputParam(required = true)
     private String password;
+    @InputParam(required = true, description = "Absolute path for private key location")
+    private String privateKey;
     @InputParam(required = true, description = "Provide Punter syntax script")
     private String script;
     @InputParam(required = false)
@@ -43,10 +47,16 @@ public class ShellScriptTask extends Tasks {
             JSch jsch = new JSch();
 
             //jsch.setKnownHosts("/home/foo/.ssh/known_hosts");
+            if (privateKey != null && !privateKey.isEmpty())
+                jsch.addIdentity(privateKey);
 
-            Session session = jsch.getSession(username, hostname, 22);
+            if(port == 0)
+                port = 22;
 
-            session.setPassword(password);
+            Session session = jsch.getSession(username, hostname, port);
+
+            if (password != null && !password.isEmpty())
+                session.setPassword(password);
 
             // username and password will be given via UserInfo interface.
             UserInfo ui = new MyUserInfo();

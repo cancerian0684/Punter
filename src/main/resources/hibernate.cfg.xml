@@ -5,7 +5,7 @@
 <hibernate-configuration>
     <session-factory>
         <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="connection.url">jdbc:mysql:///punterdb?useUnicode=yes&amp;characterEncoding=UTF-8&amp;createDatabaseIfNotExist=true</property>
+        <property name="connection.url">jdbc:mysql:///punterdb?useUnicode=true&amp;characterEncoding=UTF-8&amp;createDatabaseIfNotExist=true</property>
         <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
         <property name="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
         <property name="connection.username">root</property>
