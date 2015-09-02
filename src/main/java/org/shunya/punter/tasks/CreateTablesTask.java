@@ -15,7 +15,7 @@ import java.util.logging.Level;
 public class CreateTablesTask extends Tasks {
 	@InputParam(required = true, description = "comma delimited sql DDL script")
 	private String SQLScript;
-	@InputParam(required = true, description = "jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1")
+	@InputParam(required = true, description = "jdbc:oracle:thin:@hostname:1523:DELSHRD1")
 	private String conURL;
 	@InputParam(required = false, description = "DAISY4")
 	private String username;

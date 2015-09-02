@@ -2,14 +2,14 @@
 <body>
 DAISY4
 <br/>
-impCommand=imp 'DAISY4/Welcome1@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1523)(HOST=xldn2738dor.ldn.swissbank.com)))(CONNECT_DATA=(SERVICE_NAME=DELSHRD1)))' fromuser=AIS1 touser=DAISY2 ignore=y log=C:/import_daisy.log file=#{dumpFile}
+impCommand=imp 'DAISY4/Welcome1@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1523)(HOST=hostname)))(CONNECT_DATA=(SERVICE_NAME=DELSHRD1)))' fromuser=AIS1 touser=DAISY2 ignore=y log=C:/import_daisy.log file=#{dumpFile}
 <br />
 dumpFile=P:\dump\daisy\20101007.dmp
 <br/>
 <br/>
 AISDB4
 <br/>
-impCommand=imp 'AISDB4/Welcome1@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1523)(HOST=xldn2738dor.ldn.swissbank.com)))(CONNECT_DATA=(SERVICE_NAME=DELSHRD1)))' fromuser=AIS_DBO touser=AISDB4 ignore=y log=C:/import_daisy.log file=$dumFile
+impCommand=imp 'AISDB4/Welcome1@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1523)(HOST=hostname)))(CONNECT_DATA=(SERVICE_NAME=DELSHRD1)))' fromuser=AIS_DBO touser=AISDB4 ignore=y log=C:/import_daisy.log file=$dumFile
 <br />
 dumpFile=P:\dump\daisy\20101007.dmp
 <br/>
@@ -18,7 +18,7 @@ dumpFile=P:\dump\daisy\20101007.dmp
 <br/>
 AISDB4
 <br/>
-impCommand=imp 'sft_dev4/sft_dev4@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1523)(HOST=xldn2738dor.ldn.swissbank.com)))(CONNECT_DATA=(SERVICE_NAME=DELSHRD1)))' fromuser=sft touser=SFT_DEV4 ignore=y log=C:/import_sft.log file=#{dumpFile}
+impCommand=imp 'sft_dev4/sft_dev4@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1523)(HOST=hostname)))(CONNECT_DATA=(SERVICE_NAME=DELSHRD1)))' fromuser=sft touser=SFT_DEV4 ignore=y log=C:/import_sft.log file=#{dumpFile}
 <br />
 dumpFile=P:\dump\sft\20101007.dmp
 <br/>

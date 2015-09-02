@@ -19,7 +19,7 @@ import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="GenTableDDLTask",documentation= "src/main/resources/docs/GenTableDDLTask.html")
 public class SelectQueryTask extends Tasks {
-	@InputParam(required = true,description="jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1") 
+	@InputParam(required = true,description="jdbc:oracle:thin:@hostname:1523:DELSHRD1")
 	private String conURL;
 	@InputParam(required = true,description="DAISY2")
 	private String username;
@@ -41,7 +41,7 @@ public class SelectQueryTask extends Tasks {
 		try{
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			Connection conn = DriverManager.getConnection(conURL, username, password);
-	//		Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1", "AISDB4", "Welcome1");
+	//		Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@hostname:1523:DELSHRD1", "AISDB4", "Welcome1");
 			conn.setReadOnly(true);
 			Scanner stk = new Scanner(query).useDelimiter("\r\n|\n\r|\r|\n");
 			String sheetName="Sheet";

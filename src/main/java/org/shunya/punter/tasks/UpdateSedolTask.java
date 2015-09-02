@@ -10,7 +10,7 @@ import java.util.logging.Level;
 @PunterTask(author="sharmban",name="UpdateSedolTask",description="Updates Sedol for Fund in AISDB and DAISY",documentation= "src/main/resources/docs/TextSamplerDemoHelp.html")
 public class UpdateSedolTask extends Tasks{
 	private Connection dAISyQADBConnection = null;
-	@InputParam(required = true,description="jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1")
+	@InputParam(required = true,description="jdbc:oracle:thin:@hostname:1523:DELSHRD1")
 	private String dAISyConnURL;
 	@InputParam(required = true,description="DAISY3")
 	private String dAISyUser;
@@ -18,7 +18,7 @@ public class UpdateSedolTask extends Tasks{
     private String dAISyPswd;
     
     private Connection AISDBQADBConnection = null;
-	@InputParam(required = true,description="jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1")
+	@InputParam(required = true,description="jdbc:oracle:thin:@hostname:1523:DELSHRD1")
 	private String AISDBConnURL;
 	@InputParam(required = true,description="AISDB3")
 	private String AISDBUser;

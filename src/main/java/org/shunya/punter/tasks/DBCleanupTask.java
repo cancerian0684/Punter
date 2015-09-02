@@ -16,7 +16,7 @@ import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="DBCleanupTask",documentation= "src/main/resources/docs/DBCleanupTask.html")
 public class DBCleanupTask extends Tasks {
-	@InputParam(required = true,description="jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1") 
+	@InputParam(required = true,description="jdbc:oracle:thin:@hostname:1523:DELSHRD1")
 	private String conURL;
 	@InputParam(required = false,description="DAISY4")
 	private String username;

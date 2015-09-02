@@ -14,7 +14,7 @@ import java.util.logging.Level;
  * Created by munichan on 5/20/2014.
  */
 public class UpdateDBTask extends Tasks {
-    @InputParam(required = true, description = "jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1")
+    @InputParam(required = true, description = "jdbc:oracle:thin:@hostname:1523:DELSHRD1")
     private String conURL;
     @InputParam(required = false, description = "DAISY2")
     private String username;

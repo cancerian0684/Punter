@@ -13,7 +13,7 @@ import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="CloseDAISYFundsTask",description="Close Out DAISY Funds.",documentation= "src/main/resources/docs/TextSamplerDemoHelp.html")
 public class CloseDAISYFundsTask extends Tasks {
-	@InputParam(required = true,description="jdbc:oracle:thin:@xldn2738dor.ldn.swissbank.com:1523:DELSHRD1") 
+	@InputParam(required = true,description="jdbc:oracle:thin:@hostname:1523:DELSHRD1")
 	private String conURL;
 	@InputParam(required = false,description="DAISY2")
 	private String username;

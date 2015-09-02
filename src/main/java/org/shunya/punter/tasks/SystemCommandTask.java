@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 @PunterTask(author = "munishc", name = "SystemCommandTask", documentation = "src/main/resources/docs/SystemCommandTask.html")
 public class SystemCommandTask extends Tasks {
-    @InputParam(required = true, description = "imp 'DAISY4/Welcome1@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1523)(HOST=xldn2738dor.ldn.swissbank.com)))(CONNECT_DATA=(SERVICE_NAME=DELSHRD1)))' fromuser=AIS1 touser=DAISY2 ignore=y log=C:\\import_daisy.log file=#{dumpFile}")
+    @InputParam(required = true, description = "imp 'DAISY4/Welcome1@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(PORT=1523)(HOST=hostname)))(CONNECT_DATA=(SERVICE_NAME=DELSHRD1)))' fromuser=AIS1 touser=DAISY2 ignore=y log=C:\\import_daisy.log file=#{dumpFile}")
     public String systemCommand;
     @InputParam(required = false, description = "Import terminated successfully")
     public String successMessage;
