@@ -5,7 +5,7 @@
 <hibernate-configuration>
     <session-factory>
         <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="connection.url">jdbc:mysql:///punterdb?useUnicode=true&amp;characterEncoding=UTF-8&amp;createDatabaseIfNotExist=true</property>
+        <property name="connection.url">jdbc:mysql:///punterdb?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;createDatabaseIfNotExist=true</property>
         <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
         <property name="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
         <property name="connection.username">root</property>
@@ -15,6 +15,12 @@
         <property name="hibernate.cache.use_query_cache">false</property>
         <property name="hibernate.cache.use_second_level_cache">false</property>
         <property name="hibernate.connection.pool_size">2</property>
+        <property name="hibernate.connection.release_mode">after_transaction</property>
+        <property name="hibernate.c3p0.acquire_increment">1</property>
+        <property name="hibernate.c3p0.idle_test_period">300</property>
+        <property name="hibernate.c3p0.timeout">120</property>
+        <property name="hibernate.c3p0.min_size">1</property>
+        <property name="hibernate.c3p0.max_size">300</property>
         <!-- DB schema will be updated if needed -->
         <property name="hbm2ddl.auto">update</property>
         <property name="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</property>
