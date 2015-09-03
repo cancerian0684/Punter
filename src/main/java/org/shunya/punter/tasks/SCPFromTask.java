@@ -62,6 +62,7 @@ public class SCPFromTask extends Tasks {
 //	      session.connect(30000);   // making a connection with timeout.
             LOGGER.get().log(Level.INFO, "Connected to Shell.");
             int fileCounter = 0;
+            String[] localFiles = localFile.split("[\r\n|\n\r|\r|\n|;|,]");
             Scanner stk = new Scanner(remoteFile).useDelimiter("\r\n|\n\r|\r|\n|;|,");
             while (stk.hasNext()) {
                 String currfile = stk.next().trim();
@@ -119,10 +120,10 @@ public class SCPFromTask extends Tasks {
                     out.flush();
 
                     // read a content of lfile
-                    File fout = new File(prefix == null ? localFile : prefix + file);
+                    File fout = new File(prefix == null ? localFiles[fileCounter-1] : prefix + file);
 //		        if(!fout.exists()||(fout.exists()&&overwrite))
 //		        {	
-                    fos = new FileOutputStream(prefix == null ? localFile : prefix + file);
+                    fos = new FileOutputStream(prefix == null ? localFiles[fileCounter-1] : prefix + file);
                     int foo;
                     while (true) {
                         if (buf.length < filesize) foo = buf.length;
