@@ -1,5 +1,8 @@
 package org.shunya.server.component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.*;
+import org.apache.commons.io.IOUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -22,12 +25,17 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBException;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 @Service
 public class DBService {
@@ -55,6 +63,47 @@ public class DBService {
 
     public String getUsername() {
         return AppSettings.getInstance().getUsername();
+    }
+
+    public void exportAll() throws IOException {
+        List<Long> documentIds = getDocumentIds();
+        Path outputDir = Paths.get("C:\\Munish", "backup");
+        Files.createDirectory(outputDir);
+        for (Long documentId : documentIds) {
+            Document document = getDocument(documentId);
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
+            ObjectWriter objectWriter = mapper.writerWithDefaultPrettyPrinter();
+            File fileDir = new File(outputDir.toFile(), "" + documentId + "-json.gz");
+            try (Writer out = new BufferedWriter(new OutputStreamWriter(
+                    new GZIPOutputStream(new FileOutputStream(fileDir)), "UTF8"))) {
+                objectWriter.writeValue(out, document);
+            }
+        }
+    }
+
+    public void importAll() throws IOException {
+        Path dataDir = Paths.get("C:\\Munish", "backup");
+        File[] files = dataDir.toFile().listFiles();
+        for (File file : files) {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            ObjectReader objectReader = mapper.reader();
+            try (
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(
+                                    new GZIPInputStream(new FileInputStream(file)), "UTF8"))) {
+                Document remoteDoc = objectReader.readValue(new MappingJsonFactory().createParser(IOUtils.toString(in)), new TypeReference<Document>() {
+                });
+                Document existingMatchingDoc = getDocumentByMD5(remoteDoc.getMd5());
+                if (existingMatchingDoc == null) {
+                    saveDocument(remoteDoc);
+                    System.out.println("copied remote remoteDoc = " + file.getName());
+                } else {
+                    System.out.println("Ignored existing remote remoteDoc = " + file.getName());
+                }
+            }
+        }
     }
 
     public void messageProcessor() {
@@ -207,9 +256,11 @@ public class DBService {
             System.out.println("Deleting document - " + document);
             transatomatic.run(session -> {
                 Document document1 = (Document) session.get(Document.class, document.getId());
-                session.delete(document1);
-                session.flush();
-                luceneIndexService.deleteIndexForDoc(document1.getId());
+                if (document1 != null) {
+                    session.delete(document1);
+                    session.flush();
+                }
+                luceneIndexService.deleteIndexForDoc(document.getId());
             });
         }
         long t2 = System.currentTimeMillis();
@@ -283,7 +334,7 @@ public class DBService {
         final ResultHolder<List<SynonymWord>> resultHolder = new ResultHolder<>();
         transatomatic.run(session -> {
             List<SynonymWord> synonymWords = session.createCriteria(SynonymWord.class)
-                    .add(Restrictions.ilike("words", "%"+filter+"%"))
+                    .add(Restrictions.ilike("words", "%" + filter + "%"))
                     .setMaxResults(100)
                     .setCacheable(true)
                     .list();
@@ -293,18 +344,18 @@ public class DBService {
     }
 
     public List<Long> getDocumentIds() {
-		 /**
-		 try {
-            final List<Document> documents = luceneIndexService.search("**", "/all", false, 0, 1000);
-            List<Long> ids = new ArrayList<>();
-            for (Document o : documents) {
-                ids.add(o.getId());
-            }
-            return ids;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-		**/
+        /**
+         try {
+         final List<Document> documents = luceneIndexService.search("**", "/all", false, 0, 1000);
+         List<Long> ids = new ArrayList<>();
+         for (Document o : documents) {
+         ids.add(o.getId());
+         }
+         return ids;
+         } catch (IOException e) {
+         e.printStackTrace();
+         }
+         **/
         final ResultHolder<List<Long>> resultHolder = new ResultHolder<>();
         transatomatic.run(session -> {
             List<Document> documents = session.createCriteria(Document.class).list();

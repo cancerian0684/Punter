@@ -402,7 +402,7 @@ public class PunterKB extends JPanel {
         c.gridy = 1;
         add(new JScrollPane(searchResultTable), c);
 
-        final JMenuItem addProcessMenu, openDocMenu, renameMenu, deleteDocMenu, docTagsMenu, reindexDocsMenu, copyURL, pasteMenu, emailMenu;
+        final JMenuItem addProcessMenu, openDocMenu, renameMenu, deleteDocMenu, docTagsMenu, reindexDocsMenu, copyURL, pasteMenu, emailMenu, exportMenu, importMenu;
         final JPopupMenu popupProcess = new JPopupMenu();
         addProcessMenu = new JMenuItem("Add");
         addProcessMenu.addActionListener(new ActionListener() {
@@ -422,8 +422,8 @@ public class PunterKB extends JPanel {
                 if (searchResultTable.getSelectedRow() >= 0) {
                     Document doc = (Document) ((DocumentTableModel) searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
                     doc = dbService.getDocument(doc.getId());
-                    if(doc == null){
-                       JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
+                    if (doc == null) {
+                        JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
                         return;
                     }
                     if (doc.getExt().isEmpty())
@@ -509,6 +509,32 @@ public class PunterKB extends JPanel {
             }
         });
         popupProcess.add(pasteMenu);
+
+        popupProcess.addSeparator();
+
+        exportMenu = new JMenuItem("Export");
+        exportMenu.addActionListener(e -> {
+            System.out.println("Backing Up all Documents");
+            try {
+                dbService.exportAll();
+                System.out.println("Backing Complete for all Documents");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
+        popupProcess.add(exportMenu);
+
+        importMenu = new JMenuItem("Import");
+        importMenu.addActionListener(e -> {
+            System.out.println("Importing all Documents");
+            try {
+                dbService.importAll();
+                System.out.println("Import Complete for all Documents");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
+        popupProcess.add(importMenu);
 
         reindexDocsMenu = new JMenuItem("Rebuild Indexes");
         reindexDocsMenu.addActionListener(new ActionListener() {
