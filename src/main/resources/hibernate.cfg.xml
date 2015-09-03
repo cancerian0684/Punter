@@ -24,7 +24,6 @@
         <!-- DB schema will be updated if needed -->
         <property name="hbm2ddl.auto">update</property>
         <property name="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</property>
-
         <mapping class="org.shunya.punter.jpa.TaskData"/>
         <mapping class="org.shunya.punter.jpa.ProcessData"/>
         <mapping class="org.shunya.punter.jpa.ProcessHistory"/>

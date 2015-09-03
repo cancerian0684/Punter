@@ -516,7 +516,13 @@ public class PunterKB extends JPanel {
         exportMenu.addActionListener(e -> {
             System.out.println("Backing Up all Documents");
             try {
-                dbService.exportAll();
+                JFileChooser jfc = new JFileChooser();
+                jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                Integer returnVal = jfc.showOpenDialog(this);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = jfc.getSelectedFile();
+                    dbService.exportAll(file);
+                }
                 System.out.println("Backing Complete for all Documents");
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -528,8 +534,14 @@ public class PunterKB extends JPanel {
         importMenu.addActionListener(e -> {
             System.out.println("Importing all Documents");
             try {
-                dbService.importAll();
-                System.out.println("Import Complete for all Documents");
+                JFileChooser jfc = new JFileChooser();
+                jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                Integer returnVal = jfc.showOpenDialog(this);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = jfc.getSelectedFile();
+                    dbService.importAll(file);
+                    System.out.println("Import Complete for all Documents");
+                }
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

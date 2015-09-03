@@ -28,9 +28,6 @@ import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -65,16 +62,15 @@ public class DBService {
         return AppSettings.getInstance().getUsername();
     }
 
-    public void exportAll() throws IOException {
+    public void exportAll(File outputDir) throws IOException {
         List<Long> documentIds = getDocumentIds();
-        Path outputDir = Paths.get("C:\\Munish", "backup");
-        Files.createDirectory(outputDir);
+        outputDir.mkdirs();
         for (Long documentId : documentIds) {
             Document document = getDocument(documentId);
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
             ObjectWriter objectWriter = mapper.writerWithDefaultPrettyPrinter();
-            File fileDir = new File(outputDir.toFile(), "" + documentId + "-json.gz");
+            File fileDir = new File(outputDir, "" + documentId + "-json.gz");
             try (Writer out = new BufferedWriter(new OutputStreamWriter(
                     new GZIPOutputStream(new FileOutputStream(fileDir)), "UTF8"))) {
                 objectWriter.writeValue(out, document);
@@ -82,9 +78,8 @@ public class DBService {
         }
     }
 
-    public void importAll() throws IOException {
-        Path dataDir = Paths.get("C:\\Munish", "backup");
-        File[] files = dataDir.toFile().listFiles();
+    public void importAll(File dataDir) throws IOException {
+        File[] files = dataDir.listFiles();
         for (File file : files) {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
