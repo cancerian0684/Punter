@@ -84,18 +84,23 @@ public class DBService {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             ObjectReader objectReader = mapper.reader();
-            try (
-                    BufferedReader in = new BufferedReader(
+            try (BufferedReader in = new BufferedReader(
                             new InputStreamReader(
                                     new GZIPInputStream(new FileInputStream(file)), "UTF8"))) {
                 Document remoteDoc = objectReader.readValue(new MappingJsonFactory().createParser(IOUtils.toString(in)), new TypeReference<Document>() {
                 });
-                Document existingMatchingDoc = getDocumentByMD5(remoteDoc.getMd5());
-                if (existingMatchingDoc == null) {
-                    saveDocument(remoteDoc);
-                    System.out.println("copied remote remoteDoc = " + file.getName());
+                if (remoteDoc.getMd5() != null) {
+                    Document existingMatchingDoc = getDocumentByMD5(remoteDoc.getMd5());
+                    if (existingMatchingDoc == null) {
+                        saveDocument(remoteDoc);
+                        System.out.println("copied remote remoteDoc = " + file.getName());
+                    } else {
+                        deleteDocument(existingMatchingDoc);
+                        saveDocument(remoteDoc);
+                        System.out.println("updated existing remote remoteDoc = " + file.getName());
+                    }
                 } else {
-                    System.out.println("Ignored existing remote remoteDoc = " + file.getName());
+                    saveDocument(remoteDoc);
                 }
             }
         }
