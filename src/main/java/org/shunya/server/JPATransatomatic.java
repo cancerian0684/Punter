@@ -1,20 +1,17 @@
 package org.shunya.server;
 
-import org.hibernate.CacheMode;
-import org.hibernate.FlushMode;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 
 public class JPATransatomatic implements Transatomatic {
-    private JPASessionFactory jpaSessionFactory;
+    private SessionFactory sessionFactory;
 
-    public JPATransatomatic(JPASessionFactory jpaSessionFactory) {
-        this.jpaSessionFactory = jpaSessionFactory;
+    public JPATransatomatic(SessionFactory jpaSessionFactory) {
+        this.sessionFactory = jpaSessionFactory;
     }
 
     @Override
     public void run(UnitOfWork unitOfWork) {
-        final Session session = jpaSessionFactory.getSession();
+        final Session session = sessionFactory.openSession();
         Transaction tx = null;
         try {
             tx = session.getTransaction();

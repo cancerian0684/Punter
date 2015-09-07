@@ -3,10 +3,7 @@ package org.shunya.server.component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import org.apache.commons.io.IOUtils;
-import org.hibernate.CacheMode;
-import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
-import org.hibernate.Query;
+import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.shunya.kb.gui.SearchQuery;
 import org.shunya.kb.model.*;
@@ -46,6 +43,8 @@ public class DBService {
     private LuceneIndexService luceneIndexService;
     @Autowired
     private SynonymService synonymService;
+    @Autowired
+    private SessionFactory sessionFactory;
     private RestClient restClient = new RestClient();
 
     public void setClipBoardListener(ClipBoardListener clipBoardListener) {
@@ -169,7 +168,7 @@ public class DBService {
     public void initialize() {
         singleInstanceFileLock = new SingleInstanceFileLock("PunterServer.lock");
         sessionFacade = SessionFacade.getInstance();
-        transatomatic = new JPATransatomatic(new JPASessionFactory());
+        transatomatic = new JPATransatomatic(sessionFactory);
         synonymService.loadFromDB();
     }
 
