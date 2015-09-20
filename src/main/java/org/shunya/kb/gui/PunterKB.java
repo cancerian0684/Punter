@@ -549,18 +549,17 @@ public class PunterKB extends JPanel {
         popupProcess.add(importMenu);
 
         reindexDocsMenu = new JMenuItem("Rebuild Indexes");
-        reindexDocsMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-                System.out.println("Rebuilding Index");
-                PunterKB.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        reindexDocsMenu.addActionListener(e -> {
+            System.out.println("Rebuilding Indexes in background");
+            PunterKB.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            executorService.submit(() -> {
                 try {
                     dbService.rebuildIndex();
                 } catch (RemoteException e1) {
                     e1.printStackTrace();
                 }
-                PunterKB.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
+            });
+            PunterKB.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         });
         popupProcess.add(reindexDocsMenu);
 //        reindexDocsMenu.setEnabled(false);
