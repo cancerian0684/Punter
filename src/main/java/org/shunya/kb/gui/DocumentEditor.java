@@ -10,9 +10,7 @@ import org.shunya.kb.model.Attachment;
 import org.shunya.kb.model.Document;
 import org.shunya.kb.utils.TextCompletionHandler;
 import org.shunya.kb.utils.WordService;
-import org.shunya.punter.gui.AppSettings;
-import org.shunya.punter.gui.GUIUtils;
-import org.shunya.punter.gui.PunterGUI;
+import org.shunya.punter.gui.*;
 import org.shunya.server.component.DBService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,7 +167,7 @@ public class DocumentEditor extends JFrame {
 
 
         textField = new JTextField(20);
-        textField.setFont(new Font("Arial Unicode MS", Font.TRUETYPE_FONT, 12));
+        textField.setFont(new Font("Arial Unicode MS", Font.TRUETYPE_FONT, AppSettings.getInstance().getEditorPreviewSize()));
         textField.setPreferredSize(new Dimension(textField.getWidth(), 30));
 
         GridBagConstraints c = new GridBagConstraints();
@@ -501,8 +499,8 @@ public class DocumentEditor extends JFrame {
         c.weightx = 1.0;
         c.weighty = 1.0;
         getContentPane().add(jtp, c);
-        setPreferredSize(AppSettings.getInstance().getDocumentEditorLastDim());
-        setLocation(AppSettings.getInstance().getDocumentEditorLocation());
+        setPreferredSize(AppSettings.getInstance().getDocumentEditorLastDim().getDimension());
+        setLocation(AppSettings.getInstance().getDocumentEditorLocation().getLocation());
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent we) {
                 if (isDocumentModified()) {
@@ -531,8 +529,8 @@ public class DocumentEditor extends JFrame {
                         dbService = null;
                     }
                 }
-                AppSettings.getInstance().setDocumentEditorLocation(getLocationOnScreen());
-                AppSettings.getInstance().setDocumentEditorLastDim(DocumentEditor.this.getSize());
+                AppSettings.getInstance().setDocumentEditorLocation(new PunterPoint(getLocationOnScreen()));
+                AppSettings.getInstance().setDocumentEditorLastDim(new PunterDimension(DocumentEditor.this.getSize()));
                 DocumentEditor.this.doc = null;
                 DocumentEditor.this.dbService = null;
                 DocumentEditor.this.currentMD5 = null;

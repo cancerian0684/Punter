@@ -8,9 +8,12 @@ import org.shunya.server.component.DBService;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
- 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 public class ProcessPropertyTableModel extends AbstractTableModel {
-	public final int[] width = {150,206};
+	public final List<Integer> width = asList(150,206);
 	private static final long serialVersionUID = 1L;
     private final DBService dbService;
     /** Holds the table data in a two dimensional ArrayList datastructure */

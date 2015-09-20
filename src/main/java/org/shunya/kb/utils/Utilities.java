@@ -1,5 +1,7 @@
 package org.shunya.kb.utils;
 
+import com.fasterxml.jackson.databind.*;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,7 +9,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -57,6 +59,30 @@ public class Utilities {
         }
     }
 
+    public static <T> void save(T obj, String fileName) throws IOException {
+        Path path = FileSystems.getDefault().getPath(System.getProperty("user.home"));
+        File file = new File(path.resolve(fileName).toUri());
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
+        ObjectWriter objectWriter = mapper.writerWithDefaultPrettyPrinter();
+        try (Writer out = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(file), "UTF8"))) {
+            objectWriter.writeValue(out, obj);
+        }
+    }
+
+    public static <T> T loadJson(Class<T> clazz, String fileName) throws IllegalAccessException, InstantiationException, IOException {
+        logger.info("Loading File : " + fileName);
+        Path path = FileSystems.getDefault().getPath(System.getProperty("user.home"));
+        File file = new File(path.resolve(fileName).toUri());
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ObjectReader objectReader = mapper.reader();
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF8"))) {
+            return objectReader.readValue(new MappingJsonFactory().createParser(IOUtils.toString(in)), clazz);
+        }
+    }
+
     public static <T> T load(Class<T> clazz, String fileName) throws IllegalAccessException, InstantiationException {
         try {
             logger.info("Loading File : " + fileName);
@@ -66,7 +92,7 @@ public class Utilities {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             return (T) unmarshaller.unmarshal(file);
         } catch (Exception e) {
-            System.err.println("Could not load XML file : " + fileName+ ", creating a new instance.");
+            System.err.println("Could not load XML file : " + fileName + ", creating a new instance.");
             e.printStackTrace();
         }
         return clazz.newInstance();

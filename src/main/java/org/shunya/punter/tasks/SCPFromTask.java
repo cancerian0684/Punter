@@ -33,7 +33,6 @@ public class SCPFromTask extends Tasks {
     @Override
     public boolean run() {
         boolean status = false;
-        FileOutputStream fos = null;
         try {
 //		  LOGGER.get().log(Level.INFO, outName);
             String prefix = null;
@@ -122,31 +121,32 @@ public class SCPFromTask extends Tasks {
                     // read a content of lfile
                     File fout = new File(prefix == null ? localFiles[fileCounter-1] : prefix + file);
 //		        if(!fout.exists()||(fout.exists()&&overwrite))
-//		        {	
-                    fos = new FileOutputStream(prefix == null ? localFiles[fileCounter-1] : prefix + file);
-                    int foo;
-                    while (true) {
-                        if (buf.length < filesize) foo = buf.length;
-                        else foo = (int) filesize;
-                        foo = in.read(buf, 0, foo);
-                        if (foo < 0) {
-                            // error
-                            break;
+//		        {
+                    try (FileOutputStream fos = new FileOutputStream(prefix == null ? localFiles[fileCounter - 1] : prefix + file)){
+                        int foo;
+                        while (true) {
+                            if (buf.length < filesize) foo = buf.length;
+                            else foo = (int) filesize;
+                            foo = in.read(buf, 0, foo);
+                            if (foo < 0) {
+                                // error
+                                break;
+                            }
+                            fos.write(buf, 0, foo);
+                            filesize -= foo;
+                            if (filesize == 0L) break;
                         }
-                        fos.write(buf, 0, foo);
-                        filesize -= foo;
-                        if (filesize == 0L) break;
+                        if (checkAck(in) != 0) {
+                            LOGGER.get().log(Level.SEVERE, "Unknown Technical Failure while retrieving the file.");
+                            throw new Exception("Unknown Technical Failure while retrieving the file.");
+                        }
+                        // send '\0'
+                        buf[0] = 0;
+                        out.write(buf, 0, 1);
+                        out.flush();
+                    } finally {
+                        out.close();
                     }
-                    fos.close();
-                    fos = null;
-                    if (checkAck(in) != 0) {
-                        LOGGER.get().log(Level.SEVERE, "Unknown Technical Failure while retrieving the file.");
-                        throw new Exception("Unknown Technical Failure while retrieving the file.");
-                    }
-                    // send '\0'
-                    buf[0] = 0;
-                    out.write(buf, 0, 1);
-                    out.flush();
 //		        }else{
 //		        	break;
 //		        }
@@ -157,10 +157,6 @@ public class SCPFromTask extends Tasks {
             status = true;
         } catch (Exception e) {
             LOGGER.get().log(Level.SEVERE, "Exception occurred. \n" + StringUtils.getExceptionStackTrace(e));
-            try {
-                if (fos != null) fos.close();
-            } catch (Exception ee) {
-            }
             status = false;
         }
         return status;

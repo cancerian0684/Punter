@@ -61,19 +61,25 @@ public class DBService {
         return AppSettings.getInstance().getUsername();
     }
 
+    public void export(File outputDir, Long documentId) throws IOException {
+        if (!outputDir.exists())
+            outputDir.mkdirs();
+        Document document = getDocument(documentId);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
+        ObjectWriter objectWriter = mapper.writerWithDefaultPrettyPrinter();
+        File fileDir = new File(outputDir, "" + documentId + "-json.gz");
+        try (Writer out = new BufferedWriter(new OutputStreamWriter(
+                new GZIPOutputStream(new FileOutputStream(fileDir)), "UTF8"))) {
+            objectWriter.writeValue(out, document);
+        }
+    }
+
     public void exportAll(File outputDir) throws IOException {
         List<Long> documentIds = getDocumentIds();
         outputDir.mkdirs();
         for (Long documentId : documentIds) {
-            Document document = getDocument(documentId);
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
-            ObjectWriter objectWriter = mapper.writerWithDefaultPrettyPrinter();
-            File fileDir = new File(outputDir, "" + documentId + "-json.gz");
-            try (Writer out = new BufferedWriter(new OutputStreamWriter(
-                    new GZIPOutputStream(new FileOutputStream(fileDir)), "UTF8"))) {
-                objectWriter.writeValue(out, document);
-            }
+            export(outputDir, documentId);
         }
     }
 
@@ -84,8 +90,8 @@ public class DBService {
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             ObjectReader objectReader = mapper.reader();
             try (BufferedReader in = new BufferedReader(
-                            new InputStreamReader(
-                                    new GZIPInputStream(new FileInputStream(file)), "UTF8"))) {
+                    new InputStreamReader(
+                            new GZIPInputStream(new FileInputStream(file)), "UTF8"))) {
                 Document remoteDoc = objectReader.readValue(new MappingJsonFactory().createParser(IOUtils.toString(in)), new TypeReference<Document>() {
                 });
                 if (remoteDoc.getMd5() != null) {

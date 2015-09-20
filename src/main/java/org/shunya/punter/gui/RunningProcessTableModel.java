@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 public class RunningProcessTableModel extends AbstractTableModel {
-    public final int[] width = {28, 68, 77, 77};
+    public static final List<Integer> width = asList(28, 68, 77, 77);
     private static final long serialVersionUID = 1L;
     private LinkedList<Object> data = new LinkedList<>();
     private int maxRows = 10;

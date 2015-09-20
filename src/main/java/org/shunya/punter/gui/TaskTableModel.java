@@ -6,9 +6,12 @@ import org.shunya.server.component.DBService;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class TaskTableModel extends AbstractTableModel {
-    public final int[] width = {45, 74, 225, 46, 46};
+    public final List<Integer> width = asList(45, 74, 225, 46, 46);
     private static final long serialVersionUID = 1L;
     private final DBService dbService;
     /**

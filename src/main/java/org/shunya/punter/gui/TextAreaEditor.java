@@ -76,8 +76,8 @@ public class TextAreaEditor extends JDialog {
         c.gridy = 1;
         c.gridwidth = 1;
         this.setTitle("Input");
-        setLocation(AppSettings.getInstance().getTextAreaEditorLocation());
-        setPreferredSize(AppSettings.getInstance().getTextAreaEditorLastDim());
+        setLocation(AppSettings.getInstance().getTextAreaEditorLocationPoint().getLocation());
+        setPreferredSize(AppSettings.getInstance().getTextAreaEditorLastDim().getDimension());
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.pack();
         this.addWindowListener(new WindowAdapter() {
@@ -108,8 +108,8 @@ public class TextAreaEditor extends JDialog {
                 _resultArea.setText("");
                 _resultArea.removeUndoMananger();
                 listener = null;
-                AppSettings.getInstance().setTextAreaEditorLocation(instance.getLocation());
-                AppSettings.getInstance().setTextAreaEditorLastDim(instance.getSize());
+                AppSettings.getInstance().setTextAreaEditorLocationPoint(new PunterPoint(instance.getLocation()));
+                AppSettings.getInstance().setTextAreaEditorLastDim(new PunterDimension(instance.getSize()));
                 dispose();
             }
         } else {
@@ -120,8 +120,8 @@ public class TextAreaEditor extends JDialog {
     private void cancelTransaction() {
         listener = null;
         _resultArea.setText("");
-        AppSettings.getInstance().setTextAreaEditorLocation(instance.getLocation());
-        AppSettings.getInstance().setTextAreaEditorLastDim(instance.getSize());
+        AppSettings.getInstance().setTextAreaEditorLocationPoint(new PunterPoint(instance.getLocation()));
+        AppSettings.getInstance().setTextAreaEditorLastDim(new PunterDimension(instance.getSize()));
         dispose();
     }
 }

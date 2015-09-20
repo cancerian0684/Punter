@@ -117,9 +117,9 @@ public class PunterKB extends JPanel {
                             Document luceneDoc = (Document) ((DocumentTableModel) table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow())).get(0);
                             long t1 = System.currentTimeMillis();
                             dbService.incrementCounter(luceneDoc);
-                            System.out.println("time taken for access counter "+(System.currentTimeMillis()-t1)+" ms");
+                            System.out.println("time taken for access counter " + (System.currentTimeMillis() - t1) + " ms");
                             Document doc = dbService.getDocument(luceneDoc.getId());
-                            if(doc==null) {
+                            if (doc == null) {
                                 JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
                                 return false;
                             }
@@ -281,7 +281,7 @@ public class PunterKB extends JPanel {
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
                     Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(selectedRow)).get(0);
                     doc = dbService.getDocument(doc.getId());
-                    if (doc!=null) {
+                    if (doc != null) {
                         //Punter Doc
                         if (doc.getExt().isEmpty()) {
                             files.add(createZipFromDocument(doc));
@@ -471,42 +471,36 @@ public class PunterKB extends JPanel {
         popupProcess.add(renameMenu);
 
         deleteDocMenu = new JMenuItem("Delete");
-        deleteDocMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Delete Document");
-                if (searchResultTable.getSelectedRow() >= 0) {
-                    DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
-                    Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-                    int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete?", "Confirm",
-                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (response == JOptionPane.YES_OPTION) {
-                        dbService.deleteDocument(doc);
-                        dtm.deleteRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
-                    }
+        deleteDocMenu.addActionListener(e -> {
+            System.out.println("Delete Document");
+            if (searchResultTable.getSelectedRow() >= 0) {
+                DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
+                Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete?", "Confirm",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if (response == JOptionPane.YES_OPTION) {
+                    dbService.deleteDocument(doc);
+                    dtm.deleteRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
                 }
             }
         });
         popupProcess.add(deleteDocMenu);
 
         docTagsMenu = new JMenuItem("Tags");
-        docTagsMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Document Tags");
-                if (searchResultTable.getSelectedRow() >= 0) {
-                    DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
-                    Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-                    TagDialog.getInstance(doc, dbService);
-                }
+        docTagsMenu.addActionListener(e -> {
+            System.out.println("Document Tags");
+            if (searchResultTable.getSelectedRow() >= 0) {
+                DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
+                Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                TagDialog.getInstance(doc, dbService);
             }
         });
         popupProcess.add(docTagsMenu);
 
         pasteMenu = new JMenuItem("Paste");
-        pasteMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Paste ClipBoard Contents");
-                getContentsFromTransferrable(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null));
-            }
+        pasteMenu.addActionListener(e -> {
+            System.out.println("Paste ClipBoard Contents");
+            getContentsFromTransferrable(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null));
         });
         popupProcess.add(pasteMenu);
 
@@ -521,9 +515,15 @@ public class PunterKB extends JPanel {
                 Integer returnVal = jfc.showOpenDialog(this);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = jfc.getSelectedFile();
-                    dbService.exportAll(file);
+                    if (searchResultTable.getSelectedRow() >= 0) {
+                        DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
+                        Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                        dbService.export(file, doc.getId());
+                    } else {
+                        dbService.exportAll(file);
+                    }
                 }
-                System.out.println("Backing Complete for all Documents");
+                System.out.println("Backing Process Complete");
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -590,7 +590,7 @@ public class PunterKB extends JPanel {
         });
         popupProcess.add(copyURL);
 
-        emailMenu = new JMenuItem("Email");
+        emailMenu = new JMenuItem("Share via Email");
         emailMenu.addActionListener(e -> executorService.submit(new Runnable() {
             @Override
             public void run() {
@@ -618,7 +618,8 @@ public class PunterKB extends JPanel {
                             }
                         }
                         final String htmlContent = markdown4jProcessor.markdownToHtml(new String(doc.getContent()));
-                        DevEmailService.getInstance().sendEmail(doc.getTitle(), "cancerian0684@gmail.com", htmlContent, files);
+                        String emailAddresses = JOptionPane.showInputDialog("Enter Comma separated Email ID(s) : ", "cancerian0684@gmail.com, ");
+                        DevEmailService.getInstance().sendEmail(doc.getTitle(), emailAddresses, htmlContent, files);
                     }
                     //System Doc
                     else {

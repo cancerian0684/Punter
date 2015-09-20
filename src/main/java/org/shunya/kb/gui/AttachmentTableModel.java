@@ -5,9 +5,12 @@ import org.shunya.kb.model.Attachment;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class AttachmentTableModel extends AbstractTableModel {
-    public static final int[] longValues = {20, 350, 50, 100};
+    public static final List<Integer> longValues = asList(20, 350, 50, 100);
     private static final long serialVersionUID = 1L;
     /**
      * Holds the table data in a two dimensional ArrayList datastructure

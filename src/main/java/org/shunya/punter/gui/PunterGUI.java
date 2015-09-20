@@ -101,9 +101,9 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         }
         header.setPreferredSize(new Dimension(30, 20));
         if (AppSettings.getInstance().getObject("runningProcessTable") != null)
-            GUIUtils.initilializeTableColumns(runningProcessTable, (int[]) AppSettings.getInstance().getObject("runningProcessTable"));
+            GUIUtils.initilializeTableColumns(runningProcessTable, ((ArrayList<Integer>) AppSettings.getInstance().getObject("runningProcessTable")));
         else
-            GUIUtils.initilializeTableColumns(runningProcessTable, runningProcessTableModel.width);
+            GUIUtils.initilializeTableColumns(runningProcessTable, (ArrayList)runningProcessTableModel.width);
         runningProcessTable.getColumn("<html><b>Completed").setCellRenderer(new ProgressRenderer(runningProcessTable));
         runningProcessTable.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(KeyEvent e) {
@@ -200,7 +200,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         runningTaskTable.setIntercellSpacing(new Dimension(0, 0));
         runningTaskTable.getColumnModel().getColumn(0).setCellRenderer(dtcr);
         if (AppSettings.getInstance().getObject("runningTaskTable") != null)
-            GUIUtils.initilializeTableColumns(runningTaskTable, (int[]) AppSettings.getInstance().getObject("runningTaskTable"));
+            GUIUtils.initilializeTableColumns(runningTaskTable, (List) AppSettings.getInstance().getObject("runningTaskTable"));
         else
             GUIUtils.initilializeTableColumns(runningTaskTable, runningTaskTableModel.width);
         header = runningTaskTable.getTableHeader();
@@ -872,40 +872,38 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         outputParamTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         initColumnSizesOutputParamTable();
         ListSelectionModel rowSM = taskTable.getSelectionModel();
-        rowSM.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-                if (lsm.isSelectionEmpty()) {
-                } else {
-                    AppSettings.getInstance().setObject("outputParamTable", GUIUtils.getColumnWidth(outputParamTable));
-                    AppSettings.getInstance().setObject("inputParamTable", GUIUtils.getColumnWidth(inputParamTable));
-                    int selectedRow = lsm.getMinSelectionIndex();
+        rowSM.addListSelectionListener(e -> {
+            ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+            if (lsm.isSelectionEmpty()) {
+            } else {
+                AppSettings.getInstance().setObject("outputParamTable", GUIUtils.getColumnWidth(outputParamTable));
+                AppSettings.getInstance().setObject("inputParamTable", GUIUtils.getColumnWidth(inputParamTable));
+                int selectedRow1 = lsm.getMinSelectionIndex();
 //        			System.out.println("Row " + selectedRow + " is now selected.");
-                    TaskData t = (TaskData) ((TaskTableModel) taskTable.getModel()).getRow(taskTable.convertRowIndexToModel(selectedRow)).get(0);
-                    try {
-                        if (t.getInputParamsAsObject() != null) {
-                            inputParamTable.setModel(new InputParamTableModel(t, dbService));
-                            inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
-                            initColumnSizesInputParamTable();
-                        } else {
-                            inputParamTable.setModel(new InputParamTableModel(t, dbService));
-                            inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
-                            initColumnSizesInputParamTable();
-                        }
-                    } catch (JAXBException e1) {
-                        e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                TaskData t = (TaskData) ((TaskTableModel) taskTable.getModel()).getRow(taskTable.convertRowIndexToModel(selectedRow1)).get(0);
+                try {
+                    if (t.getInputParamsAsObject() != null) {
+                        inputParamTable.setModel(new InputParamTableModel(t, dbService));
+                        inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
+                        initColumnSizesInputParamTable();
+                    } else {
+                        inputParamTable.setModel(new InputParamTableModel(t, dbService));
+                        inputParamTable.getColumn("<html><b>Value").setCellRenderer(new DefaultStringRenderer());
+                        initColumnSizesInputParamTable();
                     }
-                    try {
-                        if (t.getOutputParamsAsObject() != null) {
-                            outputParamTable.setModel(new OutputParamTableModel(t, dbService));
-                            initColumnSizesOutputParamTable();
-                        } else {
-                            outputParamTable.setModel(new OutputParamTableModel(dbService));
-                            initColumnSizesOutputParamTable();
-                        }
-                    } catch (JAXBException e1) {
-                        e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (JAXBException e1) {
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+                try {
+                    if (t.getOutputParamsAsObject() != null) {
+                        outputParamTable.setModel(new OutputParamTableModel(t, dbService));
+                        initColumnSizesOutputParamTable();
+                    } else {
+                        outputParamTable.setModel(new OutputParamTableModel(dbService));
+                        initColumnSizesOutputParamTable();
                     }
+                } catch (JAXBException e1) {
+                    e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
             }
         });
@@ -914,11 +912,11 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         JTabbedPane tabbedPane = new JTabbedPane();
         //Set up column sizes.
         if (AppSettings.getInstance().getObject("taskTable") != null)
-            GUIUtils.initilializeTableColumns(taskTable, (int[]) AppSettings.getInstance().getObject("taskTable"));
+            GUIUtils.initilializeTableColumns(taskTable, (List) AppSettings.getInstance().getObject("taskTable"));
         else
             GUIUtils.initilializeTableColumns(taskTable, taskTableModel.width);
         if (AppSettings.getInstance().getObject("processTable") != null)
-            GUIUtils.initilializeTableColumns(processTable, (int[]) AppSettings.getInstance().getObject("processTable"));
+            GUIUtils.initilializeTableColumns(processTable, (List) AppSettings.getInstance().getObject("processTable"));
         else
             GUIUtils.initilializeTableColumns(processTable, model.width);
         initColumnSizesInputParamTable();
@@ -1069,7 +1067,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         jsp4.setDividerSize(1);
         tabbedPane.addTab("Process History", null, jsp4, "Tasks Run History for selected Process");
         if (AppSettings.getInstance().getObject("processTaskHistoryTable") != null)
-            GUIUtils.initilializeTableColumns(processTaskHistoryTable, (int[]) AppSettings.getInstance().getObject("processTaskHistoryTable"));
+            GUIUtils.initilializeTableColumns(processTaskHistoryTable, (List) AppSettings.getInstance().getObject("processTaskHistoryTable"));
         else
             GUIUtils.initilializeTableColumns(processTaskHistoryTable, processTaskHistoryTableModel.width);
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -1106,7 +1104,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         processPropertyTable.getColumn("<html><b>Property").setPreferredWidth(150);
         processPropertyTable.getColumn("<html><b>Value").setCellRenderer(new ProcessPropertyTableRenderer());
         if (AppSettings.getInstance().getObject("processPropertyTable") != null)
-            GUIUtils.initilializeTableColumns(processPropertyTable, (int[]) AppSettings.getInstance().getObject("processPropertyTable"));
+            GUIUtils.initilializeTableColumns(processPropertyTable, (List) AppSettings.getInstance().getObject("processPropertyTable"));
         else
             GUIUtils.initilializeTableColumns(processPropertyTable, processPropertyTableModel.width);
         JScrollPane processPropertyPane = new JScrollPane(processPropertyTable);
@@ -1135,7 +1133,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         processAlertTable.getColumn("<html><b>Clear").setPreferredWidth(50);
         processAlertTable.getColumn("<html><b>Run ID").setCellRenderer(new ProcessAlertTableRenderer());
         if (AppSettings.getInstance().getObject("processAlertTable") != null)
-            GUIUtils.initilializeTableColumns(processAlertTable, (int[]) AppSettings.getInstance().getObject("processAlertTable"));
+            GUIUtils.initilializeTableColumns(processAlertTable, (List) AppSettings.getInstance().getObject("processAlertTable"));
         JScrollPane processAlertPane = new JScrollPane(processAlertTable);
 
         processTaskAlertTable = new JTable(new ProcessTaskHistoryTableModel()) {
@@ -1183,7 +1181,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         processTaskAlertTable.getTableHeader().setReorderingAllowed(false);
         processTaskAlertTable.getColumnModel().getColumn(0).setCellRenderer(dtcr);
         if (AppSettings.getInstance().getObject("processTaskAlertTable") != null)
-            GUIUtils.initilializeTableColumns(processTaskAlertTable, (int[]) AppSettings.getInstance().getObject("processTaskAlertTable"));
+            GUIUtils.initilializeTableColumns(processTaskAlertTable, (List) AppSettings.getInstance().getObject("processTaskAlertTable"));
         JScrollPane processTaskALertPane = new JScrollPane(processTaskAlertTable);
         jsp6 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, processAlertPane, processTaskALertPane);
         jsp6.setDividerSize(1);
@@ -1553,16 +1551,16 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
 
     private void initColumnSizesOutputParamTable() {
         if (AppSettings.getInstance().getObject("outputParamTable") != null)
-            GUIUtils.initilializeTableColumns(outputParamTable, (int[]) AppSettings.getInstance().getObject("outputParamTable"));
+            GUIUtils.initilializeTableColumns(outputParamTable, (List)AppSettings.getInstance().getObject("outputParamTable"));
         else
-            GUIUtils.initilializeTableColumns(outputParamTable, OutputParamTableModel.width);
+            GUIUtils.initilializeTableColumns(outputParamTable, (List)OutputParamTableModel.width);
     }
 
     private void initColumnSizesInputParamTable() {
         if (AppSettings.getInstance().getObject("inputParamTable") != null)
-            GUIUtils.initilializeTableColumns(inputParamTable, (int[]) AppSettings.getInstance().getObject("inputParamTable"));
+            GUIUtils.initilializeTableColumns(inputParamTable, (List) AppSettings.getInstance().getObject("inputParamTable"));
         else
-            GUIUtils.initilializeTableColumns(inputParamTable, InputParamTableModel.width);
+            GUIUtils.initilializeTableColumns(inputParamTable, (List)InputParamTableModel.width);
     }
 
     public void setUpSportColumn(JTable table, TableColumn sportColumn) {

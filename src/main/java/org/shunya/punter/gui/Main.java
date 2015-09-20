@@ -71,14 +71,12 @@ public class Main implements PunterWindow{
     }
 
     public void init() {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    createAndShowGUI();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            try {
+                createAndShowGUI();
+            } catch (Throwable e) {
+                e.printStackTrace();
+                System.exit(1);
             }
         });
     }
@@ -95,10 +93,10 @@ public class Main implements PunterWindow{
         JFrame.setDefaultLookAndFeelDecorated(true);
         KBFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         KBFrame.setContentPane(new PunterKB(dbService));
-        if (AppSettings.getInstance().KBFrameLocation != null)
-            KBFrame.setLocation(AppSettings.getInstance().KBFrameLocation);
+        if (AppSettings.getInstance().getKBFrameLocationPoint() != null)
+            KBFrame.setLocation(AppSettings.getInstance().getKBFrameLocationPoint().getLocation());
         if (AppSettings.getInstance().getKBFrameDimension() != null)
-            KBFrame.setPreferredSize(AppSettings.getInstance().getKBFrameDimension());
+            KBFrame.setPreferredSize(AppSettings.getInstance().getKBFrameDimension().getDimension());
         KBFrame.pack();
         KBFrame.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowIconified(WindowEvent e) {
@@ -129,18 +127,18 @@ public class Main implements PunterWindow{
             }
         });
         PunterGuiFrame.pack();
-        if (AppSettings.getInstance().PunterGuiFrameLocation != null)
-            PunterGuiFrame.setLocation(AppSettings.getInstance().PunterGuiFrameLocation);
+        if (AppSettings.getInstance().getPunterGuiLocationPoint() != null)
+            PunterGuiFrame.setLocation(AppSettings.getInstance().getPunterGuiLocationPoint().getLocation());
         Thread.UncaughtExceptionHandler handler = new StackWindow("Unhandled Exception", 500, 400, dbService.getDevEmailCSV());
         Thread.setDefaultUncaughtExceptionHandler(handler);
 
-        try{globalHotKeyListener.setPunterGui(this);}catch (Exception e){}
+        try{globalHotKeyListener.setPunterGui(this);} catch (Exception e){}
         synonymFrame = new JFrame("Synonym Words");
         synonymFrame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
         synonymFrame.setContentPane(new SynonymPanel(dbService, synonymService));
         synonymFrame.pack();
-        if (AppSettings.getInstance().PunterGuiFrameLocation != null)
-            synonymFrame.setLocation(AppSettings.getInstance().PunterGuiFrameLocation);
+        if (AppSettings.getInstance().getPunterGuiLocationPoint() != null)
+            synonymFrame.setLocation(AppSettings.getInstance().getPunterGuiLocationPoint().getLocation());
 
       /* 
        System.setOut( new PrintStream(
@@ -197,9 +195,9 @@ public class Main implements PunterWindow{
             ActionListener exitListener = e -> {
                 int option = JOptionPane.showConfirmDialog(PunterGuiFrame, "Exit Punter?", "Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
                 if (option == JOptionPane.OK_OPTION) {
-                    AppSettings.getInstance().KBFrameLocation = KBFrame.getLocation();
-                    AppSettings.getInstance().setKBFrameDimension(KBFrame.getSize());
-                    AppSettings.getInstance().PunterGuiFrameLocation = PunterGuiFrame.getLocation();
+                    AppSettings.getInstance().setKBFrameLocationPoint(new PunterPoint(KBFrame.getLocation().getX(), KBFrame.getLocation().getY()));
+                    AppSettings.getInstance().setKBFrameDimension(new PunterDimension(KBFrame.getSize().getWidth(), KBFrame.getSize().getHeight()));
+                    AppSettings.getInstance().setPunterGuiLocationPoint(new PunterPoint(PunterGuiFrame.getLocation()));
                     logger.log(Level.INFO, "Removing tray icon : " + KBFrame.getSize());
                     tray.remove(trayIcon);
                     Launcher.programQuit();

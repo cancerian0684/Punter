@@ -8,6 +8,9 @@ import org.shunya.server.component.DBService;
 
 import javax.swing.table.AbstractTableModel;
 import javax.xml.bind.JAXBException;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 class OutputParamTableModel extends AbstractTableModel {
     private final DBService dbService;
@@ -36,7 +39,7 @@ class OutputParamTableModel extends AbstractTableModel {
 
     private Object[][] data = {};
 
-    public final static int[] width = {60, 126};
+    public final static List<Integer> width = asList(60, 126);
 
     public int getColumnCount() {
         return columnNames.length;

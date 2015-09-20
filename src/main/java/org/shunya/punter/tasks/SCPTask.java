@@ -31,7 +31,6 @@ public class SCPTask extends Tasks {
         boolean status = false;
         try {
 //		  LOGGER.get().log(Level.INFO, outName);
-            FileInputStream fis = null;
             JSch jsch = new JSch();
 
             //jsch.setKnownHosts("/home/foo/.ssh/known_hosts");
@@ -93,25 +92,29 @@ public class SCPTask extends Tasks {
                     return false;
                 }
                 // send a content of lfile
-                fis = new FileInputStream(srcFile);
-                byte[] buf = new byte[1024];
-                while (true) {
-                    int len = fis.read(buf, 0, buf.length);
-                    if (len <= 0) break;
-                    out.write(buf, 0, len);
+                byte[] buf = new byte[0];
+                try (FileInputStream fis = new FileInputStream(srcFile)){
+                    buf = new byte[1024];
+                    while (true) {
+                        int len = fis.read(buf, 0, buf.length);
+                        if (len <= 0) break;
+                        out.write(buf, 0, len);
+                        out.flush();
+                    }
+                    // send '\0'
+                    buf[0] = 0;
+                    out.write(buf, 0, 1);
                     out.flush();
+                    if (checkAck(in) != 0) {
+                        LOGGER.get().log(Level.SEVERE, "UnKnown Error transmitting the file.");
+                        return false;
+                    }
+                } catch (IOException ee) {
+                    LOGGER.get().log(Level.SEVERE, "Error in SCP operation", ee);
+                    ee.printStackTrace();
+                } finally {
+                    out.close();
                 }
-                fis.close();
-                fis = null;
-                // send '\0'
-                buf[0] = 0;
-                out.write(buf, 0, 1);
-                out.flush();
-                if (checkAck(in) != 0) {
-                    LOGGER.get().log(Level.SEVERE, "UnKnown Error transmitting the file.");
-                    return false;
-                }
-                out.close();
                 channel.disconnect();
                 LOGGER.get().log(Level.INFO, "File sent successfully : " + tgtFile);
             }

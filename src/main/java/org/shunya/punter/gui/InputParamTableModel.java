@@ -8,6 +8,9 @@ import org.shunya.server.component.DBService;
 
 import javax.swing.table.AbstractTableModel;
 import javax.xml.bind.JAXBException;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 class InputParamTableModel extends AbstractTableModel {
     private final DBService dbService;
@@ -35,7 +38,7 @@ class InputParamTableModel extends AbstractTableModel {
 
     private Object[][] data = {};
 
-    public static int[] width = {60, 126};
+    public static List<Integer> width = asList(60, 126);
 
     public InputParamTableModel(DBService dbService) {
         this.dbService = dbService;

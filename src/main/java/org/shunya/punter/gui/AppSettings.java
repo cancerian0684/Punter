@@ -1,39 +1,40 @@
 package org.shunya.punter.gui;
 
-import javax.jnlp.*;
+import org.shunya.kb.utils.Utilities;
+
 import javax.management.*;
-import java.awt.*;
-import java.io.*;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.IOException;
+import java.io.Serializable;
 import java.lang.management.ManagementFactory;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+@XmlRootElement
 public class AppSettings implements Serializable, AppSettingsMBean {
-    private static final long serialVersionUID = 8652757533411927346L;
     private static AppSettings appSettings;
-    private Dimension KBFrameDimension;
-    private Dimension DocumentEditorLastDim;
-    private Dimension TextAreaEditorLastDim;
-    public Point KBFrameLocation;
-    public Point DocumentEditorLocation;
-    public Point PunterGuiFrameLocation;
-    public Point TextAreaEditorLocation;
-    private int maxResults;
-    private boolean isNimbusLookNFeel;
+
+    private PunterPoint KBFrameLocationPoint = new PunterPoint(0, 0);
+    private PunterPoint PunterGuiLocationPoint = new PunterPoint(0, 0);
+    private PunterPoint TextAreaEditorLocationPoint = new PunterPoint(0, 0);
+    private PunterPoint DocumentEditorLocation = new PunterPoint(0, 0);
+    private PunterDimension KBFrameDimension;
+    private PunterDimension DocumentEditorLastDim = new PunterDimension(800, 800);;
+    private PunterDimension TextAreaEditorLastDim = new PunterDimension(400, 400);
+    private int maxResults = 50;
+    private boolean isNimbusLookNFeel = true;
     private boolean multiSearchEnable = true;
     private String username;
-    private int keystrokeFlush;
-    private int maxKeyStrokeDelay;
-    private int maxExecutorSize = 3;
+    private int keystrokeFlush = 3;
+    private int maxKeyStrokeDelay = 200;
+    private int maxExecutorSize = 2;
     private String smtpHost;
     private String smtpUsername;
     private String smtpPassword;
-    private Map<String, Object> cache;
-    private Map<String, String> sessionMap;
-    private boolean schedulerEnabled = true;
-    private String tempDirectory;
+    private Map<String, Object> cache = new HashMap<>();
+    private Map<String, String> sessionMap = new HashMap<>();
+    private boolean schedulerEnabled = false;
+    private String tempDirectory = "Temp";
     private boolean showActiveTasks = false;
     private int editorPreviewSize = 12;
     private int editorEditSize = 12;
@@ -50,25 +51,19 @@ public class AppSettings implements Serializable, AppSettingsMBean {
 
     private String serverHost;
 
-    private AppSettings() {
-        KBFrameLocation = new Point(0, 0);
-        PunterGuiFrameLocation = new Point(0, 0);
-        TextAreaEditorLocation = new Point(0, 0);
-        DocumentEditorLocation = new Point(0, 0);
-        maxResults = 10;
-        keystrokeFlush = 5;
-        maxKeyStrokeDelay = 200;
-        maxExecutorSize = 2;
-        isNimbusLookNFeel = true;
-        schedulerEnabled = true;
-        cache = new HashMap<>();
-        sessionMap = new HashMap<>();
-        tempDirectory = "Temp";
-        showActiveTasks = false;
+    public AppSettings() {
     }
 
     public Map<String, String> getSessionMap() {
-        return sessionMap == null ? new HashMap<String, String>() : sessionMap;
+        return sessionMap ;
+    }
+
+    public Map<String, Object> getCache() {
+        return cache;
+    }
+
+    public void setCache(Map<String, Object> cache) {
+        this.cache = cache;
     }
 
     public void setSessionMap(Map<String, String> sessionMap) {
@@ -76,7 +71,6 @@ public class AppSettings implements Serializable, AppSettingsMBean {
     }
 
     public Object getObject(String key) {
-        if (cache == null) cache = new HashMap<>();
         return cache.get(key);
     }
 
@@ -125,60 +119,37 @@ public class AppSettings implements Serializable, AppSettingsMBean {
     }
 
     @Override
-    public Dimension getDocumentEditorLastDim() {
-        if (DocumentEditorLastDim == null) {
-            DocumentEditorLastDim = new Dimension(800, 800);
-        }
+    public PunterDimension getDocumentEditorLastDim() {
         return DocumentEditorLastDim;
     }
 
     @Override
-    public void setDocumentEditorLastDim(Dimension documentEditorLastDim) {
+    public void setDocumentEditorLastDim(PunterDimension documentEditorLastDim) {
         DocumentEditorLastDim = documentEditorLastDim;
     }
 
     @Override
-    public void setTextAreaEditorLastDim(Dimension textAreaEditorLastDim) {
+    public void setTextAreaEditorLastDim(PunterDimension textAreaEditorLastDim) {
         TextAreaEditorLastDim = textAreaEditorLastDim;
     }
 
     @Override
-    public Dimension getTextAreaEditorLastDim() {
-        if (TextAreaEditorLastDim == null) {
-            TextAreaEditorLastDim = new Dimension(400, 400);
-        }
+    public PunterDimension getTextAreaEditorLastDim() {
         return TextAreaEditorLastDim;
     }
 
     @Override
-    public Point getDocumentEditorLocation() {
-        if (DocumentEditorLocation == null)
-            DocumentEditorLocation = new Point(0, 0);
+    public PunterPoint getDocumentEditorLocation() {
         return DocumentEditorLocation;
     }
 
     @Override
-    public void setDocumentEditorLocation(Point documentEditorLocation) {
+    public void setDocumentEditorLocation(PunterPoint documentEditorLocation) {
         DocumentEditorLocation = documentEditorLocation;
     }
 
     @Override
-    public void setTextAreaEditorLocation(Point textAreaEditorLocation) {
-        TextAreaEditorLocation = textAreaEditorLocation;
-    }
-
-    @Override
-    public Point getTextAreaEditorLocation() {
-        if (TextAreaEditorLocation == null) {
-            TextAreaEditorLocation = new Point(0, 0);
-        }
-        return TextAreaEditorLocation;
-    }
-
-    @Override
     public int getMaxExecutorSize() {
-        if (maxExecutorSize < 1)
-            maxExecutorSize = 2;
         return maxExecutorSize;
     }
 
@@ -194,15 +165,11 @@ public class AppSettings implements Serializable, AppSettingsMBean {
 
     @Override
     public int getMaxKeyStrokeDelay() {
-        if (maxKeyStrokeDelay < 100)
-            maxKeyStrokeDelay = 200;
         return maxKeyStrokeDelay;
     }
 
     @Override
     public int getKeyStrokeFlush() {
-        if (keystrokeFlush < 1)
-            keystrokeFlush = 4;
         return keystrokeFlush;
     }
 
@@ -228,19 +195,16 @@ public class AppSettings implements Serializable, AppSettingsMBean {
 
     @Override
     public int getMaxResults() {
-        if (maxResults == 0)
-            maxResults = 20;
         return maxResults;
     }
 
     @Override
-    public Dimension getKBFrameDimension() {
+    public PunterDimension getKBFrameDimension() {
         return KBFrameDimension;
     }
 
-    @Override
-    public void setKBFrameDimension(Dimension kBFrameDimension) {
-        KBFrameDimension = kBFrameDimension;
+    public void setKBFrameDimension(PunterDimension KBFrameDimension) {
+        this.KBFrameDimension = KBFrameDimension;
     }
 
     public static AppSettings getInstance() {
@@ -257,15 +221,7 @@ public class AppSettings implements Serializable, AppSettingsMBean {
             try {
                 mbs.registerMBean(appSettings, new ObjectName("PunterClient:type=ClientSettings"));
                 System.err.println("AppSettings registered with MBean Server.");
-            } catch (MBeanRegistrationException e) {
-                e.printStackTrace();
-            } catch (MalformedObjectNameException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            } catch (InstanceAlreadyExistsException e) {
-                e.printStackTrace();
-            } catch (NotCompliantMBeanException e) {
+            } catch (MBeanRegistrationException | NotCompliantMBeanException | InstanceAlreadyExistsException | NullPointerException | MalformedObjectNameException e) {
                 e.printStackTrace();
             }
         }
@@ -273,85 +229,20 @@ public class AppSettings implements Serializable, AppSettingsMBean {
     }
 
     public static void saveState() {
-        AppSettingsMBean appSettings = AppSettings.getInstance();
+        AppSettings appSettings = AppSettings.getInstance();
         try {
-            PersistenceService ps;
-            BasicService bs;
-            ps = (PersistenceService) ServiceManager.lookup("javax.jnlp.PersistenceService");
-            bs = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
-            URL codebase = bs.getCodeBase();
-            FileContents fc = ps.get(codebase);
-            ObjectOutputStream oos = new ObjectOutputStream(fc.getOutputStream(true));
-            oos.writeObject(appSettings);
-            oos.flush();
-            oos.close();
-        } catch (Exception e) {
-            System.err.println("Error : " + e.getMessage());
-            try {
-                FileOutputStream fout = new FileOutputStream("punter.dat");
-                ObjectOutputStream oos = new ObjectOutputStream(fout);
-                oos.writeObject(appSettings);
-                oos.close();
-                System.err.println("Saved in Punter.dat instead.");
-            } catch (Exception ee) {
-                ee.printStackTrace();
-            }
+            Utilities.save(appSettings, "punter-app-settings.json");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     private static void loadState() {
         try {
-            PersistenceService ps;
-            BasicService bs;
-            ps = (PersistenceService) ServiceManager.lookup("javax.jnlp.PersistenceService");
-            bs = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
-            URL codebase = bs.getCodeBase();
-            FileContents settings = null;
-            settings = ps.get(codebase);
-            ObjectInputStream ois = new ObjectInputStream(settings.getInputStream());
-            appSettings = (AppSettings) ois.readObject();
-            ois.close();
-        } catch (FileNotFoundException fnfe) {
-            try {
-                PersistenceService ps;
-                BasicService bs;
-                ps = (PersistenceService) ServiceManager.lookup("javax.jnlp.PersistenceService");
-                bs = (BasicService) ServiceManager.lookup("javax.jnlp.BasicService");
-                URL codebase = bs.getCodeBase();
-                long size = ps.create(codebase, 64000);
-                System.out.println("Cache created - size: " + size);
-            } catch (MalformedURLException murle) {
-                System.err.println("Application codebase is not a valid URL?!");
-                murle.printStackTrace();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            } catch (UnavailableServiceException e) {
-                try {
-                    FileInputStream fin = new FileInputStream("punter.dat");
-                    ObjectInputStream ois = new ObjectInputStream(fin);
-                    appSettings = (AppSettings) ois.readObject();
-                    ois.close();
-                    System.out.println("Settings loaded succesfully.");
-                } catch (Exception ee) {
-                    ee.printStackTrace();
-                    appSettings = new AppSettings();
-                }
-            }
+            appSettings = Utilities.loadJson(AppSettings.class, "punter-app-settings.json");
+        } catch (Exception e) {
             appSettings = new AppSettings();
-        } catch (UnavailableServiceException e) {
-            try {
-                FileInputStream fin = new FileInputStream("punter.dat");
-                ObjectInputStream ois = new ObjectInputStream(fin);
-                appSettings = (AppSettings) ois.readObject();
-                ois.close();
-                System.out.println("Settings loaded succesfully.");
-            } catch (Exception ee) {
-                ee.printStackTrace();
-                appSettings = new AppSettings();
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            appSettings = new AppSettings();
+            e.printStackTrace();
         }
     }
 
@@ -396,8 +287,6 @@ public class AppSettings implements Serializable, AppSettingsMBean {
     }
 
     public int getEditorPreviewSize() {
-        if (editorPreviewSize < 5)
-            editorPreviewSize = 12;
         return editorPreviewSize;
     }
 
@@ -406,12 +295,36 @@ public class AppSettings implements Serializable, AppSettingsMBean {
     }
 
     public int getEditorEditSize() {
-        if (editorEditSize < 5)
-            editorEditSize = 12;
         return editorEditSize;
     }
 
     public void setEditorEditSize(int editorEditSize) {
         this.editorEditSize = editorEditSize;
+    }
+
+    public PunterPoint getKBFrameLocationPoint() {
+        return KBFrameLocationPoint;
+    }
+
+    public void setKBFrameLocationPoint(PunterPoint KBFrameLocationPoint) {
+        this.KBFrameLocationPoint = KBFrameLocationPoint;
+    }
+
+    public PunterPoint getPunterGuiLocationPoint() {
+        return PunterGuiLocationPoint;
+    }
+
+    public void setPunterGuiLocationPoint(PunterPoint punterGuiLocationPoint) {
+        this.PunterGuiLocationPoint = punterGuiLocationPoint;
+    }
+
+    @Override
+    public PunterPoint getTextAreaEditorLocationPoint() {
+        return TextAreaEditorLocationPoint;
+    }
+
+    @Override
+    public void setTextAreaEditorLocationPoint(PunterPoint textAreaEditorLocationPoint) {
+        TextAreaEditorLocationPoint = textAreaEditorLocationPoint;
     }
 }

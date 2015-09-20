@@ -5,11 +5,13 @@ import org.shunya.punter.jpa.TaskHistory;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
+import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.shunya.kb.utils.Utilities.formatMillis;
 
 public class ProcessTaskHistoryTableModel extends AbstractTableModel {
-	public final int[] width={15,332,88};
+	public final List<Integer> width= asList(15,332,88);
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          

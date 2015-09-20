@@ -5,9 +5,12 @@ import org.shunya.punter.jpa.TaskHistory;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 public class RunningTaskTableModel extends AbstractTableModel {
-	public final int[] width = {15,304,32};
+	public final List<Integer> width = asList(15,304,32);
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
 	private ArrayList<Object>  data=new ArrayList<Object>();          
