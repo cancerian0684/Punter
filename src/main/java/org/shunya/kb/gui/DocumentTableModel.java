@@ -27,7 +27,7 @@ public class DocumentTableModel extends AbstractTableModel {
    * @param <b>rows </b> number of rows initially.
    */
   public ArrayList<Object> getModelData(){
-	  ArrayList<Object>  newdata=new ArrayList<Object>(data); 
+	  ArrayList<Object>  newdata= new ArrayList<>(data);
 	  return newdata;
   }
   public DocumentTableModel() {
@@ -79,8 +79,8 @@ public class DocumentTableModel extends AbstractTableModel {
     		s2=sdf.format(doc.getDateUpdated());
     	}
     	String author="";
-    	if(doc.getAuthor()!=null){
-    		author=doc.getAuthor();
+    	if(doc.getMd5()!=null){
+    		author=doc.getMd5().substring(Math.min(doc.getMd5().length(), 25));
     	}
     	return "<html>"+doc.getId()+"-"+(float)Math.round(doc.getScore() * 100) / 100+""+"<br/>"+s2+"<br/>"+author+"</html>";
     case 1:

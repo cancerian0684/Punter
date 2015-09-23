@@ -19,7 +19,6 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
@@ -405,44 +404,40 @@ public class PunterKB extends JPanel {
         final JMenuItem addProcessMenu, openDocMenu, renameMenu, deleteDocMenu, docTagsMenu, reindexDocsMenu, copyURL, pasteMenu, emailMenu, exportMenu, importMenu;
         final JPopupMenu popupProcess = new JPopupMenu();
         addProcessMenu = new JMenuItem("Add");
-        addProcessMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Adding Document");
-                Document doc = null;
-                doc = dbService.createDocument(dbService.getUsername());
-                doc.setCategory(getSelectedCategory());
-                DocumentEditor.showEditor(doc, dbService, wordService);
-            }
+        addProcessMenu.addActionListener(e -> {
+            System.out.println("Adding Document");
+            Document doc = null;
+            doc = dbService.createDocument(dbService.getUsername());
+            doc.setCategory(getSelectedCategory());
+            DocumentEditor.showEditor(doc, dbService, wordService);
         });
         popupProcess.add(addProcessMenu);
         openDocMenu = new JMenuItem("Open");
-        openDocMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Opening Document");
-                if (searchResultTable.getSelectedRow() >= 0) {
-                    Document doc = (Document) ((DocumentTableModel) searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
-                    doc = dbService.getDocument(doc.getId());
-                    if (doc == null) {
-                        JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
-                        return;
-                    }
-                    if (doc.getExt().isEmpty())
-                        DocumentEditor.showEditor(doc, dbService, wordService);
-                    else {
-                        if (Desktop.isDesktopSupported()) {
-                            System.out.println("Opening up the file.." + doc.getExt());
-                            File temp = new File("Temp");
-                            temp.mkdir();
-                            File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
-                            try {
-                                FileOutputStream fos = new FileOutputStream(nf);
-                                fos.write(doc.getContent());
-                                fos.close();
-                                nf.deleteOnExit();
-                                Desktop.getDesktop().open(nf);
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            }
+        openDocMenu.addActionListener(e -> {
+            System.out.println("Opening Document");
+            if (searchResultTable.getSelectedRow() >= 0) {
+                Document doc = (Document) ((DocumentTableModel) searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                doc = dbService.getDocument(doc.getId());
+                if (doc == null) {
+                    JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
+                    return;
+                }
+                if (doc.getExt().isEmpty())
+                    DocumentEditor.showEditor(doc, dbService, wordService);
+                else {
+                    if (Desktop.isDesktopSupported()) {
+                        System.out.println("Opening up the file.." + doc.getExt());
+                        File temp = new File("Temp");
+                        temp.mkdir();
+                        File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
+                        try {
+                            FileOutputStream fos = new FileOutputStream(nf);
+                            fos.write(doc.getContent());
+                            fos.close();
+                            nf.deleteOnExit();
+                            Desktop.getDesktop().open(nf);
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
                         }
                     }
                 }

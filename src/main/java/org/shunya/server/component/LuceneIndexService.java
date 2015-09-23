@@ -44,6 +44,7 @@ public class LuceneIndexService {
     public org.apache.lucene.document.Document createLuceneDocument(Document pDoc) {
         org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
         doc.add(new StringField("id", "" + pDoc.getId(), Field.Store.YES));
+        doc.add(new StringField("md5", "" + pDoc.getMd5(), Field.Store.YES));
         doc.add(new TextField("title", getPunterParsedText2(pDoc.getTitle()), Field.Store.NO));
         doc.add(new Field("titleS", pDoc.getTitle(), StringField.TYPE_STORED));
         doc.add(new StringField("author", pDoc.getAuthor() != null ? pDoc.getAuthor() : "", Field.Store.YES));
@@ -329,6 +330,7 @@ public class LuceneIndexService {
                     e.printStackTrace();
                 }
                 document.setAuthor(doc.get("author"));
+                document.setMd5(doc.get("md5"));
                 document.setCategory(doc.get("category"));
                 document.setId(Long.parseLong(doc.get("id")));
                 String title = doc.get("titleS");
