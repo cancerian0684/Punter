@@ -7,17 +7,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
  
 public class DocumentTableModel extends AbstractTableModel {
-	SimpleDateFormat sdf =new SimpleDateFormat("dd/MM/yy");
+	final SimpleDateFormat sdf =new SimpleDateFormat("dd.MMM.yyyy");
 	public final Object[] longValues = {new Integer(5), "Kathy123",new Integer(5), "None of the above a,jbskjkjas jsahfk",new Boolean(true)};
 	private static final long serialVersionUID = 1L;
 	/** Holds the table data in a two dimensional ArrayList datastructure */
-	private ArrayList<Object>  data=new ArrayList<Object>();          
+	private ArrayList<Document>  data= new ArrayList<>();
 
 	/** Holds the column names */         
-	private String [] columnNames = new String [] 
-                                  {"<html><b>ID","<html><b>Document Name","<html><b>Category"};
-	private Class [] columnClasses = new Class[] 
-                                   {String.class,String.class,String.class};
+	private String [] columnNames = new String [] {"<html><b>ID","<html><b>Document Name","<html><b>Category"};
+	private Class [] columnClasses = new Class[] {String.class,String.class,String.class};
   
   /**
    * Constructor: Initializes the table structure, including number of columns
@@ -26,8 +24,8 @@ public class DocumentTableModel extends AbstractTableModel {
    * @param <b>defaultv </b> array of default value objects, for each column.
    * @param <b>rows </b> number of rows initially.
    */
-  public ArrayList<Object> getModelData(){
-	  ArrayList<Object>  newdata= new ArrayList<>(data);
+  public ArrayList<Document> getModelData(){
+	  ArrayList<Document>  newdata= new ArrayList<>(data);
 	  return newdata;
   }
   public DocumentTableModel() {
@@ -66,8 +64,7 @@ public class DocumentTableModel extends AbstractTableModel {
    * @return <b>Object</b> the value at the specified cell.
    */
   public Object getValueAt(int row, int col) {
-    ArrayList<?> colArrayList = (ArrayList<?>) data.get(row);
-    Document doc=(Document) colArrayList.get(0);
+    Document doc = data.get(row);
     switch(col){
     case 0:
     	String s1="";
@@ -88,7 +85,7 @@ public class DocumentTableModel extends AbstractTableModel {
     case 2:
     	return doc.getCategory();
     }
-    return colArrayList.get(col);
+    return "";
   }
 
   /**
@@ -110,7 +107,7 @@ public class DocumentTableModel extends AbstractTableModel {
    * @return <b> Class </b> the class for the specified column.    
    */
   public void setValueAt( Object obj, int row, int col ) {
-    ArrayList<?> colArrayList = (ArrayList<?>)data.get(row);
+    Document doc = data.get(row);
     super.fireTableDataChanged();
   }
 
@@ -118,16 +115,16 @@ public class DocumentTableModel extends AbstractTableModel {
    * Adds a new row to the table.
    * @param <b>ArrayList </b> new row data
    */
-  public synchronized ArrayList<?> insertRowAtBeginning( ArrayList<?> newrow ) {
+  public synchronized Document insertRowAtBeginning(Document newrow ) {
     data.add(0,newrow);
     super.fireTableRowsInserted(0,0);
-    return (ArrayList<?>) data.get(0);
+    return data.get(0);
   }
   
-  public synchronized ArrayList<?> insertRow( ArrayList<?> newrow ) {
+  public synchronized Document insertRow(Document newrow ) {
 	    data.add(newrow);
 	    super.fireTableRowsInserted(data.size()-1,data.size()-1);
-	    return (ArrayList<?>) data.get(data.size()-1);
+	    return data.get(data.size()-1);
 	  }
 
   /**
@@ -140,7 +137,7 @@ public class DocumentTableModel extends AbstractTableModel {
   }
 
   
-  public synchronized void deleteRows(ArrayList<Object> rows) {
+  public synchronized void deleteRows(ArrayList<Document> rows) {
 	    data.removeAll(rows);
 	    super.fireTableDataChanged();
 	  }
@@ -168,8 +165,8 @@ public class DocumentTableModel extends AbstractTableModel {
    * Returns the values at the specified row as a ArrayList.
    * @param <b>row </b> row number
    */
-  public ArrayList<?> getRow(int row) {
-    return (ArrayList<?>) data.get(row);
+  public Document getRow(int row) {
+    return data.get(row);
   }
 
   /**
@@ -178,8 +175,8 @@ public class DocumentTableModel extends AbstractTableModel {
    * @param <b>ArrayList </b> row data
    * @param <b>row </b> row number   
    */
-  public void updateRow( ArrayList<?> updatedRow, int row ) {
-    data.set( row, updatedRow);
+  public void updateRow( Document updatedRow, int row ) {
+    data.set(row, updatedRow);
     super.fireTableDataChanged();
   }
   public synchronized void refreshTable(){
@@ -193,7 +190,7 @@ public class DocumentTableModel extends AbstractTableModel {
    * Clears the table data.
    */
   public void clearTable() {
-    data = new ArrayList<Object>();
+    data.clear();
     super.fireTableDataChanged();
   }
   public boolean isCellEditable(int row, int col) {

@@ -307,7 +307,7 @@ public class LuceneIndexService {
             BooleanQuery query = new BooleanQuery();
             query.add(query1, BooleanClause.Occur.MUST);
             query.add(query2, BooleanClause.Occur.MUST);
-            BooleanQuery.setMaxClauseCount(100000);
+            BooleanQuery.setMaxClauseCount(10000);
             Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<span style='color:red;'>", "</span>"), new QueryScorer(query1));
             highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
             highlighter.setTextFragmenter(new SimpleFragmenter(200));
@@ -317,7 +317,7 @@ public class LuceneIndexService {
             hits = searcher.search(query, cwf, start + batch);
             int numTotalHits = hits.totalHits;
 //            System.out.println("time = " + (System.currentTimeMillis() - t1));
-            List<Document> resultDocs = new ArrayList<>(50);
+            List<Document> resultDocs = new ArrayList<>(batch);
             for (int i = start; i < numTotalHits && i < (start + batch); i++) {
 //				Explanation exp = isearcher.explain(query, i);
 //				System.err.println(exp.getDescription());

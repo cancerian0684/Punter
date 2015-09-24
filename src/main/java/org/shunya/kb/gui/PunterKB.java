@@ -113,7 +113,7 @@ public class PunterKB extends JPanel {
                             return false;
                         }
                         if (mEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
-                            Document luceneDoc = (Document) ((DocumentTableModel) table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow())).get(0);
+                            Document luceneDoc = ((DocumentTableModel) table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow()));
                             long t1 = System.currentTimeMillis();
                             dbService.incrementCounter(luceneDoc);
                             System.out.println("time taken for access counter " + (System.currentTimeMillis() - t1) + " ms");
@@ -278,7 +278,7 @@ public class PunterKB extends JPanel {
                 final List<File> files = new java.util.ArrayList<>();
                 for (int selectedRow : selectedRows) {
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
-                    Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(selectedRow)).get(0);
+                    Document doc =  dtm.getRow(searchResultTable.convertRowIndexToModel(selectedRow));
                     doc = dbService.getDocument(doc.getId());
                     if (doc != null) {
                         //Punter Doc
@@ -416,7 +416,7 @@ public class PunterKB extends JPanel {
         openDocMenu.addActionListener(e -> {
             System.out.println("Opening Document");
             if (searchResultTable.getSelectedRow() >= 0) {
-                Document doc = (Document) ((DocumentTableModel) searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                Document doc = ((DocumentTableModel) searchResultTable.getModel()).getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
                 doc = dbService.getDocument(doc.getId());
                 if (doc == null) {
                     JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
@@ -449,8 +449,8 @@ public class PunterKB extends JPanel {
         renameMenu.addActionListener(e -> {
             if (searchResultTable.getSelectedRow() >= 0) {
                 System.out.println("Renaming Document");
-                Document localDoc = (Document) ((DocumentTableModel) searchResultTable.getModel())
-                        .getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                Document localDoc = ((DocumentTableModel) searchResultTable.getModel())
+                        .getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
                 Document persisted = null;
                 persisted = dbService.getDocument(localDoc.getId());
                 final String newTitle = JOptionPane.showInputDialog(Main.KBFrame, "rename title to - ", persisted.getTitle());
@@ -470,7 +470,7 @@ public class PunterKB extends JPanel {
             System.out.println("Delete Document");
             if (searchResultTable.getSelectedRow() >= 0) {
                 DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
-                Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                Document doc = dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
                 int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete?", "Confirm",
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (response == JOptionPane.YES_OPTION) {
@@ -486,7 +486,7 @@ public class PunterKB extends JPanel {
             System.out.println("Document Tags");
             if (searchResultTable.getSelectedRow() >= 0) {
                 DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
-                Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                Document doc = dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
                 TagDialog.getInstance(doc, dbService);
             }
         });
@@ -512,7 +512,7 @@ public class PunterKB extends JPanel {
                     File file = jfc.getSelectedFile();
                     if (searchResultTable.getSelectedRow() >= 0) {
                         DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
-                        Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                        Document doc = dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
                         dbService.export(file, doc.getId());
                     } else {
                         dbService.exportAll(file);
@@ -563,7 +563,7 @@ public class PunterKB extends JPanel {
         copyURL.addActionListener(e -> {
             try {
                 DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
-                Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                Document doc = dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
                 String docId;
                 if (doc.getCategory().equalsIgnoreCase("/all/uploads")) {
                     doc = dbService.getDocument(doc.getId());
@@ -591,7 +591,7 @@ public class PunterKB extends JPanel {
                 try {
                     final PegDownProcessor markdown4jProcessor = new PegDownProcessor(Extensions.ALL);
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
-                    Document doc = (Document) dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow())).get(0);
+                    Document doc = dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
                     List<File> files = new ArrayList<>();
                     File temp = new File("Temp");
                     if (!temp.exists())
@@ -978,9 +978,7 @@ public class PunterKB extends JPanel {
         SwingUtilities.invokeLater(() -> {
             searchResultTableModel.clearTable();
             for (Document doc : docs) {
-                ArrayList<Document> docList = new ArrayList<>();
-                docList.add(doc);
-                searchResultTableModel.insertRow(docList);
+                searchResultTableModel.insertRow(doc);
             }
         });
     }
