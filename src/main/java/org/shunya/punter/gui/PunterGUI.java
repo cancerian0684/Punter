@@ -101,7 +101,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         }
         header.setPreferredSize(new Dimension(30, 20));
         if (AppSettings.getInstance().getObject("runningProcessTable") != null)
-            GUIUtils.initilializeTableColumns(runningProcessTable, ((List<Integer>) AppSettings.getInstance().getObject("runningProcessTable")));
+            GUIUtils.initilializeTableColumns(runningProcessTable, (List) AppSettings.getInstance().getObject("runningProcessTable"));
         else
             GUIUtils.initilializeTableColumns(runningProcessTable, (List)runningProcessTableModel.width);
         runningProcessTable.getColumn("<html><b>Completed").setCellRenderer(new ProgressRenderer(runningProcessTable));
