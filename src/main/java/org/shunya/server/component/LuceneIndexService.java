@@ -264,8 +264,9 @@ public class LuceneIndexService {
         parser2.setDefaultOperator(QueryParser.Operator.AND);
     }
 
-    public List<Document> search(String searchString, String category, boolean isAND, int start, int batch) throws IOException {
+    public SearchResult search(String searchString, String category, boolean isAND, int start, int chunkSize) throws IOException {
         long t1 = System.currentTimeMillis();
+        SearchResult searchResult = new SearchResult();
         searcherManager.maybeRefresh();
         IndexSearcher searcher = searcherManager.acquire();
         try {
@@ -273,7 +274,7 @@ public class LuceneIndexService {
             if (searchString.equals("**"))
                 searchString = "*";
             if (searchString.isEmpty()) {
-                return Collections.EMPTY_LIST;
+                return searchResult;
             }
             parser1.setAllowLeadingWildcard(true);
             if (isAND)
@@ -314,11 +315,11 @@ public class LuceneIndexService {
             TopDocs hits = null;
             QueryWrapperFilter queryFilter = new QueryWrapperFilter(query);
             CachingWrapperFilter cwf = new CachingWrapperFilter(queryFilter);
-            hits = searcher.search(query, cwf, start + batch);
+            hits = searcher.search(query, cwf, start + chunkSize);
             int numTotalHits = hits.totalHits;
 //            System.out.println("time = " + (System.currentTimeMillis() - t1));
-            List<Document> resultDocs = new ArrayList<>(batch);
-            for (int i = start; i < numTotalHits && i < (start + batch); i++) {
+            List<Document> resultDocs = new ArrayList<>(chunkSize);
+            for (int i = start; i < numTotalHits && i < (start + chunkSize); i++) {
 //				Explanation exp = isearcher.explain(query, i);
 //				System.err.println(exp.getDescription());
                 org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);                    //get the next document
@@ -365,14 +366,16 @@ public class LuceneIndexService {
                 }
                 resultDocs.add(document);
             }
-            return resultDocs;
+            searchResult.setDocuments(resultDocs);
+            searchResult.setResultCount(numTotalHits);
+            return searchResult;
         } catch (InvalidTokenOffsetsException | ParseException | IOException e1) {
             System.out.println("Search Query - " + searchString + ", Category - " + category);
             e1.printStackTrace();
         } finally {
             searcherManager.release(searcher);
         }
-        return Collections.EMPTY_LIST;
+        return searchResult;
     }
 
     public List<String> listAllTermsForTitle() throws IOException {

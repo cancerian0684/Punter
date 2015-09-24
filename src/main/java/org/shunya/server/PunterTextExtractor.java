@@ -24,7 +24,7 @@ import java.util.*;
 public class PunterTextExtractor {
 
     public static String getText(byte[] contents, String title, String ext) {
-        final PegDownProcessor markdown4jProcessor = new PegDownProcessor();
+        final PegDownProcessor markdown4jProcessor = new PegDownProcessor(10000L);
         StringBuilder text = new StringBuilder();
         ByteArrayInputStream bais = new ByteArrayInputStream(contents);
         String tt = title.toLowerCase();

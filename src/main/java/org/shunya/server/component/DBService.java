@@ -27,6 +27,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -241,23 +244,23 @@ public class DBService {
         return resultHolder.getResult();
     }
 
-    public List<Document> getDocList(SearchQuery searchQuery) {
+    public SearchResult getDocList(SearchQuery searchQuery) {
         try {
-//            long t1 = System.currentTimeMillis();
-            List<Document> result = luceneIndexService.search(searchQuery.getQuery(), searchQuery.getCategory(), searchQuery.isAndFilter(), 0, searchQuery.getMaxResults());
-//            long t2 = System.currentTimeMillis();
-//            System.err.println("time consumed : " + (t2 - t1));
-            return result;
+            long t1 = System.currentTimeMillis();
+            SearchResult searchResult = luceneIndexService.search(searchQuery.getQuery(), searchQuery.getCategory(), searchQuery.isAndFilter(), searchQuery.getStart(), searchQuery.getMaxResults());
+            long t2 = System.currentTimeMillis();
+            System.err.println("time consumed : " + (t2 - t1));
+            return searchResult;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return Collections.emptyList();
+        return new SearchResult();
     }
 
     public void deleteAllForCategory(String category) throws IOException {
         long t1 = System.currentTimeMillis();
-        List<Document> result = luceneIndexService.search("*", category, true, 0, 100);
-        for (Document document : result) {
+        SearchResult searchResult = luceneIndexService.search("*", category, true, 0, 100);
+        for (Document document : searchResult.getDocuments()) {
             System.out.println("Deleting document - " + document);
             transatomatic.run(session -> {
                 Document document1 = (Document) session.get(Document.class, document.getId());
@@ -525,13 +528,21 @@ public class DBService {
 
     public void rebuildIndex() throws RemoteException {
         transatomatic.run(session -> {
-            System.out.println("Clearing old index");
-            luceneIndexService.deleteIndex();
-            Query query = session.createQuery("SELECT e FROM Document e");
-            List<Document> allDocs = query.list();
-            for (Document doc : allDocs) {
-                System.out.println(doc.getCategory());
-                luceneIndexService.indexDocs(doc);
+            try {
+                System.out.println("Clearing old index");
+                luceneIndexService.deleteIndex();
+                Query query = session.createQuery("SELECT e FROM Document e");
+                List<Document> allDocs = query.list();
+                ExecutorService executorService = Executors.newFixedThreadPool(4);
+                int counter = 0;
+                for (Document doc : allDocs) {
+                    System.out.println(++counter + " --> ["+doc.getId()+"] " + doc.getTitle());
+                    executorService.submit(() -> luceneIndexService.indexDocs(doc));
+                }
+                executorService.shutdown();
+                executorService.awaitTermination(1, TimeUnit.HOURS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         });
     }

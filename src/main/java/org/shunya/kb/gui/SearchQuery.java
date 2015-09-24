@@ -7,6 +7,7 @@ public class SearchQuery implements Serializable{
     String category;
     boolean specialText;
     boolean andFilter;
+    int start;
     int maxResults;
 
     public static class SearchQueryBuilder {
@@ -14,6 +15,7 @@ public class SearchQuery implements Serializable{
         String category;
         boolean specialText;
         boolean andFilter;
+        int start;
         int maxResults;
 
         public SearchQuery build() {
@@ -44,6 +46,11 @@ public class SearchQuery implements Serializable{
             this.maxResults = maxResults;
             return this;
         }
+
+        public SearchQueryBuilder start(int start) {
+            this.start = start;
+            return this;
+        }
     }
 
     SearchQuery(SearchQueryBuilder queryBuilder) {
@@ -52,6 +59,7 @@ public class SearchQuery implements Serializable{
         this.category=queryBuilder.category;
         this.specialText=queryBuilder.specialText;
         this.maxResults=queryBuilder.maxResults;
+        this.start = queryBuilder.start;
     }
 
     public String getQuery() {
@@ -72,5 +80,9 @@ public class SearchQuery implements Serializable{
 
     public int getMaxResults() {
         return maxResults;
+    }
+
+    public int getStart() {
+        return start;
     }
 }

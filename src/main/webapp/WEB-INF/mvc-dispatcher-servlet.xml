@@ -47,7 +47,7 @@
 
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
         <property name="driverClass" value="com.mysql.jdbc.Driver" />
-        <property name="jdbcUrl" value="jdbc:mysql:///punter?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;createDatabaseIfNotExist=true" />
+        <property name="jdbcUrl" value="jdbc:mysql:///punterdb?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;createDatabaseIfNotExist=true" />
         <property name="user" value="root" />
         <property name="password" value="password" />
 

@@ -95,10 +95,10 @@ public class PunterKB extends JPanel {
                         updateSearchResult();
                     }
                 });
-        punterDelayedQueueHandlerThread = new DelayedQueueHandlerThread<>(query -> populateDocumentsInTable((DocumentTableModel) searchResultTable.getModel(), dbService.getDocList(query)));
+        punterDelayedQueueHandlerThread = new DelayedQueueHandlerThread<>(query -> populateDocumentsInTable((DocumentTableModel) searchResultTable.getModel(), query));
 
         punterDelayedQueueHandlerThread.start();
-        searchResultTable = new JTable(new DocumentTableModel()) {
+        searchResultTable = new JTable(new DocumentTableModel(dbService)) {
             public boolean editCellAt(int row, int column, java.util.EventObject e) {
                 column = convertColumnIndexToModel(column);
                 if (column == 1 || column == 2) {
@@ -974,12 +974,10 @@ public class PunterKB extends JPanel {
         col.setPreferredWidth(width);
     }
 
-    private void populateDocumentsInTable(final DocumentTableModel searchResultTableModel, final List<Document> docs) {
+    private void populateDocumentsInTable(final DocumentTableModel searchResultTableModel, SearchQuery query) {
         SwingUtilities.invokeLater(() -> {
             searchResultTableModel.clearTable();
-            for (Document doc : docs) {
-                searchResultTableModel.insertRow(doc);
-            }
+            searchResultTableModel.setQuery(query);
         });
     }
 
