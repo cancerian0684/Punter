@@ -475,7 +475,8 @@ public class PunterKB extends JPanel {
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (response == JOptionPane.YES_OPTION) {
                     dbService.deleteDocument(doc);
-                    dtm.deleteRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
+                    updateSearchResult();
+//                    dtm.deleteRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
                 }
             }
         });
