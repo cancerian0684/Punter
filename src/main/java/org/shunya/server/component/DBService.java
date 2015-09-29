@@ -251,7 +251,7 @@ public class DBService {
             long t2 = System.currentTimeMillis();
             System.err.println("time consumed : " + (t2 - t1));
             return searchResult;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return new SearchResult();
