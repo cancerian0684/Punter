@@ -166,7 +166,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             }
                         } else {
                             final Tasks task = taskHistory.getTasks();
-                            if(task.getHosts()!=null && !task.getHosts().isEmpty()){
+                            if(task!=null && task.getHosts()!=null && !task.getHosts().isEmpty()){
                                 try {
                                     LogWindow logWindow = new LogWindow(10000, taskHistory.getTask().getName());
                                     logWindow.log(task.getRemoteLog(taskHistory.getId()));

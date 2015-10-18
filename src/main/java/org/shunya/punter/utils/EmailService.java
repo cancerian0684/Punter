@@ -33,7 +33,7 @@ public class EmailService {
             // Create a default MimeMessage object.
             SMTPMessage message = new SMTPMessage(session);
             // Set From: header field of the header.
-            message.setFrom(new InternetAddress("munish.chandel@edifecs.com"));
+            message.setFrom(new InternetAddress("munish0684@gmail.com"));
             String[] recipients = commaSeparatedRecipients.split("[,;]");
             InternetAddress[] addresses = new InternetAddress[recipients.length];
             for (int i = 0; i < recipients.length; i++) {

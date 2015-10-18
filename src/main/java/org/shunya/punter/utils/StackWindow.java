@@ -4,8 +4,10 @@ import org.shunya.punter.gui.AppSettings;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collections;
 
 public class StackWindow extends JFrame implements Thread.UncaughtExceptionHandler {
 
@@ -50,7 +52,7 @@ public class StackWindow extends JFrame implements Thread.UncaughtExceptionHandl
                             Thread.sleep(500);
                             System.exit(0);
                         } else {
-                            EmailService.getInstance().sendEMail("Unknown Exception : [" + AppSettings.getInstance().getUsername() + "] ", devEmailCSV, sw.toString());
+                            DevEmailService.getInstance().sendEmail("Unknown Exception : [" + AppSettings.getInstance().getUsername() + "] ", devEmailCSV, sw.toString(), Collections.<File>emptyList());
                         }
                     } catch (Throwable E) {
                         System.err.println(E.toString());
