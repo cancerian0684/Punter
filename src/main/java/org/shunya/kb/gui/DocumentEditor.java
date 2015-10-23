@@ -74,7 +74,7 @@ public class DocumentEditor extends JFrame {
         }
     }
 
-    private final PegDownProcessor markdown4jProcessor = new PegDownProcessor(Extensions.ALL);
+    private final PegDownProcessor pegDownProcessor = new PegDownProcessor(Extensions.ALL);
 //    private final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
 
     public static String getMD5(String input) {
@@ -97,7 +97,7 @@ public class DocumentEditor extends JFrame {
         try {
             editor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
             editor.textField.setText(doc.getTitle());
-            editor.jTextPane.setText(editor.markdown4jProcessor.markdownToHtml(new String(doc.getContent(), "UTF-8")));
+            editor.jTextPane.setText(editor.pegDownProcessor.markdownToHtml(new String(doc.getContent(), "UTF-8")));
             editor.jTextPane.setCaretPosition(0);
         } catch (IOException e) {
             e.printStackTrace();
@@ -180,7 +180,7 @@ public class DocumentEditor extends JFrame {
 //                System.out.println("Tab: " + jtp.getSelectedIndex());
                 if (jtp.getSelectedIndex() == 0) {
                     setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
-                    jTextPane.setText(markdown4jProcessor.markdownToHtml(jTextPaneForEditing.getText()));
+                    jTextPane.setText(pegDownProcessor.markdownToHtml(jTextPaneForEditing.getText()));
                 } else if (1 == jtp.getSelectedIndex()) {
                     mayBeEdited = true;
                     setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()) + "...editing");

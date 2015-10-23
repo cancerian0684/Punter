@@ -1,5 +1,7 @@
 package org.shunya.punter.tasks;
 
+import org.pegdown.Extensions;
+import org.pegdown.PegDownProcessor;
 import org.shunya.punter.annotations.InputParam;
 import org.shunya.punter.annotations.PunterTask;
 import org.shunya.punter.utils.DevEmailService;
@@ -33,6 +35,8 @@ public class EmailTask extends Tasks {
     @InputParam(required = false, description = "Line separated expected messages")
     private String expectedMessages;
 
+    private final PegDownProcessor pegDownProcessor = new PegDownProcessor(Extensions.ALL);
+
     @Override
     public boolean run() {
         boolean status = false;
@@ -54,6 +58,7 @@ public class EmailTask extends Tasks {
             }
             attachments = attachments == null ? "" : attachments;
             String[] fileNames = attachments.split("[,;]");
+            body = pegDownProcessor.markdownToHtml(body);
             if (username != null && password != null && !username.isEmpty() && !password.isEmpty()) {
                 //Authentication Based Email
 //				EmailServiceWithAuth.getInstance(username,password).sendEMail(subject, toAddress, body+outName, fileNames, fromAddress, ccAddress);
