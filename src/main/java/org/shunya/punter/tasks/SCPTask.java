@@ -93,6 +93,8 @@ public class SCPTask extends Tasks {
                 }
                 // send a content of lfile
                 byte[] buf = new byte[0];
+                int progress = 0;
+                long transferred = 0;
                 try (FileInputStream fis = new FileInputStream(srcFile)){
                     buf = new byte[1024];
                     while (true) {
@@ -100,6 +102,10 @@ public class SCPTask extends Tasks {
                         if (len <= 0) break;
                         out.write(buf, 0, len);
                         out.flush();
+                        transferred += len;
+                        progress = (int) (transferred * 100 / filesize);
+                        getTaskHistory().setProgress(progress);
+                        getObserver().update(getTaskHistory());
                     }
                     // send '\0'
                     buf[0] = 0;

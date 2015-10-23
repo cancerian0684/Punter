@@ -36,6 +36,8 @@ public class TaskHistory implements Serializable {
     private RunStatus runStatus = RunStatus.NOT_RUN;
     @Transient
     private Tasks tasks;
+    @Transient
+    private int progress;
 
     public long getId() {
         return id;
@@ -150,5 +152,13 @@ public class TaskHistory implements Serializable {
 
     public Tasks getTasks() {
         return tasks;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
     }
 }

@@ -9,5 +9,7 @@ import java.util.concurrent.Future;
 public interface TaskObserver {
     Future<Map> createAndRunProcessSync(PunterProcessRunMessage processRunMessage);
 
-    public void saveTaskHistory(TaskHistory taskHistory);
+    void saveTaskHistory(TaskHistory taskHistory);
+
+    void update(TaskHistory taskHistory);
 }

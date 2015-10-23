@@ -199,6 +199,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         runningTaskTable.setRowHeight(26);
         runningTaskTable.setIntercellSpacing(new Dimension(0, 0));
         runningTaskTable.getColumnModel().getColumn(0).setCellRenderer(dtcr);
+        runningTaskTable.getColumn("<html><b>Completed").setCellRenderer(new ProgressRenderer(runningTaskTable));
         if (AppSettings.getInstance().getObject("runningTaskTable") != null)
             GUIUtils.initilializeTableColumns(runningTaskTable, (List) AppSettings.getInstance().getObject("runningTaskTable"));
         else
@@ -1495,30 +1496,28 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         try {
             dbService.saveTaskHistory(taskHistory);
             if (processHistoryTable.getSelectedRow() != -1) {
-                javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        try {
-                            ArrayList<?> ar = ((ProcessHistoryTableModel) processHistoryTable.getModel()).getRow(processHistoryTable.convertRowIndexToModel(processHistoryTable.getSelectedRow()));
-                            long pidTable = ((ProcessHistory) ar.get(0)).getId();
-                            long pid = taskHistory.getProcessHistory().getId();
-                            if (pid == pidTable) {
-                                ProcessHistory ph = dbService.getProcessHistoryById(pid);
-                                //populate ProcessTaskHistory
-                                ProcessTaskHistoryTableModel pthtmodel = (ProcessTaskHistoryTableModel) processTaskHistoryTable.getModel();
-                                List<TaskHistory> pthl = ph.getTaskHistoryList();
-                                pthtmodel.clearTable();
-                                for (TaskHistory th : pthl) {
-                                    final ArrayList<Object> newRequest = new ArrayList<Object>();
-                                    newRequest.add(th);
-                                    pthtmodel.insertRow(newRequest);
-                                }
-                                if (pthtmodel.getRowCount() > 0) {
-                                    processTaskHistoryTable.setRowSelectionInterval(0, 0);
-                                }
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    try {
+                        ArrayList<?> ar = ((ProcessHistoryTableModel) processHistoryTable.getModel()).getRow(processHistoryTable.convertRowIndexToModel(processHistoryTable.getSelectedRow()));
+                        long pidTable = ((ProcessHistory) ar.get(0)).getId();
+                        long pid = taskHistory.getProcessHistory().getId();
+                        if (pid == pidTable) {
+                            ProcessHistory ph = dbService.getProcessHistoryById(pid);
+                            //populate ProcessTaskHistory
+                            ProcessTaskHistoryTableModel pthtmodel = (ProcessTaskHistoryTableModel) processTaskHistoryTable.getModel();
+                            List<TaskHistory> pthl = ph.getTaskHistoryList();
+                            pthtmodel.clearTable();
+                            for (TaskHistory th : pthl) {
+                                final ArrayList<Object> newRequest = new ArrayList<>();
+                                newRequest.add(th);
+                                pthtmodel.insertRow(newRequest);
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            if (pthtmodel.getRowCount() > 0) {
+                                processTaskHistoryTable.setRowSelectionInterval(0, 0);
+                            }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 });
             }
@@ -1526,6 +1525,11 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void update(TaskHistory taskHistory) {
+        ((RunningTaskTableModel) runningTaskTable.getModel()).refreshTable();
     }
 
     private void doOnKeyPressed(KeyEvent e) {
