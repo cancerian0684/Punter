@@ -38,6 +38,8 @@ public class TaskHistory implements Serializable {
     private Tasks tasks;
     @Transient
     private int progress;
+    @Transient
+    private String activity = "";
 
     public long getId() {
         return id;
@@ -160,5 +162,13 @@ public class TaskHistory implements Serializable {
 
     public void setProgress(int progress) {
         this.progress = progress;
+    }
+
+    public String getActivity() {
+        return activity;
+    }
+
+    public void setActivity(String activity) {
+        this.activity = activity;
     }
 }

@@ -60,6 +60,10 @@ public class SCPTask extends Tasks {
             for (int index = 0; index < srcFiles.length; index++) {
                 String srcFile = srcFiles[index];
                 String tgtFile = tgtFiles[index];
+
+                getTaskHistory().setActivity("Sending File - " + srcFile);
+                getObserver().update(getTaskHistory());
+
                 // exec 'scp -t rfile' remotely
                 String command = "scp -p -t " + tgtFile;
                 Channel channel = session.openChannel("exec");

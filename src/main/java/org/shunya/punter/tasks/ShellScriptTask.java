@@ -53,8 +53,10 @@ public class ShellScriptTask extends Tasks {
             if(port == 0)
                 port = 22;
 
-            Session session = jsch.getSession(username, hostname, port);
+            getTaskHistory().setActivity("Connecting to Shell");
+            getObserver().update(getTaskHistory());
 
+            Session session = jsch.getSession(username, hostname, port);
             if (password != null && !password.isEmpty())
                 session.setPassword(password);
 
@@ -124,7 +126,9 @@ public class ShellScriptTask extends Tasks {
                             int sleep = Integer.parseInt(token);
                             TimeUnit.SECONDS.sleep(sleep);
                         } catch (Exception e) {
-                            System.err.println("P: " + token + "\r");
+                            System.err.println("Sending Command : " + token + "\r");
+                            getTaskHistory().setActivity(token);
+                            getObserver().update(getTaskHistory());
                             ps.print(token + "\r");
                         }
                     }
@@ -136,6 +140,8 @@ public class ShellScriptTask extends Tasks {
             TimeUnit.SECONDS.sleep(3);
             session.disconnect();
             channel.disconnect();
+            getTaskHistory().setActivity("Disconnected from Channel.");
+            getObserver().update(getTaskHistory());
             LOGGER.get().log(Level.INFO, "Disconnected from Channel.");
             strLogger.delete(0, strLogger.length());
             strLogger.setLength(0);
