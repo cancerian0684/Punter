@@ -32,7 +32,6 @@ public class SCPTask extends Tasks {
         try {
 //		  LOGGER.get().log(Level.INFO, outName);
             JSch jsch = new JSch();
-
             //jsch.setKnownHosts("/home/foo/.ssh/known_hosts");
             if (privateKey != null && !privateKey.isEmpty())
                 jsch.addIdentity(privateKey);
@@ -40,8 +39,10 @@ public class SCPTask extends Tasks {
             if(port == 0)
                 port = 22;
 
-            Session session = jsch.getSession(username, hostname, port);
+            getTaskHistory().setActivity("Connecting to Shell");
+            getObserver().update(getTaskHistory());
 
+            Session session = jsch.getSession(username, hostname, port);
             if (password != null && !password.isEmpty())
                 session.setPassword(password);
 

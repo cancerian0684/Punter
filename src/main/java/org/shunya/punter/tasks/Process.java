@@ -202,6 +202,7 @@ public class Process implements Serializable {
                 th.setRunStatus(RunStatus.FAILURE);
             th.setRunState(RunState.COMPLETED);
             th.setProgress(100);
+            th.setActivity("completed");
             th.setLogs(task.getMemoryLogs());
             observer.saveTaskHistory(th);
         } else {

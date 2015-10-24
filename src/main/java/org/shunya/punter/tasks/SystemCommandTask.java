@@ -43,6 +43,9 @@ public class SystemCommandTask extends Tasks {
             OutputStream out = child.getOutputStream();
 
             for (String command : commands) {
+                getTaskHistory().setActivity(command);
+                getObserver().update(getTaskHistory());
+
                 out.write((command + "\r\n").getBytes());
                 out.flush();
             }
@@ -57,6 +60,9 @@ public class SystemCommandTask extends Tasks {
                 logger.log(Level.INFO, "Waiting for the process to terminate");
                 child.waitFor();
             }
+
+            getTaskHistory().setActivity("finished all tasks");
+            getObserver().update(getTaskHistory());
         } catch (Exception e) {
             status.set(false);
             LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
