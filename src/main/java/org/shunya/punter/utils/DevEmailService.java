@@ -52,7 +52,8 @@ public class DevEmailService {
             String[] recipients = commaSeparatedRecipients.split("[,;]");
             InternetAddress[] addresses = new InternetAddress[recipients.length];
             for (int i = 0; i < recipients.length; i++) {
-                addresses[i] = new InternetAddress(recipients[i]);
+                if (!recipients[i].trim().isEmpty())
+                    addresses[i] = new InternetAddress(recipients[i]);
             }
             message.addRecipients(Message.RecipientType.TO, addresses);
             message.setSubject(subject);
@@ -64,7 +65,7 @@ public class DevEmailService {
             MimeBodyPart messageBodyPart = new MimeBodyPart();
             messageBodyPart.setHeader("Content-Type", "text/html; charset=UTF-8");
 //            messageBodyPart.setContent(body, "text/html");
-            messageBodyPart.setText( body, "UTF-8", "html" );
+            messageBodyPart.setText(body, "UTF-8", "html");
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
             // Part two is attachment
