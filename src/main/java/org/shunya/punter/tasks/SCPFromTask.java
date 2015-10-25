@@ -39,6 +39,8 @@ public class SCPFromTask extends Tasks {
             if (new File(localFile).isDirectory()) {
                 prefix = localFile + File.separator;
             }
+            getTaskHistory().setActivity("Connecting to Shell");
+            getObserver().update(getTaskHistory());
 
             JSch jsch = new JSch();
 //	      jsch.addIdentity(System.getProperty("user.home") + "/.ssh/id_rsa");
@@ -62,12 +64,19 @@ public class SCPFromTask extends Tasks {
             LOGGER.get().log(Level.INFO, "Connected to Shell.");
             int fileCounter = 0;
             String[] localFiles = localFile.split("[\r\n|\n\r|\r|\n|;|,]");
+            int totalFiles = localFiles.length;
             Scanner stk = new Scanner(remoteFile).useDelimiter("\r\n|\n\r|\r|\n|;|,");
             while (stk.hasNext()) {
                 String currfile = stk.next().trim();
+
                 if (currfile.startsWith("#") || currfile.isEmpty())
                     continue;
                 fileCounter++;
+
+                getTaskHistory().setProgress(100 * fileCounter / totalFiles);
+                getTaskHistory().setActivity("Downloading .. " + currfile);
+                getObserver().update(getTaskHistory());
+
                 // exec 'scp -f rfile' remotely
                 String command = "scp -f " + currfile;
                 Channel channel = session.openChannel("exec");
