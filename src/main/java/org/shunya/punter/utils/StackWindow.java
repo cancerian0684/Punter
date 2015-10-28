@@ -1,5 +1,7 @@
 package org.shunya.punter.utils;
 
+import org.pegdown.Extensions;
+import org.pegdown.PegDownProcessor;
 import org.shunya.punter.gui.AppSettings;
 
 import javax.swing.*;
@@ -10,7 +12,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 
 public class StackWindow extends JFrame implements Thread.UncaughtExceptionHandler {
-
+    private final PegDownProcessor pegDownProcessor = new PegDownProcessor(Extensions.ALL);
     private final String devEmailCSV;
     private JTextArea textArea;
     private volatile int count = 0;
@@ -52,7 +54,7 @@ public class StackWindow extends JFrame implements Thread.UncaughtExceptionHandl
                             Thread.sleep(500);
                             System.exit(0);
                         } else {
-                            DevEmailService.getInstance().sendEmail("Unknown Exception : [" + AppSettings.getInstance().getUsername() + "] ", devEmailCSV, sw.toString(), Collections.<File>emptyList());
+                            DevEmailService.getInstance().sendEmail("Unknown Punter Exception : [" + AppSettings.getInstance().getUsername() + "] ", devEmailCSV,pegDownProcessor.markdownToHtml("```java\n\n"+sw.toString()+"\n```"), Collections.<File>emptyList());
                         }
                     } catch (Throwable E) {
                         System.err.println(E.toString());
