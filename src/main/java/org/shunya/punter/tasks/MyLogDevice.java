@@ -1,7 +1,6 @@
 package org.shunya.punter.tasks;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
 
 class MyLogDevice implements ILogDevice
 	{
@@ -11,7 +10,7 @@ class MyLogDevice implements ILogDevice
 		}
 		@Override
 		public void log(String str) {
-			logger.log(Level.INFO, str);
+			logger.info(str);
 		}
 
 	}

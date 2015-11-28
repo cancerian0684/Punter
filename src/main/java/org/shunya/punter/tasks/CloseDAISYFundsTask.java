@@ -9,7 +9,6 @@ import java.sql.DriverManager;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.Scanner;
-import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="CloseDAISYFundsTask",description="Close Out DAISY Funds.",documentation= "src/main/resources/docs/TextSamplerDemoHelp.html")
 public class CloseDAISYFundsTask extends Tasks {
@@ -29,7 +28,7 @@ public class CloseDAISYFundsTask extends Tasks {
 		try{
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			Connection conn = DriverManager.getConnection(conURL, username, password);
-			LOGGER.get().log(Level.INFO, "Connected to DB");
+			LOGGER.get().info("Connected to DB");
 			Scanner stk = new Scanner(fundSymbols).useDelimiter("\r\n|\n\r|\r|\n|,| |;");
 			int counter=0;
 		      while (stk.hasNext()) {
@@ -46,18 +45,18 @@ public class CloseDAISYFundsTask extends Tasks {
 //					        }
 					      }
 					  else
-						  LOGGER.get().log(Level.INFO, counter+" - " + fundSymbol+" [rows updated : "+s.getUpdateCount()+ " ]["+warning+"]");
+						  LOGGER.get().info(counter+" - " + fundSymbol+" [rows updated : "+s.getUpdateCount()+ " ]["+warning+"]");
 				    }
 				    while (s.getMoreResults());
 					s.close();
 				}
 		      }
 		      conn.close();
-		      LOGGER.get().log(Level.INFO, "Connection to DB Closed.");
+		      LOGGER.get().info("Connection to DB Closed.");
 			status=true;
 		}catch (Exception e) {
 			e.printStackTrace();
-			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+			LOGGER.get().info(StringUtils.getExceptionStackTrace(e));
 		}finally{
 			
 		}

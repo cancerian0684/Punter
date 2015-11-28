@@ -28,7 +28,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="SVNCommitHistoryTask",description="Takes out SVN Commit history.",documentation= "src/main/resources/docs/TextSamplerDemoHelp.html")
 public class SVNCommitHistoryTask extends Tasks {
@@ -103,13 +102,13 @@ public class SVNCommitHistoryTask extends Tasks {
 	                     * from and what revision the origin path was at.
 	                     * */
 	                    paths[count]=entryPath.getPath();
-	                    LOGGER.get().log(Level.INFO, " "
-	                            + entryPath.getType()
-	                            + "	"
-	                            + entryPath.getPath()
-	                            + ((entryPath.getCopyPath() != null) ? " (from "
-	                                    + entryPath.getCopyPath() + " revision "
-	                                    + entryPath.getCopyRevision() + ")" : ""));
+	                    LOGGER.get().info(" "
+								+ entryPath.getType()
+								+ "	"
+								+ entryPath.getPath()
+								+ ((entryPath.getCopyPath() != null) ? " (from "
+								+ entryPath.getCopyPath() + " revision "
+								+ entryPath.getCopyRevision() + ")" : ""));
 	                    count++;
 	                }
 	            }
@@ -132,13 +131,13 @@ public class SVNCommitHistoryTask extends Tasks {
 			status=true;
 		}
         catch (SVNException svne) {
-            LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(svne));
+            LOGGER.get().error(StringUtils.getExceptionStackTrace(svne));
 		} catch (PropertyException e) {
-			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+			LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
 		} catch (JAXBException e) {
-			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+			LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
 		} catch(Exception e){
-			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+			LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
 		}
 		return status;
 	}

@@ -5,7 +5,6 @@ import org.shunya.punter.annotations.InputParam;
 import org.shunya.punter.annotations.PunterTask;
 
 import java.sql.*;
-import java.util.logging.Level;
 
 @PunterTask(author="sharmban",name="UpdateSedolTask",description="Updates Sedol for Fund in AISDB and DAISY",documentation= "src/main/resources/docs/TextSamplerDemoHelp.html")
 public class UpdateSedolTask extends Tasks{
@@ -40,9 +39,9 @@ public class UpdateSedolTask extends Tasks{
 		//for AISDB
 		
 		AISDBQADBConnection = ConnectionUtil.getConnection(AISDBConnURL, AISDBUser, AISDBPswd);
-		LOGGER.get().log(Level.INFO, "Connected to AISDB");
+		LOGGER.get().info("Connected to AISDB");
 		dAISyQADBConnection = ConnectionUtil.getConnection(dAISyConnURL, dAISyUser, dAISyPswd);
-		LOGGER.get().log(Level.INFO, "Connected to DAISY");
+		LOGGER.get().info("Connected to DAISY");
 		
 		try {
 			
@@ -53,7 +52,7 @@ public class UpdateSedolTask extends Tasks{
 			ResultSet resultSet = preparedStatement.executeQuery();
 			if(resultSet.next())
 			{
-				LOGGER.get().log(Level.INFO, "Sedol Already Exists in AISDB");
+				LOGGER.get().info("Sedol Already Exists in AISDB");
 				throw new Exception("Sedol Already Exists in AISDB");
 			}
 			//For dAISy
@@ -62,7 +61,7 @@ public class UpdateSedolTask extends Tasks{
 			resultSet = preparedStatement.executeQuery();
 			if(resultSet.next())
 			{
-				LOGGER.get().log(Level.INFO, "Sedol Already Exists in DAISY");
+				LOGGER.get().info("Sedol Already Exists in DAISY");
 				throw new Exception("Sedol Already Exists in dAISy");
 			}
 			
@@ -72,7 +71,7 @@ public class UpdateSedolTask extends Tasks{
 			resultSet = preparedStatement.executeQuery();
 			if(!resultSet.next())
 			{
-				LOGGER.get().log(Level.INFO, "No such symbol exists in AISDB");
+				LOGGER.get().info("No such symbol exists in AISDB");
 				throw new Exception("No such symbol exists in AISDB");
 			}
 			else
@@ -88,15 +87,15 @@ public class UpdateSedolTask extends Tasks{
 			callableStatement.setString(1, oldSedol);
 			callableStatement.setString(2, newSedol);
 			callableStatement.registerOutParameter(3, java.sql.Types.VARCHAR);
-			LOGGER.get().log(Level.INFO, "Calling Procedure UPDATE_SEDOL");
+			LOGGER.get().info("Calling Procedure UPDATE_SEDOL");
 			num = callableStatement.executeUpdate();
 			//callableStatement.execute();
 			if(num!=1)
 			{
-				LOGGER.get().log(Level.INFO, "Can not update Sedol .. unknown reason");
+				LOGGER.get().info("Can not update Sedol .. unknown reason");
 				throw new Exception("Can not update Sedol .. unknown reason");
 			}
-			LOGGER.get().log(Level.INFO, "updated sedol in AISDB");
+			LOGGER.get().info("updated sedol in AISDB");
 			num=0;
 			//updating real sedol if required
 			if(updateRealSedol == true)
@@ -104,11 +103,11 @@ public class UpdateSedolTask extends Tasks{
 				preparedStatement = AISDBQADBConnection.prepareStatement("update t_fund set tf_real_sedol = ? where tf_sedol = ?");
 				preparedStatement.setString(1, newSedol);
 				preparedStatement.setString(2, newSedol);
-				LOGGER.get().log(Level.INFO, "updating real sedol in AISDB");
+				LOGGER.get().info("updating real sedol in AISDB");
 				num = preparedStatement.executeUpdate();
 				if(num == 0)
 				{
-					LOGGER.get().log(Level.INFO, "Can not update real Sedol in aisdb");
+					LOGGER.get().info("Can not update real Sedol in aisdb");
 					throw new Exception("Can not update real Sedol");
 				}
 				num = 0; //because it is being used again below
@@ -123,7 +122,7 @@ public class UpdateSedolTask extends Tasks{
 			resultSet = preparedStatement.executeQuery();
 			if(!resultSet.next())
 			{
-				LOGGER.get().log(Level.INFO, "This symbol does not exist in dAISy.");
+				LOGGER.get().info("This symbol does not exist in dAISy.");
 				return true;
 			}
 			
@@ -136,10 +135,10 @@ public class UpdateSedolTask extends Tasks{
 
 			if(num == 0)
 			{
-				LOGGER.get().log(Level.INFO, "Can not update Sedol in DAISY.");
+				LOGGER.get().info("Can not update Sedol in DAISY.");
 				throw new Exception("Can not update Sedol in DAISY.");
 			}
-			LOGGER.get().log(Level.INFO, "Updated sedol in DAISY.");
+			LOGGER.get().info("Updated sedol in DAISY.");
 			
 			
 			// all done, if reaches here
@@ -156,7 +155,7 @@ public class UpdateSedolTask extends Tasks{
 			AISDBQADBConnection.close();
 			if(dAISyQADBConnection!=null)
 			dAISyQADBConnection.close();
-			LOGGER.get().log(Level.INFO, "Closed all DB connections");
+			LOGGER.get().info("Closed all DB connections");
 		}
 		return result;
 	}
@@ -170,17 +169,17 @@ public class UpdateSedolTask extends Tasks{
 		catch(Exception exception)
 		{
 			exception.printStackTrace();
-			LOGGER.get().log(Level.WARNING,exception.getMessage());
+			LOGGER.get().error(exception.getMessage());
 		}
 		finally
 		{
 			if(result == false)
 			{
-				LOGGER.get().log(Level.WARNING, "Sedol can not be updated");
+				LOGGER.get().error("Sedol can not be updated");
 			}
 			else
 			{
-				LOGGER.get().log(Level.INFO, "Sedol updated :) ");
+				LOGGER.get().error("Sedol updated :) ");
 			}
 		}
 		return result;

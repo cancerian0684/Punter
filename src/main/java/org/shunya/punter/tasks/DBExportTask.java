@@ -7,7 +7,6 @@ import org.shunya.punter.annotations.PunterTask;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="DBExportTask",documentation= "src/main/resources/docs/DBExportTask.html")
 public class DBExportTask extends Tasks {
@@ -25,15 +24,15 @@ public class DBExportTask extends Tasks {
 		try{
 			SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");
 			dumpFile=outFolderName+"/"+sdf.format(new Date())+".dmp";
-			LOGGER.get().log(Level.INFO, expCommand+" file="+dumpFile);
+			LOGGER.get().info(expCommand + " file=" + dumpFile);
 			java.lang.Process p = Runtime.getRuntime().exec(expCommand+" file="+dumpFile);
 			status=startOutputAndErrorReadThreads(p.getInputStream(),p.getErrorStream());
 			p.waitFor();
-			LOGGER.get().log(Level.INFO,"DB Backup taken successfully to file : "+dumpFile);
+			LOGGER.get().info("DB Backup taken successfully to file : " + dumpFile);
 //			status=true;
 		}catch (Exception e) {
 			status=false;
-			LOGGER.get().log(Level.SEVERE, e.getMessage());
+			LOGGER.get().error(e.getMessage());
 		}
 		 return status;
 	}

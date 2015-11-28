@@ -1,5 +1,6 @@
 package org.shunya.punter.gui;
 
+import ch.qos.logback.classic.Level;
 import org.shunya.punter.annotations.PunterTask;
 import org.shunya.punter.executors.ProcessExecutor;
 import org.shunya.punter.executors.PunterJobScheduler;
@@ -159,7 +160,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             //Task has completed
                             try {
                                 LogWindow logWindow = new LogWindow(10000, taskHistory.getTask().getName());
-                                logWindow.log(taskHistory.getLogs());
+                                logWindow.log(taskHistory.getLogs(), Level.ALL);
                                 logWindow.showLog();
                             } catch (Exception e1) {
                                 e1.printStackTrace();
@@ -169,7 +170,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             if(task!=null && task.getHosts()!=null && !task.getHosts().isEmpty()){
                                 try {
                                     LogWindow logWindow = new LogWindow(10000, taskHistory.getTask().getName());
-                                    logWindow.log(task.getRemoteLog(taskHistory.getId()));
+                                    logWindow.log(task.getRemoteLog(taskHistory.getId()), Level.ALL);
                                     logWindow.showLog();
                                 } catch (Exception e1) {
                                     e1.printStackTrace();
@@ -1038,7 +1039,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                         if (ph.getLogs() != null)
                             try {
                                 LogWindow logWindow = new LogWindow(10000, ph.getTask().getName());
-                                logWindow.log(ph.getLogs());
+                                logWindow.log(ph.getLogs(), Level.ALL);
                                 logWindow.showLog();
                             } catch (Exception e1) {
                                 e1.printStackTrace();
@@ -1157,7 +1158,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                         if (ph.getLogs() != null)
                             try {
                                 LogWindow logWindow = new LogWindow(10000, ph.getTask().getName());
-                                logWindow.log(ph.getLogs());
+                                logWindow.log(ph.getLogs(), Level.ALL);
                                 logWindow.showLog();
                             } catch (Exception e1) {
                                 e1.printStackTrace();

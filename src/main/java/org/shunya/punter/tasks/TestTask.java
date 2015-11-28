@@ -1,10 +1,12 @@
 package org.shunya.punter.tasks;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.Process;
-import java.util.logging.Logger;
 
 /**
  * Created by munichan on 2/23/14.
@@ -16,7 +18,7 @@ public class TestTask {
     public static final ThreadLocal<Logger> LOGGER = new ThreadLocal<Logger>() {
         @Override
         protected Logger initialValue() {
-            Logger logger = Logger.getLogger("Logger for " + Thread.currentThread().getName());
+            Logger logger = LoggerFactory.getLogger("Logger for " + Thread.currentThread().getName());
             return logger;
         }
     };

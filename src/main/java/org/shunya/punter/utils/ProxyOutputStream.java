@@ -1,9 +1,9 @@
 package org.shunya.punter.utils;
 
+import org.slf4j.Logger;
+
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ProxyOutputStream extends OutputStream {
     private StringBuilder logs = new StringBuilder(10000);
@@ -45,7 +45,7 @@ public class ProxyOutputStream extends OutputStream {
     }
 
     private void writeLine(String line) {
-        logger.log(Level.INFO, line);
+        logger.info(line);
     }
 
     public synchronized void waitForToken() {

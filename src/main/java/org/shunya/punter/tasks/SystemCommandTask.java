@@ -1,5 +1,6 @@
 package org.shunya.punter.tasks;
 
+import ch.qos.logback.classic.Logger;
 import org.shunya.punter.annotations.InputParam;
 import org.shunya.punter.annotations.PunterTask;
 import org.shunya.punter.utils.StringUtils;
@@ -7,8 +8,6 @@ import org.shunya.punter.utils.StringUtils;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @PunterTask(author = "munishc", name = "SystemCommandTask", documentation = "src/main/resources/docs/SystemCommandTask.html")
 public class SystemCommandTask extends Tasks {
@@ -32,10 +31,10 @@ public class SystemCommandTask extends Tasks {
                     startOutputAndErrorReadThreads(child.getInputStream(), child.getErrorStream(), logger);
                 } catch (AssertionMessageException e) {
                     status.set(false);
-                    logger.log(Level.SEVERE, e.getMessage());
+                    logger.error(e.getMessage());
                 } catch (Exception e) {
                     status.set(false);
-                    logger.log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+                    logger.error(StringUtils.getExceptionStackTrace(e));
                 }
             });
             captureProcessStreams.start();
@@ -57,7 +56,7 @@ public class SystemCommandTask extends Tasks {
             captureProcessStreams.join();
 
             if (waitForTerminate) {
-                logger.log(Level.INFO, "Waiting for the process to terminate");
+                logger.info("Waiting for the process to terminate");
                 child.waitFor();
             }
 
@@ -65,7 +64,7 @@ public class SystemCommandTask extends Tasks {
             getObserver().update(getTaskHistory());
         } catch (Exception e) {
             status.set(false);
-            LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+            LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
         }
         return status.get();
     }

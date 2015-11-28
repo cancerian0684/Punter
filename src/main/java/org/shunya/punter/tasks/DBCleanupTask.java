@@ -12,7 +12,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="DBCleanupTask",documentation= "src/main/resources/docs/DBCleanupTask.html")
 public class DBCleanupTask extends Tasks {
@@ -32,7 +31,7 @@ public class DBCleanupTask extends Tasks {
 				throw new Exception("This task is not meant for Production DB's");
 			}
 			Connection conn = DriverManager.getConnection(conURL, username, password);
-			LOGGER.get().log(Level.INFO, "Connected to DB");
+			LOGGER.get().info("Connected to DB");
 			Statement s = conn.createStatement();
 			s.setQueryTimeout(3*60);
 //			s.executeUpdate(readFromFile("sql/test.sql","\n"));
@@ -41,29 +40,29 @@ public class DBCleanupTask extends Tasks {
 			while(rs.next()){
 				i++;
 				String sql=rs.getString(1);
-				LOGGER.get().log(Level.INFO, ""+i+" "+sql);
+				LOGGER.get().info("" + i + " " + sql);
 				Statement dropStatement = conn.createStatement();
 				try{
 				dropStatement.executeUpdate(sql);
 				dropStatement.close();
 				}catch (Exception e) {
 //					e.printStackTrace();
-					LOGGER.get().log(Level.WARNING, ""+i+" "+sql+" Failed" +StringUtils.getExceptionStackTrace(e));
+					LOGGER.get().warn("" + i + " " + sql + " Failed" + StringUtils.getExceptionStackTrace(e));
 				}finally{
 					dropStatement.close();
 				}
 			}
-			LOGGER.get().log(Level.INFO, "DBCleanup Task completed successfully");
+			LOGGER.get().info("DBCleanup Task completed successfully");
 			/*CallableStatement cs=conn.prepareCall("{call MYPROC}");
 			cs.setQueryTimeout(2*60);
 			cs.executeUpdate();
 			System.out.println("Database objects dropped successfully.");*/
 			conn.close();
-			LOGGER.get().log(Level.INFO, "Connection to DB Closed.");
+			LOGGER.get().info("Connection to DB Closed.");
 			status=true;
 		}catch (Exception e) {
 			status=false;
-			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+			LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
 		}
 		 return status;
 	}

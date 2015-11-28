@@ -7,7 +7,6 @@ import org.shunya.punter.annotations.PunterTask;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
-import java.util.logging.Level;
 
 @PunterTask(author = "munishc", name = "SCPTask", description = "SCP File to remote machine.", documentation = "src/main/resources/docs/SCPTask.html")
 public class SCPTask extends Tasks {
@@ -53,7 +52,7 @@ public class SCPTask extends Tasks {
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect();
 //	      session.connect(30000);   // making a connection with timeout.
-            LOGGER.get().log(Level.INFO, "Connected to Shell.");
+            LOGGER.get().info("Connected to Shell.");
 
             String[] srcFiles = sourceFile.split("[\r\n|\n\r|\r|\n|;|,]");
             String[] tgtFiles = targetFile.split("[\r\n|\n\r|\r|\n|;|,]");
@@ -77,7 +76,7 @@ public class SCPTask extends Tasks {
                 channel.connect();
 
                 if (checkAck(in) != 0) {
-                    LOGGER.get().log(Level.SEVERE, "UnKnown Error transmitting the file.");
+                    LOGGER.get().error("UnKnown Error transmitting the file.");
                     return false;
                 }
 
@@ -93,7 +92,7 @@ public class SCPTask extends Tasks {
                 out.write(command.getBytes());
                 out.flush();
                 if (checkAck(in) != 0) {
-                    LOGGER.get().log(Level.SEVERE, "UnKnown Error transmitting the file.");
+                    LOGGER.get().error("UnKnown Error transmitting the file.");
                     return false;
                 }
                 // send a content of lfile
@@ -117,23 +116,23 @@ public class SCPTask extends Tasks {
                     out.write(buf, 0, 1);
                     out.flush();
                     if (checkAck(in) != 0) {
-                        LOGGER.get().log(Level.SEVERE, "UnKnown Error transmitting the file.");
+                        LOGGER.get().error("UnKnown Error transmitting the file.");
                         return false;
                     }
                 } catch (IOException ee) {
-                    LOGGER.get().log(Level.SEVERE, "Error in SCP operation", ee);
+                    LOGGER.get().error("Error in SCP operation", ee);
                     ee.printStackTrace();
                 } finally {
                     out.close();
                 }
                 channel.disconnect();
-                LOGGER.get().log(Level.INFO, "File sent successfully : " + tgtFile);
+                LOGGER.get().info("File sent successfully : " + tgtFile);
             }
 
             session.disconnect();
             status = true;
         } catch (Exception e) {
-            LOGGER.get().log(Level.SEVERE, "Error in SCP operation", e);
+            LOGGER.get().error("Error in SCP operation", e);
             e.printStackTrace();
         }
         return status;

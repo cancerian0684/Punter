@@ -8,7 +8,6 @@ import org.shunya.server.PunterProcessRunMessage;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="EchoTask",description="Echo's the input data to SOP",documentation= "src/main/resources/docs/TextSamplerDemoHelp.html")
 public class RunProcessTask extends Tasks {
@@ -17,7 +16,7 @@ public class RunProcessTask extends Tasks {
 
 	@Override
 	public boolean run() {
-		LOGGER.get().log(Level.INFO, "Running process - "+ id);
+		LOGGER.get().info("Running process - " + id);
         PunterProcessRunMessage processRunMessage = new PunterProcessRunMessage();
         processRunMessage.setProcessId(Long.parseLong(id));
 //        processRunMessage.setParams();

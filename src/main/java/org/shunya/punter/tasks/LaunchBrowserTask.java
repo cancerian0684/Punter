@@ -8,7 +8,6 @@ import org.shunya.punter.utils.StringUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="LaunchBrowserTask",description="Launch the System default browser fpr the given URL.",documentation= "src/main/resources/docs/TextSamplerDemoHelp.html")
 public class LaunchBrowserTask extends Tasks {
@@ -26,9 +25,9 @@ public class LaunchBrowserTask extends Tasks {
 			result=url;
 			status=true;
 		} catch (IOException e) {
-			LOGGER.get().log(Level.WARNING, StringUtils.getExceptionStackTrace(e));
+			LOGGER.get().warn(StringUtils.getExceptionStackTrace(e));
 		} catch (URISyntaxException e) {
-			LOGGER.get().log(Level.WARNING, StringUtils.getExceptionStackTrace(e));
+			LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
 		} 
 		return status;
 	}

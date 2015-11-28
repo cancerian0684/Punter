@@ -9,7 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.util.Scanner;
-import java.util.logging.Level;
 
 @PunterTask(author = "munishc", name = "SCPFromTask", description = "SCP remote file to Local machine.", documentation = "src/main/resources/docs/SCPFromTask.html")
 public class SCPFromTask extends Tasks {
@@ -61,7 +60,7 @@ public class SCPFromTask extends Tasks {
             // session.setConfig("StrictHostKeyChecking", "no");
             session.connect();
 //	      session.connect(30000);   // making a connection with timeout.
-            LOGGER.get().log(Level.INFO, "Connected to Shell.");
+            LOGGER.get().info("Connected to Shell.");
             int fileCounter = 0;
             String[] localFiles = localFile.split("[\r\n|\n\r|\r|\n|;|,]");
             int totalFiles = localFiles.length;
@@ -121,7 +120,7 @@ public class SCPFromTask extends Tasks {
                             break;
                         }
                     }
-                    LOGGER.get().log(Level.INFO, fileCounter + ".) filesize=" + filesize + ", file=" + file + " [" + currfile + "]");
+                    LOGGER.get().info(fileCounter + ".) filesize=" + filesize + ", file=" + file + " [" + currfile + "]");
                     // send '\0'
                     buf[0] = 0;
                     out.write(buf, 0, 1);
@@ -146,7 +145,7 @@ public class SCPFromTask extends Tasks {
                             if (filesize == 0L) break;
                         }
                         if (checkAck(in) != 0) {
-                            LOGGER.get().log(Level.SEVERE, "Unknown Technical Failure while retrieving the file.");
+                            LOGGER.get().error("Unknown Technical Failure while retrieving the file.");
                             throw new Exception("Unknown Technical Failure while retrieving the file.");
                         }
                         // send '\0'
@@ -161,11 +160,11 @@ public class SCPFromTask extends Tasks {
 //		        }
                 }
             }
-            LOGGER.get().log(Level.INFO, "Disconnecting from the session.");
+            LOGGER.get().info("Disconnecting from the session.");
             session.disconnect();
             status = true;
         } catch (Exception e) {
-            LOGGER.get().log(Level.SEVERE, "Exception occurred. \n" + StringUtils.getExceptionStackTrace(e));
+            LOGGER.get().error("Exception occurred. \n" + StringUtils.getExceptionStackTrace(e));
             status = false;
         }
         return status;
@@ -189,10 +188,10 @@ public class SCPFromTask extends Tasks {
             }
             while (c != '\n');
             if (b == 1) { // error
-                LOGGER.get().log(Level.SEVERE, "Error occurred." + sb.toString());
+                LOGGER.get().error("Error occurred." + sb.toString());
             }
             if (b == 2) { // fatal error
-                LOGGER.get().log(Level.SEVERE, "Fatal Error occurred." + sb.toString());
+                LOGGER.get().error("Fatal Error occurred." + sb.toString());
             }
         }
         return b;

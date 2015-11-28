@@ -8,7 +8,6 @@ import org.shunya.punter.utils.StringUtils;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="CopyTableDataTask",description="Copie's Select Queries resultset to target Table.",documentation= "src/main/resources/docs/CopyTableDataTask.html")
 public class CopyTableDataTask extends Tasks {
@@ -62,7 +61,7 @@ public class CopyTableDataTask extends Tasks {
 		  	 		int dataType=sourceRS.getMetaData().getColumnType(i);
 		  	 		columnDataType.add(dataType);
 		  	 	}
-			LOGGER.get().log(Level.INFO, "Inserting Data.");
+			LOGGER.get().info("Inserting Data.");
 			while(sourceRS.next()){
 				try{
 				for (int i=0; i<columns; i++) {
@@ -79,17 +78,17 @@ public class CopyTableDataTask extends Tasks {
 					e.printStackTrace();
 				}
 			}
-			LOGGER.get().log(Level.INFO, "Commiting changes");
+			LOGGER.get().info("Commiting changes");
 			targetCon.commit();
 			sourceRS.close();
 			stmt.close();
 			pstmt.close();
 			targetCon.close();
 			sourceCon.close();
-			LOGGER.get().log(Level.INFO, "Successfully Rows updated : "+rows);
+			LOGGER.get().info("Successfully Rows updated : " + rows);
 			status=true;
 		}catch (Exception e) {
-            LOGGER.get().severe(StringUtils.getExceptionStackTrace(e));
+            LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
 		}
 		return status;
 	}

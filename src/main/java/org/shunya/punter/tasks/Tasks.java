@@ -1,5 +1,11 @@
 package org.shunya.punter.tasks;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.OutputStreamAppender;
 import org.shunya.punter.annotations.InputParam;
 import org.shunya.punter.annotations.OutputParam;
 import org.shunya.punter.executors.ParallelTaskRunner;
@@ -10,8 +16,10 @@ import org.shunya.punter.utils.FieldProperties;
 import org.shunya.punter.utils.FieldPropertiesMap;
 import org.shunya.server.component.DBService;
 import org.shunya.server.component.RestClient;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBException;
+import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.text.ParseException;
@@ -22,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.*;
 
 import static java.util.Arrays.asList;
 
@@ -34,15 +41,14 @@ public abstract class Tasks implements Serializable {
     private FieldPropertiesMap overrideInputParams;
     protected TaskData taskDao;
     protected DBService dbService;
-    private transient ConsoleHandler cHandler = null;
-    private transient MemoryHandler mHandler = null;
-    private transient Level loggingLevel = Level.FINE;
-    protected StringBuilder strLogger;
+    protected ByteArrayOutputStream logStream = new ByteArrayOutputStream();
     private boolean doVariableSubstitution = false;
     private LogListener logListener;
+    private LogWindowAppender logWindowAppender;
     private String hosts;
     protected RestClient restClient = new RestClient();
     protected TaskObserver observer;
+    public String LOG_PATTERN = "%d{HH:mm:ss} %-5level - %msg%n";
 
     public void setDoVariableSubstitution(boolean doVariableSubstitution) {
         this.doVariableSubstitution = doVariableSubstitution;
@@ -51,48 +57,40 @@ public abstract class Tasks implements Serializable {
     public static final ThreadLocal<Logger> LOGGER = new ThreadLocal<Logger>() {
         @Override
         protected Logger initialValue() {
-            Logger logger = Logger.getLogger("Logger for " + Thread.currentThread().getName());
+            Logger logger = (Logger) LoggerFactory.getLogger("Logger for " + Thread.currentThread().getName());
             return logger;
         }
     };
 
     public void beforeTaskStart() {
-        strLogger = new StringBuilder();
-        /* cHandler = new ConsoleHandler();
-          cHandler.setFormatter(new Formatter() {
-              @Override
-              public String format(LogRecord record) {
-                  return new Date(record.getMillis())+" ["+Thread.currentThread().getName()+"] "+record.getLevel()
-                  + " "+record.getSourceClassName()+"."
-                + record.getSourceMethodName() + "() - "
-                + record.getMessage() + "\r\n";
-              }
-          });*/
-        mHandler = new MemoryHandler(new Handler() {
-            public void publish(LogRecord record) {
-                //String msg = new Date(record.getMillis()) + " [" + record.getLevel() + "] " + record.getMessage();
-                final String msg = record.getMessage() + "\n";
-                strLogger.append(msg);
-                if (logListener != null) {
-                    logListener.log(msg);
-                }
-            }
+// Get LoggerContext from SLF4J
+        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-            @Override
-            public void flush() {
-            }
+// Encoder
+        PatternLayoutEncoder encoder = new PatternLayoutEncoder();
+        encoder.setContext(context);
+        encoder.setPattern(LOG_PATTERN);
+        encoder.start();
 
-            @Override
-            public void close() throws SecurityException {
-            }
-        }, 2, loggingLevel);
-        LOGGER.get().addHandler(mHandler);
-//	    LOGGER.get().addHandler(cHandler);
-        LOGGER.get().setUseParentHandlers(false);
-    }
+// OutputStreamAppender
+        OutputStreamAppender<ILoggingEvent> appender= new OutputStreamAppender<>();
+        appender.setName( "OutputStream Appender" );
+        appender.setContext(context);
+        appender.setEncoder(encoder);
+        appender.setOutputStream(logStream);
+        appender.setEncoder(encoder);
+        appender.start();
 
-    public void setLoggingLevel(Level loggingLevel) {
-        this.loggingLevel = loggingLevel;
+        logWindowAppender = new LogWindowAppender(logListener, LOG_PATTERN);
+        logWindowAppender.setName( "LogWidow Appender" );
+        logWindowAppender.setContext(context);
+        logWindowAppender.start();
+
+        Logger logger = LOGGER.get();
+        logger.addAppender(appender);
+        logger.addAppender(logWindowAppender);
+        logger.setLevel(Level.DEBUG);
+        logger.setAdditive(false); /* set to true if root should log too */
     }
 
     public DBService getDbService() {
@@ -104,8 +102,8 @@ public abstract class Tasks implements Serializable {
     }
 
     public String getMemoryLogs() {
-        if (strLogger != null)
-            return strLogger.toString();
+        if (logStream != null)
+            return logStream.toString();
         return "";
     }
 
@@ -239,8 +237,7 @@ public abstract class Tasks implements Serializable {
     }
 
     public void afterTaskFinish() {
-        LOGGER.get().removeHandler(mHandler);
-        LOGGER.get().removeHandler(cHandler);
+        LOGGER.get().detachAndStopAllAppenders();
     }
 
     /*
@@ -258,14 +255,15 @@ public abstract class Tasks implements Serializable {
             taskDao.setInputParamsAsObject(getInputParams());
             List<Callable> tasks = new ArrayList<>();
             List<Boolean> statuses = new ArrayList<>();
+            Logger logger = LOGGER.get();
             asList(taskDao.getHosts().split("[,;]")).forEach(host -> tasks.add(() -> restClient.executeRemoteTask(taskDao, host.trim(), getTaskHistory().getId())));
             new ParallelTaskRunner().execute(tasks, resultsMap -> {
                 boolean jobStatus = (boolean) resultsMap.get("status");
                 statuses.add(jobStatus);
                 sessionMap.putAll(resultsMap);
-                strLogger.append("\n-------------------------------------\n");
-                strLogger.append("Host = " + resultsMap.get("host") + "\n");
-                strLogger.append(resultsMap.get("logs"));
+                logger.info("\n-------------------------------------\n");
+                logger.info("Host = " + resultsMap.get("host") + "\n");
+                logger.info(resultsMap.get("logs").toString());
             }).shutdown();
             status.set(true);
             statuses.forEach(jobStatus -> status.set(status.get() & jobStatus));

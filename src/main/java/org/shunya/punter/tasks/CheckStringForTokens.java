@@ -4,8 +4,6 @@ import org.shunya.punter.annotations.InputParam;
 import org.shunya.punter.annotations.OutputParam;
 import org.shunya.punter.annotations.PunterTask;
 
-import java.util.logging.Level;
-
 @PunterTask(author = "munishc", name = "CheckStringForTokens", description = "Echo's the input data to SOP", documentation = "com/shunya/punter/tasks/docs/TextSamplerDemoHelp.html")
 public class CheckStringForTokens extends Tasks {
 	@InputParam(required = true,description="enter the input string")
@@ -30,11 +28,11 @@ public class CheckStringForTokens extends Tasks {
 				      }
 				}
 				if(outName.length()>=1){
-					LOGGER.get().log(Level.SEVERE, outName);
+					LOGGER.get().warn(outName);
                 tokenPresent = true;
 				}
             if (tokenPresent == assertion) {
-                LOGGER.get().log(Level.INFO, "every expectation met.");
+                LOGGER.get().info("every expectation met.");
                 return true;
             }else{
                 return false;

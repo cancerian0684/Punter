@@ -13,7 +13,6 @@ import org.shunya.punter.annotations.PunterTask;
 import org.shunya.punter.utils.StringUtils;
 
 import java.io.InputStream;
-import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="ColtMsgSenderTask",description="Echo's the input data to SOP",documentation= "src/main/resources/docs/TextSamplerDemoHelp.html")
 public class ColtMsgSenderTask extends Tasks {
@@ -36,22 +35,22 @@ public class ColtMsgSenderTask extends Tasks {
 			httppost.setEntity(new StringEntity(json, HTTP.UTF_8));
 			HttpResponse response = httpclient.execute(httppost);
 			HttpEntity resEntity = response.getEntity();
-			LOGGER.get().log(Level.INFO, response.getStatusLine().toString());
+			LOGGER.get().info(response.getStatusLine().toString());
 			if (resEntity != null) {
-				LOGGER.get().log(Level.INFO, "Response content length: "+ resEntity.getContentLength());
+				LOGGER.get().info("Response content length: "+ resEntity.getContentLength());
 			}
 			InputStream in = resEntity.getContent();
 			String res = org.apache.commons.io.IOUtils.toString(in);
-			LOGGER.get().log(Level.INFO, res);
+			LOGGER.get().info(res);
 			status=true;
 		} catch (Exception e) {
-			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+			LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
 		} finally {
 			try {
 				httpclient.getConnectionManager().shutdown();
 			} catch (Exception ignore) {
 				ignore.printStackTrace();
-				LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(ignore));
+				LOGGER.get().error(StringUtils.getExceptionStackTrace(ignore));
 			}
 		}
 		return status;

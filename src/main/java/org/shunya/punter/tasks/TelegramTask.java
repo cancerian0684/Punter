@@ -5,7 +5,6 @@ import org.shunya.punter.annotations.PunterTask;
 import org.telegram.bot.Application;
 
 import java.io.IOException;
-import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="TelegramTask",description="Echo's the input data to Telegram API", documentation= "src/main/resources/docs/TextSamplerDemoHelp.html")
 public class TelegramTask extends Tasks {
@@ -14,7 +13,7 @@ public class TelegramTask extends Tasks {
 
 	@Override
 	public boolean run() {
-		LOGGER.get().log(Level.INFO, message);
+		LOGGER.get().info(message);
         Application telegram = new Application();
         try {
             telegram.sendMessageToTestM(message);

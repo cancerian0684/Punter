@@ -8,7 +8,6 @@ import org.shunya.punter.utils.StringUtils;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.logging.Level;
 
 @PunterTask(author = "munishc", name = "HttpGetTask", description = "Plays HTTP GET Request on the given URL.", documentation = "src/main/resources/docs/TextSamplerDemoHelp.html")
 public class HttpGetTask extends Tasks {
@@ -25,7 +24,7 @@ public class HttpGetTask extends Tasks {
     @Override
     public boolean run() {
         boolean status = false;
-        LOGGER.get().log(Level.INFO, httpUrl);
+        LOGGER.get().info(httpUrl);
         try {
             URL url = new URL(httpUrl);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -39,7 +38,7 @@ public class HttpGetTask extends Tasks {
             else
                 status = false;
         } catch (Exception e) {
-            LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+            LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
         }
         return status;
     }

@@ -14,7 +14,6 @@ import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 @PunterTask(author = "munishc", name = "ShellScriptTask", description = "Runs Script in Bash Shell", documentation = "com/shunya/punter/tasks/docs/ShellScriptTask.html")
 public class ShellScriptTask extends Tasks {
@@ -36,6 +35,10 @@ public class ShellScriptTask extends Tasks {
     private String expectedMessage;
     @OutputParam
     private String outName;
+
+    public ShellScriptTask() {
+        LOG_PATTERN = "%msg%n";
+    }
 
     @Override
     public boolean run() {
@@ -71,7 +74,7 @@ public class ShellScriptTask extends Tasks {
 
             Channel channel = session.openChannel("shell");
 
-            LOGGER.get().log(Level.INFO, "Connected to Shell.");
+            LOGGER.get().info("Connected to Shell.");
             // Enable agent-forwarding.
             //((ChannelShell)channel).setAgentForwarding(true);
 
@@ -142,11 +145,11 @@ public class ShellScriptTask extends Tasks {
             channel.disconnect();
             getTaskHistory().setActivity("Disconnected from Channel.");
             getObserver().update(getTaskHistory());
-            LOGGER.get().log(Level.INFO, "Disconnected from Channel.");
-            strLogger.delete(0, strLogger.length());
-            strLogger.setLength(0);
+            LOGGER.get().info("Disconnected from Channel.");
+//            strLogger.delete(0, strLogger.length());
+//            strLogger.setLength(0);
             String proxyOutputStreamLogs = proxyOutputStream.getLogs();
-            strLogger.append(proxyOutputStreamLogs);
+//            logStream.write(proxyOutputStreamLogs.getBytes());
             outName = proxyOutputStreamLogs;
             if (expectedMessage != null && !expectedMessage.isEmpty()) {
                 if (!outName.contains(expectedMessage)) {
@@ -158,7 +161,7 @@ public class ShellScriptTask extends Tasks {
                 status = true;
             }
         } catch (Exception e) {
-            LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+            LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
         }
         return status;
     }

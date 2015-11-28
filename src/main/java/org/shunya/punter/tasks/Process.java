@@ -14,6 +14,7 @@ import org.shunya.punter.utils.FieldProperties;
 import org.shunya.punter.utils.FieldPropertiesMap;
 import org.shunya.punter.utils.StringUtils;
 import org.shunya.server.component.DBService;
+import org.slf4j.Logger;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -25,8 +26,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Process implements Serializable {
@@ -82,7 +81,7 @@ public class Process implements Serializable {
                 return;
             try {
                 if (processLogger != null) {
-                    processLogger.log(Level.INFO, "Sending Task Report Mail to : " + emailsToNotify);
+                    processLogger.info("Sending Task Report Mail to : " + emailsToNotify);
                 }
                 StringBuilder processLogs = new StringBuilder(10000);
                 for (TaskHistory th : processHistory.getTaskHistoryList()) {
@@ -90,7 +89,7 @@ public class Process implements Serializable {
                 }
                 DevEmailService.getInstance().sendEmail("Punter Task : [" + processHistory.getRunStatus() + "] " + processHistory.getName(), emailsToNotify, processLogs.toString(), Collections.<File>emptyList());
                 if (processLogger != null) {
-                    processLogger.log(Level.INFO, "Mail Sent.");
+                    processLogger.info("Mail Sent.");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -99,11 +98,7 @@ public class Process implements Serializable {
     }
 
     private void setLoggingLevel(Logger processLogger) {
-        try {
-            processLogger.setLevel(Level.parse(loggingLevel));
-        } catch (Exception e) {
-            processLogger.setLevel(Level.INFO);
-        }
+        //TODO set a particular logging level
     }
 
     public Map execute() throws Exception {
@@ -175,9 +170,9 @@ public class Process implements Serializable {
                 task.beforeTaskStart();
                 processLogger = task.LOGGER.get();
                 setLoggingLevel(processLogger);
-                processLogger.log(Level.INFO, "started executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
+                processLogger.info("started executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
                 status = task.execute();
-                processLogger.log(Level.INFO, "Finished executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
+                processLogger.info("Finished executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
                 th.setFinishTime(new Date());
                 if (stopOnTaskFailure & !status) {
                     keepRunning.set(false);
@@ -190,8 +185,8 @@ public class Process implements Serializable {
                 if (stopOnTaskFailure) {
                     keepRunning.set(false);
                 }
-                task.LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
-                task.LOGGER.get().log(Level.FINE, "Finished executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
+                task.LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
+                task.LOGGER.get().info("Finished executing task.." + task.getTaskDao().getSequence() + " - " + task.getTaskDao().getName());
             } finally {
                 task.afterTaskFinish();
             }
@@ -260,13 +255,13 @@ public class Process implements Serializable {
                         }
                     }
                 } catch (IllegalArgumentException e) {
-                    Tasks.LOGGER.get().severe(e.toString());
+                    Tasks.LOGGER.get().error(e.toString());
                 } catch (IllegalAccessException e) {
-                    Tasks.LOGGER.get().severe(e.toString());
+                    Tasks.LOGGER.get().error(e.toString());
                 } catch (ParseException e) {
-                    Tasks.LOGGER.get().severe(e.toString());
+                    Tasks.LOGGER.get().error(e.toString());
                 } catch (Exception e) {
-                    Tasks.LOGGER.get().severe(e.toString());
+                    Tasks.LOGGER.get().error(e.toString());
                 }
             }
         }

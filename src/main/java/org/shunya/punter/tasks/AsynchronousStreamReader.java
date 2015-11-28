@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.logging.Level;
 
 /**
 * Created by IntelliJ IDEA.
@@ -78,10 +77,10 @@ class AsynchronousStreamReader extends Thread
     }
 
     private synchronized void printToConsole(String line) {
-        DBExportTask.LOGGER.get().log(Level.INFO, line);
+        DBExportTask.LOGGER.get().info(line);
     }
 
     private synchronized void printToConsole2(String line) {
-        DBExportTask.LOGGER.get().log(Level.WARNING, line);
+        DBExportTask.LOGGER.get().info(line);
     }
 }

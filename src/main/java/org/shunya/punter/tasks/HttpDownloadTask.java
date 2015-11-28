@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.security.cert.X509Certificate;
-import java.util.logging.Level;
 
 @PunterTask(author = "munishc", name = "HttpGetTask", description = "Plays HTTP GET Request on the given URL.", documentation = "src/main/resources/docs/TextSamplerDemoHelp.html")
 public class HttpDownloadTask extends Tasks {
@@ -30,7 +29,7 @@ public class HttpDownloadTask extends Tasks {
     @Override
     public boolean run() {
         boolean status = false;
-        LOGGER.get().log(Level.INFO, httpUrl == null ? httpsUrl : httpUrl);
+        LOGGER.get().info(httpUrl == null ? httpsUrl : httpUrl);
         if (fileName == null || fileName.isEmpty()) {
             if (httpsUrl != null && !httpsUrl.isEmpty()) {
                 fileName = httpsUrl.substring(httpsUrl.lastIndexOf("/"));
@@ -73,7 +72,7 @@ public class HttpDownloadTask extends Tasks {
             status = true;
             httpResponse = "Success";
         } catch (Exception e) {
-            LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+            LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
             httpResponse = "Fail";
         }
         return status;

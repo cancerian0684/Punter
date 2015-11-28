@@ -10,7 +10,6 @@ import org.shunya.punter.utils.StringUtils;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.logging.Level;
 
 @PunterTask(author = "munishc", name = "EmailTask", description = "Email Task", documentation = "src/main/resources/docs/EmailTask.html")
 public class EmailTask extends Tasks {
@@ -50,9 +49,9 @@ public class EmailTask extends Tasks {
                     }
                 }
                 if (outName.length() >= 1) {
-                    LOGGER.get().log(Level.SEVERE, outName);
+                    LOGGER.get().error(outName);
                 } else {
-                    LOGGER.get().log(Level.INFO, "No Email was sent since Condition did not meet!");
+                    LOGGER.get().info("No Email was sent since Condition did not meet!");
                     return true;
                 }
             }
@@ -68,10 +67,10 @@ public class EmailTask extends Tasks {
                 EmailService.getInstance().sendEMail(subject, toAddress, body + outName, fileNames, fromAddress, ccAddress);
             }
             status = true;
-            LOGGER.get().log(Level.INFO, "Email sent successfully To Addresses: " + toAddress);
+            LOGGER.get().info("Email sent successfully To Addresses: " + toAddress);
         } catch (Exception e) {
             status = false;
-            LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+            LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
         }
         return status;
     }

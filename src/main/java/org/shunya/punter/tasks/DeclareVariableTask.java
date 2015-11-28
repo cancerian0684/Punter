@@ -9,7 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="EchoTask",description="Load process properties into the system.",documentation= "src/main/resources/docs/TextSamplerDemoHelp.html")
 public class DeclareVariableTask extends Tasks {
@@ -25,16 +24,16 @@ public class DeclareVariableTask extends Tasks {
 	public boolean run() {
 		boolean status=false;
 		try {
-			LOGGER.get().log(Level.FINE, "Loading properties into process.");
+			LOGGER.get().debug("Loading properties into process.");
 			InputStream is = new ByteArrayInputStream(properties.getBytes());  
 	        Properties prop = new Properties();  
 	        prop.load(is);  
 			super.loadSessionVariables((Map) prop);
 		} catch (Exception e) {
-			LOGGER.get().log(Level.WARNING, StringUtils.getExceptionStackTrace(e));
+			LOGGER.get().warn(StringUtils.getExceptionStackTrace(e));
 			e.printStackTrace();
 		}
-		LOGGER.get().log(Level.FINE, "Properties loaded succesfully into Process.");
+		LOGGER.get().info("Properties loaded succesfully into Process.");
 		status=true;
 		outName="success";
 		return status;

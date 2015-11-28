@@ -9,7 +9,6 @@ import java.sql.DriverManager;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 
 @PunterTask(author = "munishc", name = "CreateTablesTask", documentation = "src/main/resources/docs/CreateTablesTask.html")
 public class CreateTablesTask extends Tasks {
@@ -29,12 +28,12 @@ public class CreateTablesTask extends Tasks {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			Connection conn = DriverManager.getConnection(conURL, username, password);
 			try {
-				LOGGER.get().log(Level.INFO, "Connected to DB");
+				LOGGER.get().info("Connected to DB");
 				StringTokenizer sk = new StringTokenizer(SQLScript, ";");
 				while (sk.hasMoreTokens()) {
 					String currSql = sk.nextToken().trim();
 					if (!currSql.isEmpty()) {
-						LOGGER.get().log(Level.INFO, currSql);
+						LOGGER.get().info(currSql);
 						Statement s = conn.createStatement();
 						boolean gotResult = s.execute(currSql);
 						do {
@@ -44,7 +43,7 @@ public class CreateTablesTask extends Tasks {
 								// delegate.processResult(s.getResultSet());
 								// }
 							} else
-								LOGGER.get().log(Level.INFO, "rows updated : " + s.getUpdateCount());
+								LOGGER.get().info("rows updated : " + s.getUpdateCount());
 						} while (s.getMoreResults());
 						s.close();
 					}
@@ -53,14 +52,14 @@ public class CreateTablesTask extends Tasks {
 				 * CallableStatement call =
 				 * conn.prepareCall("{"+existingSQL+"}"); call.execute();
 				 */
-				LOGGER.get().log(Level.INFO, taskDao.getDescription() + " Completed.");
+				LOGGER.get().info(taskDao.getDescription() + " Completed.");
 			} finally {
 				conn.close();
 			}
 			status = true;
 		} catch (Exception e) {
 			status = false;
-			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+			LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
 		}
 		return status;
 	}

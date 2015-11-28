@@ -10,7 +10,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
-import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="GenTableDDLTask",documentation= "src/main/resources/docs/GenTableDDLTask.html")
 public class GenTableDDLTask extends Tasks {
@@ -31,7 +30,7 @@ public class GenTableDDLTask extends Tasks {
 			Class.forName("net.sourceforge.jtds.jdbc.Driver");
 			Connection conn = DriverManager.getConnection(conURL, username, password);
 			conn.setReadOnly(true);
-			LOGGER.get().log(Level.INFO, "Connected to DB");
+			LOGGER.get().info("Connected to DB");
 			Statement s = conn.createStatement();
 			s.setQueryTimeout(2*60);
 			tableDDLString="";
@@ -58,16 +57,16 @@ public class GenTableDDLTask extends Tasks {
 				rs1.next();
 				String tableDDL=getCreateTableSql(rs1.getString(1)).replace('"', ' ')+";";
 				tableDDLString=tableDDLString+tableDDL;
-				LOGGER.get().log(Level.INFO, tableDDL);
+				LOGGER.get().info(tableDDL);
 				rs1.close();
 			}
 			s.close();
 			conn.close();
-			LOGGER.get().log(Level.INFO, "Connection to DB Closed.");
+			LOGGER.get().info("Connection to DB Closed.");
 			status=true;
 		}catch (Exception e) {
 			status=false;
-			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+			LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
 		}
 		 return status;
 	}

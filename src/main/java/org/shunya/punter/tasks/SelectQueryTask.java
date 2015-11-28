@@ -15,7 +15,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
 
 @PunterTask(author="munishc",name="GenTableDDLTask",documentation= "src/main/resources/docs/GenTableDDLTask.html")
 public class SelectQueryTask extends Tasks {
@@ -54,7 +53,7 @@ public class SelectQueryTask extends Tasks {
 					sheetName=token;
 					continue;
 				}
-				LOGGER.get().log(Level.INFO, sheetName);
+				LOGGER.get().info(sheetName);
 				Sheet sheet = wb.createSheet(sheetName);
 				if(!token.isEmpty()){
 					Statement s = conn.createStatement();
@@ -62,16 +61,16 @@ public class SelectQueryTask extends Tasks {
 					ResultSet rs=s.executeQuery(token);
 					int columns = createXLSFile(rs,sheet,wb);
 					s.close();
-					LOGGER.get().log(Level.FINE, "Resizing Excel Columns.");
+					LOGGER.get().debug("Resizing Excel Columns.");
 					for(int i=0;i<columns;i++){
 						sheet.autoSizeColumn(i);
 					}
-					LOGGER.get().log(Level.INFO, "\n-------------------------************-------------------------\n");
+					LOGGER.get().info("\n-------------------------************-------------------------\n");
 				}
 		    }
 			conn.close();
 			if(outFileName!=null&&!outFileName.isEmpty()){
-				LOGGER.get().log(Level.INFO, "Writing Query output to XLS File : "+outFileName);
+				LOGGER.get().info("Writing Query output to XLS File : " + outFileName);
 				FileOutputStream fileOut = new FileOutputStream(outFileName);
 			    wb.write(fileOut);
 			    fileOut.close();
@@ -79,7 +78,7 @@ public class SelectQueryTask extends Tasks {
 			status=true;
 		}catch (Exception e) {
 			status=false;
-			LOGGER.get().log(Level.SEVERE, StringUtils.getExceptionStackTrace(e));
+			LOGGER.get().error(StringUtils.getExceptionStackTrace(e));
 		}
 	 return status;
 	 }
@@ -98,7 +97,7 @@ public class SelectQueryTask extends Tasks {
 			cell.setCellValue(metaData.getColumnName(i));
 			cell.setCellStyle(getHeaderDataCellStyle( (HSSFWorkbook) wb));
 		}
-		LOGGER.get().log(Level.INFO, out);
+		LOGGER.get().info(out);
 		rs.setFetchSize(20);
 		int rowCount=0;
 		while(rs.next()){
@@ -109,7 +108,7 @@ public class SelectQueryTask extends Tasks {
 				out+=rs.getString(i)+"\t";
 				setAppropriateCellValue(rs, i, row, metaData,wb);
 			}
-			LOGGER.get().log(Level.INFO, out);
+			LOGGER.get().info(out);
 		}
 		rs.close();
 		return columns;
