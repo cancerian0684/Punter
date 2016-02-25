@@ -45,17 +45,24 @@
 
     <bean class="org.shunya.punter.gui.Main" init-method="init"></bean>
 
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-        <property name="driverClass" value="com.mysql.jdbc.Driver" />
-        <property name="jdbcUrl" value="jdbc:mysql:///punterdb?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;createDatabaseIfNotExist=true" />
-        <property name="user" value="root" />
+    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql:///punterdb?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;createDatabaseIfNotExist=true" />
+        <property name="username" value="root" />
         <property name="password" value="password" />
 
-        <!-- these are C3P0 properties -->
-        <property name="acquireIncrement" value="1" />
-        <property name="minPoolSize" value="2" />
-        <property name="maxPoolSize" value="3" />
-        <property name="maxIdleTime" value="30000" />
+        <!-- these are Tomcat database Pool properties -->
+        <property name="initialSize" value="2" />
+        <property name="maxActive" value="5" />
+        <property name="maxIdle" value="3" />
+        <property name="minIdle" value="1" />
+        <property name="fairQueue" value="true" />
+        <property name="testOnBorrow" value="true"/>
+        <property name="validationQuery" value="SELECT 1"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="validationInterval" value="30000"/>
+        <property name="logAbandoned" value="true"/>
+        <property name="removeAbandoned" value="true"/>
     </bean>
 
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
@@ -72,6 +79,7 @@
                 <!--<prop key="hibernate.connection.isolation">2</prop>-->
                 <prop key="hibernate.max_fetch_depth">3</prop>
                 <prop key="hibernate.jdbc.batch_size">50</prop>
+                <prop key="hibernate.order_updates">true</prop>
                 <prop key="hibernate.connection.autocommit">false</prop>
                 <!--<prop key="hibernate.cache.use_query_cache">true</prop>-->
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
