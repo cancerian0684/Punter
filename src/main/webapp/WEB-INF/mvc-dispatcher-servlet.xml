@@ -55,14 +55,14 @@
         <property name="initialSize" value="2" />
         <property name="maxActive" value="5" />
         <property name="maxIdle" value="3" />
-        <property name="minIdle" value="1" />
+        <property name="minIdle" value="2" />
         <property name="fairQueue" value="true" />
         <property name="testOnBorrow" value="true"/>
         <property name="validationQuery" value="SELECT 1"/>
         <property name="testOnReturn" value="false"/>
         <property name="validationInterval" value="30000"/>
         <property name="logAbandoned" value="true"/>
-        <property name="removeAbandoned" value="true"/>
+        <!--<property name="removeAbandoned" value="true"/>-->
     </bean>
 
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
