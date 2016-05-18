@@ -140,18 +140,23 @@ public class PunterKB extends JPanel {
                                                 e1.printStackTrace();
                                             }
                                         } else {
-                                            System.out.println("Opening up the file.." + doc.getTitle());
-                                            File temp = new File("Temp");
-                                            temp.mkdir();
-                                            File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
-                                            try {
-                                                FileOutputStream fos = new FileOutputStream(nf);
-                                                fos.write(doc.getContent());
-                                                fos.close();
-                                                nf.deleteOnExit();
-                                                Desktop.getDesktop().open(nf);
-                                            } catch (IOException e1) {
-                                                e1.printStackTrace();
+                                            if(doc.getContent()==null) {
+                                                JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
+                                                return false;
+                                            } else {
+                                                System.out.println("Opening up the file.." + doc.getTitle());
+                                                File temp = new File("Temp");
+                                                temp.mkdir();
+                                                File nf = new File(temp, "D_" + doc.getId() + doc.getExt());
+                                                try {
+                                                    FileOutputStream fos = new FileOutputStream(nf);
+                                                    fos.write(doc.getContent());
+                                                    fos.close();
+                                                    nf.deleteOnExit();
+                                                    Desktop.getDesktop().open(nf);
+                                                } catch (IOException e1) {
+                                                    e1.printStackTrace();
+                                                }
                                             }
                                         }
                                     }
