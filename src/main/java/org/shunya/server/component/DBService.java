@@ -541,6 +541,7 @@ public class DBService {
                 }
                 executorService.shutdown();
                 executorService.awaitTermination(1, TimeUnit.HOURS);
+                System.out.println("Index rebuilding complete now");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
