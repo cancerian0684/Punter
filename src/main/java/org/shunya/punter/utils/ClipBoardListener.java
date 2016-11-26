@@ -1,6 +1,5 @@
 package org.shunya.punter.utils;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.shunya.server.ClipboardPunterMessage;
 import org.shunya.server.component.DBService;
 import org.shunya.server.component.PunterService;
@@ -12,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 
 public class ClipBoardListener implements ClipboardOwner, PunterComponent {
     private final DBService dbService;
@@ -53,7 +53,7 @@ public class ClipBoardListener implements ClipboardOwner, PunterComponent {
             sysClip.setContents(ss, this);
         }else if(punterMessage.getType().equals("image")){
             try {
-                byte[] bytearray = Base64.decode(punterMessage.getContents());
+                byte[] bytearray = Base64.getDecoder().decode(punterMessage.getContents());
                 BufferedImage imag = ImageIO.read(new ByteArrayInputStream(bytearray));
                 ImageSelection ss = new ImageSelection(imag);
                 sysClip.setContents(ss, this);
@@ -82,7 +82,7 @@ public class ClipBoardListener implements ClipboardOwner, PunterComponent {
                     ByteArrayOutputStream baos=new ByteArrayOutputStream(1000);
                     ImageIO.write(img, "png", baos);
                     baos.flush();
-                    String base64String= Base64.encode(baos.toByteArray());
+                    String base64String= Base64.getEncoder().encodeToString(baos.toByteArray());
                     baos.close();
                     ClipboardPunterMessage punterMessage = new ClipboardPunterMessage();
                     punterMessage.setType("image");

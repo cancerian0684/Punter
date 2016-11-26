@@ -576,10 +576,11 @@ public class DocumentEditor extends JFrame {
         doc.setMd5(currentMD5);
         doc.setDateUpdated(new Date());
         Document tmpDoc = dbService.saveDocument(doc);
-        DateLocaleConverter converter = new DateLocaleConverter();
+        //TODO - Evaulate if below code is really required?
+        /*DateLocaleConverter converter = new DateLocaleConverter();
         converter.setLenient(true);
         ConvertUtils.register(converter, java.util.Date.class);
-        BeanUtils.copyProperties(doc, tmpDoc);
+        BeanUtils.copyProperties(doc, tmpDoc);*/
 
     }
 

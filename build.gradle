@@ -1,0 +1,97 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.2.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+springBoot {
+    mainClass = "org.shunya.PunterApp"
+}
+
+jar {
+    baseName = 'shunya-punter'
+    version =  '0.1'
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-web') {
+        exclude module: "spring-boot-starter-tomcat"
+    }
+//    compile("org.springframework.boot:spring-boot-starter-jetty")
+    compile("org.springframework.boot:spring-boot-starter-undertow")
+    compile('org.springframework.boot:spring-boot-starter-aop')
+    compile('org.springframework.boot:spring-boot-starter-mail')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+
+    compile name: 'app-1.0'
+    compile name: 'mtproto-1.0-SNAPSHOT'
+    compile name: 'telegram-api-1.0-SNAPSHOT'
+    compile name: 'tl-api-v11'
+    compile name: 'tl-core-1.0-SNAPSHOT'
+
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    // https://mvnrepository.com/artifact/org.apache.lucene/lucene-core
+    compile group: 'org.apache.lucene', name: 'lucene-core', version: '4.10.4'
+    compile group: 'org.apache.lucene', name: 'lucene-queryparser', version: '4.10.4'
+    compile group: 'org.apache.lucene', name: 'lucene-codecs', version: '4.10.4'
+    compile group: 'org.apache.lucene', name: 'lucene-highlighter', version: '4.10.4'
+    compile group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '4.10.4'
+
+    // https://mvnrepository.com/artifact/org.pegdown/pegdown
+    compile group: 'org.pegdown', name: 'pegdown', version: '1.6.0'
+// https://mvnrepository.com/artifact/com.jcraft/jsch
+    compile group: 'com.jcraft', name: 'jsch', version: '0.1.54'
+// https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils
+    compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
+// https://mvnrepository.com/artifact/org.apache.poi/poi
+    compile group: 'org.apache.poi', name: 'poi', version: '3.15'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.15'
+    compile group: 'org.apache.poi', name: 'poi-scratchpad', version: '3.15'
+    compile group: 'org.apache.poi', name: 'poi-ooxml-schemas', version: '3.15'
+    compile group: 'org.apache.poi', name: 'ooxml-schemas', version: '1.3'
+
+// https://mvnrepository.com/artifact/org.apache.poi/poi-contrib
+    compile group: 'org.apache.poi', name: 'poi-contrib', version: '3.6'
+
+    // https://mvnrepository.com/artifact/com.itextpdf/itextpdf
+    compile group: 'com.itextpdf', name: 'itextpdf', version: '5.5.10'
+
+    // https://mvnrepository.com/artifact/org.tmatesoft.svnkit/svnkit
+    compile group: 'org.tmatesoft.svnkit', name: 'svnkit', version: '1.8.14'
+
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
+    // https://mvnrepository.com/artifact/it.sauronsoftware.cron4j/cron4j
+    compile group: 'it.sauronsoftware.cron4j', name: 'cron4j', version: '2.2.5'
+    // https://mvnrepository.com/artifact/net.htmlparser.jericho/jericho-html
+    compile group: 'net.htmlparser.jericho', name: 'jericho-html', version: '3.4'
+    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.40'
+
+    // https://mvnrepository.com/artifact/com.melloware/jintellitype
+    compile group: 'com.melloware', name: 'jintellitype', version: '1.3.9'
+
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2'
+}
+

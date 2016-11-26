@@ -8,9 +8,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.Process;
 
-/**
- * Created by munichan on 2/23/14.
- */
 public class TestTask {
 
     private static String successMessage;

@@ -11,7 +11,9 @@ import org.shunya.server.component.DBService;
 import org.shunya.server.component.PunterService;
 import org.shunya.server.component.SynonymService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.*;
 
+import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@org.springframework.stereotype.Component
 public class Main implements PunterWindow{
     @Autowired
     private DBService dbService;

@@ -2,7 +2,7 @@ package org.shunya.punter.tasks;
 
 import org.shunya.punter.annotations.InputParam;
 import org.shunya.punter.annotations.PunterTask;
-import org.telegram.bot.Application;
+//import org.telegram.bot.Application;
 
 import java.io.IOException;
 
@@ -14,13 +14,13 @@ public class TelegramTask extends Tasks {
 	@Override
 	public boolean run() {
 		LOGGER.get().info(message);
-        Application telegram = new Application();
-        try {
-            telegram.sendMessageToTestM(message);
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        Application telegram = new Application();
+//        try {
+//            telegram.sendMessageToTestM(message);
+//            return true;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         return false;
 	}
 }

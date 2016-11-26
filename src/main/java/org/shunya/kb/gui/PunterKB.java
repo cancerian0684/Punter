@@ -3,6 +3,7 @@ package org.shunya.kb.gui;
 import org.apache.commons.io.IOUtils;
 import org.pegdown.Extensions;
 import org.pegdown.PegDownProcessor;
+import org.shunya.kb.model.AccessEvent;
 import org.shunya.kb.model.Attachment;
 import org.shunya.kb.model.Document;
 import org.shunya.kb.utils.WordService;
@@ -115,7 +116,7 @@ public class PunterKB extends JPanel {
                         if (mEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
                             Document luceneDoc = ((DocumentTableModel) table.getModel()).getRow(table.convertRowIndexToModel(table.getSelectedRow()));
                             long t1 = System.currentTimeMillis();
-                            dbService.incrementCounter(luceneDoc);
+                            dbService.publish(new AccessEvent(Document.class.getSimpleName(), luceneDoc.getId()));
                             System.out.println("time taken for access counter " + (System.currentTimeMillis() - t1) + " ms");
                             Document doc = dbService.getDocument(luceneDoc.getId());
                             if (doc == null) {

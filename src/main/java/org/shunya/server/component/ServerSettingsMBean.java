@@ -5,39 +5,37 @@ import java.net.UnknownHostException;
 public interface ServerSettingsMBean {
     void addSynonym(String words);
 
-    public void refreshIndexes();
+    void refreshIndexes();
 
-	public void stopServer();
+	void stopServer();
 
-	public void setMaxResultsToDisplay(int maxResults);
+	void setMaxResultsToDisplay(int maxResults);
 
-	public int getMaxResultsToDisplay();
+	int getMaxResultsToDisplay();
 
-	public abstract void setMaxProcessHistory(int maxProcessHistory);
+	void setMaxProcessHistory(int maxProcessHistory);
 
-	public abstract int getMaxProcessHistory();
+	int getMaxProcessHistory();
 
-	public abstract void setMaxProcessAlerts(int maxProcessAlerts);
+	void setMaxProcessAlerts(int maxProcessAlerts);
 
-	public abstract int getMaxProcessAlerts();
+	int getMaxProcessAlerts();
 
-	public void updateAllProcessProperties();
+	void updateAllProcessProperties();
 
-	public abstract String toggleMultiCastResponder();
+	String toggleMultiCastResponder();
 
-	public abstract int deleteStaleProcessHistory(int staleDays);
+	int deleteStaleProcessHistory(int staleDays);
 
-	public abstract void compressTables();
+	void deleteDocument(int docId);
 
-	public abstract void deleteDocument(int docId);
+	void setWebServerPort(int webServerPort);
 
-	public abstract void setWebServerPort(int webServerPort);
+	int getWebServerPort();
 
-	public abstract int getWebServerPort();
+    String getTempDirectory();
 
-    public String getTempDirectory();
-
-    public void setTempDirectory(String tempDirectory);
+    void setTempDirectory(String tempDirectory);
 
     void saveState();
 

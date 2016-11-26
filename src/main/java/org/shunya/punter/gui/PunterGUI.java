@@ -597,6 +597,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             task.setInputParamsAsObject(inProp);
                             task.setOutputParamsAsObject(outProp);
                             task.setName(s);
+                            task.setFailOver(false);
                             task.setClassName(taskProps.getProperty(s));
                             ProcessData p = new ProcessData();
                             p.setId(procId);

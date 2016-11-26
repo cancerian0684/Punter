@@ -9,8 +9,10 @@ public class AccessCounter {
     @Id
     @GeneratedValue(strategy= GenerationType.TABLE, generator="seqGen")
     private long id;
-    private long documentId;
     private long counter;
+
+    private long entityId;
+    private String entityName;
 
     public long getId() {
         return id;
@@ -28,11 +30,19 @@ public class AccessCounter {
         this.counter = counter;
     }
 
-    public long getDocumentId() {
-        return documentId;
+    public long getEntityId() {
+        return entityId;
     }
 
-    public void setDocumentId(long documentId) {
-        this.documentId = documentId;
+    public void setEntityId(long entityId) {
+        this.entityId = entityId;
+    }
+
+    public String getEntityName() {
+        return entityName;
+    }
+
+    public void setEntityName(String entityName) {
+        this.entityName = entityName;
     }
 }

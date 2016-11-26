@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="3410039974">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
     <data-source source="LOCAL" name="hibernate.cfg.xml" uuid="626ce88a-0122-46b0-bf3d-b3f4f4d7deeb">
-      <driver-ref>h2.embedded</driver-ref>
+      <driver-ref>73511c7c-1f02-4ee2-b926-5662c753c620</driver-ref>
       <jdbc-driver>org.h2.Driver</jdbc-driver>
       <jdbc-url>jdbc:h2:~/punterDB</jdbc-url>
       <libraries>
@@ -12,7 +12,7 @@
       </libraries>
     </data-source>
     <data-source source="LOCAL" name="src:hibernate.cfg.xml" uuid="0846e8ea-b0f3-4f19-975a-5d5fed6d4770">
-      <driver-ref>h2.embedded</driver-ref>
+      <driver-ref>73511c7c-1f02-4ee2-b926-5662c753c620</driver-ref>
       <jdbc-driver>org.h2.Driver</jdbc-driver>
       <jdbc-url>jdbc:h2:punterDB</jdbc-url>
       <libraries>

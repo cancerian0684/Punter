@@ -1,9 +1,5 @@
 package org.shunya.server.component;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.apache.commons.io.IOUtils;
 import org.shunya.kb.model.Document;
 import org.shunya.punter.gui.PunterJobBasket;
@@ -35,7 +31,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @Controller
-@RequestMapping(value = "/punter")
+@RequestMapping(value = "/rest/punter")
 public class PunterController {
     final Logger logger = LoggerFactory.getLogger(PunterController.class);
     @Autowired

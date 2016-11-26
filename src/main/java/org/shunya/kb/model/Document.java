@@ -24,7 +24,7 @@ public class Document implements Serializable{
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="seqGen")
     @JsonIgnore
 	private long id;
-	private long accessCount;
+	//TODO - Add uuid to track id and uniqueness between server and client
 	private float priority;
 	private boolean active;
 	@Temporal(TemporalType.TIMESTAMP)
@@ -73,12 +73,6 @@ public class Document implements Serializable{
 	}
 	public void setId(long id) {
 		this.id = id;
-	}
-	public long getAccessCount() {
-		return accessCount;
-	}
-	public void setAccessCount(long accessCount) {
-		this.accessCount = accessCount;
 	}
 	public float getPriority() {
 		return priority;

@@ -84,7 +84,8 @@ public class DevEmailService {
 //            transport.connect(properties.getProperty("mail.smtp.host"), properties.getProperty("mail.smtp.user"), properties.getProperty("mail.smtp.password"));
 //            transport.sendMessage(message, message.getAllRecipients());
 //            transport.close();
-            Transport.send(message);
+//TODO - uncomment after testing
+//            Transport.send(message);
             System.out.println("Email sent successfully....");
         } catch (MessagingException mex) {
             throw new RuntimeException(mex);

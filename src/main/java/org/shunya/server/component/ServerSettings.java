@@ -146,11 +146,6 @@ public class ServerSettings implements ServerSettingsMBean, Serializable {
     }
 
     @Override
-    public void compressTables() {
-        daoFacade.compressTables();
-    }
-
-    @Override
     public String getTempDirectory() {
         return settingsBean.getTempDirectory() == null ? "Temp" : settingsBean.getTempDirectory();
     }

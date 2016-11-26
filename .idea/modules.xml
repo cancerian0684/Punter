@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/punter.iml" filepath="$PROJECT_DIR$/punter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/punter.iml" filepath="$PROJECT_DIR$/.idea/modules/punter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/punter_main.iml" filepath="$PROJECT_DIR$/.idea/modules/punter_main.iml" group="punter" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/punter_test.iml" filepath="$PROJECT_DIR$/.idea/modules/punter_test.iml" group="punter" />
     </modules>
   </component>
 </project>
-
