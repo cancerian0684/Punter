@@ -1,6 +1,6 @@
 package org.shunya.server.component;
 
-import org.pegdown.PegDownProcessor;
+import org.asciidoctor.Asciidoctor;
 import org.shunya.kb.model.Document;
 import org.shunya.kb.utils.Utilities;
 import org.shunya.punter.gui.AppConstants;
@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 
+import static org.asciidoctor.Asciidoctor.Factory.create;
+
 @Service
 public class PunterService {
     private final Logger logger = LoggerFactory.getLogger(PunterService.class);
@@ -31,8 +33,8 @@ public class PunterService {
     private DBService daoFacade;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final RestClient restClient = new RestClient();
-    private final PegDownProcessor markdown4jProcessor = new PegDownProcessor();
     private final ConcurrentMap<Long, Tasks> taskCache = new ConcurrentHashMap<>();
+    private final Asciidoctor asciidoctor = create();
 
     public void syncRemoteDocuments(String baseUri) {
         Long[] remoteDocList = restClient.getRemoteDocList(baseUri);

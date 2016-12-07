@@ -1,7 +1,6 @@
 package org.shunya.punter.tasks;
 
-import org.pegdown.Extensions;
-import org.pegdown.PegDownProcessor;
+import org.asciidoctor.Asciidoctor;
 import org.shunya.punter.annotations.InputParam;
 import org.shunya.punter.annotations.PunterTask;
 import org.shunya.punter.utils.DevEmailService;
@@ -10,6 +9,8 @@ import org.shunya.punter.utils.StringUtils;
 
 import java.io.File;
 import java.util.Collections;
+
+import static org.asciidoctor.Asciidoctor.Factory.create;
 
 @PunterTask(author = "munishc", name = "EmailTask", description = "Email Task", documentation = "src/main/resources/docs/EmailTask.html")
 public class EmailTask extends Tasks {
@@ -34,7 +35,7 @@ public class EmailTask extends Tasks {
     @InputParam(required = false, description = "Line separated expected messages")
     private String expectedMessages;
 
-    private final PegDownProcessor pegDownProcessor = new PegDownProcessor(Extensions.ALL);
+    private final Asciidoctor asciidoctor = create();
 
     @Override
     public boolean run() {
@@ -57,7 +58,7 @@ public class EmailTask extends Tasks {
             }
             attachments = attachments == null ? "" : attachments;
             String[] fileNames = attachments.split("[,;]");
-            body = pegDownProcessor.markdownToHtml(body);
+            body = asciidoctor.convert(body, Collections.emptyMap());
             if (username != null && password != null && !username.isEmpty() && !password.isEmpty()) {
                 //Authentication Based Email
 //				EmailServiceWithAuth.getInstance(username,password).sendEMail(subject, toAddress, body+outName, fileNames, fromAddress, ccAddress);

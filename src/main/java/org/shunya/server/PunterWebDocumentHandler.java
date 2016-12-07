@@ -1,12 +1,13 @@
 package org.shunya.server;
 
-import org.pegdown.Extensions;
-import org.pegdown.PegDownProcessor;
+import org.asciidoctor.Asciidoctor;
 import org.shunya.kb.model.Document;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
+import static org.asciidoctor.Asciidoctor.Factory.create;
 import static org.shunya.server.LocalTemporaryFileUtils.createZipFile;
 import static org.shunya.server.LocalTemporaryFileUtils.write;
 
@@ -33,8 +34,8 @@ public enum PunterWebDocumentHandler {
     PUNTER_DOC_WITHOUT_ATTACHMENT_HANDLER(Document.DocumentType.PUNTER_DOC_WITHOUT_ATTACHMENT) {
         @Override
         public File handle(Document document) throws IOException {
-            final PegDownProcessor markdown4jProcessor = new PegDownProcessor(Extensions.ALL);
-            return write(markdown4jProcessor.markdownToHtml(new String(document.getContent())).getBytes(), new File("" + document.getId() + ".html"), new File("Temp"));
+            final Asciidoctor asciidoctor = create();
+            return write(asciidoctor.convert(new String(document.getContent()), Collections.emptyMap()).getBytes(), new File("" + document.getId() + ".html"), new File("Temp"));
         }
     };
 

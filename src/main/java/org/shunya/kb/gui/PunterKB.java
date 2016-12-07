@@ -1,8 +1,7 @@
 package org.shunya.kb.gui;
 
 import org.apache.commons.io.IOUtils;
-import org.pegdown.Extensions;
-import org.pegdown.PegDownProcessor;
+import org.asciidoctor.Asciidoctor;
 import org.shunya.kb.model.AccessEvent;
 import org.shunya.kb.model.Attachment;
 import org.shunya.kb.model.Document;
@@ -37,6 +36,7 @@ import java.util.zip.ZipOutputStream;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.StandardWatchEventKinds.*;
+import static org.asciidoctor.Asciidoctor.Factory.create;
 
 public class PunterKB extends JPanel {
     private static JFrame frame;
@@ -596,7 +596,7 @@ public class PunterKB extends JPanel {
             @Override
             public void run() {
                 try {
-                    final PegDownProcessor markdown4jProcessor = new PegDownProcessor(Extensions.ALL);
+                    final Asciidoctor asciidoctor = create();
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
                     Document doc = dtm.getRow(searchResultTable.convertRowIndexToModel(searchResultTable.getSelectedRow()));
                     List<File> files = new ArrayList<>();
@@ -618,7 +618,7 @@ public class PunterKB extends JPanel {
                                 e1.printStackTrace();
                             }
                         }
-                        final String htmlContent = markdown4jProcessor.markdownToHtml(new String(doc.getContent()));
+                        final String htmlContent = asciidoctor.convert(new String(doc.getContent()), Collections.emptyMap());
                         String emailAddresses = JOptionPane.showInputDialog("Enter Comma separated Email ID(s) : ", "cancerian0684@gmail.com, ");
                         DevEmailService.getInstance().sendEmail(doc.getTitle(), emailAddresses, htmlContent, files);
                     }

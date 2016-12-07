@@ -54,8 +54,9 @@ dependencies {
     compile group: 'org.apache.lucene', name: 'lucene-highlighter', version: '4.10.4'
     compile group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '4.10.4'
 
+    compile 'org.asciidoctor:asciidoctorj:1.5.4'
     // https://mvnrepository.com/artifact/org.pegdown/pegdown
-    compile group: 'org.pegdown', name: 'pegdown', version: '1.6.0'
+//    compile group: 'org.pegdown', name: 'pegdown', version: '1.6.0'
 // https://mvnrepository.com/artifact/com.jcraft/jsch
     compile group: 'com.jcraft', name: 'jsch', version: '0.1.54'
 // https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils

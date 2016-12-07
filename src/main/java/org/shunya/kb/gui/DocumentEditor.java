@@ -1,11 +1,7 @@
 package org.shunya.kb.gui;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
+import org.asciidoctor.Asciidoctor;
 import org.hibernate.StaleStateException;
-import org.pegdown.Extensions;
-import org.pegdown.PegDownProcessor;
 import org.shunya.kb.model.Attachment;
 import org.shunya.kb.model.Document;
 import org.shunya.kb.utils.TextCompletionHandler;
@@ -43,10 +39,10 @@ import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
+
+import static org.asciidoctor.Asciidoctor.Factory.create;
 
 public class DocumentEditor extends JFrame {
     private final Logger logger = LoggerFactory.getLogger(DocumentEditor.class);
@@ -74,7 +70,7 @@ public class DocumentEditor extends JFrame {
         }
     }
 
-    private final PegDownProcessor pegDownProcessor = new PegDownProcessor(Extensions.ALL);
+    private final Asciidoctor asciidoctor = create();
 //    private final Markdown4jProcessor markdown4jProcessor = new Markdown4jProcessor();
 
     public static String getMD5(String input) {
@@ -97,7 +93,7 @@ public class DocumentEditor extends JFrame {
         try {
             editor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
             editor.textField.setText(doc.getTitle());
-            editor.jTextPane.setText(editor.pegDownProcessor.markdownToHtml(new String(doc.getContent(), "UTF-8")));
+            editor.jTextPane.setText(editor.asciidoctor.convert(new String(doc.getContent(), "UTF-8"), Collections.emptyMap()));
             editor.jTextPane.setCaretPosition(0);
         } catch (IOException e) {
             e.printStackTrace();
@@ -180,7 +176,7 @@ public class DocumentEditor extends JFrame {
 //                System.out.println("Tab: " + jtp.getSelectedIndex());
                 if (jtp.getSelectedIndex() == 0) {
                     setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
-                    jTextPane.setText(pegDownProcessor.markdownToHtml(jTextPaneForEditing.getText()));
+                    jTextPane.setText(asciidoctor.convert(jTextPaneForEditing.getText(), Collections.emptyMap()));
                 } else if (1 == jtp.getSelectedIndex()) {
                     mayBeEdited = true;
                     setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()) + "...editing");

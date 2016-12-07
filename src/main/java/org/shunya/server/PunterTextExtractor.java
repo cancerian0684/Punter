@@ -13,7 +13,7 @@ import org.apache.poi.hsmf.MAPIMessage;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.pegdown.PegDownProcessor;
+import org.asciidoctor.Asciidoctor;
 
 import javax.swing.text.Document;
 import javax.swing.text.rtf.RTFEditorKit;
@@ -21,17 +21,19 @@ import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.util.*;
 
+import static org.asciidoctor.Asciidoctor.Factory.create;
+
 public class PunterTextExtractor {
 
     public static String getText(byte[] contents, String title, String ext) {
-        final PegDownProcessor markdown4jProcessor = new PegDownProcessor(10000L);
+        final Asciidoctor asciidoctor = create();
         StringBuilder text = new StringBuilder();
         ByteArrayInputStream bais = new ByteArrayInputStream(contents);
         String tt = title.toLowerCase();
         text.append(tt + " ");
         try {
             if (ext.isEmpty()) {
-                Source source = new Source(new StringReader(markdown4jProcessor.markdownToHtml(new String(contents, "UTF-8"))));
+                Source source = new Source(new StringReader(asciidoctor.convert(new String(contents, "UTF-8"), Collections.emptyMap())));
                 TextExtractor te = new TextExtractor(source);
                 text.append(te.toString());
             } else if (ext.equalsIgnoreCase(".txt")) {
