@@ -13,6 +13,8 @@ apply plugin: 'org.springframework.boot'
 
 springBoot {
     mainClass = "org.shunya.PunterApp"
+    executable = true
+    requiresUnpack = ['org.jruby:jruby-complete', 'org.asciidoctor:asciidoctorj']
 }
 
 jar {

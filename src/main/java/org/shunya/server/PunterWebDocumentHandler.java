@@ -11,13 +11,6 @@ import static org.asciidoctor.Asciidoctor.Factory.create;
 import static org.shunya.server.LocalTemporaryFileUtils.createZipFile;
 import static org.shunya.server.LocalTemporaryFileUtils.write;
 
-/**
- * Created by IntelliJ IDEA.
- * User: mchan2
- * Date: 10/6/11
- * Time: 7:42 PM
- * To change this template use File | Settings | File Templates.
- */
 public enum PunterWebDocumentHandler {
     EXTERNAL_DOC_HANDLER(Document.DocumentType.EXTERNAL_DOC) {
         @Override
