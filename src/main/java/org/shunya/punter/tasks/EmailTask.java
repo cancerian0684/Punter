@@ -62,6 +62,7 @@ public class EmailTask extends Tasks {
             if (username != null && password != null && !username.isEmpty() && !password.isEmpty()) {
                 //Authentication Based Email
 //				EmailServiceWithAuth.getInstance(username,password).sendEMail(subject, toAddress, body+outName, fileNames, fromAddress, ccAddress);
+                getObserver().update(getTaskHistory());
                 DevEmailService.getInstance().sendEmail(subject, toAddress, body, Collections.<File>emptyList());
             } else {
                 //Non-Auth Based Email

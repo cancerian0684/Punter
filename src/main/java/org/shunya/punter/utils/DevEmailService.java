@@ -1,6 +1,9 @@
 package org.shunya.punter.utils;
 
 import com.sun.mail.smtp.SMTPMessage;
+import org.shunya.PunterApp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -15,6 +18,8 @@ import java.util.List;
 import java.util.Properties;
 
 public class DevEmailService {
+    private static final Logger logger = LoggerFactory.getLogger(DevEmailService.class);
+
     private static DevEmailService emailService;
     private final Properties properties;
 
@@ -84,10 +89,10 @@ public class DevEmailService {
 //            transport.connect(properties.getProperty("mail.smtp.host"), properties.getProperty("mail.smtp.user"), properties.getProperty("mail.smtp.password"));
 //            transport.sendMessage(message, message.getAllRecipients());
 //            transport.close();
-//TODO - uncomment after testing
-//            Transport.send(message);
-            System.out.println("Email sent successfully....");
+            Transport.send(message);
+            logger.info("Email sent successfully....");
         } catch (MessagingException mex) {
+            logger.error("Error sending the email", mex);
             throw new RuntimeException(mex);
         }
     }
