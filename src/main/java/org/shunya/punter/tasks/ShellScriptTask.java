@@ -111,6 +111,7 @@ public class ShellScriptTask extends Tasks {
                     if (token.equalsIgnoreCase("f")) {
                         ps.flush();
                     } else if (token.equalsIgnoreCase("e")) {
+                        System.err.println("Sending Command : echo munish1234\r");
                         ps.print("echo munish1234\r");
                         ps.flush();
                         proxyOutputStream.waitForToken();

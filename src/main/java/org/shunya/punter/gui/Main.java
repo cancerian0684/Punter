@@ -53,7 +53,6 @@ public class Main implements PunterWindow{
             BufferedImage requiredImage;
             if (isBusy()) {
                 requiredImage = busyImage;
-
             } else if (!isConnected()) {
                 requiredImage = dsctImage;
             } else {
@@ -86,11 +85,11 @@ public class Main implements PunterWindow{
 
     private void createAndShowGUI() throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        try {
+        /*try {
             globalHotKeyListener = new GlobalHotKeyListener();
         } catch (Throwable t) {
             t.printStackTrace();
-        }
+        }*/
         getAndSetUsername();
         KBFrame = new JFrame("Search");
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -115,7 +114,7 @@ public class Main implements PunterWindow{
         PunterGuiFrame = new JFrame("My Personal Assistant");
         PunterGuiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         punterGUI = new PunterGUI(dbService, punterService);
-        punterGUI.setGlobalHotKeyListener(globalHotKeyListener);
+//        punterGUI.setGlobalHotKeyListener(globalHotKeyListener);
         PunterGuiFrame.setContentPane(punterGUI);
 
         PunterGuiFrame.addWindowListener(new java.awt.event.WindowAdapter() {
