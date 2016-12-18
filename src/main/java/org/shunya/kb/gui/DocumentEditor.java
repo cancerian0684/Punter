@@ -1,6 +1,6 @@
 package org.shunya.kb.gui;
 
-import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.*;
 import org.hibernate.StaleStateException;
 import org.shunya.kb.model.Attachment;
 import org.shunya.kb.model.Document;
@@ -93,8 +93,27 @@ public class DocumentEditor extends JFrame {
         try {
             editor.setTitle(doc.getId() + "-" + doc.getTitle().substring(0, doc.getTitle().length() > 40 ? 40 : doc.getTitle().length()));
             editor.textField.setText(doc.getTitle());
-            editor.jTextPane.setText(editor.asciidoctor.convert(new String(doc.getContent(), "UTF-8"), Collections.emptyMap()));
+
+            String[] attributesArray = new String[]{"toc", "source-highlighter=prettify"};
+            Attributes attributes = AttributesBuilder.attributes()
+                    .attributes(attributesArray)
+                    .tableOfContents(true)
+                    .linkCss(true)
+                    .sourceLanguage("java")
+                    .sourceHighlighter("prettify")
+                    .sectionNumbers(true)
+                    .get();
+
+            Options asciiDoctorOptions = OptionsBuilder.options()
+                    .headerFooter(true)
+                    .backend("html5")
+                    .attributes(attributes)
+                    .get();
+
+            String convert = editor.asciidoctor.render(new String(doc.getContent(), "UTF-8"), asciiDoctorOptions);
+            editor.jTextPane.setText(convert);
             editor.jTextPane.setCaretPosition(0);
+            System.out.println("convert = " + convert);
         } catch (IOException e) {
             e.printStackTrace();
             editor.jTextPane.setText("unable to parse the markdown syntax");
