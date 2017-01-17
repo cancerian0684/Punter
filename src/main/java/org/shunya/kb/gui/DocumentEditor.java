@@ -35,6 +35,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigInteger;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.security.MessageDigest;
@@ -98,10 +99,12 @@ public class DocumentEditor extends JFrame {
             Attributes attributes = AttributesBuilder.attributes()
                     .attributes(attributesArray)
                     .tableOfContents(true)
-                    .linkCss(true)
+                    .linkCss(false)
                     .sourceLanguage("java")
                     .sourceHighlighter("prettify")
                     .sectionNumbers(true)
+                    .iconFontCdn(URI.create("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"))
+                    .icons("font")
                     .get();
 
             Options asciiDoctorOptions = OptionsBuilder.options()
@@ -110,9 +113,12 @@ public class DocumentEditor extends JFrame {
                     .attributes(attributes)
                     .get();
 
+            long t1= System.currentTimeMillis();
             String convert = editor.asciidoctor.render(new String(doc.getContent(), "UTF-8"), asciiDoctorOptions);
             editor.jTextPane.setText(convert);
             editor.jTextPane.setCaretPosition(0);
+            long t2= System.currentTimeMillis();
+            System.out.println("Time taken to convert document = "+(t2-t1)+"ms");
             System.out.println("convert = " + convert);
         } catch (IOException e) {
             e.printStackTrace();
