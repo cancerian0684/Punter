@@ -104,7 +104,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         if (AppSettings.getInstance().getObject("runningProcessTable") != null)
             GUIUtils.initilializeTableColumns(runningProcessTable, (List) AppSettings.getInstance().getObject("runningProcessTable"));
         else
-            GUIUtils.initilializeTableColumns(runningProcessTable, (List)runningProcessTableModel.width);
+            GUIUtils.initilializeTableColumns(runningProcessTable, (List) runningProcessTableModel.width);
         runningProcessTable.getColumn("<html><b>Completed").setCellRenderer(new ProgressRenderer(runningProcessTable));
         runningProcessTable.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(KeyEvent e) {
@@ -153,7 +153,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     if (((MouseEvent) e).getClickCount() == 1 && this.isRowSelected(row)) {
                         return false;
                     }
-                    if (mEvent.getClickCount() == 2) {
+                    if (mEvent.getClickCount() == 2 && runningTaskTable.getSelectedRow() != -1) {
                         RunningTaskTableModel phtm = ((RunningTaskTableModel) runningTaskTable.getModel());
                         TaskHistory taskHistory = (TaskHistory) phtm.getRow(runningTaskTable.convertRowIndexToModel(runningTaskTable.getSelectedRow())).get(0);
                         if (taskHistory.getLogs() != null) {
@@ -167,7 +167,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                             }
                         } else {
                             final Tasks task = taskHistory.getTasks();
-                            if(task!=null && task.getHosts()!=null && !task.getHosts().isEmpty()){
+                            if (task != null && task.getHosts() != null && !task.getHosts().isEmpty()) {
                                 try {
                                     LogWindow logWindow = new LogWindow(10000, taskHistory.getTask().getName());
                                     logWindow.log(task.getRemoteLog(taskHistory.getId()), Level.ALL);
@@ -963,7 +963,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                         }
                         //populate task table
                         List<TaskData> taskList = dbService.getProcessTasksById(procId);
-                        taskList = taskList.stream().filter(task ->task.isActive() == AppSettings.getInstance().isShowActiveTasks() || task.isActive() == true).collect(toList());
+                        taskList = taskList.stream().filter(task -> task.isActive() == AppSettings.getInstance().isShowActiveTasks() || task.isActive() == true).collect(toList());
                         ProcessData process = dbService.getProcess(procId);
                         TaskTableModel model = (TaskTableModel) taskTable.getModel();
                         model.clearTable();
@@ -1427,7 +1427,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
                     e.printStackTrace();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
-                }finally {
+                } finally {
                     processRunMessage.markDone();
                 }
             }
@@ -1557,16 +1557,16 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
 
     private void initColumnSizesOutputParamTable() {
         if (AppSettings.getInstance().getObject("outputParamTable") != null)
-            GUIUtils.initilializeTableColumns(outputParamTable, (List)AppSettings.getInstance().getObject("outputParamTable"));
+            GUIUtils.initilializeTableColumns(outputParamTable, (List) AppSettings.getInstance().getObject("outputParamTable"));
         else
-            GUIUtils.initilializeTableColumns(outputParamTable, (List)OutputParamTableModel.width);
+            GUIUtils.initilializeTableColumns(outputParamTable, (List) OutputParamTableModel.width);
     }
 
     private void initColumnSizesInputParamTable() {
         if (AppSettings.getInstance().getObject("inputParamTable") != null)
             GUIUtils.initilializeTableColumns(inputParamTable, (List) AppSettings.getInstance().getObject("inputParamTable"));
         else
-            GUIUtils.initilializeTableColumns(inputParamTable, (List)InputParamTableModel.width);
+            GUIUtils.initilializeTableColumns(inputParamTable, (List) InputParamTableModel.width);
     }
 
     public void setUpSportColumn(JTable table, TableColumn sportColumn) {
