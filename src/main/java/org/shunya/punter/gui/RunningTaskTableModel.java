@@ -197,7 +197,7 @@ public class RunningTaskTableModel extends AbstractTableModel {
         super.fireTableDataChanged();
     }
 
-    public synchronized void refreshTable() {
+    public void refreshTable() {
         super.fireTableDataChanged();
         /*for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getColumnCount(); j++) {
