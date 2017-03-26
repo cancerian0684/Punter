@@ -21,7 +21,7 @@ spring:
      show-sql: false
      database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
      hibernate:
-       ddl-auto: update
+       ddl-auto: none
        use-new-id-generator-mappings: true
 #     properties:
 #        javax.persistence.sharedCache.mode: ALL
@@ -165,7 +165,7 @@ ribbon:
   MaxAutoRetriesNextServer: 2
 
 server:
-  port: 8999
+  port: 8989
   compression:
     enabled: true
   display-name: Shunya eLearning App
