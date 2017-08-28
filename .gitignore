@@ -1,4 +1,7 @@
 target/
+.idea/
+build/
+out/
 
 ### Java template
 *.class
