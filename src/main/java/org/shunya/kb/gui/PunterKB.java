@@ -141,7 +141,7 @@ public class PunterKB extends JPanel {
                                                 e1.printStackTrace();
                                             }
                                         } else {
-                                            if(doc.getContent()==null) {
+                                            if (doc.getContent() == null) {
                                                 JOptionPane.showMessageDialog(Main.KBFrame, "Probably document is deleted from DB");
                                                 return false;
                                             } else {
@@ -284,7 +284,7 @@ public class PunterKB extends JPanel {
                 final List<File> files = new java.util.ArrayList<>();
                 for (int selectedRow : selectedRows) {
                     DocumentTableModel dtm = (DocumentTableModel) searchResultTable.getModel();
-                    Document doc =  dtm.getRow(searchResultTable.convertRowIndexToModel(selectedRow));
+                    Document doc = dtm.getRow(searchResultTable.convertRowIndexToModel(selectedRow));
                     doc = dbService.getDocument(doc.getId());
                     if (doc != null) {
                         //Punter Doc
@@ -728,28 +728,26 @@ public class PunterKB extends JPanel {
         thread.setName("Background.Document.Listener");
         thread.start();
 
-        Thread uploadScanner = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                updateUploadsCache();
-                Path dir = Paths.get("uploads");
-                try {
-                    new WatchDir(dir, false, new WatchDir.FileObserver() {
-                        @Override
-                        public void notify(Path path) {
-                            updateUploadsCache();
-                        }
-                    }, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE).processEvents();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        Path dir = Paths.get("uploads");
+        Thread uploadScanner = new Thread(() -> {
+            updateUploadsCache(dir);
+            try {
+                new WatchDir(dir, false, new WatchDir.FileObserver() {
+                    @Override
+                    public void notify(Path path) {
+                        updateUploadsCache(dir);
+                    }
+                }, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE).processEvents();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
-        uploadScanner.start();
+        if (dir.toFile().exists()) {
+            uploadScanner.start();
+        }
     }
 
-    private void updateUploadsCache() {
-        Path dir = Paths.get("uploads");
+    private void updateUploadsCache(Path dir) {
         try {
             System.out.println("Deleting all for category");
             dbService.deleteAllForCategory("/all/uploads");
