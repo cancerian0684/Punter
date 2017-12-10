@@ -60,6 +60,7 @@ public class ShellScriptTask extends Tasks {
             getObserver().update(getTaskHistory());
 
             Session session = jsch.getSession(username, hostname, port);
+            session.setConfig("StrictHostKeyChecking", "no");
             if (password != null && !password.isEmpty())
                 session.setPassword(password);
 
@@ -111,8 +112,8 @@ public class ShellScriptTask extends Tasks {
                     if (token.equalsIgnoreCase("f")) {
                         ps.flush();
                     } else if (token.equalsIgnoreCase("e")) {
-                        System.err.println("Sending Command : echo munish1234\r");
-                        ps.print("echo munish1234\r");
+                        System.err.println("Sending Command : echo munish1234");
+                        ps.println("echo munish1234");
                         ps.flush();
                         proxyOutputStream.waitForToken();
                     } else if (token.startsWith("e ")) {
@@ -122,7 +123,7 @@ public class ShellScriptTask extends Tasks {
                         }
                         proxyOutputStream.waitForToken();
                     } else if (token.toLowerCase().startsWith("e-")) {
-                        ps.print("echo munish1234\r");
+                        ps.println("echo munish1234");
                         ps.flush();
                         proxyOutputStream.waitForToken();
                     } else {
@@ -130,18 +131,19 @@ public class ShellScriptTask extends Tasks {
                             int sleep = Integer.parseInt(token);
                             TimeUnit.SECONDS.sleep(sleep);
                         } catch (Exception e) {
-                            System.err.println("Sending Command : " + token + "\r");
+                            System.err.println("Sending Command : " + token);
                             getTaskHistory().setActivity(token);
                             getObserver().update(getTaskHistory());
-                            ps.print(token + "\r");
+                            ps.println(token);
                         }
                     }
                 }
             }
             stk.close();
-//            ps.print("exit\r");
-//            ps.flush();
+            ps.println("exit");
+            ps.flush();
             TimeUnit.SECONDS.sleep(3);
+            channel.getExitStatus();
             session.disconnect();
             channel.disconnect();
             getTaskHistory().setActivity("Disconnected from Channel.");
