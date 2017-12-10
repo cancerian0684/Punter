@@ -1,5 +1,7 @@
 #debug: true
 
+shunya_home: ${user.home}/shunya
+
 spring:
   application:
     name: shunya-punter
@@ -108,7 +110,7 @@ logging:
       com.shunya: DEBUG
       org.hibernate: ERROR
 #      org.hibernate.type: TRACE
-    file: logs/${spring.application.name}.log
+    file: ${shunya_home}/logs/${spring.application.name}.log
 #    file: ${java.io.tmpdir}/${spring.application.name}.log
 
 #http://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html
@@ -176,10 +178,9 @@ server:
 
 custom:
   static:
-      path:
+      path: ${shunya_home}/punter/static
 
-file.store.path: C:/Munish
-
+lucene.index.path: ${shunya_home}/punter/lucene_index
 
 ---
 

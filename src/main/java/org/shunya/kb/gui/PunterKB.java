@@ -35,7 +35,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
-import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static org.asciidoctor.Asciidoctor.Factory.create;
 
 public class PunterKB extends JPanel {
@@ -728,23 +728,18 @@ public class PunterKB extends JPanel {
         thread.setName("Background.Document.Listener");
         thread.start();
 
-        Path dir = Paths.get("uploads");
+        /*Path dir = Paths.get("uploads");
         Thread uploadScanner = new Thread(() -> {
             updateUploadsCache(dir);
             try {
-                new WatchDir(dir, false, new WatchDir.FileObserver() {
-                    @Override
-                    public void notify(Path path) {
-                        updateUploadsCache(dir);
-                    }
-                }, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE).processEvents();
+                new WatchDir(dir, false, path -> updateUploadsCache(dir), ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE).processEvents();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
         if (dir.toFile().exists()) {
             uploadScanner.start();
-        }
+        }*/
     }
 
     private void updateUploadsCache(Path dir) {

@@ -20,22 +20,25 @@ import org.shunya.kb.model.Attachment;
 import org.shunya.kb.model.Document;
 import org.shunya.server.PunterTextExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.file.FileSystems;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Service
 public class LuceneIndexService {
-    static final File INDEX_DIR = FileSystems.getDefault().getPath(System.getProperty("user.home")).resolve("LuceneIndex").toFile();
     private Directory directory;
     private IndexWriter indexWriter;
     private Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_48);
-    private final QueryParser parser1;
-    private final QueryParser parser2;
+    private QueryParser parser1;
+    private QueryParser parser2;
+
+    @Value("${lucene.index.path}")
+    private String indexPath;
 
     private SearcherManager searcherManager;
     @Autowired
@@ -217,9 +220,10 @@ public class LuceneIndexService {
         }
     }
 
-    private LuceneIndexService() {
+    @PostConstruct
+    public void initialize() {
         try {
-            directory = NIOFSDirectory.open(INDEX_DIR);
+            directory = NIOFSDirectory.open(Paths.get(indexPath).toFile());
             directory.clearLock("write.lock");
             Analyzer analyzer = new EnglishAnalyzer(Version.LUCENE_48);
             IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_48, analyzer);
