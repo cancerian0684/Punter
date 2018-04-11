@@ -71,7 +71,7 @@ public class ShellScriptTask extends Tasks {
             // session.setConfig("StrictHostKeyChecking", "no");
 
             //session.connect();
-            session.connect(30000);   // making a connection with timeout.
+            session.connect(60000);   // making a connection with timeout.
 
             Channel channel = session.openChannel("shell");
 
@@ -93,7 +93,7 @@ public class ShellScriptTask extends Tasks {
 //	      channel.setInputStream(pipeIn);
             channel.setInputStream(pipeIn);
             ((ChannelShell) channel).setPtyType("vt102");
-            channel.connect(5 * 1000);
+            channel.connect(6 * 1000);
 
 //          MyThread t = new MyThread(in, LOGGER.get());
 //	      t.setDaemon(true);

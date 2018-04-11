@@ -1,12 +1,12 @@
 buildscript {
     ext['logback.version'] = '1.2.3'
     ext['hibernate.version'] = '5.2.12.Final'
-    ext['jackson.version'] = '2.9.4'
+    ext['jackson.version'] = '2.9.5'
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.10.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.12.RELEASE")
     }
 }
 
@@ -102,5 +102,5 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.5.1'
+    gradleVersion = '4.6'
 }
