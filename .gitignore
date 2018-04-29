@@ -2,6 +2,7 @@ target/
 .idea/
 build/
 out/
+logs/
 
 ### Java template
 *.class
