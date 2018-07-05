@@ -14,14 +14,14 @@ spring:
 
 #Hibernate Framework
   datasource:
-      driverClassName: com.mysql.jdbc.Driver
+#      driverClassName: com.mysql.jdbc.Driver
       url: jdbc:mysql://localhost/punter?useUnicode=true&characterEncoding=UTF-8&createDatabaseIfNotExist=true&autoReconnect=true&useSSL=false
       username: root
       password: password
 
   jpa:
      show-sql: false
-     database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
+     database-platform: org.hibernate.dialect.MySQL5Dialect
      hibernate:
        ddl-auto: none
        use-new-id-generator-mappings: true

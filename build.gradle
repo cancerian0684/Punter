@@ -1,12 +1,12 @@
 buildscript {
     ext['logback.version'] = '1.2.3'
-    ext['hibernate.version'] = '5.2.17.Final'
-    ext['jackson.version'] = '2.9.5'
+    ext['hibernate.version'] = '5.3.1.Final'
+    ext['jackson.version'] = '2.9.6'
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.13.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.14.RELEASE")
     }
 }
 
@@ -63,7 +63,7 @@ dependencies {
     compile group: 'org.apache.lucene', name: 'lucene-highlighter', version: '4.10.4'
     compile group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '4.10.4'
 
-    compile 'org.asciidoctor:asciidoctorj:1.5.6'
+    compile 'org.asciidoctor:asciidoctorj:1.5.7'
     // https://mvnrepository.com/artifact/org.pegdown/pegdown
 //    compile group: 'org.pegdown', name: 'pegdown', version: '1.6.0'
 // https://mvnrepository.com/artifact/com.jcraft/jsch
@@ -93,7 +93,8 @@ dependencies {
     // https://mvnrepository.com/artifact/net.htmlparser.jericho/jericho-html
     compile group: 'net.htmlparser.jericho', name: 'jericho-html', version: '3.4'
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
-    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.40'
+//    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.40'
+    runtime('mysql:mysql-connector-java')
 
     // https://mvnrepository.com/artifact/com.melloware/jintellitype
     compile group: 'com.melloware', name: 'jintellitype', version: '1.3.9'
@@ -102,5 +103,5 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+    gradleVersion = '4.7'
 }
