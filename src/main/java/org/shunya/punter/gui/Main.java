@@ -11,9 +11,7 @@ import org.shunya.server.component.DBService;
 import org.shunya.server.component.PunterService;
 import org.shunya.server.component.SynonymService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.*;
 
-import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -123,8 +121,9 @@ public class Main implements PunterWindow{
             }
 
             public void windowClosing(WindowEvent e) {
+                PunterGuiFrame.setExtendedState(Frame.ICONIFIED);
                 //setVisible(false);
-                PunterGuiFrame.dispose();
+//                PunterGuiFrame.dispose();
 //	        			displayMsg("Assistant has been minimized to System Tray",TrayIcon.MessageType.INFO);
             }
         });
@@ -316,6 +315,8 @@ public class Main implements PunterWindow{
                 logger.log(Level.WARNING, "TrayIcon could not be added.");
             }
         } else {
+            PunterGuiFrame.setVisible(true);
+            PunterGuiFrame.setExtendedState(Frame.NORMAL);
             //  System Tray is not supported
         }
         timer.start();
