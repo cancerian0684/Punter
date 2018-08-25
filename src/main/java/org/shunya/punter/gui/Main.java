@@ -17,7 +17,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -121,7 +120,16 @@ public class Main implements PunterWindow{
             }
 
             public void windowClosing(WindowEvent e) {
-                PunterGuiFrame.setExtendedState(Frame.ICONIFIED);
+                int option = JOptionPane.showConfirmDialog(PunterGuiFrame, "Exit Punter?", "Confirm Exit", JOptionPane.OK_CANCEL_OPTION);
+                if (option == JOptionPane.OK_OPTION) {
+                    AppSettings.getInstance().setKBFrameLocationPoint(new PunterPoint(KBFrame.getLocation().getX(), KBFrame.getLocation().getY()));
+                    AppSettings.getInstance().setKBFrameDimension(new PunterDimension(KBFrame.getSize().getWidth(), KBFrame.getSize().getHeight()));
+                    AppSettings.getInstance().setPunterGuiLocationPoint(new PunterPoint(PunterGuiFrame.getLocation()));
+                    logger.log(Level.INFO, "Removing tray icon : " + KBFrame.getSize());
+                    Launcher.programQuit();
+                }
+//                PunterGuiFrame.setExtendedState(Frame.ICONIFIED);
+
                 //setVisible(false);
 //                PunterGuiFrame.dispose();
 //	        			displayMsg("Assistant has been minimized to System Tray",TrayIcon.MessageType.INFO);
@@ -156,8 +164,6 @@ public class Main implements PunterWindow{
                 dsctImage = ImageIO.read(PunterGUI.class.getResource("/images/punter_idle.png"));
                 PunterGuiFrame.setIconImage(busyImage);
                 KBFrame.setIconImage(busyImage);
-            } catch (IOException e) {
-                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
