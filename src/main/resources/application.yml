@@ -47,10 +47,10 @@ spring:
           enabled: true
           cache: true
           html-application-cache: true
-      cache-period: 36000000
+      cache:
+        period: 360d
 
-
-#  thymeleaf:
+  #  thymeleaf:
 #       cache: false
 #       mode: LEGACYHTML5
 #       suffix: .html
@@ -93,12 +93,22 @@ spring:
 
   jackson:
       default-property-inclusion: non_null
-  http:
+
+  servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+      file-size-threshold: 10MB
       enabled: true
-      file-size-threshold: 1MB
+  security:
+    user:
+      password: none
+  main:
+    allow-bean-definition-overriding: true
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: default
 
 #Logging Framework
 logging:
@@ -116,8 +126,7 @@ logging:
 #http://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html
 
 security:
-  user:
-    password: none
+
   oauth2:
     client:
       accessTokenUri: http://localhost:8999/uaa/oauth/token
@@ -170,11 +179,12 @@ server:
   port: 8989
   compression:
     enabled: true
-  display-name: Shunya eLearning App
   undertow:
       io-threads: 3
       worker-threads: 5
   error.whitelabel.enabled: false
+  servlet:
+    application-display-name: Shunya eLearning App
 
 custom:
   static:

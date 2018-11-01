@@ -3,7 +3,7 @@ package org.shunya.server.component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import org.apache.commons.io.IOUtils;
-import org.hibernate.*;
+import org.hibernate.Hibernate;
 import org.shunya.kb.gui.SearchQuery;
 import org.shunya.kb.model.*;
 import org.shunya.punter.gui.AppSettings;
@@ -12,7 +12,10 @@ import org.shunya.punter.gui.SingleInstanceFileLock;
 import org.shunya.punter.jpa.*;
 import org.shunya.punter.utils.ClipBoardListener;
 import org.shunya.punter.utils.FieldPropertiesMap;
-import org.shunya.server.*;
+import org.shunya.server.ClipboardPunterMessage;
+import org.shunya.server.PunterMessage;
+import org.shunya.server.PunterProcessRunMessage;
+import org.shunya.server.SessionFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -282,7 +285,7 @@ public class DBService {
         SearchResult searchResult = luceneIndexService.search("*", category, true, 0, 100);
         for (Document document : searchResult.getDocuments()) {
             System.out.println("Deleting document - " + document);
-            documentRepository.delete(document.getId());
+            documentRepository.deleteById(document.getId());
             luceneIndexService.deleteIndexForDoc(document.getId());
         }
         long t2 = System.currentTimeMillis();
@@ -303,7 +306,7 @@ public class DBService {
     }
 
     public Document getDocument(Long id) {
-        final Document document = documentRepository.findOne(id);
+        final Document document = documentRepository.findById(id).get();
         Hibernate.initialize(document.getContent());
         return document;
     }
@@ -348,21 +351,21 @@ public class DBService {
     }
 
     public Attachment getAttachment(Attachment doc) {
-        return attachmentRepository.findOne(doc.getId());
+        return attachmentRepository.findById(doc.getId()).get();
     }
 
     public boolean deleteAttachment(long id) throws RemoteException {
-        final Attachment attachment = attachmentRepository.findOne(id);
+        final Attachment attachment = attachmentRepository.findById(id).get();
         attachment.getDocument().getAttachments().remove(attachment);
-        attachmentRepository.delete(attachment.getId());
+        attachmentRepository.deleteById(attachment.getId());
 
-        final Document document = documentRepository.findOne(attachment.getDocument().getId());
+        final Document document = documentRepository.findById(attachment.getDocument().getId()).get();
         luceneIndexService.indexDocs(document);
         return true;
     }
 
     public boolean deleteDocument(final Document document) {
-        final Document one = documentRepository.findOne(document.getId());
+        final Document one = documentRepository.findById(document.getId()).get();
         luceneIndexService.deleteIndexForDoc(one.getId());
         return true;
     }
@@ -374,7 +377,7 @@ public class DBService {
                 FieldPropertiesMap inProp = org.shunya.punter.tasks.Process.listInputParams();
                 processData.setInputParams(inProp);
                 try {
-                    ProcessData tmp = processDataRepository.findOne(processData.getId());
+                    ProcessData tmp = processDataRepository.findById(processData.getId()).get();
                     tmp.setInputParams(processData.getInputParams());
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -392,7 +395,7 @@ public class DBService {
             cal.set(cal.DATE, cal.get(cal.DATE) - days);
             final List<ProcessHistory> histories = processHistoryRepository.findByStartTimeLessThan(cal.getTime());
             for (ProcessHistory processHistory : histories) {
-                processHistoryRepository.delete(processHistory.getId());
+                processHistoryRepository.deleteById(processHistory.getId());
                 counter.incrementAndGet();
                 System.out.println("Removed : " + processHistory.getId());
             }
@@ -412,7 +415,7 @@ public class DBService {
     }
 
     public boolean deleteCategory(long id) throws RemoteException {
-        categoryRepository.delete(id);
+        categoryRepository.deleteById(id);
         return true;
     }
 
@@ -459,7 +462,7 @@ public class DBService {
     }
 
     public void removeTask(TaskData task) {
-        TaskData tmp = taskDataRepository.findOne(task.getId());
+        TaskData tmp = taskDataRepository.findById(task.getId()).get();
         tmp.getProcess().getTaskList().remove(tmp);
         taskDataRepository.delete(tmp);
     }
@@ -469,7 +472,7 @@ public class DBService {
     }
 
     public void saveTaskHistory(TaskHistory th) {
-        final TaskHistory taskHistory = taskHistoryRepository.findOne(th.getId());
+        final TaskHistory taskHistory = taskHistoryRepository.findById(th.getId()).get();
         taskHistory.setRunState(th.getRunState());
         taskHistory.setRunStatus(th.getRunStatus());
         taskHistory.setSequence(th.getSequence());
@@ -480,7 +483,7 @@ public class DBService {
     }
 
     public void saveProcessHistory(ProcessHistory procHistory) {
-        final ProcessHistory ph = processHistoryRepository.findOne(procHistory.getId());
+        final ProcessHistory ph = processHistoryRepository.findById(procHistory.getId()).get();
         ph.setRunState(procHistory.getRunState());
         ph.setRunStatus(procHistory.getRunStatus());
         ph.setStartTime(procHistory.getStartTime());
@@ -490,7 +493,7 @@ public class DBService {
     }
 
     public TaskData saveTask(TaskData t) {
-        final TaskData tmp = taskDataRepository.findOne(t.getId());
+        final TaskData tmp = taskDataRepository.findById(t.getId()).get();
         //			em.lock(tmp, LockModeType.READ);
         tmp.setActive(t.isActive());
         tmp.setAuthor(t.getAuthor());
@@ -512,7 +515,7 @@ public class DBService {
     }
 
     public ProcessData saveProcess(ProcessData p) {
-        final ProcessData tmp = processDataRepository.findOne(p.getId());
+        final ProcessData tmp = processDataRepository.findById(p.getId()).get();
         tmp.setName(p.getName());
         try {
             tmp.setInputParams(p.getInputParams());
@@ -554,15 +557,15 @@ public class DBService {
     }
 
     public ProcessData getProcess(long id) {
-        return processDataRepository.findOne(id);
+        return processDataRepository.findById(id).get();
     }
 
     public TaskHistory getTaskDao(TaskHistory td) {
-        return taskHistoryRepository.findOne(td.getId());
+        return taskHistoryRepository.findById(td.getId()).get();
     }
 
     public List<ProcessHistory> getProcessHistoryListForProcessId(long id) {
-        final ProcessData processData = processDataRepository.findOne(id);
+        final ProcessData processData = processDataRepository.findById(id).get();
         return processData.getProcessHistoryList();
     }
 
@@ -579,7 +582,7 @@ public class DBService {
 
 
     public ProcessHistory getProcessHistoryById(long id) {
-        return processHistoryRepository.findOne(id);
+        return processHistoryRepository.findById(id).get();
     }
 
     public List<TaskData> getProcessTasksById(long pid) {
@@ -597,7 +600,7 @@ public class DBService {
     }
 
     public void saveSynonym(SynonymWord word) {
-        final SynonymWord one = synonymWordRepository.findOne(word.getId());
+        final SynonymWord one = synonymWordRepository.findById(word.getId()).get();
         one.setWords(word.getWords());
     }
 
