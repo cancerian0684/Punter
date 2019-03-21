@@ -43,7 +43,7 @@ public class PunterApp implements CommandLineRunner{
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(3);
         executor.setMaxPoolSize(10);
-        executor.setQueueCapacity(10);
+        executor.setQueueCapacity(100);
         executor.setThreadNamePrefix("AsyncExec-");
         executor.initialize();
         return executor;
