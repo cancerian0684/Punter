@@ -13,7 +13,7 @@ public class NonRepeatingLetter {
 
     private static void findFirstNonRepeatingLetter(String s, Consumer<Character> callback) {
         s.chars()
-                .mapToObj(i -> Character.valueOf((char) i))
+                .mapToObj(i -> (char) i)
                 .collect(Collectors.groupingBy(identity(), LinkedHashMap::new, Collectors.counting()))
                 .entrySet().stream()
                 .filter(entry -> entry.getValue() == 1L)
