@@ -11,8 +11,8 @@ import org.shunya.server.PunterProcessRunMessage;
 import org.shunya.server.component.DBService;
 import org.shunya.server.component.PunterService;
 
-import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.xml.bind.*;
@@ -24,8 +24,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.*;
 import java.io.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -1644,12 +1644,11 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
             } catch (JAXBException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
-                    row, column);
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
 
         public void setValue(Object value) {
-            setText((value.toString().isEmpty()) ? "---" : value.toString());
+            setText((value == null || value.toString().isEmpty()) ? "---" : value.toString());
         }
     }
 
@@ -1811,7 +1810,7 @@ public class PunterGUI extends JPanel implements TaskObserver, Observer {
         }
 
         public void setValue(Object value) {
-            setText((value.toString().isEmpty()) ? "---" : value.toString());
+            setText((value == null || value.toString().isEmpty()) ? "---" : value.toString());
         }
     }
 }
